@@ -19,7 +19,13 @@
 
 <body ng-app="companyListing">
       <section ng-view class="main-section"></section>
-
+      <% if ( user ) { %>
+          <h2>Hello <%=user%> </h2>
+          <a href="/logout">Logout</a>
+      <% } else { %>
+          <a href="/register">Register</a>
+          <a href="/login">Login</a>
+      <% } %>
       <script type="text/javascript">
           window.user = <%- user || 'null' %>;
       </script>
