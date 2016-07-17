@@ -26,8 +26,14 @@ module.exports = function() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-	require('../app/routes/index.server.routes.js')(app);
+	require('../app/routes/checkins.server.routes.js')(app);
 	require('../app/routes/companies.server.routes.js')(app);
+	require('../app/routes/customers.server.routes.js')(app);
+	require('../app/routes/favorites.server.routes.js')(app);
+	require('../app/routes/index.server.routes.js')(app);
+	require('../app/routes/loyalties.server.routes.js')(app);
+	require('../app/routes/reviews.server.routes.js')(app);
+	require('../app/routes/sites.server.routes.js')(app);
 	require('../app/routes/users.server.routes.js')(app);
 
 	app.use(express.static('./public'));

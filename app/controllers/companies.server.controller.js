@@ -34,8 +34,7 @@ exports.companyById=function(req,res,next,id) {
 			req.company=company;
 			next();
 		}
-	}
-	);
+	});
 };
 
 exports.update=function(req,res,next) {
