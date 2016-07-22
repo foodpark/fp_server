@@ -35,7 +35,8 @@ exports.siteById=function(req,res,next,id) {
 	});
 };
 exports.listSitesForCompany=function(req,res,next,companyId) {
-	Site.find({'company':companyId}, function(err,sites) {
+	Site.find({'company':companyId}).populate('company')
+	.exec(function(err,sites) {
 		if (err) {
 			return next(err);
 		} else {

@@ -1,9 +1,11 @@
 var User = require('mongoose').model('User'),
+    Company = require('mongoose').model('Company'),
+    Customer = require('mongoose').model('Customer'),
     passport = require('passport');
 
 var getErrorMessage = function(err) {
     var message = '';
-    if (err.code) {
+    if (err && err.code) {
         switch (err.code) {
             case 11000:
             case 11001:
@@ -35,10 +37,22 @@ exports.renderLogin = function(req, res, next) {
     }
 };
 
-exports.renderRegister = function(req, res, next) {
+exports.renderRegisterCompany = function(req, res, next) {
     if (!req.user) {
-        res.render('register', {
-            title: 'Register Form',
+        res.render('register-company', {
+            title: 'Register Company',
+            messages: req.flash('error')
+        });
+    }
+    else {
+        return res.redirect('/companies');
+    }
+};
+
+exports.renderRegisterCustomer = function(req, res, next) {
+    if (!req.user) {
+        res.render('register-customer', {
+            title: 'Register Customer',
             messages: req.flash('error')
         });
     }
@@ -47,22 +61,76 @@ exports.renderRegister = function(req, res, next) {
     }
 };
 
-exports.register = function(req, res, next) {
+exports.registerCompany = function(req, res, next) {
     if (!req.user) {
         var user = new User(req.body);
+        // Crete SFEZ company
+        var company = new Company();
+        //todo: Create Moltin company
+
+        console.log(req.body);
+        company.name = req.body.companyname;
+        company.user = user;
         var message = null;
+        user.type = "company";
+        user.typeId = company.id;
         user.provider = 'local';
         user.save(function(err) {
             if (err) {
                 var message = getErrorMessage(err);
                 req.flash('error', message);
-                return res.redirect('/register');
-            }
-
+                return res.redirect('/register-company');
+            };
+            company.save(function (err) {
+                if (err) {
+                  console.log(err);
+                  User.remove(user, function(err) {
+                    if (err) console.log(err);
+                  });
+                  return next(err);
+                }
+            });
             req.login(user, function(err) {
-                if (err)
-                    return next(err);
+                if (err) {return next(err);}
+                return res.redirect('/');
+            });
+        });
+    }
+    else {
+        return res.redirect('/');
+    }
+};
 
+exports.registerCustomer = function(req, res, next) {
+    if (!req.user) {
+        var user = new User(req.body);
+        // Crete SFEZ consumer
+        var customer = new Customer();
+
+        console.log(req.body);
+        customer.name = user.name;
+        customer.user = user;
+        var message = null;
+        user.type = "customer";
+        user.typeId = customer.id;
+        user.provider = 'local';
+        user.save(function(err) {
+            if (err) {
+                var message = getErrorMessage(err);
+                req.flash('error', message);
+                return res.redirect('/register-customer');
+            };
+            customer.save(function (err) {
+                if (err) {
+                  console.log(err);
+                  User.remove(user, function(err) {
+                    if (err) console.log(err);
+                  });
+                  return next(err);
+                }
+            });
+            req.login(user, function(err) {
+                if (err) {return next(err);}
                 return res.redirect('/');
             });
         });

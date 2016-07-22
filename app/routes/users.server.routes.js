@@ -8,9 +8,13 @@ module.exports = function(app) {
 
     app.param('userId', users.userByID);
 
-    app.route('/register')
-        .get(users.renderRegister)
-        .post(users.register);
+    app.route('/register-company')
+        .get(users.renderRegisterCompany)
+        .post(users.registerCompany);
+
+    app.route('/register-customer')
+        .get(users.renderRegisterCustomer)
+        .post(users.registerCustomer);
 
     app.route('/login')
         .get(users.renderLogin)
@@ -19,6 +23,7 @@ module.exports = function(app) {
             failureRedirect: '/login',
             failureFlash: true
         }));
+
 
     app.get('/logout', users.logout);
 

@@ -2,10 +2,10 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 var CompanySchema = new Schema ({
-    companyName:String,
-    companyOrderSysId:String,
-    companySlug:String,
-    companyDefaultCategory:String,
+    name:String,
+    orderSysId:String,
+    baseSlug:String,
+    defaultCategoryId:String,
     description:String,
     email:String,
     facebook:String,
@@ -23,6 +23,10 @@ var CompanySchema = new Schema ({
       _id:false,
       text:String
     }],
+    user: {
+      type: Schema.ObjectId,
+      ref: 'User'
+    },
     created: {
         type: Date,
         default: Date.now

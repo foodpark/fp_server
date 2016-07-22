@@ -4,4 +4,5 @@ module.exports=function(app) {
 	app.route('/companies').post(companies.create).get(companies.list);
 	app.route('/companies/:companyId').get(companies.read).put(companies.update);
 	app.param('companyId',companies.companyById);
+	app.route('/companies/:companyId/tags').post(companies.addTag);
 };

@@ -9,6 +9,7 @@
     "express-params": "0.0.3",
     "express-session": "^1.14.0",
     "gulp": "latest",
+    "moltin": "^1.0.0",
     "mongoose": "^4.5.3",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",

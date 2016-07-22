@@ -1,5 +1,5 @@
 var appName = 'companyListing';
-var app = angular.module(appName, ['ngResource', 'ngRoute', 'example', 'users']);
+var app = angular.module(appName, ['ngResource', 'ngRoute', 'users', 'companies']);
 
 app.config(['$locationProvider', function($locationProvider) {
         $locationProvider.hashPrefix('!');

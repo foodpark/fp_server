@@ -7,6 +7,7 @@ var config = require('./config'),
 
 module.exports = function() {
 	var app = express();
+  app.use(express.static('./public'));
 
 	app.use(bodyParser.urlencoded({
 		extended: true
@@ -35,8 +36,6 @@ module.exports = function() {
 	require('../app/routes/reviews.server.routes.js')(app);
 	require('../app/routes/sites.server.routes.js')(app);
 	require('../app/routes/users.server.routes.js')(app);
-
-	app.use(express.static('./public'));
 
 	return app;
 }

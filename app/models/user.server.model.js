@@ -11,6 +11,8 @@ var UserSchema = new Schema({
         unique: true
     },
     password: String,
+    type: String,
+    typeId: String,
     provider: String,
     providerId: String,
     providerData: {},

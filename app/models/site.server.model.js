@@ -12,7 +12,7 @@ var SiteSchema = new Schema ({
     password:String, //encrypted hash
     schedule:String,
     company: {
-      type:Schema.ObjectId,
+      type: Schema.ObjectId,
       ref: 'Company'
     },
     location: {
