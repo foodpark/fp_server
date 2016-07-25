@@ -21,11 +21,10 @@
       <section ng-view class="main-section"></section>
       <% if ( user ) { %>
           <h2>Hello <%=user%> </h2>
-          <a href="/logout">Logout</a>
+          <a href="/auth/logout">Logout</a>
       <% } else { %>
-          <a href="/register-company">Register a Company</a>
-          <a href="/register-customer">Register as a Customer</a>
-          <a href="/login">Login</a>
+          <a href="/auth/register">Register</a>
+          <a href="/auth/login">Login</a>
       <% } %>
       <script type="text/javascript">
           window.user = <%- user || 'null' %>;

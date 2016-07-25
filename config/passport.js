@@ -3,6 +3,7 @@ var passport = require('passport'),
 
 module.exports = function() {
     var User = mongoose.model('User');
+    const localOptions = { usernameField: 'username' };
 
     passport.serializeUser(function(user, done) {
         done(null, user.id);
@@ -19,4 +20,5 @@ module.exports = function() {
     });
 
     require('./strategies/local.js')();
+    require('./strategies/jwt.js')();
 };

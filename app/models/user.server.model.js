@@ -4,15 +4,26 @@ var mongoose = require('mongoose'),
 
 var UserSchema = new Schema({
     name: String,
-    email: String,
+    email: {
+      type: String,
+      required: true
+    },
     username: {
         type: String,
         trim: true,
-        unique: true
+        unique: true,
+        required: true
     },
-    password: String,
-    type: String,
-    typeId: String,
+    password: {
+      type: String,
+      required: true
+    },
+    role: {
+      type: String,
+      enum: ['Member', 'Owner', 'SiteMgr', 'Admin'],
+      default: 'Member'
+    },
+    roleId: String,
     provider: String,
     providerId: String,
     providerData: {},
