@@ -20,8 +20,8 @@ var UserSchema = new Schema({
     },
     role: {
       type: String,
-      enum: ['Member', 'Owner', 'SiteMgr', 'Admin'],
-      default: 'Member'
+      enum: ['Customer', 'Owner', 'SiteMgr', 'Admin'],
+      default: 'Customer'
     },
     roleId: String,
     provider: String,

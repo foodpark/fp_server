@@ -5,7 +5,7 @@ var CompanySchema = new Schema ({
     name:String,
     orderSysId:String,
     baseSlug:String,
-    defaultCategoryId:String,
+    defaultCategory:String,
     description:String,
     email:String,
     facebook:String,

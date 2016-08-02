@@ -5,18 +5,23 @@
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.2",
     "connect-flash": "^0.1.1",
+    "debug": "^2.2.0",
     "ejs": "^2.4.2",
     "express": "latest",
     "express-jwt": "^3.4.0",
     "express-params": "0.0.3",
     "express-session": "^1.14.0",
+    "form-data": "^1.0.0-rc4",
     "gulp": "latest",
+    "http": "0.0.0",
     "jsonwebtoken": "^7.1.6",
     "moltin": "^1.0.0",
     "mongoose": "^4.5.3",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-jwt": "^2.1.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "querystring": "^0.2.0",
+    "request": "^2.74.0"
   }
 }
