@@ -79,7 +79,7 @@ exports.renderRegister = function(req, res, next) {
     }
 };
 
-var createMoltinCompany = function(company, next, callback) {
+var createMoltinCompany = function(company, callback) {
   debug('start');
   msc.createCompany(company, function(comp) {
     if (comp instanceof Error) {
@@ -89,24 +89,18 @@ var createMoltinCompany = function(company, next, callback) {
     debug('leaving')
     return callback (comp);
   });
-/*  moltin.Authenticate( function() {
-    moltin.Category.Create( {
-      slug : 'name',
-      status: 'email',
-      title: 'title',
-      description: 'descript',
-      company:'1293770040725734215',
-      menu_availability:'false'
-    }, function(moltinCompany) {
-      debug('createMoltinCompany: Created :'+ moltinCompany);
-      company.orderSysId = moltinCompany._id;
-      return next(company);
-    }, function (err) {
-      console.error('createMoltinCompany: Did not create moltin Company for '+ company);
-      console.error('stack :'+ err.stack);
-      return next (err);
-    })
-  })*/
+};
+
+var createMoltinDefaultCategory= function(company, callback) {
+  debug('start');
+  msc.createDefaultCategory(company, function(category) {
+    if (category instanceof Error) {
+      console.error(category)
+      return callback(category)
+    }
+    debug('leaving')
+    return callback (category)
+  });
 };
 
 var createCompany = function(companyName, email, user, next, callback) {
@@ -114,15 +108,33 @@ var createCompany = function(companyName, email, user, next, callback) {
   company.name = companyName;
   company.email = email;
   company.user = user;
-  createMoltinCompany(company, next, function(company) {
-    if (company instanceof Error) {
+  createMoltinCompany(company, function(moltinCompany) {
+    if (moltinCompany instanceof Error) {
       console.error('moltin company create failed');
-      console.error(company +' : '+ getErrorMessage(company));
-      return callback (company);
+      console.error(moltinCompany +' : '+ getErrorMessage(moltinCompany));
+      return callback (moltinCompany);
     }
-    debug('moltin company successfully created : '+ company.id)
-    user.roleId = company.id;
-    return callback(user)
+    debug('moltin company successfully created : '+ moltinCompany.id)
+    company.orderSysId = moltinCompany.id;
+    user.roleId = moltinCompany.id;
+    createMoltinDefaultCategory(moltinCompany, function(moltinCat) {
+      if (moltinCat instanceof Error) {
+        console.error('moltin category create failed');
+        console.error(moltinCat +' : '+ getErrorMessage(moltinCat));
+        return callback (moltinCat);
+      }
+      debug('moltin category successfully created : '+ moltinCat.id)
+      company.defaultCategory = moltinCat.id;
+      company.baseSlug = moltinCat.slug;
+      company.save(function(err, company) {
+        if (err) {
+          console.error('createCompany: error during company save');
+          console.error(err);
+          return callback(err)
+        };
+        return callback(user)
+      })
+    })
   });
 };
 
