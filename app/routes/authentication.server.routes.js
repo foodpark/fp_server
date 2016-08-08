@@ -8,7 +8,7 @@ var requireLogin = passport.authenticate('local', { session: false });
 var REQUIRE_ADMIN     = "Admin",
       REQUIRE_OWNER   = "Owner",
       REQUIRE_SITEMGR = "SiteMgr",
-      REQUIRE_MEMBER  = "Member";
+      REQUIRE_CUSTOMER  = "Customer";
 
 module.exports = function(app) {
 

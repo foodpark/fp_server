@@ -36,6 +36,7 @@ module.exports = function() {
   	require('../app/routes/loyalty.server.routes.js')(app);
   	require('../app/routes/reviews.server.routes.js')(app);
   	require('../app/routes/sites.server.routes.js')(app);
+  	require('../app/routes/storefront.server.routes.js')(app);
   	require('../app/routes/users.server.routes.js')(app);
 
   	return app;

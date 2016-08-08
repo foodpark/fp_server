@@ -5,13 +5,12 @@ var User = require('mongoose').model('User'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
     passport = require('passport'),
-    debug = require('debug')('authentication.server.controller'),
-    moltin = require('moltin')({
-      publicId: config.clientId,
-      secretKey: config.client_secret
-    });
+    debug = require('debug')('authentication.server.controller');
 
-
+exports.CUSTOMER = 'Customer'
+exports.ONWER = 'Owner'
+exports.SITE_MGR = 'SiteMgr'
+exports.ADMIN = 'Admin'
 
 var getErrorMessage = function(err) {
     var message = '';
@@ -116,7 +115,7 @@ var createCompany = function(companyName, email, user, next, callback) {
     }
     debug('moltin company successfully created : '+ moltinCompany.id)
     company.orderSysId = moltinCompany.id;
-    user.roleId = moltinCompany.id;
+    user.roleId = company.id;
     createMoltinDefaultCategory(moltinCompany, function(moltinCat) {
       if (moltinCat instanceof Error) {
         console.error('moltin category create failed');
@@ -148,8 +147,6 @@ var createCustomer = function(user) {
     }
   });
 };
-
-
 
 exports.register = function(req, res, next) {
     if (!req.user) {
@@ -215,16 +212,19 @@ exports.register = function(req, res, next) {
 
 exports.roleAuthorization = function(role) {
   return function(req, res, next) {
+    debug(req.user)
     const user = req.user;
-
     User.findById(user._id, function(err, foundUser) {
       if (err) {
+        debug(err)
         res.status(422).json({ error: 'No user was found.' });
         return next(err);
       }
       if (foundUser.role == role) {
+        debug('found')
         return next();
       }
+      debug('401 Unauthorized')
       res.status(401).json({ error: 'You are not authorized to view this content.' });
       return next('Unauthorized');
     })
