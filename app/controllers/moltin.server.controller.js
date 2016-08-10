@@ -167,13 +167,15 @@ exports.createDefaultCategory=function(moltincompany, callback) {
     })
   })
 };
-var requestEntities = function(flow, method, data, callback) {
+var requestEntities = function(flow, method, data, callback, id) {
   getBearerToken(function(token) {
     if (token instanceof Error) return callback(token);
     debug('token : '+ token)
+    var oid = '';
+    if (id) oid = '/'+id
     request({
       method: method,
-      url: config.moltinStoreUrl + flow,
+      url: config.moltinStoreUrl + flow + oid,
       json: data,
       headers: {
         'Authorization': 'Bearer '+ token
@@ -184,90 +186,97 @@ var requestEntities = function(flow, method, data, callback) {
         debug(res.body)
         var bodyJson = JSON.stringify(res);
         bodyJson = JSON.parse(bodyJson).body;
-        debug(bodyJson.result)
+        //debug(bodyJson.result)
         return callback(bodyJson.result);
       }
       else {
-        console.error(err);
+        if (err) {
+          console.error(err);
+          return callback(err);
+        }
         console.error(body);
-        var resError = JSON.stringify(body);
-        resError = JSON.parse(resError);
-        console.error("response.statusCode: " + res.statusCode);
-        console.error("response.statusText: " + res.statusText);
-        callback (Error(resError.errors));
+        return callback(new Error(body));
       }
     })
   })
 }
 
-exports.createCategory=function(catTitle, company, callback) {
-  var catSlug = company.defaultSlug + '-' + title.replace(/\W+/g, '-').toLowerCase();
+exports.createCategory=function(company, catTitle, callback) {
+  var catSlug = company.baseSlug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
   var data = {
     slug : catSlug,
     status : 1,
     title : catTitle,
-    description : catTtile,
-    company : company._id
+    description : catTitle,
+    company : company.orderSysId
   }
+  debug(data)
   return requestEntities(CATEGORIES, POST, data, callback)
 };
-exports.findCategory=function(categoryId,callback) {
-  return requestEntities(CATEGORIES, GET, {id:categoryId}, callback)
+exports.findCategory=function(company, categoryId, callback) {
+  return requestEntities(CATEGORIES, GET, {id:categoryId, company:company.orderSysId}, callback)
 };
-exports.listCategories=function(data, callback) {
+exports.listCategories=function(company, data, callback) {
+  data.company = company.orderSysId
+  debug(data)
   return requestEntities(CATEGORIES, GET, data, callback)
 };
-exports.updateCategory=function(data, callback) {
-  return requestEntities(CATEGORIES, PUT, data, callback)
+exports.updateCategory=function(company, category, data, callback) {
+  data.company = company.orderSysId
+  return requestEntities(CATEGORIES, PUT, data, callback, category)
 };
-exports.deleteCategory=function(data, callback) {
-  return requestEntities(CATEGORIES, DELETE, data, callback)
+exports.deleteCategory=function(category, callback) {
+  return requestEntities(CATEGORIES, DELETE, '', callback, category)
 };
 
-exports.createMenuItem=function(data, callback) {
+exports.createMenuItem=function(company, data, callback) {
+  data.company = company.orderSysId
   return requestEntities(MENU_ITEMS, POST, data, callback)
 };
-exports.findMenuItem=function(menuItemId,callback) {
-  return requestEntities(MENU_ITEMS, GET, {id:cmenuItemId}, callback)
+exports.findMenuItem=function(company, menuItemId,callback) {
+  return requestEntities(MENU_ITEMS, GET, {id:cmenuItemId, company:company.orderSysId}, callback)
 };
-exports.listMenuItems=function(data, callback) {
+exports.listMenuItems=function(company, data, callback) {
+  data.company = company.orderSysId
   return requestEntities(MENU_ITEMS, GET, data, callback)
 };
-exports.updateMenuItem=function(data, callback) {
+exports.updateMenuItem=function(company, data, callback) {
+  data.company = company.orderSysId
   return requestEntities(MENU_ITEMS, PUT, data, callback)
 };
-exports.deleteMenuItem=function(data, callback) {
+exports.deleteMenuItem=function(company, data, callback) {
+  data.company = company.orderSysId
   return requestEntities(MENU_ITEMS, DELETE, data, callback)
 };
 
-exports.createOptionItem=function(data, callback) {
+exports.createOptionItem=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, POST, data, callback)
 };
-exports.findOptionItem=function(optionItemId,callback) {
-  return requestEntities(OPTION_ITEMS, GET, {id:optionItemId}, callback)
+exports.findOptionItem=function(company, optionItemId,callback) {
+  return requestEntities(OPTION_ITEMS, GET, {id:optionItemId, company:company.orderSysId}, callback)
 };
-exports.listOptionItems=function(data, callback) {
+exports.listOptionItems=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, GET, data, callback)
 };
-exports.updateOptionItem=function(data, callback) {
+exports.updateOptionItem=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, PUT, data, callback)
 };
-exports.deleteOptionItem=function(data, callback) {
+exports.deleteOptionItem=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, DELETE, data, callback)
 };
 
-exports.createOptionCategory=function(data, callback) {
+exports.createOptionCategory=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, POST, data, callback)
 };
-exports.findOptionCategory=function(optionCategoryId,callback) {
-  return requestEntities(OPTION_ITEMS, GET, {id:optionCategoryId}, callback)
+exports.findOptionCategory=function(company, optionCategoryId,callback) {
+  return requestEntities(OPTION_ITEMS, GET, {id:optionCategoryId, company:company.orderSysId}, callback)
 };
-exports.listOptionCategories=function(data, callback) {
+exports.listOptionCategories=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, GET, data, callback)
 };
-exports.updateOptionCategory=function(data, callback) {
+exports.updateOptionCategory=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, PUT, data, callback)
 };
-exports.deleteOptionCategory=function(data, callback) {
+exports.deleteOptionCategory=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, DELETE, data, callback)
 };

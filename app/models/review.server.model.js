@@ -10,9 +10,9 @@ var ReviewSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Site'
     },
-    user: {
+    customer: {
         type: Schema.ObjectId,
-        ref: 'User'
+        ref: 'Customer'
     },
     comment: String,
     reviewScore:Number

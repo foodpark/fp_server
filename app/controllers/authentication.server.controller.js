@@ -152,12 +152,14 @@ exports.register = function(req, res, next) {
     if (!req.user) {
       const email = req.body.email;
       const name = req.body.name;
+      const companyName = req.body.companyName;
       const username = req.body.username;
       const password = req.body.password;
       const role = req.body.role;
 
       if (!email) {return res.status(422).send({ error: 'Please enter an email address.'});}
       if (!name) {return res.status(422).send({ error: 'Please enter your name.'});}
+      if (!companyName) {return res.status(422).send({ error: 'Please enter a company name.'});}
       if (!username) {return res.status(422).send({ error: 'Please enter a user name.'});}
       if (!password) {return res.status(422).send({ error: 'Please enter a password.'});}
       if (!role) {return res.status(422).send({ error: 'Please specify member or owner.'});}
@@ -176,7 +178,7 @@ exports.register = function(req, res, next) {
             debug('register: creating Owner');
             debug(req.body);
             user.role = 'Owner';
-            createCompany(name, email, user, next, function(user) {
+            createCompany(companyName, email, user, next, function(user) {
               if (user instanceof Error) {
                 console.error('register: error creating company');
                 return res.status(500).send({ error: err});
