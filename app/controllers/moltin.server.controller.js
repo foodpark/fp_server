@@ -182,8 +182,8 @@ var requestEntities = function(flow, method, data, callback, id) {
       }
     },
     function (err, res, body) {
-      if (!err && (res.statusCode === 200 || res.statusCode === 201)) {
-        debug(res.body)
+      if (!err && (res.statusCode === 200 || res.statusCode === 201) || body.status == 'false') {
+        debug(body)
         var bodyJson = JSON.stringify(res);
         bodyJson = JSON.parse(bodyJson).body;
         //debug(bodyJson.result)
@@ -201,9 +201,11 @@ var requestEntities = function(flow, method, data, callback, id) {
   })
 }
 
-exports.createCategory=function(company, catTitle, callback) {
+exports.createCategory=function(company, catTitle, catParent,callback) {
   var catSlug = company.baseSlug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
+  if (!catParent) catParent = company.defaultCategory;
   var data = {
+    parent: catParent,
     slug : catSlug,
     status : 1,
     title : catTitle,
@@ -229,8 +231,31 @@ exports.deleteCategory=function(category, callback) {
   return requestEntities(CATEGORIES, DELETE, '', callback, category)
 };
 
-exports.createMenuItem=function(company, data, callback) {
-  data.company = company.orderSysId
+exports.createMenuItem=function(company, title, status, price, category, description, callback) {
+  //generate unique sku
+  var sku = company.baseSlug + title.replace(/\W+/g, '-').toLowerCase();
+  var slug = sku;
+  var status = 1; // is live
+  var stockLevel = 10000000;
+  var stockStatus = 0; // unlimited
+  var requiresShipping = 0; // No shipping required
+  var catalogOnly = 0; // Not catalog only
+  var data = {
+    sku : sku,
+    slug : slug,
+    status : status,
+    title : title,
+    description : description,
+    price : price,
+    category : category,
+    stock_level : stockLevel,
+    stock_status : stockStatus,
+    requires_shipping : requiresShipping,
+    catalog_only : catalogOnly,
+    tax : "default",
+    company : company.orderSysId
+  }
+  debug(data)
   return requestEntities(MENU_ITEMS, POST, data, callback)
 };
 exports.findMenuItem=function(company, menuItemId,callback) {

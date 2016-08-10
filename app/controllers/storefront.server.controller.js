@@ -14,10 +14,10 @@ exports.createCategory=function(req,res,next) {
   Company.findById(companyId, function(err,company) {
     if (err) { return next(err) }
     else {
-      debug(company)
       const title = req.body.title;
-      if (!title) {return res.status(422).send({ error: 'Title is required.'});}
-      return msc.createCategory(company, title, function(category) {
+      const parent = req.body.parent;
+      if (!title) return res.status(422).send({ error: 'Title is required.'});
+      return msc.createCategory(company, title, parent, function(category) {
         if (category instanceof Error) {
           debug(category)
           return res.status(422).send({ error: category});
@@ -107,12 +107,71 @@ exports.deleteCategory=function(req,res,next) {
 }
 
 exports.createMenuItem=function(req,res,next) {
-  var data, callback;
-  msc.createMenuItem(data, callback)
+  debug(req.user)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) { return next(err) }
+    else {
+      debug(company)
+      /**
+      Name	Slug	Field Type	Required?	Unique?	Title Column?
+      *SKU	sku	string	Yes	Yes	No
+      *Product Title	title	string	Yes	No	Yes
+      *Slug	slug	slug	Yes	Yes	No
+      *Price	price	money	Yes	No	No
+      Sale Price	sale_price	decimal	No	No	No
+      *Status	status	choice	Yes	No	No
+      *Category	category	multiple	Yes	No	No
+      *Stock Level	stock_level	integer	Yes	No	No
+      *Stock Status	stock_status	choice	Yes	No	No
+      *Description	description	text	Yes	No	No
+      *Requires Shipping	requires_shipping	choice	Yes	No	No
+      Weight	weight	decimal	No	No	No
+      Height	height	decimal	No	No	No
+      Width	width	decimal	No	No	No
+      Depth	depth	decimal	No	No	No
+      *Catalog Only	catalog_only	choice	Yes	No	No
+      Collection	collection	relationship	No	No	No
+      Brand	brand	relationship	No	No	No
+      *Tax Band	tax_band	tax-band	Yes	No	No
+      *Company	company	relationship	Yes **/
+      const title = req.body.title;
+      const price = req.body.price;
+      const status = req.body.status;
+      const category = req.body.category;
+      const description = req.body.description;
+
+      if (!status) status = 1; // live by default TODO: turn draft by default when menu availability completed
+      if (!title) {return res.status(422).send({ error: 'Title is required.'});}
+      if (!price) {return res.status(422).send({ error: 'Price is required.'});}
+      if (!category) {return res.status(422).send({ error: 'Category is required.'});}
+      if (!description) {return res.status(422).send({ error: 'Description is required.'});}
+      return msc.createMenuItem(company, title, status, price, category, description, function(menuItem) {
+        if (menuItem instanceof Error) {
+          debug(menuItem)
+          //TODO: Check for error - duplicate sku/slug, which means the title was a duplicate
+          return res.status(422).send({ error: menuItem});
+        }
+        else res.json(menuItem)
+      })
+    }
+  });
 };
 exports.listMenuItems=function(req,res,next) {
-  var data, callback;
-  msc.listMenuItems(data, callback)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) { return next(err) }
+    else {
+      var data = req.body;
+      msc.listMenuItems(company, data, function(menuItem) {
+        if (menuItem instanceof Error) {
+          debug(menuItem)
+          return res.status(422).send({ error: menuItem});
+        }
+        else res.json(menuItem)
+      })
+    }
+  });
 };
 exports.readMenuItem=function(req,res,next) {
 	res.json(req.menuItem);
