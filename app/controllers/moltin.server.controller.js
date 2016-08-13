@@ -167,6 +167,7 @@ exports.createDefaultCategory=function(moltincompany, callback) {
     })
   })
 };
+
 var requestEntities = function(flow, method, data, callback, id) {
   getBearerToken(function(token) {
     if (token instanceof Error) return callback(token);
@@ -182,7 +183,7 @@ var requestEntities = function(flow, method, data, callback, id) {
       }
     },
     function (err, res, body) {
-      if (!err && (res.statusCode === 200 || res.statusCode === 201) || body.status == 'false') {
+      if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
         debug(body)
         var bodyJson = JSON.stringify(res);
         bodyJson = JSON.parse(bodyJson).body;
@@ -190,12 +191,14 @@ var requestEntities = function(flow, method, data, callback, id) {
         return callback(bodyJson.result);
       }
       else {
+        console.error('Response Status: ' + res.statusCode)
         if (err) {
-          console.error(err);
+          console.error('err'+ err);
           return callback(err);
         }
-        console.error(body);
-        return callback(new Error(body));
+        console.error(body)
+        debug(body.error)
+        return callback(new Error(body.error))
       }
     })
   })
@@ -252,14 +255,14 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
     stock_status : stockStatus,
     requires_shipping : requiresShipping,
     catalog_only : catalogOnly,
-    tax : "default",
+    tax_band : config.defaultTaxBand,
     company : company.orderSysId
   }
   debug(data)
   return requestEntities(MENU_ITEMS, POST, data, callback)
 };
-exports.findMenuItem=function(company, menuItemId,callback) {
-  return requestEntities(MENU_ITEMS, GET, {id:cmenuItemId, company:company.orderSysId}, callback)
+exports.findMenuItem=function(company, menuItemId, callback) {
+  return requestEntities(MENU_ITEMS, GET, {id:menuItemId, company:company.orderSysId}, callback)
 };
 exports.listMenuItems=function(company, data, callback) {
   data.company = company.orderSysId
@@ -274,14 +277,20 @@ exports.deleteMenuItem=function(company, data, callback) {
   return requestEntities(MENU_ITEMS, DELETE, data, callback)
 };
 
+var menuOptionFlow = function (menuItemId) {
+  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_ITEMS
+  debug(flow)
+  return flow
+}
+
 exports.createOptionItem=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, POST, data, callback)
 };
 exports.findOptionItem=function(company, optionItemId,callback) {
   return requestEntities(OPTION_ITEMS, GET, {id:optionItemId, company:company.orderSysId}, callback)
 };
-exports.listOptionItems=function(company, data, callback) {
-  return requestEntities(OPTION_ITEMS, GET, data, callback)
+exports.listOptionItems=function(menuItemId, data, callback) {
+  return requestEntities(menuOptionFlow(menuItemId), GET, data, callback)
 };
 exports.updateOptionItem=function(company, data, callback) {
   return requestEntities(OPTION_ITEMS, PUT, data, callback)

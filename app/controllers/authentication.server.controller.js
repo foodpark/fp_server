@@ -8,9 +8,9 @@ var User = require('mongoose').model('User'),
     debug = require('debug')('authentication.server.controller');
 
 exports.CUSTOMER = 'Customer'
-exports.ONWER = 'Owner'
+exports.ONWER    = 'Owner'
 exports.SITE_MGR = 'SiteMgr'
-exports.ADMIN = 'Admin'
+exports.ADMIN    = 'Admin'
 
 var getErrorMessage = function(err) {
     var message = '';

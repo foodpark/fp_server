@@ -7,6 +7,19 @@ var User = require('mongoose').model('User'),
     mongoose = require('mongoose'),
     debug = require('debug')('storefront.server.controller');
 
+var getErrorMessage = function(err) {
+    var message = '';
+    for (var errName in err.errors) {
+            if (err.errors[errName].message)
+                message = err.errors[errName].message;
+    }
+    return message;
+};
+
+var sendErrorResponse = function(err, res, status) {
+  if (!status) status = 500
+  return res.status(status).send({'error': err})
+}
 
 exports.createCategory=function(req,res,next) {
   debug(req.user)
@@ -37,7 +50,8 @@ exports.listCategories=function(req,res,next) {
       msc.listCategories(company, data, function(categories) {
         debug(categories)
         if (categories instanceof Error) {
-          return next(categories)
+          var message = getErrorMessage(categories);
+          return res.status(500).send({ error: message });
         } else {
           res.json(categories)
         }
@@ -56,7 +70,8 @@ exports.getCategory=function(req,res,next,id) {
     else {
       msc.findCategory(company, id, function(category) {
         if (category instanceof Error) {
-          return next(err)
+          var message = getErrorMessage(category);
+          return res.status(500).send({ error: message });
         } else {
           req.category=category;
           next();
@@ -74,7 +89,8 @@ exports.updateCategory=function(req,res,next) {
       var category=req.category;
       msc.updateCategory(company, category, data, function(category) {
         if (category instanceof Error) {
-          return next(err)
+          var message = getErrorMessage(category);
+          return res.status(500).send({ error: message });
         } else {
           req.category=category;
           next();
@@ -89,19 +105,15 @@ exports.deleteCategory=function(req,res,next) {
     if (err) { return next(err) }
     else {
       var category = req.category[0]
-      debug(category.company.data.id + "=="+ company.orderSysId)
-      if (category.company.data.id == company.orderSysId) {
-        msc.deleteCategory(category, function(category) {
-          if (category instanceof Error) {
-            return next(err)
-          } else {
-            req.category=category;
-            next();
-          }
-        })
-      } else {
-        return next({warning: 'Category does not belong to company'})
-      }
+      msc.deleteCategory(category, function(category) {
+        if (category instanceof Error) {
+          var message = getErrorMessage(category);
+          return res.status(500).send({ error: message });
+        } else {
+          req.category=category;
+          next();
+        }
+      })
     }
   })
 }
@@ -177,31 +189,130 @@ exports.readMenuItem=function(req,res,next) {
 	res.json(req.menuItem);
 };
 exports.getMenuItem=function(req,res,next,id) {
-  msc.findMenuItem(id, function(menuItem) {
-    if (menuItem instanceof Error) {
-      return next(err)
-    } else {
-      req.menuItem=menuItem;
-      next();
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err)
+      return sendErrorResponse(message, res, 500)
     }
-  });
+    else {
+      msc.findMenuItem(company, id, function(menuItem) {
+        if (menuItem instanceof Error) {
+          debug(menuItem)
+          return sendErrorResponse(menuItem.message, res, 500)
+        } else {
+          req.menuItem=menuItem;
+          next();
+        }
+      })
+    }
+  })
 };
 exports.updateMenuItem=function(req,res,next) {
-  var data, callback;
   msc.updateMenuItem(data, callback)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
+    }
+    else {
+      var menuItem = req.menuItem
+      var data = req.body;
+      msc.updateMenuItem(company, menuItem, data, function(item) {
+        if (item instanceof Error) {
+          var message = getErrorMessage(item);
+          return sendErrorResponse(message, res, 500)
+        } else {
+          req.menuItem=item;
+          next();
+        }
+      })
+    }
+  })
 };
 exports.deleteMenuItem=function(req,res,next) {
-  var data, callback;
-  msc.deleteMenuItem(data, callback)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
+    }
+    else {
+      var menuItem = req.menuItem
+      msc.deleteMenuItem(menuItem, function(item) {
+        if (item instanceof Error) {
+          var message = getErrorMessage(item);
+          return sendErrorResponse(message, res, 500)
+        } else {
+          req.menuItem=item;
+          next();
+        }
+      })
+    }
+  })
 };
 
 exports.createOptionItem=function(req,res,next) {
-  var data, callback;
-  msc.createOptionItem(data, callback)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
+    }
+    else {
+      var mi = req.menuItem
+      debug(mi)
+      var oc = req.optionCategory
+      if (!oc) {
+        // get default option
+      }
+      const title = req.body.title;
+      if (!title) return sendErrorResponse('Title is required.',res, 422);
+      if (mi.company == company.id) {
+        return msc.createOptionItem(company, title, parent, function(optCat) {
+          if (optCat instanceof Error) {
+            debug(optCat)
+            return sendErrorResponse(optCat, res, 422);
+          }
+          else res.json(optCat)
+        })
+      } else {
+        return sendErrorResponse('Menu item does not belong to company', res, 422)
+      }
+    }
+  });
 };
+
 exports.listOptionItems=function(req,res,next) {
-  var data, callback;
-  msc.listOptionItems(data, callback)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
+    }
+    else {
+      var item = JSON.stringify(req.menuItem)
+      item = JSON.parse(item)
+      item = item[0]
+      debug(item.company.data.id +'=='+ company.orderSysId)
+      if (item.company.data.id == company.orderSysId) {
+        var data = req.body
+        debug('BODY')
+        debug(data)
+        return msc.listOptionItems(item.id, data, function(optionItemList) {
+          if (optionItemList instanceof Error) {
+            debug(optionItemList)
+            var message = getErrorMessage(optionItemList)
+            return sendErrorResponse(message,res, 422);
+          }
+          else res.json(optionItemList)
+        })
+      } else {
+        return sendErrorResponse('Menu item does not belong to company', res, 422)
+      }
+    }
+  });
 };
 exports.readOptionItem=function(req,res,next) {
 	res.json(req.optionItem);

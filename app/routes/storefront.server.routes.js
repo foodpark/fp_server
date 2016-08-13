@@ -14,12 +14,16 @@ module.exports=function(app) {
 	app.route('/api/menuitems/:menuItemId').delete(auth.roleAuthorization("Owner"),  storefront.deleteMenuItem);
 	app.param('menuItemId',storefront.getMenuItem);
 
-  app.route('/api/optionitems').post(auth.roleAuthorization("Owner"),  storefront.createOptionItem).get(storefront.listOptionItems);
-  app.route('/api/optionitems/:optionItemId').get(storefront.readOptionItem).put(auth.roleAuthorization("Owner"), storefront.updateOptionItem);
+	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems').post(auth.roleAuthorization("Owner"),  storefront.createOptionItem).get(storefront.listOptionItems);
+	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId').get(storefront.readOptionItem).put(auth.roleAuthorization("Owner"), storefront.updateOptionItem);
+	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId').delete(auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
+  app.route('/api/menuitems/:menuItemId/optioncategories').post(auth.roleAuthorization("Owner"),  storefront.createOptionCategory).get(storefront.listOptionCategories);
+	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId').get(storefront.readOptionCategory).put(auth.roleAuthorization("Owner"),  storefront.updateOptionCategory);
+	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId').delete(auth.roleAuthorization("Owner"),  storefront.deleteOptionCategory);
+	app.param('optionCategoryId',storefront.getOptionCategory);
+
+  app.route('/api/menuitems/:menuItemId/optionitems').post(auth.roleAuthorization("Owner"),  storefront.createOptionItem).get(storefront.listOptionItems);
+  app.route('/api/menuitems/:menuItemId/optionitems/:optionItemId').get(storefront.readOptionItem).put(auth.roleAuthorization("Owner"), storefront.updateOptionItem);
+	app.route('/api/menuitems/:menuItemId/optionitems/:optionItemId').delete(auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
   app.param('optionItemId',storefront.getOptionItem);
-
-  app.route('/api/optioncategories').post(auth.roleAuthorization("Owner"),  storefront.createOptionCategory).get(storefront.listOptionCategories);
-  app.route('/api/optioncategories/:optionCategoryId').get(storefront.readOptionCategory).put(auth.roleAuthorization("Owner"),  storefront.updateOptionCategory);
-  app.param('optionCategoryId',storefront.getOptionCategory);
-
 };
