@@ -38,8 +38,8 @@ exports.createCategory=function(req,res,next) {
         else res.json(category)
       })
     }
-  });
-};
+  })
+}
 exports.listCategories=function(req,res,next) {
   var data = req.body;
   debug(req.user.roleId)
@@ -253,6 +253,15 @@ exports.deleteMenuItem=function(req,res,next) {
   })
 };
 
+var optionItemCreator = function(menuItemId, optionCategoryId, title, modPrice, res) {
+  msc.createOptionItem(menuItemId, optionCategoryId, title, modPrice, function(optionItem) {
+    if (optionItem instanceof Error) {
+      debug(optionItem)
+      return sendErrorResponse(optionItem, res, 422);
+    }
+    else return res.json(optionItem)
+  })
+}
 exports.createOptionItem=function(req,res,next) {
   var companyId = mongoose.Types.ObjectId(req.user.roleId);
   Company.findById(companyId, function(err,company) {
@@ -261,22 +270,50 @@ exports.createOptionItem=function(req,res,next) {
       return sendErrorResponse(message, res, 500)
     }
     else {
-      var mi = req.menuItem
-      debug(mi)
-      var oc = req.optionCategory
-      if (!oc) {
-        // get default option
-      }
-      const title = req.body.title;
+      const title = req.body.title
       if (!title) return sendErrorResponse('Title is required.',res, 422);
-      if (mi.company == company.id) {
-        return msc.createOptionItem(company, title, parent, function(optCat) {
-          if (optCat instanceof Error) {
-            debug(optCat)
-            return sendErrorResponse(optCat, res, 422);
-          }
-          else res.json(optCat)
-        })
+      const modPrice = req.modprice
+      var mi = req.menuItem
+      mi = mi[0]
+      debug(mi)
+      debug(mi.company.data.id +'=='+ company.orderSysId)
+      if (mi.company.data.id == company.orderSysId) {
+        var oc = req.optionCategory
+        debug(oc)
+        if (!oc) {
+          debug('No option category provided')
+          // No Option Category!!
+          // TODO: Lookup option category
+          msc.listOptionItems(mi.id, '{title: "OptionItems"}', function(optionItemList) {
+            if (optionItemList instanceof Error) {
+              debug(optionItemList)
+              var message = getErrorMessage(optionItemList)
+              return sendErrorResponse(message,res, 422);
+            }
+            debug(optionItemList)
+            var optionItemCat = optionItemList[0]
+
+            if (!optionItemCat) {
+              // Create default optionItems category
+              optionCategoryCreator(mi.id, 'optionItems', 'single', function(optionCategory) {
+                debug(optionCategory)
+                if (optionCategory instanceof Error) {
+                  return res.status(422).send({ error: optionCategory});
+                }
+                debug('about to create option item')
+                return optionItemCreator(mi.id, optionCategory.id, title, modPrice, res)
+              })
+            } else { // found existing 'OptionItems' option category
+              optionItemCat = JSON.stringify(optionItemCat)
+              optionItemCat = JSON.parse(optionItemCat)
+              debug(optionItemCat.id)
+              return optionItemCreator(mi.id, optionItemCat.id, title, modPrice, res)
+            }
+          })
+        } else { // Option Category found
+          debug('option category: '+ oc)
+          return optionItemCreator(mi.id, oc, title, modPrice, res)
+        }
       } else {
         return sendErrorResponse('Menu item does not belong to company', res, 422)
       }
@@ -292,40 +329,111 @@ exports.listOptionItems=function(req,res,next) {
       return sendErrorResponse(message, res, 500)
     }
     else {
-      var item = JSON.stringify(req.menuItem)
-      item = JSON.parse(item)
-      item = item[0]
-      debug(item.company.data.id +'=='+ company.orderSysId)
-      if (item.company.data.id == company.orderSysId) {
-        var data = req.body
-        debug('BODY')
-        debug(data)
-        return msc.listOptionItems(item.id, data, function(optionItemList) {
-          if (optionItemList instanceof Error) {
-            debug(optionItemList)
-            var message = getErrorMessage(optionItemList)
-            return sendErrorResponse(message,res, 422);
-          }
-          else res.json(optionItemList)
-        })
+      var mi = req.menuItem
+      mi = mi[0]
+      debug(mi)
+      debug(mi.company.data.id +'=='+ company.orderSysId)
+      if (mi.company.data.id == company.orderSysId) {
+        var oc = req.optionCategory
+        var data=req.body
+        debug(oc)
+        if (!oc) {
+          debug('getOptionItem: No option category provided')
+          // No Option Category!!
+          // Lookup option category
+          data.title = 'OptionItems'
+          msc.listOptionCategories(mi.id, data, function(optionItemList) {
+            if (optionItemList instanceof Error) {
+              debug(optionItemList)
+              var message = getErrorMessage(optionItemList)
+              return sendErrorResponse(message,res, 422);
+            }
+            var optionItemCat = optionItemList[0]
+            if (!optionItemCat) {
+              return sendErrorResponse('Could not find Option Item list',res, 422);
+            } else {
+              optionItemCat = JSON.stringify(optionItemCat)
+              optionItemCat = JSON.parse(optionItemCat)
+              debug(optionItemCat.id)
+              return res.json(optionItemCat)
+            }
+          })
+        } else {
+          msc.listOptionItems(mi.id, oc.id, data, function(optionItems) {
+            if (optionItems instanceof Error) {
+              return next(err)
+            } else {
+              return res.json(optionItems)
+            }
+          })
+        }
       } else {
         return sendErrorResponse('Menu item does not belong to company', res, 422)
       }
     }
-  });
+  })
 };
 exports.readOptionItem=function(req,res,next) {
 	res.json(req.optionItem);
 };
 exports.getOptionItem=function(req,res,next,id) {
-  msc.findOptionItem(id, function(optionItem) {
-    if (optionItem instanceof Error) {
-      return next(err)
-    } else {
-      req.optionItem=optionItem;
-      next();
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
     }
-  });
+    else {
+      var mi = req.menuItem
+      mi = mi[0]
+      debug(mi)
+      debug(mi.company.data.id +'=='+ company.orderSysId)
+      if (mi.company.data.id == company.orderSysId) {
+        var oc = req.optionCategory
+        debug(oc)
+        if (!oc) {
+          debug('getOptionItem: No option category provided')
+          // No Option Category!!
+          // Lookup option category
+          msc.listOptionCategories(mi.id, '{title: "OptionItems"}', function(optionItemList) {
+            if (optionItemList instanceof Error) {
+              debug(optionItemList)
+              var message = getErrorMessage(optionItemList)
+              return sendErrorResponse(message,res, 422);
+            }
+            var optionItemCat = optionItemList[0]
+            if (!optionItemCat) {
+              return sendErrorResponse('Could not find Option Item',res, 422);
+            } else {
+              optionItemCat = JSON.stringify(optionItemCat)
+              optionItemCat = JSON.parse(optionItemCat)
+              debug(optionItemCat.id)
+              msc.findOptionItem(mi.id, optionItemCat.id, req.body.optionItem, function(optionItem) {
+                if (optionItem instanceof Error) {
+                  return next(err)
+                } else {
+                  req.optionCategory = optionItemCat;
+                  req.optionItem=optionItem;
+                  next();
+                }
+              })
+            }
+          })
+        } else {
+          msc.findOptionItem(mi.id, oc.id, req.body.optionItem, function(optionItem) {
+            if (optionItem instanceof Error) {
+              return next(err)
+            } else {
+              req.optionItem=optionItem;
+              next();
+            }
+          })
+        }
+      } else {
+        return sendErrorResponse('Menu item does not belong to company', res, 422)
+      }
+    }
+  })
 };
 exports.updateOptionItem=function(req,res,next) {
   var data, callback;
@@ -336,26 +444,101 @@ exports.deleteOptionItem=function(req,res,next) {
   msc.deleteOptionItem(data, callback)
 };
 
+var optionCategoryCreator = function (menuItemId, title, type, callback) {
+  return msc.createOptionCategory(menuItemId, title, type, callback)
+}
+
 exports.createOptionCategory=function(req,res,next) {
-  var data, callback;
-  msc.createOptionItem(data, callback)
-};
+  debug(req.user)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
+    }
+    else {
+      const title = req.body.title;
+      const type = 'variant';
+      if (!title) return res.status(422).send({ error: 'Title is required.'});
+      var menuItem = JSON.stringify(req.menuItem)
+      menuItem = JSON.parse(menuItem)
+      menuItem = menuItem[0]
+      debug(menuItem.company.data.id +'=='+ company.orderSysId)
+      if (menuItem.company.data.id == company.orderSysId) {
+        return optionCategoryCreator(menuItem, title, type, function(optionCategory) {
+          if (optionCategory instanceof Error) {
+            debug(optionCategory)
+            return res.status(422).send({ error: optionCategory});
+          }
+          else res.json(optionCategory)
+        })
+      } else {
+        return sendErrorResponse('Menu item does not belong to company', res, 422)
+      }
+    }
+  })
+}
+
 exports.listOptionCategories=function(req,res,next) {
-  var data, callback;
-  msc.listOptionItems(data, callback)
+  debug(req.user)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
+    }
+    else {
+      var menuItem = JSON.stringify(req.menuItem)
+      menuItem = JSON.parse(menuItem)
+      menuItem = menuItem[0]
+      debug(menuItem.company.data.id +'=='+ company.orderSysId)
+      if (menuItem.company.data.id == company.orderSysId) {
+        var data = req.body
+        debug(data)
+        msc.listOptionCategories(menuItem.id, data, function(optionCategoryList) {
+          if (optionCategoryList instanceof Error) {
+            debug(optionCategoryList)
+            return res.status(422).send({ error: optionCategoryList});
+          }
+          else res.json(optionCategoryList)
+        })
+      } else {
+        return sendErrorResponse('Menu item does not belong to company', res, 422)
+      }
+    }
+  })
 };
 exports.readOptionCategory=function(req,res,next) {
 	res.json(req.optionCategory);
 };
 exports.getOptionCategory=function(req,res,next,id) {
-  msc.findOptionCategory(id, function(optionCategory) {
-    if (optionCategory instanceof Error) {
-      return next(err)
-    } else {
-      req.optionCategory=optionCategory;
-      next();
+  debug(req.user)
+  var companyId = mongoose.Types.ObjectId(req.user.roleId);
+  Company.findById(companyId, function(err,company) {
+    if (err) {
+      var message = getErrorMessage(err);
+      return sendErrorResponse(message, res, 500)
     }
-  });
+    else {
+      var menuItem = JSON.stringify(req.menuItem)
+      menuItem = JSON.parse(menuItem)
+      menuItem = menuItem[0]
+      var data = req.body
+      debug(menuItem.company.data.id +'=='+ company.orderSysId)
+      if (menuItem.company.data.id == company.orderSysId) {
+        msc.findOptionCategory(menuItemId, id, data, function(optionCategory) {
+          if (optionCategory instanceof Error) {
+            return next(err)
+          } else {
+            req.optionCategory=optionCategory;
+            next();
+          }
+        });
+      } else {
+        return sendErrorResponse('Menu item does not belong to company', res, 422)
+      }
+    }
+  })
 };
 exports.updateOptionCategory=function(req,res,next) {
   var data, callback;
