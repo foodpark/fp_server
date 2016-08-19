@@ -7,5 +7,6 @@ module.exports=function(app) {
 	app.route('/api/companies/:companyId').put(auth.roleAuthorization("Owner"), companies.update);
 	app.route('/api/companies/:companyId').delete(auth.roleAuthorization("Owner"), companies.delete);
 	app.param('companyId',companies.companyById);
-	app.route('/api/companies/:companyId/tags').post(auth.roleAuthorization("Owner"), companies.addTag);
+	app.route('/api/companies/:companyId/tags').post(auth.roleAuthorization("Owner"), companies.addTag).get(companies.listTags);
+	app.route('/api/companies/:companyId/tags').delete(auth.roleAuthorization("Owner"), companies.deleteTag);
 };
