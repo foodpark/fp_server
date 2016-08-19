@@ -137,16 +137,35 @@ var createCompany = function(companyName, email, user, next, callback) {
   });
 };
 
-var createCustomer = function(user) {
+var createCustomer = function(user, callback) {
   var customer = new Customer();
   customer.name = user.name;
   customer.user = user;
-  customer.save(function(err) {
+  customer.save(function(err, customer) {
     if (err) {
-      return (err);
+      console.error('createCustomer: error')
+      console.error(err)
+      return callback(err);
     }
+    return callback(customer)
   });
 };
+
+var saveUser = function(res, user) {
+  user.save(function(err, user) {
+    if (err) {
+      console.error('register: error during user save');
+      console.error(err);
+      var message = getErrorMessage(err);
+      return res.status(500).send({ error: message });
+    };
+    var userInfo = setUserInfo(user);
+    return res.status(201).json({
+      token: 'JWT ' + sts.generateToken(userInfo),
+      user: userInfo
+    })
+  })
+}
 
 exports.register = function(req, res, next) {
     if (!req.user) {
@@ -159,7 +178,6 @@ exports.register = function(req, res, next) {
 
       if (!email) {return res.status(422).send({ error: 'Please enter an email address.'});}
       if (!name) {return res.status(422).send({ error: 'Please enter your name.'});}
-      if (!companyName) {return res.status(422).send({ error: 'Please enter a company name.'});}
       if (!username) {return res.status(422).send({ error: 'Please enter a user name.'});}
       if (!password) {return res.status(422).send({ error: 'Please enter a password.'});}
       if (!role) {return res.status(422).send({ error: 'Please specify member or owner.'});}
@@ -174,6 +192,7 @@ exports.register = function(req, res, next) {
           user.provider = 'local';
           var method = "register";
           if (role=='Owner') {
+            if (!companyName) {return res.status(422).send({ error: 'Please enter a company name.'});}
             var message = null;
             debug('register: creating Owner');
             debug(req.body);
@@ -183,29 +202,23 @@ exports.register = function(req, res, next) {
                 console.error('register: error creating company');
                 return res.status(500).send({ error: err});
               }
-              user.save(function(err, user) {
-                if (err) {
-                  console.error('register: error during user save');
-                  console.error(err);
-                  var message = getErrorMessage(err);
-                  return res.status(500).send({ error: message });
-                };
-                var userInfo = setUserInfo(user);
-                return res.status(201).json({
-                  token: 'JWT ' + sts.generateToken(userInfo),
-                  user: userInfo
-                });
-              });
+              return saveUser(res, user)
             });
           }
           else if (role == 'Customer') {
             var message = null;
             debug(req.body);
             user.role = "Customer";
-            var customer = createCustomer(user, next);
-            user.roleId = customer.id;
+            createCustomer(user, function(customer) {
+              if (customer instanceof Error) {
+                console.error('register: error creating customer');
+                return res.status(500).send({ error: err});
+              }
+              user.roleId = customer.id;
+              return saveUser(res, user)
+            })
           }
-        });
+        })
       }
       else {
           return res.status(422).send({ error: 'A user is already logged in.'});
