@@ -48,3 +48,15 @@ exports.update=function(req,res,next) {
 		}
 	});
 };
+exports.delete = function(req, res) {
+    var customer = req.customer;
+    customer.remove(function(err) {
+        if (err) {
+            return res.status(400).send({
+                message: getErrorMessage(err)
+            });
+        } else {
+            res.json(customer);
+        }
+    });
+};
