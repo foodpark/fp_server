@@ -56,3 +56,15 @@ exports.addTag=function(req,res,next,id) {
 		});
 	})
 };
+exports.delete = function(req, res) {
+    var company = req.company;
+    company.remove(function(err) {
+        if (err) {
+            return res.status(400).send({
+                message: getErrorMessage(err)
+            });
+        } else {
+            res.json(company);
+        }
+    });
+};
