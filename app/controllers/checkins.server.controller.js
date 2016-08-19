@@ -1,4 +1,5 @@
-var Checkin = require('mongoose').model('Checkin');
+var Checkin = require('mongoose').model('Checkin'),
+debug = require('debug')('checkins.server.controller');
 
 exports.create=function(req,res,next) {
 	var checkin = new Checkin(req.body);

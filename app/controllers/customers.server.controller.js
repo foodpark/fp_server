@@ -1,4 +1,5 @@
-var Customer = require('mongoose').model('Customer');
+var Customer = require('mongoose').model('Customer'),
+debug = require('debug')('customer.server.controller');
 
 exports.create=function(req,res,next) {
 	var customer = new Customer(req.body);

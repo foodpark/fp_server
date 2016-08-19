@@ -1,4 +1,5 @@
-var User = require('mongoose').model('User');
+var User = require('mongoose').model('User'),
+debug = require('debug')('users.server.controller');
 
 
 exports.list = function(req, res, next) {

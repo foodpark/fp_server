@@ -1,4 +1,5 @@
-var Site = require('mongoose').model('Site');
+var Site = require('mongoose').model('Site'),
+debug = require('debug')('sites.server.controller');
 
 exports.create=function(req,res,next) {
 	var site = new Site(req.body);
