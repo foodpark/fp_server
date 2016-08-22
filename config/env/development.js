@@ -2,6 +2,7 @@ var port=1337;
 module.exports = {
 	port: port,
 	db: 'mongodb://127.0.0.1:27017/sfez',
+	pg_connection_string: 'postgres://sfez_read_write_user:sfez@localhost:5432/sfez',
 	secret: 'CorrectHorseBatteryStaple',
 	apiVersion: 'v0.1',
 	moltinAuthUrl: "https://api.molt.in/oauth/access_token",

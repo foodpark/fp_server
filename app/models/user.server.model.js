@@ -1,76 +1,82 @@
-var mongoose = require('mongoose'),
-    crypto = require('crypto'),
-    Schema = mongoose.Schema;
+var crypto = require('crypto'),
+    db_config = require('../../config/knex'),
+    pg = require('knex')(db_config);
+/**
 
-var UserSchema = new Schema({
-    name: String,
-    email: {
-      type: String,
-      required: true
-    },
-    username: {
-        type: String,
-        trim: true,
-        unique: true,
-        required: true
-    },
-    password: {
-      type: String,
-      required: true
-    },
-    role: {
-      type: String,
-      enum: ['Customer', 'Owner', 'SiteMgr', 'Admin'],
-      default: 'Customer'
-    },
-    roleId: String,
-    provider: String,
-    providerId: String,
-    providerData: {},
-    created: {
-        type: Date,
-        default: Date.now
-    }
-});
+CREATE TABLE users (
+  ID SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  username TEXT NOT NULL,
+  password TEXT NOT NULL,
+  role TEXT REFERENCES roles (type),
+  role_id INTEGER,
+  provider TEXT,
+  provider_id TEXT,
+  provider_data TEXT,
+  created TIMESTAMP DEFAULT current_timestamp
+)
+CREATE TABLE roles (
+  ID SERIAL PRIMARY KEY,
+  type TEXT NOT NULL UNIQUE
+)
+INSERT INTO ROLES (type) values ('CUSTOMER');
+INSERT INTO ROLES (type) values ('OWNER');
+INSERT INTO ROLES (type) values ('SITEMGR');
+INSERT INTO ROLES (type) values ('ADMIN');
+**/
 
-UserSchema.pre('save',
-    function(next) {
-        if (this.password) {
-            var md5 = crypto.createHash('md5');
-            this.password = md5.update(this.password).digest('hex');
-        }
+exports.getAllUsers = function() {
+  db.any('select * from users')
+    .then(function (data) {
+      return (data)
+    })
+    .catch(function (err) {
+      return (err);
+    });
+}
+exports.getSingleUser = function(id, callback) {
+  pg('users').select().where('id', id).asCallback(callback)
+}
 
-        next();
-    }
-);
+exports.getUserByUsername = function (username, callback) {
+  pg('users').select().where('username',username).asCallback(function (err, results) {
+    if (err) return callback(err)
+    console.log(results)
+    var user = results[0]
+    return callback (null, user)
+  });
+}
 
-UserSchema.methods.authenticate = function(password) {
+exports.isUserForUsername = function (username, callback) {
+  pg('users').count('username').where('username',username).asCallback(function (err, results) {
+    if (err) return callback(err)
+    console.log(results)
+    var count = results[0].count
+    if (count > 0) return callback (null, true)
+    return callback (null, false)
+  });
+}
+
+exports.createUser = function (name, email, username, password, role, provider, providerId, providerData, callback) {
+  //enrypt password
+  var md5 = crypto.createHash('md5')
+  password = md5.update(password).digest('hex')
+  pg('users').insert(
+    {
+      name: name,
+      email: email,
+      username:username,
+      password: password,
+      role: role,
+      provider: provider,
+      provider_id: providerId,
+      provider_data: providerData
+    }).returning('id').asCallback(callback)
+}
+exports.authenticate = function(md5password, password) {
     var md5 = crypto.createHash('md5');
     md5 = md5.update(password).digest('hex');
 
-    return this.password === md5;
+    return md5password === md5;
 };
-
-UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
-    var _this = this;
-    var possibleUsername = username + (suffix || '');
-
-    _this.findOne(
-        {username: possibleUsername},
-        function(err, user) {
-            if (!err) {
-                if (!user) {
-                    callback(possibleUsername);
-                }
-                else {
-                    return _this.findUniqueUsername(username, (suffix || 0) + 1, callback);
-                }
-            }
-            else {
-                callback(null);
-            }
-        }
-    );
-};
-
-mongoose.model('User', UserSchema);

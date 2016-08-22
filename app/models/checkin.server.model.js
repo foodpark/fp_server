@@ -1,6 +1,6 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var db = require ('../../config/knex');
 
+/**
 var CheckinSchema = new Schema({
     _id: false,
     created: {
@@ -16,4 +16,4 @@ var CheckinSchema = new Schema({
         ref: 'Customer'
     }
 });
-mongoose.model('Checkin', CheckinSchema);
+**/

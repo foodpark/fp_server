@@ -1,4 +1,4 @@
-var Loyalty = require('mongoose').model('Loyalty');
+var Loyalty = require ('../models/loyalty.server.model');
 
 exports.create=function(req,res,next) {
 	var loyalty = new Loyalty(req.body);

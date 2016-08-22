@@ -3,7 +3,7 @@ var passport = require('passport'),
     config = require('../config'),
     JwtStrategy = require('passport-jwt').Strategy,
     ExtractJwt = require('passport-jwt').ExtractJwt,
-    User = require('mongoose').model('User');
+    User = require ('../../app/models/user.server.model');
 
 
 module.exports = function() {
@@ -13,7 +13,7 @@ module.exports = function() {
     };
 
     const jwtLogin = new JwtStrategy(jwtOptions, function(payload, done) {
-      User.findById(payload._id, function(err, user) {
+      User.getSingleUser(payload._id, function(err, user) {
         if (err) { return done(err, false); }
         if (user) {
           done(null, user);

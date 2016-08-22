@@ -1,36 +1,56 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var db_config = require('../../config/knex'),
+    pg = require('knex')(db_config);
 
-var CompanySchema = new Schema ({
-    name:String,
-    orderSysId:String,
-    baseSlug:String,
-    defaultCategory:String,
-    description:String,
-    email:String,
-    facebook:String,
-    twitter:String,
-    photo:String,
-    featuredDish:String,
-    hours:String,
-    schedule:String,
-    city:String,
-    state:String,
-    country:String,
-    totalReview:Number,
-    trending:Boolean,
-    tags: [{
-      _id:false,
-      text:String
-    }],
-    user: {
-      type: Schema.ObjectId,
-      ref: 'User'
-    },
-    created: {
-        type: Date,
-        default: Date.now
-    }
-});
+    /**
+    CREATE TABLE companies (
+      ID SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      order_sys_id TEXT NOT NULL,
+      base_slug TEXT NOT NULL,
+      default_cat TEXT NOT NULL,
+      description TEXT,
+      email TEXT,
+      facebook TEXT,
+      twitter TEXT,
+      photo TEXT,
+      featured_dish TEXT,
+      hours TEXT,
+      schedule TEXT,
+      city TEXT,
+      state TEXT,
+      country TEXT,
+      taxband TEXT,
+      user_id INTEGER REFERENCES users (id),
+      created TIMESTAMP DEFAULT current_timestamp
+    ) **/
 
-mongoose.model('Company',CompanySchema);
+exports.getAllCompanies = function () {
+  db.any('select * from companies')
+    .then(function (data) {
+      return(data)
+    })
+    .catch(function (err) {
+      return (err);
+    });
+}
+exports.getSingleCompany = function (id) {
+  db.one('select * from companies where id = $1', id)
+    .then(function (data) {
+      return (data)
+    })
+    .catch(function (err) {
+      return (err);
+    });
+}
+exports.createCompany = function (name, email, userId, moltCoId, moltDefCat, moltSlug, callback) {
+  console.log('userId: ' +userId)
+  pg('companies').insert(
+    {
+      name: name,
+      email: email,
+      user_id: parseInt(userId),
+      order_sys_id: moltCoId,
+      default_cat: moltDefCat,
+      base_slug: moltSlug
+    }).returning('id').asCallback(callback)
+}

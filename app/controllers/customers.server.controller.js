@@ -1,4 +1,4 @@
-var Customer = require('mongoose').model('Customer');
+var Customer = require ('../models/customer.server.model');
 
 exports.create=function(req,res,next) {
 	var customer = new Customer(req.body);

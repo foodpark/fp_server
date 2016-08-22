@@ -1,8 +1,7 @@
 var passport = require('passport'),
-    mongoose = require('mongoose');
+    User = require ('../app/models/user.server.model');
 
 module.exports = function() {
-    var User = mongoose.model('User');
     const localOptions = { usernameField: 'username' };
 
     passport.serializeUser(function(user, done) {
@@ -10,9 +9,7 @@ module.exports = function() {
     });
 
     passport.deserializeUser(function(id, done) {
-        User.findOne(
-            {_id: id},
-            '-password',
+        User.getSingleUser(id,
             function(err, user) {
                 done(err, user);
             }

@@ -1,7 +1,4 @@
-var User = require('mongoose').model('User'),
-    Company = require('mongoose').model('Company'),
-    Customer = require('mongoose').model('Customer'),
-    debug = require('debug')('moltin.server.controller'),
+var debug = require('debug')('moltin.server.controller'),
     sts = require('./security.server.controller'),
     FormData = require('form-data'),
     http = require ('http'),

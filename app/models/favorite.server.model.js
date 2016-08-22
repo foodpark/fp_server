@@ -1,7 +1,6 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
+var db = require ('../../config/knex');
 
-var FavoriteSchema = new Schema({
+/** var FavoriteSchema = new Schema({
     _id: false,
     created: {
         type: Date,
@@ -15,5 +14,4 @@ var FavoriteSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'User'
     }
-});
-mongoose.model('Favorite', FavoriteSchema);
+}); **/

@@ -1,16 +1,15 @@
-var User = require('mongoose').model('User'),
-    Company = require('mongoose').model('Company'),
-    Customer = require('mongoose').model('Customer'),
-    sts = require('./security.server.controller'),
+var sts = require('./security.server.controller'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
     passport = require('passport'),
+    User = require ('../models/user.server.model'),
+    Company = require ('../models/company.server.model'),
     debug = require('debug')('authentication.server.controller');
 
-exports.CUSTOMER = 'Customer'
-exports.ONWER    = 'Owner'
-exports.SITE_MGR = 'SiteMgr'
-exports.ADMIN    = 'Admin'
+exports.CUSTOMER = 'CUSTOMER'
+exports.OWNER    = 'OWNER'
+exports.SITE_MGR = 'SITEMGR'
+exports.ADMIN    = 'ADMIN'
 
 var getErrorMessage = function(err) {
     var message = '';
@@ -36,12 +35,11 @@ var getErrorMessage = function(err) {
 
 var setUserInfo = function(user) {
   return {
-    _id: user._id,
+    id: user.id,
     name: user.name,
     username: user.username,
     email: user.email,
-    role: user.role,
-    roleId: user.roleId
+    role: user.role
   };
 };
 
@@ -79,63 +77,62 @@ exports.renderRegister = function(req, res, next) {
 };
 
 var createMoltinCompany = function(company, callback) {
-  debug('start');
+  console.log('create Moltin company: entry');
   msc.createCompany(company, function(comp) {
     if (comp instanceof Error) {
       console.error(comp);
       return callback(comp)
     }
-    debug('leaving')
-    return callback (comp);
+    console.log('create Moltin company: leaving')
+    return  callback(null, comp);
   });
 };
 
 var createMoltinDefaultCategory= function(company, callback) {
-  debug('start');
   msc.createDefaultCategory(company, function(category) {
     if (category instanceof Error) {
       console.error(category)
       return callback(category)
     }
-    debug('leaving')
-    return callback (category)
+    return callback(null, category)
   });
 };
 
-var createCompany = function(companyName, email, user, next, callback) {
-  var company = new Company();
-  company.name = companyName;
-  company.email = email;
-  company.user = user;
-  createMoltinCompany(company, function(moltinCompany) {
-    if (moltinCompany instanceof Error) {
-      console.error('moltin company create failed');
-      console.error(moltinCompany +' : '+ getErrorMessage(moltinCompany));
-      return callback (moltinCompany);
+var createCompany = function(companyName, email, userId, callback) {
+  console.log('create company: userId is ')
+  console.log(userId)
+  var company = {
+    name : companyName,
+    email : email,
+    userId : userId
+  }
+  createMoltinCompany(company, function(err, moltinCompany) {
+    if (err) {
+      console.error('createCompany: error during Moltin company creation')
+      console.error(err)
+      return callback(err)
     }
-    debug('moltin company successfully created : '+ moltinCompany.id)
+    console.log('moltin company successfully created : '+ moltinCompany.id)
     company.orderSysId = moltinCompany.id;
-    user.roleId = company.id;
-    createMoltinDefaultCategory(moltinCompany, function(moltinCat) {
-      if (moltinCat instanceof Error) {
-        console.error('moltin category create failed');
-        console.error(moltinCat +' : '+ getErrorMessage(moltinCat));
-        return callback (moltinCat);
+    createMoltinDefaultCategory(moltinCompany, function(err, moltinCat) {
+      if (err) {
+        console.error('createCompany: error during Moltin default category creation')
+        console.error(err)
+        return callback(err)
       }
-      debug('moltin category successfully created : '+ moltinCat.id)
-      company.defaultCategory = moltinCat.id;
-      company.baseSlug = moltinCat.slug;
-      company.save(function(err, company) {
-        if (err) {
-          console.error('createCompany: error during company save');
-          console.error(err);
-          return callback(err)
-        };
-        return callback(user)
+      console.log('moltin category successfully created : '+ moltinCat.id)
+      Company.createCompany(companyName, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug,
+        function(err,companyId) {
+          if (err) {
+            console.error('createCompany: error creating company')
+            console.error(err)
+            return callback(err)
+          }
+          return callback(null,companyId)
+        })
       })
     })
-  });
-};
+}
 
 var createCustomer = function(user) {
   var customer = new Customer();
@@ -164,48 +161,65 @@ exports.register = function(req, res, next) {
       if (!password) {return res.status(422).send({ error: 'Please enter a password.'});}
       if (!role) {return res.status(422).send({ error: 'Please specify member or owner.'});}
 
-      User.findOne({ username: username }, function(err, existingUser) {
-          if (err) { return next(err); }
+      console.log('register: checking for duplicate user name')
+      debug('register: checking for duplicate user name')
+      User.isUserForUsername(username, function(err, existingUser) {
+          if (err) {
+            console.error('register: error during registration');
+            return res.status(500).send({ error: err});
+          }
+          console.log(existingUser)
           if (existingUser) {
             return res.status(422).send({ error: 'That user name is already in use.'});
           }
-
-          var user = new User(req.body);
-          user.provider = 'local';
-          var method = "register";
-          if (role=='Owner') {
+          var user = {
+            name : name,
+            email : email,
+            username : username,
+            password : password,
+            role : role
+          }
+          console.log(user)
+          if (role== 'OWNER') {
             var message = null;
-            debug('register: creating Owner');
-            debug(req.body);
-            user.role = 'Owner';
-            createCompany(companyName, email, user, next, function(user) {
-              if (user instanceof Error) {
-                console.error('register: error creating company');
-                return res.status(500).send({ error: err});
-              }
-              user.save(function(err, user) {
+            console.log('register: creating User-Owner');
+            var provider = 'local'
+            var providerId = 'local'
+            var providerData = 'local'
+            User.createUser(name, email, username, password, role,
+              provider, providerId, providerData, function (err,userId) {
                 if (err) {
-                  console.error('register: error during user save');
-                  console.error(err);
-                  var message = getErrorMessage(err);
-                  return res.status(500).send({ error: message });
-                };
-                var userInfo = setUserInfo(user);
-                return res.status(201).json({
-                  token: 'JWT ' + sts.generateToken(userInfo),
-                  user: userInfo
-                });
-              });
-            });
-          }
-          else if (role == 'Customer') {
-            var message = null;
-            debug(req.body);
-            user.role = "Customer";
-            var customer = createCustomer(user, next);
-            user.roleId = customer.id;
-          }
-        });
+                  console.error('register: error creating company');
+                  return res.status(500).send({ error: err});
+                }
+                console.log('register: creating company')
+                createCompany(companyName, email, userId, function(err, companyId) {
+                  if (err) {
+                    console.error('register: error creating company');
+                    return res.status(500).send({ error: err});
+                  }
+                  var userInfo = setUserInfo(user);
+                  return res.status(201).json({
+                    token: 'JWT ' + sts.generateToken(userInfo),
+                    user: userInfo
+                  })
+                })
+              })
+            }
+            else if (role == 'CUSTOMER') {
+              console.log('register: creating User-Customer');
+              var message = null;
+              debug(req.body);
+              user.role = "CUSTOMER";
+              createCustomer(user, next);
+            } else if (role == 'ADMIN') {
+              console.log('register: creating User-Customer');
+              var message = null;
+              debug(req.body);
+              user.role = "ADMIN";
+              createCustomer(user, next);
+            }
+        })
       }
       else {
           return res.status(422).send({ error: 'A user is already logged in.'});
@@ -216,7 +230,7 @@ exports.roleAuthorization = function(role) {
   return function(req, res, next) {
     debug(req.user)
     const user = req.user;
-    User.findById(user._id, function(err, foundUser) {
+    User.getSingleUser(user._id, function(err, foundUser) {
       if (err) {
         debug(err)
         res.status(422).json({ error: 'No user was found.' });

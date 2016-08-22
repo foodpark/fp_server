@@ -1,4 +1,4 @@
-var Review = require('mongoose').model('Review');
+var Review = require ('../models/review.server.model');
 
 exports.create=function(req,res,next) {
 	if (req.user) {

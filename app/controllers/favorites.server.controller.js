@@ -1,4 +1,4 @@
-var Favorite = require('mongoose').model('Favorite');
+var Favorite = require ('../models/favorite.server.model');
 
 exports.create=function(req,res,next) {
 	var favorite = new Favorite(req.body);

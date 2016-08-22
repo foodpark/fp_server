@@ -1,12 +1,57 @@
-var Site = require('mongoose').model('Site');
+var Site = require ('../models/site.server.model'),
+		debug = require('debug')('sites.server.controller');
 
+exports.createSite = function(name, type, username, pass, company, callback) {
+	var site = new Site(
+		{
+			name: name,
+			user: username,
+			password: pass,
+			type: type,
+			company: company
+		}
+	)
+	site.save(function(err) {
+		if (err) {
+			return callback(err)
+		} else {
+			var user = new User (
+				{
+					name: name,
+					username: username,
+					password: pass,
+					email: company.email,
+					role: 'SiteMgr',
+					roleid: site.id
+				}
+			)
+			user.save(function (err) {
+				if (err) {
+					return callback(err)
+				}
+				return callback(site)
+			})
+		}
+	})
+
+}
 exports.create=function(req,res,next) {
-	var site = new Site(req.body);
+	var company = req.company
+	var type = req.body.type
+	var username = req.body.username
+	var pass = req.body.password
+
+	if (!type) {return res.status(422).send({ error: 'Please specify site type (truck, cart).'});}
+	if (!username) {return res.status(422).send({ error: 'Please enter a user name.'});}
+	if (!password) {return res.status(422).send({ error: 'Please enter a password.'});}
+
+	var name = company.name
 	site.save(function(err) {
 		if(err) {
 			return next(err);
 		}
 		else {
+			// create a new user
 			res.json(site);
 		}
 	});
