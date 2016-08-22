@@ -1,4 +1,5 @@
-var db = require ('../../config/knex');
+var db_config = require('../../config/knex'),
+    pg = require('knex')(db_config);
 
 /** v
 CREATE TABLE customers (
@@ -19,31 +20,17 @@ CREATE TABLE customers (
 **/
 
 exports.getAllCustomers = function () {
-  db.any('select * from customers')
-    .then(function (data) {
-      return(data)
-    })
-    .catch(function (err) {
-      return (err);
-    });
-}
-exports.getSingleCustomer = function (id) {
-  db.one('select * from customers where id = $1', id)
-    .then(function (data) {
-      return (data)
-    })
-    .catch(function (err) {
-      return (err);
-    });
+  pg('customers').select().asCallback(callback)
 }
 
-exports.createCustomer = function (name, email, userId) {
-  db.none('insert into customers(name, email, user_id)' +
-      'values($1, $2, $3) returning id', name, email, userId)
-    .then(function (data) {
-      return (data);
-    })
-    .catch(function (err) {
-      return (err);
-    });
+exports.getSingleCustomer = function (id, callback) {
+  pg('customers').select().where('id',id).asCallback(callback)
+}
+
+exports.createCustomer = function (name, userId, callback) {
+  pg('customers').insert(
+    {
+      name: name,
+      user_id: parseInt(userId)
+    }).returning('id').asCallback(callback)
 }

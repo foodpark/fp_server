@@ -26,15 +26,10 @@ INSERT INTO ROLES (type) values ('SITEMGR');
 INSERT INTO ROLES (type) values ('ADMIN');
 **/
 
-exports.getAllUsers = function() {
-  db.any('select * from users')
-    .then(function (data) {
-      return (data)
-    })
-    .catch(function (err) {
-      return (err);
-    });
+exports.getAllUsers = function(callback) {
+  pg('users').select().asCallback(callback)
 }
+
 exports.getSingleUser = function(id, callback) {
   pg('users').select().where('id', id).asCallback(callback)
 }

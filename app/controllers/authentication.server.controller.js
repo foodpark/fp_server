@@ -4,6 +4,7 @@ var sts = require('./security.server.controller'),
     passport = require('passport'),
     User = require ('../models/user.server.model'),
     Company = require ('../models/company.server.model'),
+    Customer = require ('../models/customer.server.model'),
     debug = require('debug')('authentication.server.controller');
 
 exports.CUSTOMER = 'CUSTOMER'
@@ -134,17 +135,6 @@ var createCompany = function(companyName, email, userId, callback) {
     })
 }
 
-var createCustomer = function(user) {
-  var customer = new Customer();
-  customer.name = user.name;
-  customer.user = user;
-  customer.save(function(err) {
-    if (err) {
-      return (err);
-    }
-  });
-};
-
 exports.register = function(req, res, next) {
     if (!req.user) {
       const email = req.body.email;
@@ -156,10 +146,12 @@ exports.register = function(req, res, next) {
 
       if (!email) {return res.status(422).send({ error: 'Please enter an email address.'});}
       if (!name) {return res.status(422).send({ error: 'Please enter your name.'});}
-      if (!companyName) {return res.status(422).send({ error: 'Please enter a company name.'});}
       if (!username) {return res.status(422).send({ error: 'Please enter a user name.'});}
       if (!password) {return res.status(422).send({ error: 'Please enter a password.'});}
       if (!role) {return res.status(422).send({ error: 'Please specify member or owner.'});}
+      if (role == 'OWNER') {
+        if (!companyName) {return res.status(422).send({ error: 'Please enter a company name.'});}
+      }
 
       console.log('register: checking for duplicate user name')
       debug('register: checking for duplicate user name')
@@ -211,7 +203,30 @@ exports.register = function(req, res, next) {
               var message = null;
               debug(req.body);
               user.role = "CUSTOMER";
-              createCustomer(user, next);
+
+              var provider = 'local'
+              var providerId = 'local'
+              var providerData = 'local'
+              User.createUser(name, email, username, password, role,
+                provider, providerId, providerData, function (err,userId) {
+                  if (err) {
+                    console.error('register: error creating user');
+                    return res.status(500).send({ error: err});
+                  }
+                  user.userId = userId
+                  console.log('register: creating customer')
+                  Customer.createCustomer(name, userId, function(err, customerId) {
+                    if (err) {
+                      console.error('register: error creating customer');
+                      return res.status(500).send({ error: err});
+                    }
+                    var userInfo = setUserInfo(user);
+                    return res.status(201).json({
+                      token: 'JWT ' + sts.generateToken(userInfo),
+                      user: userInfo
+                    })
+                  })
+                })
             } else if (role == 'ADMIN') {
               console.log('register: creating User-Customer');
               var message = null;
