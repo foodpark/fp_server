@@ -17,10 +17,31 @@ Provides relationship services between customer and food truck company.
 
 ## Installation
 
-1. Install MEAN server
-2. Git pull: git clone git@github.com:mpeter88/SFEZ_server.git
-4. cd SFEZ_server.git
-5. npm install
+Dependencies: docker & docker-compose (see https://github.com/thehumaneffort/docker-infrastructure for instructions & help)
+
+Start up the DB, and create the development database:
+```
+docker-compose up -d postgres
+docker-compose run pgadmin createdb sfez-development
+```
+
+Migrate the DB:
+```
+docker-compose run app npm run migrate:latest
+```
+
+Run the server (in development mode)
+```
+docker-compose up -d app
+docker-compose logs app
+```
+
+Now execute: `dinghy ip` (if you're using dinghy), or `echo
+$DOCKER_HOST`, and add that IP to your /etc/hosts file or use it in
+your browser:
+
+And go to http://192.168.99.100:1337/api/v1/sites (use the IP address
+from above)
 
 ## API Reference
 
