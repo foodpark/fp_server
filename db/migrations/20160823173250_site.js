@@ -9,8 +9,6 @@ exports.up = function(knex, Promise) {
       t.float('latitude');
       t.float('longitude');
 
-      t.integer('company_id').references('companies.id');
-
       t.timestamps();
     }),
   ]);
