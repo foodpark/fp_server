@@ -4,6 +4,8 @@ exports.up = function(knex, Promise) {
       t.increments();
 
       t.integer('user_id').references('users.id');
+
+      t.integer('company_id').references('companies.id');
       t.integer('site_id').references('sites.id');
 
       t.text('comment');
