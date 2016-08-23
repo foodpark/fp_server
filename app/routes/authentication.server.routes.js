@@ -1,37 +1,36 @@
-var auth = require('../../app/controllers/authentication.server.controller'),
-    express = require('express'),
-    passport = require('passport');
+var auth = require('../../app/controllers/authentication.server.controller');
+var passport = require('koa-passport');
+var Router = require('koa-router');
 
 var requireAuth = passport.authenticate('jwt', { session: false });
 var requireLogin = passport.authenticate('local', { session: false });
 
-var REQUIRE_ADMIN     = "Admin",
-      REQUIRE_OWNER   = "Owner",
-      REQUIRE_SITEMGR = "SiteMgr",
-      REQUIRE_CUSTOMER  = "Customer";
+var REQUIRE_ADMIN     = 'Admin',
+      REQUIRE_OWNER   = 'Owner',
+      REQUIRE_SITEMGR = 'SiteMgr',
+      REQUIRE_CUSTOMER  = 'Customer';
 
-module.exports = function(app) {
+module.exports = function() {
+  var router = new Router();
 
-    app.use('/api', requireAuth );
+  router.get('/auth/register', auth.renderRegister);
+  router.post('/auth/register', auth.register);
 
-    app.route('/auth/register')
-        .get(auth.renderRegister)
-        .post(auth.register);
+  router.get('/auth/login', auth.renderLogin);
+  router.post('/auth/login', requireLogin, auth.login);
 
-    app.route('/auth/login')
-        .get(auth.renderLogin)
-        .post(requireLogin, auth.login);
+  router.get('/auth/logout', auth.logout);
 
-    app.route('/auth/logout').get(auth.logout);
-
-    app.get('/oauth/facebook', passport.authenticate('facebook', {
+  router.get('/oauth/facebook', passport.authenticate('facebook', {
       failureRedirect: '/login',
-      scope:['email']
+      scope:['email'],
     }));
 
-    app.get('/oauth/facebook/callback', passport.authenticate('facebook', {
-      failureRedirect: '/login',
-      successRedirect: '/',
-      scope:['email']
-    }));
+  router.get('/oauth/facebook/callback', passport.authenticate('facebook', {
+    failureRedirect: '/login',
+    successRedirect: '/',
+    scope:['email'],
+  }));
+
+  return router;
 };
