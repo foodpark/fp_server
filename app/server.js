@@ -13,7 +13,7 @@ var passport = Passport();
 var config = require('../config/config');
 var dbConfig = require('../config/knex');
 
-var RestHooks = require('./rest_hooks');
+var RestOptions = require('./rest_options');
 
 var moltin = require('moltin')({
   publicId: config.clientId,
@@ -34,7 +34,7 @@ app.use(Views(__dirname + '/views', { extension: 'ejs' }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(Mount('/api', Resteasy({ hooks: RestHooks })));
+app.use(Mount('/api', Resteasy(RestOptions)));
 
 require('./routes')(app);
 
