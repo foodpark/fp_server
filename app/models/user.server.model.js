@@ -9,7 +9,6 @@ CREATE TABLE users (
   username TEXT NOT NULL,
   password TEXT NOT NULL,
   role TEXT REFERENCES roles (type),
-  role_id INTEGER,
   provider TEXT,
   provider_id TEXT,
   provider_data TEXT,
@@ -26,34 +25,19 @@ INSERT INTO ROLES (type) values ('ADMIN');
 **/
 
 exports.userForUsername = function(username) {
-  return knex('users').select('*').where('username', 'ILIKE', username);
+  return knex('users').select('*').where('username', 'ILIKE', username)
 };
 
-exports.getAllUsers = function(callback) {
-  knex('users').select().asCallback(callback);
+exports.getAllUsers = function() {
+  return knex('users').select()
 };
 
-exports.getSingleUser = function(id, callback) {
-  knex('users').select().where('id', id).asCallback(callback);
+exports.getSingleUser = function(id) {
+  return knex('users').select().where('id', id)
 };
 
-exports.getUserByUsername = function(username, callback) {
-  knex('users').select().where('username', username).asCallback(function(err, results) {
-    if (err) return callback(err);
-    console.log(results);
-    var user = results[0];
-    return callback(null, user);
-  });
-};
-
-exports.isUserForUsername = function(username, callback) {
-  knex('users').count('username').where('username', username).asCallback(function(err, results) {
-    if (err) return callback(err);
-    console.log(results);
-    var count = results[0].count;
-    if (count > 0) return callback(null, true);
-    return callback(null, false);
-  });
+exports.getUserByUsername = function(username) {
+  return knex('users').select().where('username', username)
 };
 
 exports.createUser = function(hash) {
@@ -69,4 +53,3 @@ exports.authenticate = function(md5password, password) {
 
   return md5password === md5;
 };
-

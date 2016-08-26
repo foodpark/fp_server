@@ -1,7 +1,6 @@
 app:
   build: .
   links:
-    - mongo
     - postgres
   volumes:
     - ./app:/application/app
@@ -13,11 +12,8 @@ app:
   command: nodemon app/server.js
   environment:
     - 'DATABASE_URL=postgresql://pguser:pgpass@postgres:5432/sfez-development'
-    - MONGO_URL=mongodb://mongo:27017/sfez
     - NODE_ENV=development
     - PORT=8080
-mongo:
-  image: mongo:3.3
 pgadmin:
   image: postgres:9.5
   command: tail -f /dev/null

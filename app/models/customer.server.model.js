@@ -1,6 +1,6 @@
-var pg = require('../../config/knex');
+var knex = require('../../config/knex');
 
-/** v
+/**
 CREATE TABLE customers (
   ID SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
@@ -19,17 +19,21 @@ CREATE TABLE customers (
 **/
 
 exports.getAllCustomers = function() {
-  pg('customers').select().asCallback(callback);
+  return knex('customers').select()
 };
 
-exports.getSingleCustomer = function(id, callback) {
-  pg('customers').select().where('id', id).asCallback(callback);
+exports.getSingleCustomer = function(id) {
+  return knex('customers').select().where('id', id)
 };
 
-exports.createCustomer = function(name, userId, callback) {
-  pg('customers').insert(
+exports.getForUser = function(userId) {
+  return knex('customers').select().where('user_id', userId)
+};
+
+exports.createCustomer = function(name, userId) {
+  return knex('customers').insert(
     {
       name: name,
-      user_id: parseInt(userId),
-    }).returning('id').asCallback(callback);
+      user_id: userId,
+    }).returning('*')
 };

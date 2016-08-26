@@ -66,9 +66,12 @@ var oAuthMoltin = function (callback) {
         if (bearerToken) { // possibly need to refresh
           refreshBearerToken(callback);
         }
-        console.error("response.statusCode: " + res.statusCode);
-        console.error("response.statusText: " + res.statusText);
-        callback(err);
+        console.err('Authorization with Moltin failed')
+        if (res) {
+          console.error("response.statusCode: " + res.statusCode);
+          console.error("response.statusText: " + res.statusText);
+          callback(err);
+        }
       }
   })
 };

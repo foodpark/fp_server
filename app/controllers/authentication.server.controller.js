@@ -234,37 +234,37 @@ exports.register = function*(next) {
       var provider_data = null;
 
       try {
-        var userObject = User.createUser(Object.assign(user, { provider, provider_id, provider_data }));
+        var userObject =  (yield User.createUser(Object.assign(user, { provider, provider_id, provider_data })))[0];
       } catch (err) {
         console.error('register: error creating user');
 
         throw err;
       }
-
+      console.log(userObject)
       user.userId = userObject.id;
 
       console.log('register: creating customer');
 
       try {
-        var customerId = yield Customer.createCustomer(name, userId); // , function(err, customerId) {
+        var customerId = yield Customer.createCustomer(name, user.userId); // , function(err, customerId) {
       } catch (err) {
         console.error('register: error creating customer');
         throw err;
       }
 
       var userInfo = setUserInfo(user);
-      return res.status(201).json({
+      this.status = 201;
+      this.body = {
         token: 'JWT ' + sts.generateToken(userInfo),
         user: userInfo,
-      });
-
+      };
       return;
     } else if (role == 'ADMIN') {
-      console.log('register: creating User-Customer');
+      console.log('register: creating User-Admin');
       var message = null;
       debug(this.body);
       user.role = 'ADMIN';
-      createCustomer(user, next);
+      /* createCustomer(user, next); */
       return;
     }
   }

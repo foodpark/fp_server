@@ -1,4 +1,4 @@
-var    pg = require('../../config/knex');
+var knex = require('../../config/knex');
 
 /**
 CREATE TABLE companies (
@@ -21,31 +21,25 @@ CREATE TABLE companies (
   taxband TEXT,
   user_id INTEGER REFERENCES users (id),
   created TIMESTAMP DEFAULT current_timestamp
-) **/
+)
+**/
 
 exports.getAllCompanies = function() {
-  db.any('select * from companies')
-    .then(function(data) {
-      return (data);
-    })
-    .catch(function(err) {
-      return (err);
-    });
+  return knex('companies').select()
 };
 
 exports.getSingleCompany = function(id) {
-  db.one('select * from companies where id = $1', id)
-    .then(function(data) {
-      return (data);
-    })
-    .catch(function(err) {
-      return (err);
-    });
+  return knex('companies').select().where('id', id)
+
 };
 
-exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug, callback) {
+exports.getForUser = function(userId) {
+  return knex('companies').select().where('user_id', userId)
+};
+
+exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug) {
   console.log('userId: ' + userId);
-  pg('companies').insert(
+  return knex('companies').insert(
     {
       name: name,
       email: email,
@@ -53,5 +47,5 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
       order_sys_id: moltCoId,
       default_cat: moltDefCat,
       base_slug: moltSlug,
-    }).returning('id').asCallback(callback);
+    }).returning('*')
 };
