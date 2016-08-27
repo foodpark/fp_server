@@ -24,6 +24,10 @@ CREATE TABLE companies (
 )
 **/
 
+exports.companyForCompanyName = function(companyName) {
+  return knex('companies').select('*').where('name', 'ILIKE', companyName)
+};
+
 exports.getAllCompanies = function() {
   return knex('companies').select()
 };
@@ -37,8 +41,7 @@ exports.getForUser = function(userId) {
   return knex('companies').select().where('user_id', userId)
 };
 
-exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug) {
-  console.log('userId: ' + userId);
+exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug, callback) {
   return knex('companies').insert(
     {
       name: name,
@@ -47,5 +50,5 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
       order_sys_id: moltCoId,
       default_cat: moltDefCat,
       base_slug: moltSlug,
-    }).returning('*')
+    }).returning('*').asCallback(callback);
 };

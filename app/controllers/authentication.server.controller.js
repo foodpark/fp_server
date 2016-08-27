@@ -133,13 +133,15 @@ var createCompany = function(companyName, email, userId) {
 
         console.log('moltin category successfully created : ' + moltinCat.id);
         Company.createCompany(companyName, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug,
-                              function(err, companyId) {
+                              function(err, company) {
+                                console.log('returned from db insert')
                                 if (err) {
                                   console.error('createCompany: error creating company');
                                   console.error(err);
                                   reject(err);
                                 } else {
-                                  resolve(companyId);
+                                  console.log(company)
+                                  resolve(company);
                                 }
                               });
       });
@@ -199,12 +201,25 @@ exports.register = function*(next) {
       console.error('register: error during registration');
       throw err;
     }
-
     if (existingUser) {
       this.status = 422;
       this.body = { error: 'That user name is already in use.'};
       return;
     }
+
+    console.log('register: checking for duplicate company name');
+    try {
+      existingCompany = (yield Company.companyForCompanyName(companyName))[0];
+    } catch (err) {
+      console.error('register: error during registration');
+      throw err;
+    }
+    if (existingCompany) {
+      this.status = 422;
+      this.body = { error: 'That company name is already in use.'};
+      return;
+    }
+
 
     var user = {
       name: name,
@@ -230,12 +245,12 @@ exports.register = function*(next) {
       }
 
       try {
-        var companyId  = yield createCompany(companyName, email, userObject.id);
+        var company  = yield createCompany(companyName, email, userObject.id);
       } catch (err) {
         console.error('register: error creating company');
         throw err;
       }
-
+      console.log('Complete. Authenticating user...')
       var userInfo = setUserInfo(user);
       this.status = 201;
       this.body = {
