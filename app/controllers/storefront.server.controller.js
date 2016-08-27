@@ -4,7 +4,6 @@ var User = require ('../models/user.server.model'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
     passport = require('passport'),
-    mongoose = require('mongoose'),
     debug = require('debug')('storefront.server.controller');
 
 var getErrorMessage = function(err) {
@@ -21,25 +20,30 @@ var sendErrorResponse = function(err, res, status) {
   return res.status(status).send({'error': err})
 }
 
-exports.createCategory=function(req,res,next) {
+exports.createCategory=function*(next) {
   debug(req.user)
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      const title = req.body.title;
-      const parent = req.body.parent;
-      if (!title) return res.status(422).send({ error: 'Title is required.'});
-      return msc.createCategory(company, title, parent, function(category) {
-        if (category instanceof Error) {
-          debug(category)
-          return res.status(422).send({ error: category});
-        }
-        else res.json(category)
-      })
-    }
-  })
+  try {
+    var company = (yield Company.companyForUser(companyId))[0]
+  } catch (err) {
+    console.err('error creating category: could not find company for user')
+    throw(err)
+  }
+  const title = req.body.title;
+  const parent = req.body.parent;
+  if (!title) {
+    this.status=422
+    this.body={ error: 'Please enter a title for the category.'}
+  }
+  try {
+    var category = yield msc.createCategory(company, title, parent)
+  } catch (err) {
+      console.err('error creating category in ordering system ')
+      throw(err)
+  }
+  this.body = category
+  return;
 }
+
 exports.listCategories=function(req,res,next) {
   var data = req.body;
   debug(req.user.roleId)

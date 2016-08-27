@@ -1,29 +1,40 @@
 var storefront = require('../../app/controllers/storefront.server.controller'),
-auth = require('../../app/controllers/authentication.server.controller');
+		auth = require('../../app/controllers/authentication.server.controller')
+		var Router = require('koa-router');;
 
 module.exports=function(app) {
-	app.route('/api/categories').post(auth.roleAuthorization("Owner"), storefront.createCategory).get(storefront.listCategories);
-  app.route('/api/categories/:categoryId').get(storefront.readCategory);
-	app.route('/api/categories/:categoryId').put(auth.roleAuthorization("Owner"), storefront.updateCategory);
-	app.route('/api/categories/:categoryId').delete(auth.roleAuthorization("Owner"), storefront.deleteCategory);
-	app.param('categoryId',storefront.getCategory);
+	var router = new Router();
+	router.post('/api/v1/categories', auth.roleAuthorization("Owner"), storefront.createCategory)
+	router.get('/api/v1/categories', storefront.listCategories)
+  router.get('/api/v1/categories/:categoryId', storefront.readCategory);
+	router.put('/api/v1/categories/:categoryId', auth.roleAuthorization("Owner"), storefront.updateCategory);
+	router.delete('/api/v1/categories/:categoryId', auth.roleAuthorization("Owner"), storefront.deleteCategory);
+	router.param('categoryId', storefront.getCategory);
 
-  app.route('/api/menuitems').post(auth.roleAuthorization("Owner"),  storefront.createMenuItem).get(storefront.listMenuItems);
-  app.route('/api/menuitems/:menuItemId').get(storefront.readMenuItem);
-	app.route('/api/menuitems/:menuItemId').put(auth.roleAuthorization("Owner"),  storefront.updateMenuItem);
-	app.route('/api/menuitems/:menuItemId').delete(auth.roleAuthorization("Owner"),  storefront.deleteMenuItem);
-	app.param('menuItemId',storefront.getMenuItem);
+  router.post('/api/v1/menuitems', auth.roleAuthorization("Owner"), storefront.createMenuItem)
+	router.get('/api/v1/menuitems', storefront.listMenuItems);
+  router.get('/api/v1/menuitems/:menuItemId', storefront.readMenuItem);
+	router.put('/api/v1/menuitems/:menuItemId', auth.roleAuthorization("Owner"), storefront.updateMenuItem);
+	router.delete('/api/v1/menuitems/:menuItemId', auth.roleAuthorization("Owner"), storefront.deleteMenuItem);
+	router.param('menuItemId', storefront.getMenuItem);
 
-	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems').post(auth.roleAuthorization("Owner"),  storefront.createOptionItem).get(storefront.listOptionItems);
-	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId').get(storefront.readOptionItem).put(auth.roleAuthorization("Owner"), storefront.updateOptionItem);
-	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId').delete(auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
-  app.route('/api/menuitems/:menuItemId/optioncategories').post(auth.roleAuthorization("Owner"),  storefront.createOptionCategory).get(storefront.listOptionCategories);
-	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId').get(storefront.readOptionCategory).put(auth.roleAuthorization("Owner"),  storefront.updateOptionCategory);
-	app.route('/api/menuitems/:menuItemId/optioncategories/:optionCategoryId').delete(auth.roleAuthorization("Owner"),  storefront.deleteOptionCategory);
-	app.param('optionCategoryId',storefront.getOptionCategory);
+	router.post('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', auth.roleAuthorization("Owner"), storefront.createOptionItem)
+	router.get('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems);
+	router.get('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
+	router.put('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization("Owner"), storefront.updateOptionItem);
+	router.delete('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
+  router.post('/api/v1/menuitems/:menuItemId/optioncategories', auth.roleAuthorization("Owner"), storefront.createOptionCategory)
+	router.get('/api/v1/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories);
+	router.get('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId', storefront.readOptionCategory)
+	router.put('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization("Owner"),  storefront.updateOptionCategory);
+	router.delete('/api/v1/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization("Owner"),  storefront.deleteOptionCategory);
+	router.param('optionCategoryId', storefront.getOptionCategory);
 
-  app.route('/api/menuitems/:menuItemId/optionitems').post(auth.roleAuthorization("Owner"),  storefront.createOptionItem).get(storefront.listOptionItems);
-  app.route('/api/menuitems/:menuItemId/optionitems/:optionItemId').get(storefront.readOptionItem).put(auth.roleAuthorization("Owner"), storefront.updateOptionItem);
-	app.route('/api/menuitems/:menuItemId/optionitems/:optionItemId').delete(auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
-  app.param('optionItemId',storefront.getOptionItem);
+  router.post('/api/v1/menuitems/:menuItemId/optionitems', auth.roleAuthorization("Owner"), storefront.createOptionItem)
+	router.get('/api/v1/menuitems/:menuItemId/optionitems', storefront.listOptionItems);
+  router.get('/api/v1/menuitems/:menuItemId/optionitems/:optionItemId', storefront.readOptionItem)
+	router.put('/api/v1/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization("Owner"), storefront.updateOptionItem);
+	router.delete('/api/v1/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
+  router.param('optionItemId', storefront.getOptionItem);
+	return router;
 };

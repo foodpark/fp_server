@@ -28,6 +28,10 @@ exports.companyForCompanyName = function(companyName) {
   return knex('companies').select('*').where('name', 'ILIKE', companyName)
 };
 
+exports.companyForUser = function(userId) {
+  return knex('companies').select('*').where('user_id', userId)
+};
+
 exports.getAllCompanies = function() {
   return knex('companies').select()
 };

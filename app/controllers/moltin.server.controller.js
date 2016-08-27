@@ -168,44 +168,54 @@ exports.createDefaultCategory=function(moltincompany, callback) {
   })
 };
 
-var requestEntities = function(flow, method, data, callback, id) {
+var requestEntities = function(flow, method, data, id) {
   debug (flow)
-  getBearerToken(function(token) {
-    if (token instanceof Error) return callback(token);
-    debug('token : '+ token)
-    var oid = '';
-    if (id) oid = '/'+id
-    request({
-      method: method,
-      url: config.moltinStoreUrl + flow + oid,
-      json: data,
-      headers: {
-        'Authorization': 'Bearer '+ token
+
+  return new Promise(function(resolve, reject) {
+    getBearerToken(function(token) {
+      if (token instanceof Error) {
+        reject(token);
+        return;
       }
-    },
-    function (err, res, body) {
-      if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
-        debug(body)
-        var bodyJson = JSON.stringify(res);
-        bodyJson = JSON.parse(bodyJson).body;
-        //debug(bodyJson.result)
-        return callback(bodyJson.result);
-      }
-      else {
-        console.error('Response Status: ' + res.statusCode)
-        if (err) {
-          console.error('err'+ err);
-          return callback(err);
-        }
-        console.error(body)
-        debug(body.error)
-        return callback(new Error(body.error))
-      }
+      debug('token : '+ token)
+      var oid = '';
+      if (id) oid = '/'+id
+      request(
+        {
+          method: method,
+          url: config.moltinStoreUrl + flow + oid,
+          json: data,
+          headers: {
+            'Authorization': 'Bearer '+ token
+          }
+        },
+        function (err, res, body) {
+          if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
+            debug(body)
+            var bodyJson = JSON.stringify(res);
+            bodyJson = JSON.parse(bodyJson).body;
+            //debug(bodyJson.result)
+            resolve(bodyJson.result)
+            return;
+          }
+          else {
+            console.error('Response Status: ' + res.statusCode)
+            if (err) {
+              console.error('err'+ err);
+              reject(err)
+              return;
+            }
+            console.error(body)
+            debug(body.error)
+            reject(body.error)
+            return;
+          }
+        })
     })
   })
 }
 
-exports.createCategory=function(company, catTitle, catParent,callback) {
+exports.createCategory=function(company, catTitle, catParent) {
   var catSlug = company.baseSlug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
   if (!catParent) catParent = company.defaultCategory;
   var data = {
@@ -217,7 +227,7 @@ exports.createCategory=function(company, catTitle, catParent,callback) {
     company : company.orderSysId
   }
   debug(data)
-  return requestEntities(CATEGORIES, POST, data, callback)
+  return requestEntities(CATEGORIES, POST, data)
 };
 exports.findCategory=function(company, categoryId, callback) {
   return requestEntities(CATEGORIES, GET, {id:categoryId, company:company.orderSysId}, callback)
