@@ -1,5 +1,4 @@
-var db_config = require('../../config/knex'),
-    pg = require('knex')(db_config);
+var knex = require('../../config/knex');
 
 /** var FavoriteSchema = new Schema({
     _id: false,

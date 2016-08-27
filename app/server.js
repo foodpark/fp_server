@@ -15,10 +15,6 @@ var dbConfig = require('../config/knex');
 
 var RestOptions = require('./rest_options');
 
-var moltin = require('moltin')({
-  publicId: config.clientId,
-  secretKey: config.client_secret,
-});
 
 var app = Koa();
 
@@ -38,8 +34,7 @@ app.use(Mount('/api', Resteasy(RestOptions)));
 
 require('./routes')(app);
 
-moltin.Authenticate(function() {
-  app.listen(config.port);
-  module.exports = app;
-  console.log(process.env.NODE_ENV + ' server running at http://localhost:' + config.port);
-});
+
+app.listen(config.port);
+module.exports = app;
+console.log(process.env.NODE_ENV + ' server running at http://localhost:' + config.port);

@@ -1,4 +1,4 @@
-var db = require ('../../config/knex');
+var knex = require('../../config/knex');
 
 /**
 siteOrderSysId:String,

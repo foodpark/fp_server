@@ -1,20 +1,11 @@
-var db_config = require('../../config/knex'),
-    pg = require('knex')(db_config);
+var knex = require('../../config/knex');
 
-/**
-var CheckinSchema = new Schema({
-    _id: false,
-    created: {
-        type: Date,
-        default: Date.now
-    },
-    site: {
-        type: Schema.ObjectId,
-        ref: 'Site'
-    },
-    customer: {
-        type: Schema.ObjectId,
-        ref: 'Customer'
-    }
-});
+
+/**CREATE TABLE checkins (
+  ID SERIAL PRIMARY KEY,
+  site_id INTEGER REFERENCES site (id),
+  point GEOMETRY NOT NULL,
+  food_park_id INTEGER REFERENCES food_park (id),
+  checkin TIMESTAMP,
+)
 **/

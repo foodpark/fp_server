@@ -1,21 +1,38 @@
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+var Koa = require('koa');
+var Body = require('koa-better-body');
+var Mount = require('koa-mount');
+var Helmet = require('koa-helmet');
+var Session = require('koa-session');
+var Views = require('koa-views');
+var Flash = require('koa-flash');
+var Resteasy = require('koa-resteasy')(require('./config/knex'));
 
-var config = require('./config/config'),
-    express = require('./config/express'),
-    db_config = require('./config/knex'),
-    passport = require('./config/passport'),
-  /*  moltin = require('moltin')({
-      publicId: config.clientId,
-      secretKey: config.client_secret
-    }); */
+var Passport = require('../config/passport');
+var passport = Passport();
 
+var config = require('./config/config');
+var dbConfig = require('./config/knex');
 
-var app = express(),
-    passport = passport(),
-    pg = require('knex')(db_config);
+var RestOptions = require('./app/rest_options');
 
-//moltin.Authenticate( function() {
-  app.listen(config.port);
-  module.exports=app;
-  console.log(process.env.NODE_ENV+ " server running at http://localhost:"+ config.port);
-//});
+var app = Koa();
+
+app.use(require('koa-error')());
+app.keys = [config.secret];
+
+app.use(Helmet());
+app.use(Body());
+app.use(Session(app));
+app.use(Flash());
+app.use(Views(__dirname + '/views', { extension: 'ejs' }));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(Mount('/api', Resteasy(RestOptions)));
+
+require('./routes')(app);
+
+app.listen(config.port);
+module.exports = app;
+console.log(process.env.NODE_ENV + ' server running at http://localhost:' + config.port);

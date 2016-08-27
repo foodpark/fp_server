@@ -148,6 +148,7 @@ var createCompany = function(companyName, email, userId) {
 };
 
 exports.register = function*(next) {
+  console.log("register")
   if (!this.isAuthenticated()) {
     const email = this.body.email;
     const name = this.body.name;
@@ -156,18 +157,37 @@ exports.register = function*(next) {
     const password = this.body.password;
     const role = this.body.role.toUpperCase();
 
-    if (!email) {return res.status(422).send({ error: 'Please enter an email address.'});}
-
-    if (!name) {return res.status(422).send({ error: 'Please enter your name.'});}
-
-    if (!username) {return res.status(422).send({ error: 'Please enter a user name.'});}
-
-    if (!password) {return res.status(422).send({ error: 'Please enter a password.'});}
-
-    if (!role) {return res.status(422).send({ error: 'Please specify member or owner.'});}
-
+    if (!email) {
+      this.status = 422
+      this.body = {error: 'Please enter an email address.'}
+      return;
+    }
+    if (!name) {
+      this.status = 422
+      this.body = {error: 'Please enter your name.'}
+      return;
+    }
+    if (!username) {
+      this.status = 422
+      this.body = {error: 'Please enter a user name.'}
+      return;
+    }
+    if (!password) {
+      this.status = 422
+      this.body = {error: 'Please enter a password.'}
+      return;
+    }
+    if (!role) {
+      this.status = 422
+      this.body = {error: 'Please specify member or owner.'}
+      return;
+    }
     if (role == 'OWNER') {
-      if (!companyName) {return res.status(422).send({ error: 'Please enter a company name.'});}
+      if (!companyName) {
+        this.status = 422
+        this.body = {error: 'Please enter a company name.'}
+        return;
+      }
     }
 
     console.log('register: checking for duplicate user name');
@@ -271,7 +291,6 @@ exports.register = function*(next) {
 
   this.status = 422;
   this.body = { error: 'A user is already logged in.'};
-
 };
 
 exports.roleAuthorization = function(role) {
