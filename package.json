@@ -1,11 +1,12 @@
 {
-  "name": "SFEZServer",
+  "name": "sfezserver",
   "version": "1.0.0",
   "scripts": {
     "migrate": "knex --knexfile db/config.js",
     "migrate:make": "knex --knexfile db/config.js migrate:make",
     "migrate:latest": "knex --knexfile db/config.js migrate:latest",
-    "migrate:rollback": "knex --knexfile db/config.js migrate:rollback"
+    "migrate:rollback": "knex --knexfile db/config.js migrate:rollback",
+    "start": "node server.js"
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
@@ -14,7 +15,7 @@
     "connect-flash": "^0.1.1",
     "debug": "^2.2.0",
     "ejs": "^2.4.2",
-    "express": "latest",
+    "express": "^4.14.0",
     "express-jwt": "^3.4.0",
     "express-params": "0.0.3",
     "express-session": "^1.14.0",
@@ -45,5 +46,18 @@
     "pg-promise": "^5.3.1",
     "querystring": "^0.2.0",
     "request": "^2.74.0"
-  }
+  },
+  "description": "The SFEZ server is a MEAN-based implementation that serves the relationship services for StreetFood EZ. Basic services include reviews, favorites, checkins, loyalty, social media.",
+  "main": "server.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattGuiger/SFEZ_server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MattGuiger/SFEZ_server/issues"
+  },
+  "homepage": "https://github.com/MattGuiger/SFEZ_server#readme"
 }
