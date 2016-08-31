@@ -8,7 +8,8 @@ exports.up = function(knex, Promise) {
       t.integer('unit_id').references('units.id');
       t.string('company_name');
       t.integer('company_id').references('companies.id');
-
+      t.integer('user_id').references('users.id'); //User who created checkin history
+      t.dateTime('service_cancellation_time');  //If you need to invalidate this history
       t.dateTime('check_in');
       t.dateTime('check_out');
 
@@ -17,6 +18,8 @@ exports.up = function(knex, Promise) {
 
       t.string('food_park_name');
       t.integer('food_park_id').references('food_parks.id');
+      t.string('note');
+      t.string('display_address'); //The address displayed to customers
 
       t.timestamps();
     }),
