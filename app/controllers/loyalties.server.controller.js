@@ -37,7 +37,7 @@ exports.loyaltyById=function(req,res,next,id) {
 	});
 };
 exports.listLoyaltiesForCompany=function(req,res,next,companyId) {
-	Loyalty.find({'site.company':companyId}, function(err,loyalties) {
+	Loyalty.find({'unit.company':companyId}, function(err,loyalties) {
 		if (err) {
 			return next(err);
 		} else {
@@ -54,8 +54,8 @@ exports.listLoyaltiesForCustomer=function(req,res,next,customerId) {
 		}
 	});
 };
-exports.listLoyaltiesForSite=function(req,res,next,siteId) {
-	Loyalty.find({'site':siteId}, function(err,loyalties) {
+exports.listLoyaltiesForUnit=function(req,res,next,unitId) {
+	Loyalty.find({'unit':unitId}, function(err,loyalties) {
 		if (err) {
 			return next(err);
 		} else {
@@ -73,7 +73,7 @@ exports.update=function(req,res,next) {
 		}
 	});
 };
-// Loyaltys don't have an _id attribute as they are retrieved by user, site,
+// Loyaltys don't have an _id attribute as they are retrieved by user, unit,
 // and company
 // exports.listLoyaltyById=function(req,res,next,id) {}
 

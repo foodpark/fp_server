@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
       t.dateTime('check_out');
 
       t.integer('company_id').references('companies.id');
-      t.integer('site_id').references('sites.id');
+      t.integer('unit_id').references('units.id');
 
       t.timestamps();
     }),

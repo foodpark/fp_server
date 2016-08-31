@@ -41,7 +41,7 @@ angular.module('myApp', ['ngResource']);
 ## Documentation
 
 Documentation is available on the
-[AngularJS docs site](http://docs.angularjs.org/api/ngResource).
+[AngularJS docs unit](http://docs.angularjs.org/api/ngResource).
 
 ## License
 

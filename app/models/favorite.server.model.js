@@ -6,9 +6,9 @@ var knex = require('../../config/knex');
         type: Date,
         default: Date.now
     },
-    site: {
+    unit: {
         type: Schema.ObjectId,
-        ref: 'Site'
+        ref: 'Unit'
     },
     user: {
         type: Schema.ObjectId,

@@ -6,5 +6,5 @@ module.exports=function(app) {
 	app.param('loyaltyId',loyalties.loyaltyById);
   app.route('/api/loyalty/companies/:companyId').get(loyalties.listLoyaltiesForCompany);
   app.route('/api/loyalty/customers/:customerId').get(loyalties.listLoyaltiesForCustomer);
-  app.route('/api/loyalty/sites/:siteId').get(loyalties.listLoyaltiesForSite);
+  app.route('/api/loyalty/units/:unitId').get(loyalties.listLoyaltiesForUnit);
 };

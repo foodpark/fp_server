@@ -1,9 +1,7 @@
 var sts = require('./security.server.controller'),
     jwt = require('jsonwebtoken'),
-    config = require('../../config/config'),
-    passport = require('passport');
+    config = require('../../config/config');
 
-var moltinAccessToken='';
 
 exports.generateToken = function(user) {
   return jwt.sign(user, config.secret, {

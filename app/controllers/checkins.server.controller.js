@@ -22,7 +22,7 @@ exports.list=function(req,res,next) {
 	});
 };
 exports.listCheckinsForCompany=function(req,res,next,companyId) {
-	Checkin.find({'site.company':companyId}, function(err,checkins) {
+	Checkin.find({'unit.company':companyId}, function(err,checkins) {
 		if (err) {
 			return next(err);
 		} else {
@@ -39,8 +39,8 @@ exports.listCheckinsForCustomer=function(req,res,next,customerId) {
 		}
 	});
 };
-exports.listCheckinsForSite=function(req,res,next,siteId) {
-	Checkin.find({'site':siteId}, function(err,checkins) {
+exports.listCheckinsForUnit=function(req,res,next,unitId) {
+	Checkin.find({'unit':unitId}, function(err,checkins) {
 		if (err) {
 			return next(err);
 		} else {
@@ -48,7 +48,7 @@ exports.listCheckinsForSite=function(req,res,next,siteId) {
 		}
 	});
 };
-// Checkins don't have an _id attribute as they are retrieved by user, site,
+// Checkins don't have an _id attribute as they are retrieved by user, unit,
 // and company
 // exports.listCheckinById=function(req,res,next,id) {}
 

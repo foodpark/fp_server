@@ -38,23 +38,22 @@ var getErrorMessage = function(err) {
 var setUserInfo = function(user) {
   return {
     id: user.id,
-    name: user.name,
     username: user.username,
-    email: user.email,
     role: user.role,
   };
 };
 
 exports.login = function*(next) {
-  this.body = _.keys(this);
-  return;
-
-  var userInfo = setUserInfo(this.user);
+  // login has been processed through passport
+  console.log('login complete')
+  console.log(this.user)
+  var userInfo = setUserInfo(user);
   this.status = 200;
   this.body = {
     token: 'JWT ' + sts.generateToken(userInfo),
     user: userInfo,
   };
+  return;
 };
 
 exports.renderLogin = function*(next) {
@@ -222,8 +221,6 @@ exports.register = function*(next) {
 
 
     var user = {
-      name: name,
-      email: email,
       username: username,
       password: password,
       role: role,
@@ -312,7 +309,7 @@ exports.roleAuthorization = function(role) {
   return function*(next) {
     debug(this.user);
     const user = this.user;
-    User.getSingleUser(user._id, function(err, foundUser) {
+    User.getSingleUser(user.id, function(err, foundUser) {
       if (err) {
         debug(err);
         res.status(422).json({ error: 'No user was found.' });

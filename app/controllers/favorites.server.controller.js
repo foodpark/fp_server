@@ -25,7 +25,7 @@ exports.read=function(req,res,next) {
 	res.json(req.favorite);
 };
 exports.listFavoritesForCompany=function(req,res,next,companyId) {
-	Favorite.find({'site.company':companyId}, function(err,favorites) {
+	Favorite.find({'unit.company':companyId}, function(err,favorites) {
 		if (err) {
 			return next(err);
 		} else {
@@ -43,8 +43,8 @@ exports.listFavoritesForCustomer=function(req,res,next,customerId) {
 		}
 	});
 };
-exports.listFavoritesForSite=function(req,res,next,siteId) {
-	Favorite.find({'site':siteId}, function(err,favorites) {
+exports.listFavoritesForUnit=function(req,res,next,unitId) {
+	Favorite.find({'unit':unitId}, function(err,favorites) {
 		if (err) {
 			return next(err);
 		} else {
@@ -66,7 +66,7 @@ exports.delete = function(req, res) {
 };
 
 // Favorites don't have an _id attribute as they are retrieved by customer,
-// site,and company
+// unit,and company
 // exports.listFavoriteById=function(req,res,next,id) {}
 
 // Favorites are not updated

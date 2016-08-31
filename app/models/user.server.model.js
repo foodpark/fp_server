@@ -4,8 +4,6 @@ var crypto = require('crypto'),
 
 CREATE TABLE users (
   ID SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
   username TEXT NOT NULL,
   password TEXT NOT NULL,
   role TEXT REFERENCES roles (type),
@@ -24,8 +22,21 @@ INSERT INTO ROLES (type) values ('SITEMGR');
 INSERT INTO ROLES (type) values ('ADMIN');
 **/
 
+var encryptPassword = function (password) {
+  var md5 = crypto.createHash('md5');
+  md5 = md5.update(password).digest('hex');
+
+  return md5;
+}
+
 exports.userForUsername = function(username) {
   return knex('users').select('*').where('username', 'ILIKE', username)
+};
+
+/* Used for LocalStrategy login */
+exports.getUserByUsername = function(username, callback) {
+  console.log('user model: get user by '+ username)
+  return knex('users').select('*').where('username', 'ILIKE', username).asCallback(callback)
 };
 
 exports.getAllUsers = function() {
@@ -36,20 +47,26 @@ exports.getSingleUser = function(id) {
   return knex('users').select().where('id', id)
 };
 
-exports.getUserByUsername = function(username) {
-  return knex('users').select().where('username', username)
-};
-
 exports.createUser = function(hash) {
-  //enrypt password
-  var md5 = crypto.createHash('md5');
-  hash.password = md5.update(hash.password).digest('hex');
+  hash.password = encryptPassword(hash.password);
   return knex('users').insert(hash).returning('*');
 };
 
+exports.updateUser = function(id, hash) {
+  hash.password = encryptPassword(hash.password);
+  return knex('users').update(hash).where('id',id).returning('*');
+};
+
+exports.createOrUpdateUser = function(hash) {
+  var user = this.userForUsername(hash.username)[0];
+  if (user) {
+    return this.updateUser(id, hash)
+  }
+  return this.createUser(hash)
+}
+
 exports.authenticate = function(md5password, password) {
-  var md5 = crypto.createHash('md5');
-  md5 = md5.update(password).digest('hex');
+  var md5 = encryptPassord(password)
 
   return md5password === md5;
 };

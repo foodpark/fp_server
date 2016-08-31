@@ -37,7 +37,7 @@ Then add a `<script>` to your `index.html`:
 ## Documentation
 
 Documentation is available on the
-[AngularJS docs site](http://docs.angularjs.org/).
+[AngularJS docs unit](http://docs.angularjs.org/).
 
 ## License
 

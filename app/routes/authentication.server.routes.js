@@ -5,10 +5,10 @@ var Router = require('koa-router');
 var requireAuth = passport.authenticate('jwt', { session: false });
 var requireLogin = passport.authenticate('local', { session: false });
 
-var REQUIRE_ADMIN     = 'Admin',
-      REQUIRE_OWNER   = 'Owner',
-      REQUIRE_SITEMGR = 'SiteMgr',
-      REQUIRE_CUSTOMER  = 'Customer';
+var REQUIRE_ADMIN     = 'ADMIN',
+    REQUIRE_OWNER     = 'OWNER',
+    REQUIRE_SITEMGR   = 'SITEMGR',
+    REQUIRE_CUSTOMER  = 'CUSTOMER';
 
 module.exports = function() {
   var router = new Router();

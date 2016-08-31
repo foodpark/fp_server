@@ -6694,7 +6694,7 @@ function $TemplateCacheProvider() {
  * - "linkFn" - linking fn of a single directive
  * - "nodeLinkFn" - function that aggregates all linking fns for a particular node
  * - "childLinkFn" -  function that aggregates all linking fns for child nodes of a particular node
- * - "compositeLinkFn" - function that aggregates all linking fns for a compilation root (nodeList)
+ * - "compounitLinkFn" - function that aggregates all linking fns for a compilation root (nodeList)
  */
 
 
@@ -8328,7 +8328,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         }
       }
 
-      var compositeLinkFn =
+      var compounitLinkFn =
               compileNodes($compileNodes, transcludeFn, $compileNodes,
                            maxPriority, ignoreDirective, previousCompileContext);
       compile.$$addScopeClass($compileNodes);
@@ -8387,7 +8387,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
         compile.$$addScopeInfo($linkNode, scope);
 
         if (cloneConnectFn) cloneConnectFn($linkNode, scope);
-        if (compositeLinkFn) compositeLinkFn(scope, $linkNode, $linkNode, parentBoundTranscludeFn);
+        if (compounitLinkFn) compounitLinkFn(scope, $linkNode, $linkNode, parentBoundTranscludeFn);
         return $linkNode;
       };
     }
@@ -8405,7 +8405,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
     /**
      * Compile function matches each node in nodeList against the directives. Once all directives
      * for a particular node are collected their compile functions are executed. The compile
-     * functions return values - the linking functions - are combined into a composite linking
+     * functions return values - the linking functions - are combined into a compounit linking
      * function, which is the a linking function for the node.
      *
      * @param {NodeList} nodeList an array of nodes or NodeList to compile
@@ -8415,7 +8415,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
      *        the rootElement must be set the jqLite collection of the compile root. This is
      *        needed so that the jqLite collection items can be replaced with widgets.
      * @param {number=} maxPriority Max directive priority.
-     * @returns {Function} A composite linking function of all of the matched directives or null.
+     * @returns {Function} A compounit linking function of all of the matched directives or null.
      */
     function compileNodes(nodeList, transcludeFn, $rootElement, maxPriority, ignoreDirective,
                             previousCompileContext) {
@@ -8458,9 +8458,9 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       }
 
       // return a linking function if we have found anything, null otherwise
-      return linkFnFound ? compositeLinkFn : null;
+      return linkFnFound ? compounitLinkFn : null;
 
-      function compositeLinkFn(scope, nodeList, $rootElement, parentBoundTranscludeFn) {
+      function compounitLinkFn(scope, nodeList, $rootElement, parentBoundTranscludeFn) {
         var nodeLinkFn, childLinkFn, node, childScope, i, ii, idx, childBoundTranscludeFn;
         var stableNodeList;
 
@@ -11111,7 +11111,7 @@ function $HttpProvider() {
      * When designing web applications, consider security threats from:
      *
      * - [JSON vulnerability](http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx)
-     * - [XSRF](http://en.wikipedia.org/wiki/Cross-site_request_forgery)
+     * - [XSRF](http://en.wikipedia.org/wiki/Cross-unit_request_forgery)
      *
      * Both server and the client must cooperate in order to eliminate these threats. Angular comes
      * pre-configured with strategies that address these issues, but for this to work backend server
@@ -11120,7 +11120,7 @@ function $HttpProvider() {
      * ### JSON Vulnerability Protection
      *
      * A [JSON vulnerability](http://haacked.com/archive/2008/11/20/anatomy-of-a-subtle-json-vulnerability.aspx)
-     * allows third party website to turn your JSON resource URL into
+     * allows third party webunit to turn your JSON resource URL into
      * [JSONP](http://en.wikipedia.org/wiki/JSONP) request under some conditions. To
      * counter this your server can prefix all JSON requests with following string `")]}',\n"`.
      * Angular will automatically strip the prefix before processing it as JSON.
@@ -11141,9 +11141,9 @@ function $HttpProvider() {
      *
      * ### Cross Site Request Forgery (XSRF) Protection
      *
-     * [XSRF](http://en.wikipedia.org/wiki/Cross-site_request_forgery) is an attack technique by
+     * [XSRF](http://en.wikipedia.org/wiki/Cross-unit_request_forgery) is an attack technique by
      * which the attacker can trick an authenticated user into unknowingly executing actions on your
-     * website. Angular provides a mechanism to counter XSRF. When performing XHR requests, the
+     * webunit. Angular provides a mechanism to counter XSRF. When performing XHR requests, the
      * $http service reads a token from a cookie (by default, `XSRF-TOKEN`) and sets it as an HTTP
      * header (`X-XSRF-TOKEN`). Since only JavaScript that runs on your domain could read the
      * cookie, your server can be assured that the XHR came from JavaScript running on your domain.
@@ -11154,7 +11154,7 @@ function $HttpProvider() {
      * server can verify that the cookie matches `X-XSRF-TOKEN` HTTP header, and therefore be sure
      * that only JavaScript running on your domain could have sent the request. The token must be
      * unique for each user and must be verifiable by the server (to prevent the JavaScript from
-     * making up its own tokens). We recommend that the token is a digest of your site's
+     * making up its own tokens). We recommend that the token is a digest of your unit's
      * authentication cookie with a [salt](https://en.wikipedia.org/wiki/Salt_(cryptography&#41;)
      * for added security.
      *
@@ -28104,7 +28104,7 @@ function isObjectEmpty(obj) {
  * @description
  * The `ngNonBindable` directive tells Angular not to compile or bind the contents of the current
  * DOM element. This is useful if the element contains what appears to be Angular directives and
- * bindings but which should be ignored by Angular. This could be the case if you have a site that
+ * bindings but which should be ignored by Angular. This could be the case if you have a unit that
  * displays snippets of code, for instance.
  *
  * @element ANY

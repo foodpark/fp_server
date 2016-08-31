@@ -40,7 +40,7 @@ Now execute: `dinghy ip` (if you're using dinghy), or `echo
 $DOCKER_HOST`, and add that IP to your /etc/hosts file or use it in
 your browser:
 
-And go to http://192.168.99.100:1337/api/v1/sites (use the IP address
+And go to http://192.168.99.100:1337/api/v1/units (use the IP address
 from above)
 
 ## API Reference
@@ -52,7 +52,7 @@ customers
 favorites
 loyalty
 orders
-sites
+units
 
 ## Tests
 

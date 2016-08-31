@@ -6,5 +6,5 @@ module.exports=function(app) {
 	app.param('reviewId',reviews.reviewById);
   app.route('/api/reviews/companies/:companyId').get(reviews.listReviewsForCompany);
   app.route('/api/reviews/customers/:customerId').get(reviews.listReviewsForCustomer);
-  app.route('/api/reviews/sites/:siteId').get(reviews.listReviewsForSite);
+  app.route('/api/reviews/units/:unitId').get(reviews.listReviewsForUnit);
 };

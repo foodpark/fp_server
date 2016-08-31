@@ -4,8 +4,8 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('checkin_history', function(t) {
       t.increments();
 
-      t.string('site_name');
-      t.integer('site_id').references('sites.id');
+      t.string('unit_name');
+      t.integer('unit_id').references('units.id');
       t.string('company_name');
       t.integer('company_id').references('companies.id');
 

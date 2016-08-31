@@ -42,7 +42,7 @@ exports.reviewById=function(req,res,next,id) {
 	});
 };
 exports.listReviewsForCompany=function(req,res,next,companyId) {
-	Review.find({'site.company':companyId}, function(err,reviews) {
+	Review.find({'unit.company':companyId}, function(err,reviews) {
 		if (err) {
 			return next(err);
 		} else {
@@ -59,8 +59,8 @@ exports.listReviewsForCustomer=function(req,res,next,customerId) {
 		}
 	});
 };
-exports.listReviewsForSite=function(req,res,next,siteId) {
-	Review.find({'site':siteId}, function(err,reviews) {
+exports.listReviewsForUnit=function(req,res,next,unitId) {
+	Review.find({'unit':unitId}, function(err,reviews) {
 		if (err) {
 			return next(err);
 		} else {

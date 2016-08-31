@@ -6,9 +6,9 @@ exports.up = function(knex, Promise) {
       t.integer('user_id').references('users.id');
 
       t.integer('company_id').references('companies.id');
-      t.integer('site_id').references('sites.id');
+      t.integer('unit_id').references('units.id');
 
-      t.text('comment');
+      t.string('comment');
       t.decimal('rating', 2, 1);
       t.specificType('answers', 'jsonb[]');
 

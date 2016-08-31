@@ -3,7 +3,6 @@ var User = require ('../models/user.server.model'),
     Customer = require ('../models/customer.server.model'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
-    passport = require('passport'),
     debug = require('debug')('storefront.server.controller');
 
 var getErrorMessage = function(err) {
