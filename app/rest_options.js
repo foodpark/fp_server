@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Queries = require('koa-resteasy').Queries;
 var User = require('./models/user.server.model');
+var Unit = require('./models/unit.server.model')
 
 function *beforeSaveReview() {
   var answers = this.resteasy.object.answers;
@@ -18,8 +19,8 @@ function *beforeSaveUnit() {
   /** A Unit is associated with a User-UnitMgr
     * Owners create/update/delete Units and by association
     * create/update/delete the User-UnitMgr.
-    * Username/password are replicated here so that they can easily be
-    * dsplayed to the Owner, specifically that the password can be shown/updated
+    * User-UnitMgr username/password are replicated in Unit so that they can be
+    * displayed to the Owner, specifically that the password can be shown/updated
     * 1. Creating a unit - make sure the unit name is unique in Units,
     *    as well as the username in users
     * 2. Update a unit - if the username/password is changed, it also needs
@@ -30,7 +31,6 @@ function *beforeSaveUnit() {
     *       and we need the unit_mgr_id in order to update the right User record
     *       if the username has changed
     */
-  console.log(this.resteasy)
   var username = this.resteasy.object.username;
   var password = this.resteasy.object.password;
   var existingUser = '';
@@ -50,7 +50,7 @@ function *beforeSaveUnit() {
     // associated, then any existing user found is a failure of uniqueness.
     // No existing user found means a new username is being entered for the Unit
     // and User-UnitMgr
-    var unitId = this.resteasy.object.id
+    var unitId = this.params.id
     if (!unitId) { // must have unit id for update
       throw new Error('update operation requires unit id')
     }
@@ -60,7 +60,12 @@ function *beforeSaveUnit() {
       console.error('update unit: error retrieving unit during update');
       throw err;
     }
-    if (existingUser.id == unit.unit_mgr_id) {
+    console.log(this.params)
+    console.log('existing user ')
+    console.log(existingUser)
+    console.log('unit ')
+    console.log(unit)
+    if (existingUser && (existingUser.id == unit.unit_mgr_id)) {
       // No other unit/user is using (potentially new) username
       existingUser = ''
       // check if changed. Must use unit to check password, as password in
@@ -68,24 +73,35 @@ function *beforeSaveUnit() {
       if (username==unit.username && password == unit.password) {
         // No changes to User record
         createOrUpdateUser = false;
-      } // eles there's a new username or password and we'll need to use the
+      } // else there's a new username or password and we'll need to use the
         // unit.unit_mgr_id for the update
-    } // else the existingUser doesn't belong to this unit. Error thrown below
+    } // else no existingUser and this is an update to username
+      // Or existingUser doesn't belong to this unit so throw error below
   }
   if (existingUser) {
     throw new Error('That user name is already in use.');
     return;
   }
   if (createOrUpdateUser) {
-    var unitUser = { role: 'SITEMGR', username: username, password: password}
-    if (unit) unitUser.id = unit.unit_mgr_id // update the right one
+    var unitmgr = { role: 'SITEMGR', username: username, password: password}
+    if (unit) unitmgr.id = unit.unit_mgr_id // update the right one
+    console.log(unitmgr)
     try {
-      var user = (yield User.createOrUpdateUser(unitUser))[0]
+      var user = (yield User.createOrUpdateUser(unitmgr))[0]
     } catch (err) {
       console.error('create/update unit: error creating/updating User-UnitMgr');
       throw err;
     }
-    if (!unit) this.resteasy.object.unit_mgr_id = user.id; // a new Unit
+    if (!unit) {
+      this.resteasy.object.unit_mgr_id = user.id; // a new Unit
+      // get the company
+      if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
+        this.resteasy.object.company_id = m[1]
+      } else {
+        // no company context is an error
+        throw new Error ('No company context for unit')
+      }
+    }
   }
 }
 
@@ -136,7 +152,7 @@ module.exports = {
   applyContext: function(query) {
     var context = this.params.context;
     var m;
-    if (this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+    if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
       return query.select(['units.*', 'checkins.check_in AS unit_check_in', 'checkins.check_out AS unit_check_out']).join('checkins', 'checkins.unit_id', 'units.id')
         .whereRaw('checkins.company_id = ? AND checkins.check_in <= now() AND ( checkins.check_out IS NULL OR checkins.check_out >= now() )', [m[1]]);
       /*        .where('checkins.company_id', '=', m[1])

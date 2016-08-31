@@ -58,9 +58,9 @@ exports.updateUser = function(id, hash) {
 };
 
 exports.createOrUpdateUser = function(hash) {
-  var user = this.userForUsername(hash.username)[0];
-  if (user) {
-    return this.updateUser(id, hash)
+  var userId = hash.id
+  if (userId) {
+    return this.updateUser(userId, hash)
   }
   return this.createUser(hash)
 }
