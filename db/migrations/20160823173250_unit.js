@@ -7,7 +7,7 @@ exports.up = function(knex, Promise) {
       t.string('type');
       t.string('username');
       t.string('password');
-      t.increments('number');
+      t.integer('number');
       t.string('qr_code');
 
       t.integer('unit_order_sys_id');
