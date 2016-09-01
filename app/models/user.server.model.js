@@ -18,7 +18,7 @@ CREATE TABLE roles (
 )
 INSERT INTO ROLES (type) values ('CUSTOMER');
 INSERT INTO ROLES (type) values ('OWNER');
-INSERT INTO ROLES (type) values ('SITEMGR');
+INSERT INTO ROLES (type) values ('UNITMGR');
 INSERT INTO ROLES (type) values ('ADMIN');
 **/
 

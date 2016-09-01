@@ -119,6 +119,23 @@ function *afterUpdateReviewApproval(approval) {
 
 module.exports = {
   hooks: {
+    authorize: function *(operation, object) {
+      if (operation == 'create') {
+        console.log('authorize create')
+        console.log(this.params.context)
+      } else if (operation == 'update') {
+        console.log('authorize update')
+        console.log(this.params.context)
+        console.log(this.user)
+      } else if (operation == 'read') {
+        console.log('authorize read')
+        console.log(this.params.context)
+      } else {
+        console.erro('authorize: unknown operation' + operation)
+        throw new Error ('unknown operation: '+ operation)
+      }
+    },
+
     beforeSave: function *() {
       if (this.resteasy.table == 'reviews') {
         yield beforeSaveReview.call(this);

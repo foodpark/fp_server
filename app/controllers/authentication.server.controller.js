@@ -5,6 +5,7 @@ var sts = require('./security.server.controller'),
     User = require('../models/user.server.model'),
     Company = require('../models/company.server.model'),
     Customer = require('../models/customer.server.model'),
+    Admin = require('../models/admin.server.model'),
     debug = require('debug')('authentication.server.controller');
 
 var _ = require('lodash');
@@ -189,6 +190,18 @@ exports.register = function*(next) {
         this.body = {error: 'Please enter a company name.'}
         return;
       }
+      console.log('register: checking for duplicate company name');
+      try {
+        existingCompany = (yield Company.companyForCompanyName(companyName))[0];
+      } catch (err) {
+        console.error('register: error during registration');
+        throw err;
+      }
+      if (existingCompany) {
+        this.status = 422;
+        this.body = { error: 'That company name is already in use.'};
+        return;
+      }
     }
 
     console.log('register: checking for duplicate user name');
@@ -206,40 +219,27 @@ exports.register = function*(next) {
       return;
     }
 
-    console.log('register: checking for duplicate company name');
-    try {
-      existingCompany = (yield Company.companyForCompanyName(companyName))[0];
-    } catch (err) {
-      console.error('register: error during registration');
-      throw err;
-    }
-    if (existingCompany) {
-      this.status = 422;
-      this.body = { error: 'That company name is already in use.'};
-      return;
-    }
-
-
     var user = {
       username: username,
       password: password,
       role: role,
     };
-    console.log(user);
+
+    var provider = 'local';
+    var provider_id = 'local';
+    var provider_data = null;
+
+
+    console.log('register: creating user');
+    try {
+      var userObject =  (yield User.createUser(Object.assign(user, { provider, provider_id, provider_data })))[0];
+    } catch (err) {
+      console.error('register: error creating user');
+      throw err;
+    }
+
     if (role == 'OWNER') {
-      var message = null;
-      console.log('register: creating User-Owner');
-
-      var provider = 'local';
-      var provider_id = 'local';
-      var provider_data = null;
-
-      try {
-        var userObject = (yield User.createUser(Object.assign(user, { provider, provider_id, provider_data })))[0];
-      } catch (err) {
-        console.error('register: error creating user');
-        throw err;
-      }
+      console.log('register: creating company');
 
       try {
         var company  = yield createCompany(companyName, email, userObject.id);
@@ -255,30 +255,12 @@ exports.register = function*(next) {
         user: userInfo,
       };
       return;
+
     } else if (role == 'CUSTOMER') {
-      console.log('register: creating User-Customer');
-      var message = null;
-      debug(this.body);
-      user.role = 'CUSTOMER';
-
-      var provider = 'local';
-      var provider_id = 'local';
-      var provider_data = null;
-
-      try {
-        var userObject =  (yield User.createUser(Object.assign(user, { provider, provider_id, provider_data })))[0];
-      } catch (err) {
-        console.error('register: error creating user');
-
-        throw err;
-      }
-      console.log(userObject)
-      user.userId = userObject.id;
-
       console.log('register: creating customer');
 
       try {
-        var customerId = yield Customer.createCustomer(name, user.userId); // , function(err, customerId) {
+        var customerId = yield Customer.createCustomer(name, userObject.id);
       } catch (err) {
         console.error('register: error creating customer');
         throw err;
@@ -292,11 +274,21 @@ exports.register = function*(next) {
       };
       return;
     } else if (role == 'ADMIN') {
-      console.log('register: creating User-Admin');
-      var message = null;
-      debug(this.body);
-      user.role = 'ADMIN';
-      /* createCustomer(user, next); */
+      console.log('register: creating admin');
+
+      try {
+        var customerId = yield Admin.createAdmin(name, userObject.id);
+      } catch (err) {
+        console.error('register: error creating admin');
+        throw err;
+      }
+
+      var userInfo = setUserInfo(user);
+      this.status = 201;
+      this.body = {
+        token: 'JWT ' + sts.generateToken(userInfo),
+        user: userInfo,
+      };
       return;
     }
   }
