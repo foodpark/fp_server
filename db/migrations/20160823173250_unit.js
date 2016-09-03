@@ -7,8 +7,10 @@ exports.up = function(knex, Promise) {
       t.string('type');
       t.string('username');
       t.string('password');
-      t.increments('number');
+      t.integer('number');
       t.string('qr_code');
+      t.float('latitude');
+      t.float('longitude');
 
       t.integer('unit_order_sys_id');
       t.integer('company_id').references('companies.id');

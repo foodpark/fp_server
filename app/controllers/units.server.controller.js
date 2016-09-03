@@ -89,6 +89,15 @@ exports.listUnitsForCompany=function(req,res,next,companyId) {
 		}
 	});
 };
+exports.searchUnits=function(req, res, next) {
+	Unit.findByCheckinTimebox(req.params.latitude, req.params.longitude, req.params.distance, req.params.time,function(err,units) {
+		if (err) {
+			return next(err);
+		} else {
+			res.json(units);
+		}
+	});
+};
 exports.update=function(req,res,next) {
 	Unit.findByIdAndUpdate(req.unit.id, req.body,function(err,unit) {
 		if (err) {

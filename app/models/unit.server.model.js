@@ -19,6 +19,38 @@ exports.getSingleUnit = function(id) {
   return knex('units').select().where('id', id)
 };
 
+exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtime, callback) {
+  var earth = 6371;  // earth radius in km
+  var lat1 = latitude + 180/Math.PI * (distance/earth);
+  var lat2 = latitude - 180/Math.PI * (distance/earth);
+  var lon1 = longitude - 180/Math.PI * (distance/earth/Math.cos(latitude * Math.PI/180));
+  var lon2 = longitude + 180/Math.PI * (distance/earth/Math.cos(latitude * Math.PI/180));
+  var checkInObject = Checkin.findByTimeBox(lat1, lon1, lat2, lon2, searchtime);
+  var idList = checkInObject.map(function(obj){
+   return obj['unit_id'];
+  });
+  return knex('units').where('id',idList)
+};
+
+exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
+  if (lat1 < lat2) {
+    var minlat = lat1;
+    var maxlat = lat2;
+  } else {
+    var minlat = lat2;
+    var maxlat = lat1;
+  }
+  if (lon1 < lon2) {
+    var minlon = lon1;
+    var maxlon = lon2;
+  } else {
+    var minlon = lon2;
+    var maxlon = lon1;
+  }
+  return knex('units').whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon])
+};
+
+
 exports.findUniqueUnitName = function(company, unitName, suffix, callback) {
     var _this = this;
     var possibleName = unitName + (suffix || '');

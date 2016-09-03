@@ -21,6 +21,7 @@ exports.list=function(req,res,next) {
 		}
 	});
 };
+
 exports.listCheckinsForCompany=function(req,res,next,companyId) {
 	Checkin.find({'unit.company':companyId}, function(err,checkins) {
 		if (err) {
