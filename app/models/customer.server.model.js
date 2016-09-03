@@ -6,6 +6,7 @@ CREATE TABLE customers (
   name TEXT NOT NULL,
   order_sys_id TEXT,
   description TEXT,
+  email TEXT,
   facebook TEXT,
   twitter TEXT,
   photo TEXT,
@@ -34,6 +35,6 @@ exports.createCustomer = function(name, userId) {
   return knex('customers').insert(
     {
       name: name,
-      user_id: userId,
+      user_id: userId
     }).returning('*')
 };

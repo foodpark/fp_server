@@ -53,6 +53,6 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
       user_id: parseInt(userId),
       order_sys_id: moltCoId,
       default_cat: moltDefCat,
-      base_slug: moltSlug,
+      base_slug: moltSlug
     }).returning('*').asCallback(callback);
 };

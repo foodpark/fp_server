@@ -27,10 +27,10 @@ exports.getForUser = function(userId) {
   return knex('admins').select().where('user_id', userId)
 };
 
-exports.createAdmins = function(name, userId) {
+exports.createAdmin = function(name, userId) {
   return knex('admins').insert(
     {
       name: name,
-      user_id: userId,
+      user_id: userId
     }).returning('*');
 };

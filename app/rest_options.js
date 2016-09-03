@@ -60,16 +60,11 @@ function *beforeSaveUnit() {
       console.error('update unit: error retrieving unit during update');
       throw err;
     }
-    console.log(this.params)
-    console.log('existing user ')
-    console.log(existingUser)
-    console.log('unit ')
-    console.log(unit)
     if (existingUser && (existingUser.id == unit.unit_mgr_id)) {
       // No other unit/user is using (potentially new) username
       existingUser = ''
-      // check if changed. Must use unit to check password, as password in
-      // Users is encrypted
+      // check if username/password changed. Must use unit to check password,
+      // as password in Users is encrypted
       if (username==unit.username && password == unit.password) {
         // No changes to User record
         createOrUpdateUser = false;
@@ -124,6 +119,23 @@ function *afterUpdateReviewApproval(approval) {
 
 module.exports = {
   hooks: {
+    authorize: function *(operation, object) {
+      if (operation == 'create') {
+        console.log('authorize create')
+        console.log(this.params.context)
+      } else if (operation == 'update') {
+        console.log('authorize update')
+        console.log(this.params.context)
+        console.log(this.user)
+      } else if (operation == 'read') {
+        console.log('authorize read')
+        console.log(this.params.context)
+      } else {
+        console.erro('authorize: unknown operation' + operation)
+        throw new Error ('unknown operation: '+ operation)
+      }
+    },
+
     beforeSave: function *() {
       if (this.resteasy.table == 'reviews') {
         yield beforeSaveReview.call(this);
