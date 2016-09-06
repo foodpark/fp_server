@@ -121,17 +121,20 @@ module.exports = {
   hooks: {
     authorize: function *(operation, object) {
       if (operation == 'create') {
-        console.log('authorize create')
-        console.log(this.params.context)
+        console.error('authorize create ',this.isAuthenticated())
+        console.error(this.params.context)
       } else if (operation == 'update') {
-        console.log('authorize update')
-        console.log(this.params.context)
-        console.log(this.user)
+        console.error('authorize update',this.isAuthenticated())
+        console.error(this.params.context)
+        console.error(this.passport.user)
       } else if (operation == 'read') {
-        console.log('authorize read')
-        console.log(this.params.context)
+        // This is how you might write an authorization rule for Resteasy:
+        if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') this.throw('Read Unauthorized',401);
+        
+        console.error('authorize read')
+        console.error(this.params.context)
       } else {
-        console.erro('authorize: unknown operation' + operation)
+        console.error('authorize: unknown operation' + operation)
         throw new Error ('unknown operation: '+ operation)
       }
     },
