@@ -1,9 +1,8 @@
 FROM node:6.3
 
-
 # Optional: nodemon gives you superpowers to automatically restart
 # your server whenever a file changes:
-RUN npm install -g nodemon
+RUN npm install -g nodemon forever
 
 # Make directories to store the dependencies and the application code:
 
