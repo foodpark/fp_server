@@ -9,15 +9,12 @@ module.exports = function() {
   });
 
   passport.deserializeUser(function(id, done) {
-    User.getSingleUser(id,
-            function(err, user) {
-              done(err, user);
-            }
-        );
+    User.getSingleUser(id).asCallback(done);
   });
 
   require('./strategies/local.js')();
   require('./strategies/jwt.js')();
+  require('./strategies/anonymous.js')();
 
   return passport;
 };
