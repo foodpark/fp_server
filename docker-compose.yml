@@ -3,17 +3,14 @@ app:
   links:
     - postgres
   volumes:
-    - ./app:/application/app
-    - ./config:/application/config
-    - ./public:/application/public
-    - ./db:/application/db
+    - ./:/application
   ports:
-    - '1337:1337'
-  command: nodemon app/server.js
+    - '80'
+  command: nodemon server.js
   environment:
     - 'DATABASE_URL=postgresql://pguser:pgpass@postgres:5432/sfez-development'
     - NODE_ENV=development
-    - PORT=8080
+    - PORT=80
 pgadmin:
   image: postgres:9.5
   command: tail -f /dev/null

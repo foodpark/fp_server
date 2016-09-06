@@ -13,8 +13,8 @@ WORKDIR /application
 
 # Set up the basics:
 
-ENV PORT 8080
-EXPOSE 8080
+ENV PORT 80
+EXPOSE 80
 
 # Tell node where to find dependencies (they are not installed in the
 # normal location

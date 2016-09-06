@@ -40,8 +40,8 @@ Now execute: `dinghy ip` (if you're using dinghy), or `echo
 $DOCKER_HOST`, and add that IP to your /etc/hosts file or use it in
 your browser:
 
-And go to http://192.168.99.100:1337/api/v1/units (use the IP address
-from above)
+And go to http://app.sfezserver.docker/api/v1/units (for Dinghy,
+without dinghy you may need to reconfigure things a bit).
 
 ## API Reference
 
