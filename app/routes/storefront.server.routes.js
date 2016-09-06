@@ -36,5 +36,7 @@ module.exports=function(app) {
 	router.put('/api/v1/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization("Owner"), storefront.updateOptionItem);
 	router.delete('/api/v1/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
   router.param('optionItemId', storefront.getOptionItem);
-	return router;
+
+  app.use(router.routes());
+  app.use(router.allowedMethods());
 };

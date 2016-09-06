@@ -10,7 +10,7 @@ var REQUIRE_ADMIN     = 'ADMIN',
     REQUIRE_SITEMGR   = 'SITEMGR',
     REQUIRE_CUSTOMER  = 'CUSTOMER';
 
-module.exports = function() {
+module.exports = function(app) {
   var router = new Router();
 
   router.get('/auth/register', auth.renderRegister);
@@ -32,5 +32,6 @@ module.exports = function() {
     scope:['email'],
   }));
 
-  return router;
+  app.use(router.routes())
+  app.use(router.allowedMethods())
 };
