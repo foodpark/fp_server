@@ -320,9 +320,9 @@ exports.roleAuthorization = function(role) {
   };
 };
 
-exports.logout = function(req, res) {
-  req.logout();
-  res.redirect('/');
+// Logout isn't really supported by JWT:
+exports.logout = function*(next) {
+  this.body = { success: false, message: "Logout isn't supported by JWT" }
 };
 
 exports.saveOAuthUserProfile = function(req, profile, done) {
