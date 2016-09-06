@@ -66,7 +66,7 @@ exports.createOrUpdateUser = function(hash) {
 }
 
 exports.authenticate = function(md5password, password) {
-  var md5 = encryptPassord(password)
+  var md5 = encryptPassword(password)
 
   return md5password === md5;
 };
