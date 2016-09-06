@@ -7,7 +7,7 @@ var Views = require('koa-views');
 var Flash = require('koa-flash');
 var Resteasy = require('koa-resteasy')(require('./config/knex'));
 
-var Passport = require('../config/passport');
+var Passport = require('./config/passport');
 var passport = Passport();
 
 var config = require('./config/config');
