@@ -6,6 +6,8 @@ var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model')
 
 function *beforeSaveReview() {
+  console.log('beforeSaveReview: user is ')
+  console.log(this.params.user)
   var answers = this.resteasy.object.answers;
   if (answers && answers.length) {
     var total = 0.0;
@@ -158,6 +160,7 @@ module.exports = {
             if (!valid) {
               this.throw('Update Unauthorized - User may not update this customer',401);
             } // else continue
+            console.log(valid)
           }
         }
 
