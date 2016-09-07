@@ -17,6 +17,27 @@ CREATE TABLE customers (
   user_id INTEGER REFERENCES users (id),
   created TIMESTAMP DEFAULT current_timestamp
 )
+
+create table reviews (
+  ID SERIAL PRIMARY KEY,
+
+  comment TEXT,
+  rating DECIMAL,
+  answers JSONB,
+  user_id INTEGER REFERENCES users (id),
+  company_id INTEGER REFERENCES companies (id),
+  unit_id INTEGER REFERENCES units (id),
+  status TEXT,
+  created TIMESTAMP DEFAULT current_timestamp
+)
+
+create table review_approvals (
+  ID SERIAL PRIMARY KEY,
+  review_id INTEGER REFERENCES reviews (id),
+  reviewer_id INTEGER REFERENCES admins (id),
+  status TEXT,
+  created TIMESTAMP DEFAULT current_timestamp
+)
 **/
 
 exports.getAllCustomers = function() {
@@ -29,6 +50,13 @@ exports.getSingleCustomer = function(id) {
 
 exports.getForUser = function(userId) {
   return knex('customers').select().where('user_id', userId)
+};
+
+exports.verifyUser = function(customerId, userId) {
+  return knex('customers').select().where({
+    id: customerId,
+    user_id: userId
+  })
 };
 
 exports.createCustomer = function(name, userId) {

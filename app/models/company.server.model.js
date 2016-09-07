@@ -45,6 +45,13 @@ exports.getForUser = function(userId) {
   return knex('companies').select().where('user_id', userId)
 };
 
+exports.verifyOwner = function(companyId, userId) {
+  return knex('companies').select().where({
+    id: companyId,
+    user_id: userId
+  })
+};
+
 exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug, callback) {
   return knex('companies').insert(
     {

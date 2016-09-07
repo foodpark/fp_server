@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Queries = require('koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
+var Customer = require('./models/customer.server.model');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model')
 
@@ -121,16 +122,20 @@ function *afterUpdateReviewApproval(approval) {
 module.exports = {
   hooks: {
     authorize: function *(operation, object) {
+      console.log('checking authorization of ' + operation + ' on ')
+      console.log(this.params)
       if (operation == 'create') {
-        console.log('checking authorized create of '+ this.params.context)
-        if (this.params.context == 'companies') {
+        if (this.params.table == 'companies' || this.params.context == 'companies') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
             this.throw('Create Unauthorized - Owners only',401);
           } // else continue          }
+        } else if (this.params.table == 'reviews') {
+          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
+            this.throw('Create Unauthorized - Customers only',401);
+          } // else continue          }
         }
       } else if (operation == 'update' || operation == 'delete') {
-        console.log('checking authorized update of '+ this.params.context)
-        if (this.params.context == 'companies') {
+        if (this.params.table == 'companies' || this.params.context == 'companies') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
             this.throw('Update Unauthorized - Owners only',401);
           } else {
@@ -142,13 +147,25 @@ module.exports = {
               this.throw('Update Unauthorized - incorrect Owner',401);
             } // else continue
           }
+        } else if (this.params.table == 'reviews') {
+          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
+            this.throw('Update Unauthorized - Customers only',401);
+          } else {
+            // verify user is modifying the correct review
+            console.log('verifying customer')
+            var valid = (yield Customer.verifyUser(this.params.id, this.passport.user.id))[0]
+            console.log(valid)
+            if (!valid) {
+              this.throw('Update Unauthorized - User may not update this customer',401);
+            } // else continue
+          }
         }
 
       } else if (operation == 'read') {
-        // keep going
+        console.log('got a read')
       } else {
         console.error('authorize: unknown operation' + operation)
-        throw new Error ('unknown operation: '+ operation)
+        this.throw('Unknown operation - '+ operation, 405)
       }
     },
 
