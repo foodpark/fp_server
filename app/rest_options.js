@@ -1,5 +1,6 @@
 var _ = require('lodash');
 var Queries = require('koa-resteasy').Queries;
+var Company = require('./models/company.server.model');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model')
 
@@ -78,7 +79,7 @@ function *beforeSaveUnit() {
     return;
   }
   if (createOrUpdateUser) {
-    var unitmgr = { role: 'SITEMGR', username: username, password: password}
+    var unitmgr = { role: 'UNITMGR', username: username, password: password}
     if (unit) unitmgr.id = unit.unit_mgr_id // update the right one
     console.log(unitmgr)
     try {
@@ -121,18 +122,30 @@ module.exports = {
   hooks: {
     authorize: function *(operation, object) {
       if (operation == 'create') {
-        console.error('authorize create ',this.isAuthenticated())
-        console.error(this.params.context)
-      } else if (operation == 'update') {
-        console.error('authorize update',this.isAuthenticated())
-        console.error(this.params.context)
-        console.error(this.passport.user)
-      } else if (operation == 'read') {
-        // This is how you might write an authorization rule for Resteasy:
-        if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
-          this.throw('Read Unauthorized',401);
+        console.log('checking authorized create of '+ this.params.context)
+        if (this.params.context == 'companies') {
+          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
+            this.throw('Create Unauthorized - Owners only',401);
+          } // else continue          }
         }
-        // else keep processing
+      } else if (operation == 'update' || operation == 'delete') {
+        console.log('checking authorized update of '+ this.params.context)
+        if (this.params.context == 'companies') {
+          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
+            this.throw('Update Unauthorized - Owners only',401);
+          } else {
+            // verify user is modifying the correct company
+            console.log('verifying owner')
+            var valid = (yield Company.verifyOwner(this.params.id, this.passport.user.id))[0]
+            console.log(valid)
+            if (!valid) {
+              this.throw('Update Unauthorized - incorrect Owner',401);
+            } // else continue
+          }
+        }
+
+      } else if (operation == 'read') {
+        // keep going
       } else {
         console.error('authorize: unknown operation' + operation)
         throw new Error ('unknown operation: '+ operation)
