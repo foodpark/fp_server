@@ -129,10 +129,10 @@ module.exports = {
         console.error(this.passport.user)
       } else if (operation == 'read') {
         // This is how you might write an authorization rule for Resteasy:
-        if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') this.throw('Read Unauthorized',401);
-        
-        console.error('authorize read')
-        console.error(this.params.context)
+        if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
+          this.throw('Read Unauthorized',401);
+        }
+        // else keep processing
       } else {
         console.error('authorize: unknown operation' + operation)
         throw new Error ('unknown operation: '+ operation)
