@@ -131,7 +131,7 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
             this.throw('Create Unauthorized - Owners only',401);
           } // else continue          }
-        } else if (this.params.table == 'reviews') {
+        } else if (this.params.table == 'reviews' || this.params.context == "customers") {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
@@ -149,7 +149,7 @@ module.exports = {
               this.throw('Update Unauthorized - incorrect Owner',401);
             } // else continue
           }
-        } else if (this.params.table == 'reviews') {
+        } else if (this.params.table == 'reviews' || this.params.context == "customers") {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Update Unauthorized - Customers only',401);
           } else {
