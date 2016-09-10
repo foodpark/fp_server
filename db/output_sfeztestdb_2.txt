@@ -19,10 +19,15 @@ INSERT INTO sites (id,name,type,latitude,longitude) VALUES
 (2002,'Thaitanic Cart #1','Cart',30.2560786,-97.76350909999996),
 (2003,'Paco''s Tacos Truck #1','Truck',30.2560786,-97.76350909999996);
 
-INSERT INTO food_parks (id,name,latitude,longitude) VALUES
-(3001,'The Picnic',30.2635748, -97.7627071),
-(3002,'Alamo Drafthouse',30.2560786,-97.76350909999996),
-(3003,'Austin Food Park',30.2544287, -97.7371197 );
+INSERT INTO food_parks (id,name,city,state,postal_code,country,latitude,longitude) VALUES
+(3001,'The Picnic','Austin','TX','78704','US',30.2635748, -97.7627071),
+(3002,'Alamo Drafthouse','Austin','TX','78704','US',30.2560786,-97.76350909999996),
+(3003,'Austin Food Park','Austin','TX','78702','US',30.2544287, -97.7371197 ),
+(3004,'Truck Garden Food Park - Av. Roberto Freire','Ponta Negra','RN',null,'BR',-5.874374,-35.178695),
+(3005,'Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire','Ponta Negra','RN',null,'BR',-5.865769,-35.185878),
+(3006,'Natal Shopping Food Park - Av. das Brancas Dunas','Natal','RN',null,'BR',-5.842563,-35.210624),
+(3007,'Bar 54 Food Park - Rua Porto Mirim','Natal','RN',null,'BR',-5.874674,-35.183514),
+(3008,'Bar Trove Food Park - Rua Presidente José Bento','Natal','RN',null,'BR',-5.805748,-35.214705);
 
 -- user_id should probably be customer_id referencing customers table
 INSERT INTO reviews (id,user_id,comment,rating,site_id) VALUES
