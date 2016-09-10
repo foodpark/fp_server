@@ -20,7 +20,7 @@ app.use(Helmet());
 app.use(Body());
 app.use(Session(app));
 app.use(Flash());
-app.use(Views(__dirname + '/views', { extension: 'ejs' }));
+app.use(Views(__dirname + '/app/views', { extension: 'ejs' }));
 
 app.use(passport.initialize());
 app.use(passport.session());
