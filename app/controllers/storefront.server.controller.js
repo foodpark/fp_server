@@ -19,8 +19,8 @@ var sendErrorResponse = function(err, res, status) {
   return res.status(status).send({'error': err})
 }
 
-exports.readCompany=function(req,res,next) {
-	tbis.body(this.company);
+exports.readCompany=function *(next) {
+	this.body = this.company
 }
 
 exports.getCompany=function *(id, next) {
@@ -30,8 +30,20 @@ exports.getCompany=function *(id, next) {
     console.error('error getting company')
     throw(err)
   }
-  console.log(this.company)
+  console.log(company)
   this.company = company
+  yield next;
+}
+
+exports.listCompanies=function *(next) {
+  try {
+    var companies = yield Company.getAllCompanies()
+  } catch (err) {
+    console.error('error getting companies')
+    throw(err)
+  }
+  console.log(companies)
+  this.body = companies
   return;
 }
 
@@ -76,20 +88,12 @@ exports.createCategory=function*(next) {
   return;
 }
 
-exports.listCategories=function *(req, res, next) {
-  var data = req.body;
-  console.log(data)
-  console.log('user')
-  console.log(req.user)
+exports.listCategories=function *(next) {
   console.log(this)
+  var data = this.body;
+  console.log(data)
   try {
-    var company = (yield Company.companyForUser(req.user.id))[0]
-  } catch (err) {
-    console.error('error listing category: could not find company for user')
-    throw(err)
-  }
-  try {
-    var categories = (yield msc.listCategories(company, data))[0]
+    var categories = (yield msc.listCategories(this.company, data))[0]
   } catch (err) {
     console.error('error retrieving categories from ordering system ')
     throw(err)
