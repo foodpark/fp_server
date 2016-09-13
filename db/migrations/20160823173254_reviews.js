@@ -3,7 +3,7 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('reviews', function(t) {
       t.increments();
 
-      t.integer('user_id').references('users.id');
+      t.integer('customer_id').references('customers.id');
 
       t.integer('company_id').references('companies.id');
       t.integer('unit_id').references('units.id');

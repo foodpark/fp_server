@@ -19,12 +19,45 @@ var sendErrorResponse = function(err, res, status) {
   return res.status(status).send({'error': err})
 }
 
+exports.readCompany=function(req,res,next) {
+	tbis.body(this.company);
+}
+
+exports.getCompany=function *(id, next) {
+  try {
+    var company = (yield Company.getSingleCompany(id))[0]
+  } catch (err) {
+    console.error('error getting company')
+    throw(err)
+  }
+  console.log(this.company)
+  this.company = company
+  return;
+}
+
+exports.readCategory=function(req,res,next) {
+	this.body(this.category);
+}
+
+exports.getCategory=function *(id, next) {
+  console.log('category id: '+ id)
+  console.log(company)
+  try {
+    var category = (yield msc.findCategory(this.company, id))[0]
+  } catch (err) {
+    console.error('error retrieving category from ordering system ')
+    throw(err)
+  }
+  this.category = category
+  return;
+}
+
 exports.createCategory=function*(next) {
   debug(req.user)
   try {
-    var company = (yield Company.companyForUser(companyId))[0]
+    var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
-    console.err('error creating category: could not find company for user')
+    console.error('error creating category: could not find company for user')
     throw(err)
   }
   const title = req.body.title;
@@ -36,96 +69,83 @@ exports.createCategory=function*(next) {
   try {
     var category = yield msc.createCategory(company, title, parent)
   } catch (err) {
-      console.err('error creating category in ordering system ')
+      console.error('error creating category in ordering system ')
       throw(err)
   }
   this.body = category
   return;
 }
 
-exports.listCategories=function(req,res,next) {
+exports.listCategories=function *(req, res, next) {
   var data = req.body;
-  debug(req.user.roleId)
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      msc.listCategories(company, data, function(categories) {
-        debug(categories)
-        if (categories instanceof Error) {
-          var message = getErrorMessage(categories);
-          return res.status(500).send({ error: message });
-        } else {
-          res.json(categories)
-        }
-      })
-    }
-  })
-};
-exports.readCategory=function(req,res,next) {
-	res.json(req.category);
-};
-exports.getCategory=function(req,res,next,id) {
-  debug('category id: '+ id)
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      msc.findCategory(company, id, function(category) {
-        if (category instanceof Error) {
-          var message = getErrorMessage(category);
-          return res.status(500).send({ error: message });
-        } else {
-          req.category=category;
-          next();
-        }
-      });
-    };
-  })
-}
-exports.updateCategory=function(req,res,next) {
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      var data = req.body;
-      var category=req.category;
-      msc.updateCategory(company, category, data, function(category) {
-        if (category instanceof Error) {
-          var message = getErrorMessage(category);
-          return res.status(500).send({ error: message });
-        } else {
-          return res.json(category);
-        }
-      });
-    };
-  })
-}
-exports.deleteCategory=function(req,res,next) {
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      var category = req.category[0]
-      msc.deleteCategory(category, function(category) {
-        if (category instanceof Error) {
-          var message = getErrorMessage(category);
-          return res.status(500).send({ error: message });
-        } else {
-          return res.json(category);
-        }
-      })
-    }
-  })
+  console.log(data)
+  console.log('user')
+  console.log(req.user)
+  console.log(this)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error listing category: could not find company for user')
+    throw(err)
+  }
+  try {
+    var categories = (yield msc.listCategories(company, data))[0]
+  } catch (err) {
+    console.error('error retrieving categories from ordering system ')
+    throw(err)
+  }
+  this.body = categories
+  return;
 }
 
-exports.createMenuItem=function(req,res,next) {
-  debug(req.user)
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      debug(company)
+exports.updateCategory=function *(next) {
+  console.log('update category called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error updating category: could not find company for user')
+    throw(err)
+  }
+  var data = req.body;
+  var cat=req.category[0];
+  try {
+    var category = (yield msc.updateCategory(company, cat, data))[0]
+  } catch (err) {
+    console.error('error updating category in ordering system ')
+    throw(err)
+  }
+  this.body = category
+  return;
+}
+
+exports.deleteCategory=function *(next) {
+  console.log('delete category called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error deleting category: could not find company for user')
+    throw(err)
+  }
+  var cat = req.category[0]
+  try {
+    var category = (yield msc.deleteCategory(cat))[0]
+  } catch (err) {
+    console.error('error deleting category in ordering system ')
+    throw(err)
+  }
+  this.body = category
+  return;
+}
+
+exports.createMenuItem=function *(next) {
+  console.log('create menu item called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error creating menu item: could not find company for user')
+    throw(err)
+  }
+  console.log(company)
       /**
       Name	Slug	Field Type	Required?	Unique?	Title Column?
       *SKU	sku	string	Yes	Yes	No
@@ -148,128 +168,129 @@ exports.createMenuItem=function(req,res,next) {
       Brand	brand	relationship	No	No	No
       *Tax Band	tax_band	tax-band	Yes	No	No
       *Company	company	relationship	Yes **/
-      const title = req.body.title;
-      const price = req.body.price;
-      const status = req.body.status;
-      const category = req.body.category;
-      const description = req.body.description;
+  const title = req.body.title;
+  const price = req.body.price;
+  const status = req.body.status;
+  const category = req.body.category;
+  const description = req.body.description;
 
-      if (!status) status = 1; // live by default TODO: turn draft by default when menu availability completed
-      if (!title) {return res.status(422).send({ error: 'Title is required.'});}
-      if (!price) {return res.status(422).send({ error: 'Price is required.'});}
-      if (!category) {return res.status(422).send({ error: 'Category is required.'});}
-      if (!description) {return res.status(422).send({ error: 'Description is required.'});}
-      return msc.createMenuItem(company, title, status, price, category, description, function(menuItem) {
-        if (menuItem instanceof Error) {
-          debug(menuItem)
-          //TODO: Check for error - duplicate sku/slug, which means the title was a duplicate
-          return res.status(422).send({ error: menuItem});
-        }
-        else return res.json(menuItem)
-      })
-    }
-  });
-};
-exports.listMenuItems=function(req,res,next) {
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) { return next(err) }
-    else {
-      var data = req.body;
-      msc.listMenuItems(company, data, function(menuItem) {
-        if (menuItem instanceof Error) {
-          debug(menuItem)
-          return res.status(422).send({ error: menuItem});
-        }
-        else return res.json(menuItem)
-      })
-    }
-  });
-};
-exports.readMenuItem=function(req,res,next) {
-	res.json(req.menuItem);
-};
-exports.getMenuItem=function(req,res,next,id) {
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) {
-      var message = getErrorMessage(err)
-      return sendErrorResponse(message, res, 500)
-    }
-    else {
-      msc.findMenuItem(company, id, function(menuItem) {
-        if (menuItem instanceof Error) {
-          debug(menuItem)
-          return sendErrorResponse(menuItem.message, res, 500)
-        } else {
-          req.menuItem=menuItem;
-          next();
-        }
-      })
-    }
-  })
-};
-exports.updateMenuItem=function(req,res,next) {
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) {
-      var message = getErrorMessage(err);
-      return sendErrorResponse(message, res, 500)
-    }
-    else {
-      var menuItem = req.menuItem
-      debug(menuItem.company.data.id +'=='+ company.orderSysId)
-      if (mi.company.data.id == company.orderSysId) {
-        var data = req.body;
-        msc.updateMenuItem(company, menuItem, data, function(item) {
-          if (item instanceof Error) {
-            var message = getErrorMessage(item);
-            return sendErrorResponse(message, res, 500)
-          } else {
-            return res.json(item);
-          }
-        })
-      } else {
-        return sendErrorResponse('Menu item does not belong to company', res, 422)
-      }
-    }
-  })
-};
-exports.deleteMenuItem=function(req,res,next) {
-  var companyId = mongoose.Types.ObjectId(req.user.roleId);
-  Company.findById(companyId, function(err,company) {
-    if (err) {
-      var message = getErrorMessage(err);
-      return sendErrorResponse(message, res, 500)
-    }
-    else {
-      var menuItem = req.menuItem
-      debug(menuItem.company.data.id +'=='+ company.orderSysId)
-      if (mi.company.data.id == company.orderSysId) {
-        msc.deleteMenuItem(menuItem, function(item) {
-          if (item instanceof Error) {
-            var message = getErrorMessage(item);
-            return sendErrorResponse(message, res, 500)
-          } else {
-            return res.json(item);
-          }
-        })
-      } else {
-        return sendErrorResponse('Menu item does not belong to company', res, 422)
-      }
-    }
-  })
-};
-
-var optionItemCreator = function(menuItemId, optionCategoryId, title, modPrice, res) {
-  msc.createOptionItem(menuItemId, optionCategoryId, title, modPrice, function(optionItem) {
-    if (optionItem instanceof Error) {
-      debug(optionItem)
-      return sendErrorResponse(optionItem, res, 422);
-    }
-    else return res.json(optionItem)
-  })
+  if (!status) status = 1; // live by default TODO: turn draft by default when menu availability completed
+  if (!title) {return res.status(422).send({ error: 'Title is required.'});}
+  if (!price) {return res.status(422).send({ error: 'Price is required.'});}
+  if (!category) {return res.status(422).send({ error: 'Category is required.'});}
+  if (!description) {return res.status(422).send({ error: 'Description is required.'});}
+  try {
+    var menuItem = (yield msc.createMenuItem(company, title, status, price, category, description))[0]
+  } catch (err) {
+    console.error('error creating menu item in ordering system ')
+    throw(err)
+  }
+  this.body = menuItem
+  return;
 }
+
+exports.listMenuItems=function *(next) {
+  console.log('list menu items called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error updating menu item: could not find company for user')
+    throw(err)
+  }
+  var data = req.body
+  try {
+    var menuItems = (yield msc.listMenuItems(company, data))[0]
+  } catch (err) {
+    console.error('error retrieving menu items from ordering system ')
+    throw(err)
+  }
+  this.body = menuItems
+  return;
+}
+
+exports.readMenuItem=function *(next) {
+	res.json(req.menuItem);
+}
+
+exports.getMenuItem=function *(next,id) {
+  console.log('get menu item called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error getting menu item: could not find company for user')
+    throw(err)
+  }
+  try {
+    var menuItem = (yield msc.findMenuItem(company, id))[0]
+  } catch (err) {
+    console.error('error retrieving menu item from ordering system ')
+    throw(err)
+  }
+  this.body = menuItem
+  return;
+}
+
+exports.updateMenuItem=function *(next) {
+  console.log('update menu item called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error updating menu item: could not find company for user')
+    throw(err)
+  }
+  var menuItem = req.menuItem
+  console.log(menuItem.company.data.id +'=='+ company.orderSysId)
+  if (mi.company.data.id == company.orderSysId) {
+    var data = req.body;
+    try {
+      var item = (yield msc.updateMenuItem(company, menuItem, data))[0]
+    } catch (err) {
+      console.error('error updating menu item from ordering system ')
+      throw(err)
+    }
+    this.body = item
+    return;
+  } else {
+    return sendErrorResponse('Menu item does not belong to company', res, 422)
+  }
+}
+
+exports.deleteMenuItem=function *(next) {
+  console.log('delete menu item called by' + req.user.id)
+  try {
+    var company = (yield Company.companyForUser(req.user.id))[0]
+  } catch (err) {
+    console.error('error deleting menu item: could not find company for user')
+    throw(err)
+  }
+  var menuItem = req.menuItem
+  console.log(menuItem.company.data.id +'=='+ company.orderSysId)
+  if (menuItem.company.data.id == company.orderSysId) {
+    try {
+      var item = (yield msc.deleteMenuItem(menuItem))[0]
+    } catch (err) {
+      console.error('error deleting menu item from ordering system ')
+      throw(err)
+    }
+    this.body = item
+    return
+  } else {
+    return sendErrorResponse('Menu item does not belong to company', res, 422)
+  }
+}
+
+var optionItemCreator = function *(menuItemId, optionCategoryId, title, modPrice) {
+  try {
+    var optionItem = (yield msc.createOptionItem(menuItemId, optionCategoryId, title, modPrice))[0]
+  } catch (err) {
+    console.error('error creating option item in ordering system')
+    throw(err)
+  }
+  // return res.json(optionItem)
+  this.body = optionItem
+  return;
+}
+
 exports.createOptionItem=function(req,res,next) {
   var companyId = mongoose.Types.ObjectId(req.user.roleId);
   Company.findById(companyId, function(err,company) {
@@ -498,10 +519,6 @@ exports.deleteOptionItem=function(req,res,next) {
     }
   })
 };
-
-
-
-
 
 var optionCategoryCreator = function (menuItemId, title, type, callback) {
   return msc.createOptionCategory(menuItemId, title, type, callback)

@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
 
       t.integer('amount');
 
-      t.integer('user_id').references('users.id');
+      t.integer('customer_id').references('customers.id');
       t.integer('company_id').references('companies.id');
 
       t.timestamps();
@@ -16,4 +16,3 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
   return Promise.all([knex.schema.dropTable('loyalty')]);
 };
-

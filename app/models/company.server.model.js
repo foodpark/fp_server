@@ -33,20 +33,20 @@ exports.companyForUser = function(userId) {
 };
 
 exports.getAllCompanies = function() {
-  return knex('companies').select()
+  return knex('companies').select('*')
 };
 
 exports.getSingleCompany = function(id) {
-  return knex('companies').select().where('id', id)
+  return knex('companies').select('*').where('id', id)
 
 };
 
 exports.getForUser = function(userId) {
-  return knex('companies').select().where('user_id', userId)
+  return knex('companies').select('*').where('user_id', userId)
 };
 
 exports.verifyOwner = function(companyId, userId) {
-  return knex('companies').select().where({
+  return knex('companies').select('*').where({
     id: companyId,
     user_id: userId
   })

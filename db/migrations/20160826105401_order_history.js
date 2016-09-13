@@ -8,7 +8,7 @@ exports.up = function(knex, Promise) {
       t.dateTime('purchase_date');
       t.decimal('amount');
 
-      t.integer('user_id').references('users.id');
+      t.integer('customer_id').references('customers.id');
       t.integer('unit_id').references('units.id');
       t.integer('company_id').references('companies.id');
 

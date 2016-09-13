@@ -39,12 +39,16 @@ function *beforeSaveUnit() {
   var password = this.resteasy.object.password;
   var existingUser = '';
   var unit = '';
-  var createOrUpdateUser = true;
-  try {
-    existingUser = (yield User.userForUsername(username))[0];
-  } catch (err) {
-    console.error('create unit: error during creation');
-    throw err;
+  var createOrUpdateUser = false; // assume no create/update of user
+  if (username) {
+    // username present, possible create or update
+    createOrUpdateUser = true;
+    try {
+      existingUser = (yield User.userForUsername(username))[0];
+    } catch (err) {
+      console.error('create unit: error during creation');
+      throw err;
+    }
   }
   if (this.resteasy.operation == 'update') {
     // Update an existing unit. We need to retrieve the Unit and also
@@ -127,21 +131,25 @@ module.exports = {
       console.log('checking authorization of ' + operation + ' on ')
       console.log(this.params)
       if (operation == 'create') {
-        if (this.params.table == 'companies' || this.params.context == 'companies') {
+        if (this.params.table == 'companies' || this.params.table == 'units') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
             this.throw('Create Unauthorized - Owners only',401);
           } // else continue          }
-        } else if (this.params.table == 'reviews' || this.params.context == "customers") {
+        } else if (this.params.table == 'customers' || this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
         }
       } else if (operation == 'update' || operation == 'delete') {
-        if (this.params.table == 'companies' || this.params.context == 'companies') {
+        if (this.params.table == 'companies' || this.params.table == 'units') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
             this.throw('Update Unauthorized - Owners only',401);
           } else {
             // verify user is modifying the correct company
+            var coId = this.params.id
+            if (!this.params.table == 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
+              coId = m[1]
+            }
             console.log('verifying owner')
             var valid = (yield Company.verifyOwner(this.params.id, this.passport.user.id))[0]
             console.log(valid)
@@ -149,13 +157,17 @@ module.exports = {
               this.throw('Update Unauthorized - incorrect Owner',401);
             } // else continue
           }
-        } else if (this.params.table == 'reviews' || this.params.context == "customers") {
+        } else if (this.params.table == 'customers' ||  this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Update Unauthorized - Customers only',401);
           } else {
             // verify user is modifying the correct review
+            var custId = this.params.id
+            if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
+              custId = m[1]
+            }
             console.log('verifying customer')
-            var valid = (yield Customer.verifyUser(this.params.id, this.passport.user.id))[0]
+            var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
             console.log(valid)
             if (!valid) {
               this.throw('Update Unauthorized - User may not update this customer',401);
@@ -200,12 +212,13 @@ module.exports = {
   applyContext: function(query) {
     var context = this.params.context;
     var m;
-    if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+  /**  if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
       return query.select(['units.*', 'checkins.check_in AS unit_check_in', 'checkins.check_out AS unit_check_out']).join('checkins', 'checkins.unit_id', 'units.id')
         .whereRaw('checkins.company_id = ? AND checkins.check_in <= now() AND ( checkins.check_out IS NULL OR checkins.check_out >= now() )', [m[1]]);
       /*        .where('checkins.company_id', '=', m[1])
               .where('checkins.check_in', '<=', this.resteasy.knex.fn.now())
               .where('checkins.check_out', 'IS', null); */
-    }
+  //  }
+  
   },
 };

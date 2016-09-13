@@ -3,5 +3,5 @@ module.exports = {
     port: port,
     db: 'mongodb://127.0.0.1:27017/sfez',
   	secret: 'WhanThatAprillWithHisShouresSoote',
-  	apiVersion: 'v0.1'
+  	apiVersion: 'v1'
 };
