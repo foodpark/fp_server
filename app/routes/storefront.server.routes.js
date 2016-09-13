@@ -9,6 +9,9 @@ module.exports=function(app) {
 	var apiversion = '/api/'+ config.apiVersion + '/mol';
 
 	router.use(passport.authenticate(['jwt','anonymous'], {session:false}));
+	router.get(apiversion + '/companies', storefront.listCompanies)
+	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
+
 	router.post(apiversion + '/companies/:companyId/categories', auth.roleAuthorization("Owner"), storefront.createCategory)
 	router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
   router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory);
