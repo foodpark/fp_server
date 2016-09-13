@@ -20,7 +20,7 @@ var sendErrorResponse = function(err, res, status) {
 }
 
 exports.readCompany=function(req,res,next) {
-	tbis.body(this.company);
+	this.body(this.company);
 }
 
 exports.getCompany=function *(id, next) {
