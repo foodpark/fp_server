@@ -89,11 +89,12 @@ exports.createCategory=function*(next) {
 }
 
 exports.listCategories=function *(next) {
-  console.log(this)
   var data = this.body;
+  console.log(this.company)
+  if (!data)  data = ''
   console.log(data)
   try {
-    var categories = (yield msc.listCategories(this.company, data))[0]
+    var categories = (yield msc.listCategories(this.company, data))
   } catch (err) {
     console.error('error retrieving categories from ordering system ')
     throw(err)
