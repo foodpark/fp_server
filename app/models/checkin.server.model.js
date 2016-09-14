@@ -25,5 +25,5 @@ exports.findByTimeBox = function(lat1, lon1, lat2, lon2, searchtime) {
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('checkins').whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime)
+  return knex('checkins').select('*').whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime)
 };

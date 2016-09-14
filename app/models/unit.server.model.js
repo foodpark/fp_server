@@ -1,4 +1,6 @@
 var knex = require('../../config/knex');
+var Checkin = require ('../models/checkin.server.model');
+var Promise = require('bluebird');
 
 /**
 CREATE TABLE units (
@@ -19,17 +21,42 @@ exports.getSingleUnit = function(id) {
   return knex('units').select().where('id', id)
 };
 
+
+
 exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtime, callback) {
   var earth = 6371;  // earth radius in km
   var lat1 = latitude + 180/Math.PI * (distance/earth);
   var lat2 = latitude - 180/Math.PI * (distance/earth);
   var lon1 = longitude - 180/Math.PI * (distance/earth/Math.cos(latitude * Math.PI/180));
   var lon2 = longitude + 180/Math.PI * (distance/earth/Math.cos(latitude * Math.PI/180));
-  var checkInObject = Checkin.findByTimeBox(lat1, lon1, lat2, lon2, searchtime);
-  var idList = checkInObject.map(function(obj){
-   return obj['unit_id'];
-  });
-  return knex('units').where('id',idList)
+  console.log(lat1 + ", "+ lon1  + " " + lat2 + ", " + lon2 + " d:" + distance);
+  if (lat1 < lat2) {
+    var minlat = lat1;
+    var maxlat = lat2;
+  } else {
+    var minlat = lat2;
+    var maxlat = lat1;
+  }
+  if (lon1 < lon2) {
+    var minlon = lon1;
+    var maxlon = lon2;
+  } else {
+    var minlon = lon2;
+    var maxlon = lon1;
+  }
+  return knex('checkins').select('*').whereBetween('latitude', [minlat, maxlat]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime).on('query-response', function(response, obj, builder) {}).then( function(response) {
+    console.log('checkins ' + response);
+    var idList = response.map(function(obj){
+     return obj['unit_id'];
+    });
+    return idList;
+  }).then( function(idList) {
+      console.log('idlist ' + idList);
+     return knex('units').select('*').whereIn('id', idList).on('query-response', function(response, obj, builder) {}).then( function(response) {
+        console.log('response ' + response);
+        return response;
+    }).catch(console.log.bind(console));
+  }).catch(console.log.bind(console));
 };
 
 exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
@@ -47,7 +74,7 @@ exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('units').whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon])
+  return knex('units').select('*').whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon])
 };
 
 
