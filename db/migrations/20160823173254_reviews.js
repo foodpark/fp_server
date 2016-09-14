@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
 
       t.string('comment');
       t.decimal('rating', 2, 1);
-      t.specificType('answers', 'jsonb');
+      t.specificType('answers', 'json');
 
       t.string('status');
 
