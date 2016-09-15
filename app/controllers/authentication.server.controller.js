@@ -223,16 +223,14 @@ exports.register = function*(next) {
       username: username,
       password: password,
       role: role,
+      provider: 'local',
+      provider_id: 'local',
+      provider_data: ''
     };
-
-    var provider = 'local';
-    var provider_id = 'local';
-    var provider_data = null;
-
 
     console.log('register: creating user');
     try {
-      var userObject =  (yield User.createUser(Object.assign(user, { provider, provider_id, provider_data })))[0];
+      var userObject =  (yield User.createUser(user))[0];
     } catch (err) {
       console.error('register: error creating user');
       throw err;
@@ -320,9 +318,9 @@ exports.roleAuthorization = function(role) {
   };
 };
 
-// Logout isn't really supported by JWT:
-exports.logout = function*(next) {
-  this.body = { success: false, message: "Logout isn't supported by JWT" }
+exports.logout = function(req, res) {
+  req.logout();
+  res.redirect('/');
 };
 
 exports.saveOAuthUserProfile = function(req, profile, done) {
