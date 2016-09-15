@@ -169,7 +169,7 @@ exports.createDefaultCategory=function(moltincompany, callback) {
 };
 
 var requestEntities = function(flow, method, data, id) {
-  debug (flow)
+  console.log (flow)
 
   return new Promise(function(resolve, reject) {
     getBearerToken(function(token) {
@@ -177,7 +177,7 @@ var requestEntities = function(flow, method, data, id) {
         reject(token);
         return;
       }
-      debug('token : '+ token)
+      console.log('token : '+ token)
       var oid = '';
       if (id) oid = '/'+id
       request(
@@ -232,10 +232,19 @@ exports.createCategory=function(company, catTitle, catParent) {
 exports.findCategory=function(company, categoryId, callback) {
   return requestEntities(CATEGORIES, GET, {id:categoryId, company:company.orderSysId}, callback)
 };
-exports.listCategories=function(company, data, callback) {
-  data.company = company.orderSysId
-  debug(data)
-  return requestEntities(CATEGORIES, GET, data, callback)
+exports.listCategories=function *(company, data) {
+  console.log(company.order_sys_id)
+  if (data) data.company = company.order_sys_id
+  else data = {company: {data: {id: company.order_sys_id}}}
+  console.log(data)
+  try {
+    var results = yield requestEntities(CATEGORIES, GET, data)
+  } catch (err) {
+    console.log('error calling moltin controller')
+    throw (err)
+  }
+  console.log(results)
+  return results
 };
 exports.updateCategory=function(company, category, data, callback) {
   data.company = company.orderSysId
