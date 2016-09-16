@@ -41,6 +41,25 @@ CREATE TABLE food_parks (
     updated_at timestamp without time zone DEFAULT now()
 );
 
+
+CREATE TABLE locations (
+  id SERIAL PRIMARY KEY,
+  name text,
+  type text,
+  main_loc_text text,
+  secondary_loc_text text,
+  regex_seed text,
+  hitcount integer,
+  city text,
+  state text,
+  postal_code text,
+  country text,
+  latitude float8,
+  longitude float8,
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now()
+);
+
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username text NOT NULL UNIQUE,
@@ -132,6 +151,44 @@ CREATE TABLE checkins (
   location point NOT NULL,
   food_park_id integer REFERENCES food_parks(id),
   checkin TIMESTAMP without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now()
+);
+
+CREATE TABLE favorites (
+  customer_id integer REFERENCES customers(id),
+  unit_id integer REFERENCES units(id),
+  company_id integer REFERENCES companies(id),
+  created_at timestamp without time zone DEFAULT now(),
+  PRIMARY KEY (customer_id, unit_id, company_id)
+);
+
+CREATE TABLE order_history (
+  id SERIAL PRIMARY KEY,
+  order_sys_order_id integer,
+  amount money,
+  purchase_date timestamp,
+  customer_id integer REFERENCES customers(id),
+  unit_id integer REFERENCES units(id),
+  company_id integer REFERENCES companies(id),
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now()
+);
+
+
+CREATE TABLE loyalty (
+  id SERIAL PRIMARY KEY,
+  amount integer,
+  customer_id integer REFERENCES customers(id),
+  company_id integer REFERENCES companies(id),
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now()
+);
+
+CREATE TABLE loyalty_used (
+  id SERIAL PRIMARY KEY,
+  amount integer,
+  order_history_id integer REFERENCES order_history(id),
+  created_at timestamp without time zone DEFAULT now(),
   updated_at timestamp without time zone DEFAULT now()
 );
 
