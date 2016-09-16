@@ -1,4 +1,16 @@
 
+COPY food_parks (id, name, city, state, postal_code, country, latitude, longitude, created_at) FROM stdin;
+3001	The Picnic	Austin	TX	78704	US	30.2635748	-97.7627071	2016-08-21 23:31:43.131352
+3002	Alamo Drafthouse	Austin	TX	78704	US	30.2560786	-97.76350909999996	2016-08-21 23:01:03.622149
+3003	Austin Food Park	Austin	TX	78702	US	30.2544287	-97.7371197	2016-08-21 23:01:50.563872
+3004	Truck Garden Food Park - Av. Roberto Freire	Ponta Negra	RN	\N	BR	-5.874374	-35.178695	2016-08-21 23:03:07.177813
+3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	Ponta Negra	RN	\N	BR	-5.865769	-35.185878	2016-08-21 23:05:04.914807
+3006	Natal Shopping Food Park - Av. das Brancas Dunas	Natal	RN	\N	BR	-5.842563	-35.210624	2016-08-21 23:12:10.112015
+3007	Bar 54 Food Park - Rua Porto Mirim	Natal	RN	\N	BR	-5.874674	-35.183514	2016-08-29 20:54:42.540882
+3008	Bar Trove Food Park - Rua Presidente José Bento	Natal	RN	\N	BR	-5.805748	-35.214705	2016-08-30 21:12:08.717913
+\.
+SELECT pg_catalog.setval('food_parks_id_seq', 3009, true);
+
 COPY users (id, username, password, role, provider, provider_id, provider_data, created_at) FROM stdin;
 11001	mp12	5a4636076012403dd394fa20f49fcd9c	CUSTOMER	local	local	local	2016-08-21 23:31:43.131352
 11002	mp2	defc72a96803a619a6735cd7e7e69e1b	CUSTOMER	local	local	local	2016-08-21 23:01:03.622149

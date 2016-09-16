@@ -36,7 +36,7 @@ CREATE TABLE food_parks (
     postal_code text,
     country text,
     latitude float8,
-    longtitude float8,
+    longitude float8,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
 );
