@@ -4,6 +4,7 @@ var Helmet = require('koa-helmet');
 var Session = require('koa-session');
 var Views = require('koa-views');
 var Flash = require('koa-flash');
+var serve = require('koa-static-folder');
 
 var Passport = require('./config/passport');
 var passport = Passport();
@@ -25,6 +26,8 @@ app.use(Views(__dirname + '/app/views', { extension: 'ejs' }));
 app.use(passport.initialize());
 app.use(passport.session());
 
+//This is a temporary home for vendor UI. Uses koa-static-folder and koa-send to send assets
+app.use(serve('./public/vendors'));
 require('./app/routes')(app);
 
 app.listen(config.port);
