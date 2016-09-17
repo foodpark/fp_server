@@ -6,6 +6,7 @@ module.exports = function(app) {
   require('./routes/authentication.server.routes')(app);
   require('./routes/storefront.server.routes')(app);
 
+
   var apiversion = '/api/'+ config.apiVersion + '/rel';
   app.use(Mount(apiversion,require('./routes/api')));
 };
