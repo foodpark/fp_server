@@ -44,7 +44,11 @@
   },
   "description": "The SFEZ server is a MEAN-based implementation that serves the relationship services for StreetFood EZ. Basic services include reviews, favorites, checkins, loyalty, social media.",
   "main": "server.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.0.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MattGuiger/SFEZ_server.git"
