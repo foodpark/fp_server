@@ -20,16 +20,6 @@ function *beforeSaveReview() {
     this.resteasy.object.rating = rating;
   }
 
-  /*var answers = this.resteasy.object.answers.answers;
-  if (answers && answers.length) {
-    var total = 0.0;
-    for (var i = 0; i < answers.length; i++) {
-      total += answers[i].answer;
-    }
-
-    this.resteasy.object.rating = total / answers.length;
-    //TODO: if UI sends over an 'overall' rating answer, give that value more weight.
-  }*/
   this.resteasy.object.status = 'New';
 }
 
