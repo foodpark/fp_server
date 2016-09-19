@@ -1,4 +1,7 @@
-exports.up = function(knex, Promise){}; /*function(knex, Promise) {
+// Moved contents of file 20160826014257_customers.js to this filename
+// because of a reference in reviews to the customers.id field. - jndcfc8
+
+exports.up = function(knex, Promise) {
   return Promise.all([
     knex.schema.createTable('customers', function(t) {
       t.increments();
@@ -21,8 +24,8 @@ exports.up = function(knex, Promise){}; /*function(knex, Promise) {
       t.timestamps();
     }),
   ]);
-};*/
+};
 
-exports.down = function(knex, Promise){}; /*function(knex, Promise) {
+exports.down = function(knex, Promise) {
   return Promise.all([knex.schema.dropTable('customers')]);
-};*/
+};

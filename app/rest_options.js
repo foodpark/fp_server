@@ -6,9 +6,21 @@ var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model')
 
 function *beforeSaveReview() {
-  console.log('beforeSaveReview: user is ')
-  console.log(this.params.user)
-  var answers = this.resteasy.object.answers;
+  console.log('beforeSaveReview: user is ');
+  console.log(this.passport.user);
+
+  var customer = (yield Customer.getForUser(this.passport.user.id))[0];
+  if (!customer) {
+    throw new error('Customer entry not found for user '+ this.passport.user.id);
+  }
+  this.resteasy.object.customer_id = customer.id;
+
+  var rating = calculateTotalReviewRating(this.resteasy.object.answers.answers);
+  if (rating > -1) {
+    this.resteasy.object.rating = rating;
+  }
+
+  /*var answers = this.resteasy.object.answers.answers;
   if (answers && answers.length) {
     var total = 0.0;
     for (var i = 0; i < answers.length; i++) {
@@ -16,7 +28,9 @@ function *beforeSaveReview() {
     }
 
     this.resteasy.object.rating = total / answers.length;
-  }
+    //TODO: if UI sends over an 'overall' rating answer, give that value more weight.
+  }*/
+  this.resteasy.object.status = 'New';
 }
 
 function *beforeSaveUnit() {
@@ -109,11 +123,41 @@ function *beforeSaveUnit() {
 }
 
 function *afterCreateReview(review) {
-  var reviewApproval = { review_id: review.id, updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
+  var reviewApproval = { review_id: review.id, status: review.status, updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
 
   this.resteasy.queries.push(
     this.resteasy.transaction.table('review_approvals')
       .insert(reviewApproval)
+  );
+}
+
+function *beforeUpdateReview(review) {
+  this.resteasy.object.status = 'Updated';
+
+  var rating = calculateTotalReviewRating(this.resteasy.object.answers.answers);
+  if (rating > -1) {
+    this.resteasy.object.rating = rating;
+  }
+}
+
+function calculateTotalReviewRating(answers) {
+  if (answers && answers.length) {
+    var total = 0.0;
+    for (var i = 0; i < answers.length; i++) {
+      total += answers[i].answer;
+    }
+    return total / answers.length;
+    //TODO: if UI sends over an 'overall' rating answer, give that value more weight.
+  }
+  return -1;
+}
+
+function *afterUpdateReview(review) {
+  var updatedApproval = { status: 'Updated', updated_at: this.resteasy.knex.fn.now() };
+
+  this.resteasy.queries.push(
+    this.resteasy.transaction.table('review_approvals').where('review_id', review.id)
+      .update(updatedApproval)
   );
 }
 
@@ -167,7 +211,7 @@ module.exports = {
               custId = m[1]
             }
             console.log('verifying customer')
-            var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
+            var valid = (yield Customer.getForUser(this.passport.user.id))[0];// .verifyUser(custId, this.passport.user.id))[0]
             console.log(valid)
             if (!valid) {
               this.throw('Update Unauthorized - User may not update this customer',401);
@@ -186,11 +230,21 @@ module.exports = {
 
     beforeSave: function *() {
       if (this.resteasy.table == 'reviews') {
-        yield beforeSaveReview.call(this);
+        if (this.resteasy.operation == 'create') {
+          yield beforeSaveReview.call(this);
+        } else if (this.resteasy.operation == 'update') {
+          yield beforeUpdateReview.call(this);
+        }
       } else if (this.resteasy.table == 'units') {
         yield beforeSaveUnit.call(this);
       }
     },
+
+    /*beforeUpdate: function *() {
+      if (this.resteasy.table == 'reviews') {
+        yield beforeUpdateReview.call(this);
+      }
+    },*/
 
     afterQuery: function *(res) {
       if (this.resteasy.operation == 'create') {
@@ -200,6 +254,8 @@ module.exports = {
       } else if (this.resteasy.operation == 'update') {
         if (this.resteasy.table == 'review_approvals') {
           yield afterUpdateReviewApproval.call(this, res[0]);
+        } else if (this.resteasy.table == 'reviews') {
+          yield afterUpdateReview.call(this, res[0]); // set record in review_approvals to 'Updated'
         }
       }
     },
@@ -219,6 +275,6 @@ module.exports = {
               .where('checkins.check_in', '<=', this.resteasy.knex.fn.now())
               .where('checkins.check_out', 'IS', null); */
   //  }
-  
+
   },
 };

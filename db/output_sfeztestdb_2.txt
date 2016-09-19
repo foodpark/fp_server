@@ -6,18 +6,23 @@ INSERT INTO users (id,name,username,role,email) VALUES
 (11005,'bobsmiththai','bobsmiththai','company','Bobsmith@hotmail.com'),
 (11006,'grillagriller','grillagriller','company','Cindy@gmail.com');
 
-INSERT INTO companies (id,name,base_slug,order_sys_id,default_cat,description,email,facebook,featured_dish,hours,schedule,user_id) VALUES
-('1001','Paco''s Tacos','pacostacos','1293770040725734215',6001,'Fresh street food tacos','Julieg@hotmail.com','www.facebook.com/pacostacos','56789','11am-8pm','M-F','11004'),
-('1002','Thaitanic','thaitanic','1293768990807556920',6002,'Authentic Thai','Bobsmith@hotmail.com','www.facebook.com/thaitanic','98765','3pm-5pm','TWTF','11005'),
-('1003','Grilla Cheese',null,'1293768990807556920',6008,'Thick slabs of grilled cheese on Texas toast','Cindy@gmail.com','www.facebook.com/grillacheese','11111','11am-3pm','MTWTFSS','11006'),
-('1004',null,null,null,null,null,null,null,null,null,null,null),
-('1005',null,null,null,null,null,null,null,null,null,null,null),
-('1006',null,null,null,null,null,null,null,null,null,null,null);
+INSERT INTO customers (id,name,description,photo,facebook,power_reviewer,user_id) VALUES
+(9001,'Stacy T','Taco expert. I love tacos.','12345','www.facebook.com/stacytfakeaccount',false,11001),
+(9002,'Jonathan Jones','Serial food eater','54321','www.facebook.com/jonjonesfakeaccount',true,11002),
+(9003,'Marco and Inez','Foood bloggers. Follow us on mifood.blog.com',null,'www.facebook.com/mifoodfakeaccont',true,11003);
 
-INSERT INTO sites (id,name,type,latitude,longitude) VALUES
-(2001,'Thaitanic Truck #1','Truck',30.2544287, -97.7371197 ),
-(2002,'Thaitanic Cart #1','Cart',30.2560786,-97.76350909999996),
-(2003,'Paco''s Tacos Truck #1','Truck',30.2560786,-97.76350909999996);
+INSERT INTO companies (id,name,base_slug,order_sys_id,default_cat,description,email,facebook,featured_dish,hours,schedule,user_id) VALUES
+(1001,'Paco''s Tacos','pacostacos','1293770040725734215',6001,'Fresh street food tacos','Julieg@hotmail.com','www.facebook.com/pacostacos','56789','11am-8pm','M-F','11004'),
+(1002,'Thaitanic','thaitanic','1293768990807556920',6002,'Authentic Thai','Bobsmith@hotmail.com','www.facebook.com/thaitanic','98765','3pm-5pm','TWTF','11005'),
+(1003,'Grilla Cheese',null,'1293768990807556920',6008,'Thick slabs of grilled cheese on Texas toast','Cindy@gmail.com','www.facebook.com/grillacheese','11111','11am-3pm','MTWTFSS','11006'),
+(1004,null,null,null,null,null,null,null,null,null,null,null),
+(1005,null,null,null,null,null,null,null,null,null,null,null),
+(1006,null,null,null,null,null,null,null,null,null,null,null);
+
+INSERT INTO units (id,name,type,company_id,latitude,longitude) VALUES
+(2001,'Thaitanic Truck #1','Truck',1002,30.2544287, -97.7371197 ),
+(2002,'Thaitanic Cart #1','Cart',1002,30.2560786,-97.76350909999996),
+(2003,'Paco''s Tacos Truck #1','Truck',1001,30.2560786,-97.76350909999996);
 
 INSERT INTO food_parks (id,name,city,state,postal_code,country,latitude,longitude) VALUES
 (3001,'The Picnic','Austin','TX','78704','US',30.2635748, -97.7627071),
@@ -29,12 +34,17 @@ INSERT INTO food_parks (id,name,city,state,postal_code,country,latitude,longitud
 (3007,'Bar 54 Food Park - Rua Porto Mirim','Natal','RN',null,'BR',-5.874674,-35.183514),
 (3008,'Bar Trove Food Park - Rua Presidente José Bento','Natal','RN',null,'BR',-5.805748,-35.214705);
 
--- user_id should probably be customer_id referencing customers table
-INSERT INTO reviews (id,user_id,comment,rating,site_id) VALUES
-(4001,11002,' Very clean and the customer service is excellent.',4.8,2001),
-(4002,11003,'Broad selection of quality food and creative menu.',4.9,2001),
-(4003,11001,'Thaitanic has the best cart in the city.',4.7,2002),
-(4004,11003,' BIG portions prepared exactly how you request and unreasonably low prices!!!  Love tacos! ',4.6,2003);
+INSERT INTO reviews (id,customer_id,comment,rating,unit_id) VALUES
+(4001,9002,' Very clean and the customer service is excellent.',4.8,2001),
+(4002,9003,'Broad selection of quality food and creative menu.',4.9,2001),
+(4003,9001,'Thaitanic has the best cart in the city.',4.7,2002),
+(4004,9003,' BIG portions prepared exactly how you request and unreasonably low prices!!!  Love tacos! ',4.6,2003);
+
+INSERT INTO review_approvals (id,review_id,reviewer_id,status,created_at,updated_at) VALUES
+(4001,4001,null,'New',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
+(4002,4002,null,'New',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
+(4003,4003,null,'New',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP),
+(4004,4004,null,'New',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 CREATE TABLE daily_specials
 (
@@ -129,7 +139,3 @@ INSERT INTO menu_option_items (id,option_id,title,mod_price) VALUES
 (8009,12002,'Tofu',0.0),(8001,12003,'Mild',0.0),
 (8002,12003,'Hot',0.0);
 
-INSERT INTO customers (id,name,description,photo,facebook,power_reviewer,user_id) VALUES
-(9001,'Stacy T','Taco expert. I love tacos.','12345','www.facebook.com/stacytfakeaccount',false,11001),
-(9002,'Jonathan Jones','Serial food eater','54321','www.facebook.com/jonjonesfakeaccount',true,11002),
-(9003,'Marco and Inez','Foood bloggers. Follow us on mifood.blog.com',null,'www.facebook.com/mifoodfakeaccont',true,11003);
