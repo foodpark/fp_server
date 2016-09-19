@@ -105,12 +105,12 @@ var createMoltinDefaultCategory = function(company, callback) {
   });
 };
 
-var createCompany = function(companyName, email, userId) {
+var createCompany = function(company_name, email, userId) {
   return new Promise(function(resolve, reject) {
     console.log('create company: userId is ');
     console.log(userId);
     var company = {
-      name: companyName,
+      name: company_name,
       email: email,
       userId: userId,
     };
@@ -132,7 +132,7 @@ var createCompany = function(companyName, email, userId) {
         }
 
         console.log('moltin category successfully created : ' + moltinCat.id);
-        Company.createCompany(companyName, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug,
+        Company.createCompany(company_name, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug,
                               function(err, company) {
                                 console.log('returned from db insert')
                                 if (err) {
@@ -152,10 +152,10 @@ var createCompany = function(companyName, email, userId) {
 exports.register = function*(next) {
   console.log("register")
   if (!this.isAuthenticated()) {
+    const first_name = this.body.first_name;
+    const last_name = this.body.last_name;
+    const company_name = this.body.company_name;
     const email = this.body.email;
-    const name = this.body.name;
-    const companyName = this.body.companyName || this.body.companyname;
-    const username = this.body.username;
     const password = this.body.password;
     const role = this.body.role.toUpperCase();
 
@@ -164,14 +164,14 @@ exports.register = function*(next) {
       this.body = {error: 'Please enter an email address.'}
       return;
     }
-    if (!name) {
+    if (!first_name) {
       this.status = 422
-      this.body = {error: 'Please enter your name.'}
+      this.body = {error: 'Please enter your first name.'}
       return;
     }
-    if (!username) {
+    if (!last_name) {
       this.status = 422
-      this.body = {error: 'Please enter a user name.'}
+      this.body = {error: 'Please enter your last name.'}
       return;
     }
     if (!password) {
@@ -181,20 +181,21 @@ exports.register = function*(next) {
     }
     if (!role) {
       this.status = 422
-      this.body = {error: 'Please specify member or owner.'}
+      this.body = {error: 'Missing role: Customer / Owner.'}
       return;
     }
     if (role == 'OWNER') {
-      if (!companyName) {
+      if (!company_name) {
         this.status = 422
         this.body = {error: 'Please enter a company name.'}
         return;
       }
       console.log('register: checking for duplicate company name');
       try {
-        existingCompany = (yield Company.companyForCompanyName(companyName))[0];
+        existingCompany = (yield Company.companyForCompanyName(company_name))[0];
       } catch (err) {
         console.error('register: error during registration');
+        console.error(err)
         throw err;
       }
       if (existingCompany) {
@@ -204,23 +205,24 @@ exports.register = function*(next) {
       }
     }
 
-    console.log('register: checking for duplicate user name');
-    debug('register: checking for duplicate user name');
-
+    console.log('register: checking for duplicate user name/email');
     try {
-      existingUser = (yield User.userForUsername(username))[0];
+      existingUser = (yield User.userForUsername(email))[0];
     } catch (err) {
       console.error('register: error during registration');
+      console.error(err)
       throw err;
     }
     if (existingUser) {
       this.status = 422;
-      this.body = { error: 'That user name is already in use.'};
+      this.body = { error: 'That email is already in use.'};
       return;
     }
 
     var user = {
-      username: username,
+      first_name: first_name,
+      last_name: last_name,
+      username: email,
       password: password,
       role: role,
       provider: 'local',
@@ -233,6 +235,7 @@ exports.register = function*(next) {
       var userObject =  (yield User.createUser(user))[0];
     } catch (err) {
       console.error('register: error creating user');
+      console.error(err)
       throw err;
     }
 
@@ -240,55 +243,47 @@ exports.register = function*(next) {
       console.log('register: creating company');
 
       try {
-        var company  = yield createCompany(companyName, email, userObject.id);
+        var company  = yield createCompany(company_name, email, userObject.id);
       } catch (err) {
         console.error('register: error creating company');
+        console.error(err)
         throw err;
       }
-      console.log('Complete. Authenticating user...')
-      var userInfo = setUserInfo(user);
-      this.status = 201;
-      this.body = {
-        token: 'JWT ' + sts.generateToken(userInfo),
-        user: userInfo,
-      };
-      return;
 
     } else if (role == 'CUSTOMER') {
       console.log('register: creating customer');
 
       try {
-        var customerId = yield Customer.createCustomer(name, userObject.id);
+        var customerId = yield Customer.createCustomer(userObject.id);
       } catch (err) {
         console.error('register: error creating customer');
+        console.error(err)
         throw err;
       }
 
-      var userInfo = setUserInfo(user);
-      this.status = 201;
-      this.body = {
-        token: 'JWT ' + sts.generateToken(userInfo),
-        user: userInfo,
-      };
-      return;
     } else if (role == 'ADMIN') {
       console.log('register: creating admin');
 
       try {
-        var customerId = yield Admin.createAdmin(name, userObject.id);
+        var adminId = yield Admin.createAdmin(userObject.id);
       } catch (err) {
         console.error('register: error creating admin');
+        console.error(err)
         throw err;
       }
-
-      var userInfo = setUserInfo(user);
-      this.status = 201;
-      this.body = {
-        token: 'JWT ' + sts.generateToken(userInfo),
-        user: userInfo,
-      };
-      return;
+    } else {
+      console.error('register: unknown role '+ role)
+      throw new Error('unknown role '+ role)
     }
+
+    console.log('register: completed. Authenticating user...')
+    var userInfo = setUserInfo(user);
+    this.status = 201;
+    this.body = {
+      token: 'JWT ' + sts.generateToken(userInfo),
+      user: userInfo,
+    };
+    return;
   }
 
   this.status = 422;

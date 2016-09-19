@@ -3,9 +3,9 @@ exports.up = function(knex, Promise) {
   return Promise.all([
     knex.schema.createTable('users', function(t) {
       t.increments();
-      t.string('name');
+      t.string('first_name');
+      t.string('last_name');
       t.string('email');
-      t.string('username');
       t.string('password');
       t.string('role');
       t.string('provider');
