@@ -34,7 +34,7 @@ create table reviews (
 create table review_approvals (
   ID SERIAL PRIMARY KEY,
   review_id INTEGER REFERENCES reviews (id),
-  reviewer_id INTEGER REFERENCES admins (id),
+  admin_id INTEGER REFERENCES admins (id),
   status TEXT,
   created TIMESTAMP DEFAULT current_timestamp
 )
@@ -62,7 +62,6 @@ exports.verifyUser = function(customerId, userId) {
 exports.createCustomer = function(name, userId) {
   return knex('customers').insert(
     {
-      name: name,
       user_id: userId
     }).returning('*')
 };

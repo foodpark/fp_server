@@ -64,6 +64,8 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username text NOT NULL UNIQUE,
     password text NOT NULL,
+    first_name text,
+    last_name text,
     role text REFERENCES roles(type),
     provider text,
     provider_id text,
@@ -74,7 +76,6 @@ CREATE TABLE users (
 
 CREATE TABLE admins (
     id SERIAL PRIMARY KEY,
-    name text NOT NULL,
     description text,
     photo text,
     super_admin boolean DEFAULT false,
@@ -113,7 +114,6 @@ CREATE TABLE companies (
 
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
-    name text NOT NULL,
     order_sys_id text,
     description text,
     facebook text,
@@ -264,3 +264,5 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
 
 REVOKE ALL ON TABLE users FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
+
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to sfez_rw;

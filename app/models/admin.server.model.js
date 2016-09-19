@@ -13,6 +13,8 @@ CREATE TABLE admins (
   user_id INTEGER REFERENCES users (id),
   created TIMESTAMP DEFAULT current_timestamp
 )
+
+
 **/
 
 /* exports.getAllAdmins = function() {
@@ -27,10 +29,9 @@ exports.getForUser = function(userId) {
   return knex('admins').select().where('user_id', userId)
 };
 
-exports.createAdmin = function(name, userId) {
+exports.createAdmin = function(userId) {
   return knex('admins').insert(
     {
-      name: name,
       user_id: userId
     }).returning('*');
 };
