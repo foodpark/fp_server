@@ -197,11 +197,11 @@ module.exports = {
           } else {
             // verify user is modifying the correct review
             var custId = this.params.id
-            if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
+            if (this.params.table != 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
               custId = m[1]
             }
             console.log('verifying customer')
-            var valid = (yield Customer.getForUser(this.passport.user.id))[0];// .verifyUser(custId, this.passport.user.id))[0]
+            var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
             console.log(valid)
             if (!valid) {
               this.throw('Update Unauthorized - User may not update this customer',401);
