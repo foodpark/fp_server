@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Queries = require('koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
+var ReviewStates = require('./models/reviewstates.server.model');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model')
 
@@ -20,7 +21,18 @@ function *beforeSaveReview() {
     this.resteasy.object.rating = rating;
   }
 
-  this.resteasy.object.status = 'New';
+  var initialStateName = (yield ReviewStates.getInitialState())[0];
+
+  this.resteasy.object.status = initialStateName.name;
+}
+
+function *beforeGetReviews() {
+  // Only return Approved reviews
+  var approvedState = (yield ReviewStates.getApprovedState())[0];
+  if (!this.resteasy.query.toString().includes("\"status\"")) {
+    this.resteasy.query.where('status', approvedState.name);
+  }
+  console.log(this.resteasy.query.toString());
 }
 
 function *beforeSaveUnit() {
@@ -122,7 +134,10 @@ function *afterCreateReview(review) {
 }
 
 function *beforeUpdateReview(review) {
-  this.resteasy.object.status = 'Updated';
+  // TODO: actually use the allowed_transitions values to determine state
+  //  instead of using a hard-coded call here.
+  var statusName = (yield ReviewStates.getUpdatedState())[0];
+  this.resteasy.object.status = statusName.name;
 
   var rating = calculateTotalReviewRating(this.resteasy.object.answers.answers);
   if (rating > -1) {
@@ -212,6 +227,11 @@ module.exports = {
 
       } else if (operation == 'read') {
         console.log('got a read')
+
+        if (this.resteasy.table == 'reviews') {
+          // Only return Approved reviews
+          yield beforeGetReviews.call(this);
+        }
       } else {
         console.error('authorize: unknown operation' + operation)
         this.throw('Unknown operation - '+ operation, 405)
