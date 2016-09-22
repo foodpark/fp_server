@@ -1,8 +1,5 @@
 var debug = require('debug')('moltin'),
     sts = require('./security.server.controller'),
-    FormData = require('form-data'),
-    http = require ('http'),
-    https = require('https'),
     config = require('../../config/config'),
     request = require('request'),
     moltin = require('moltin')({
