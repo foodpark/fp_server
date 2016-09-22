@@ -10,7 +10,9 @@ chai.use(chaiHttp);
 
 // TEST MOLTIN INTEGRATIONS
 
-// 1. Test SFEZ Postgres has Moltin-mapped companies
+// UNAUTHENTICATED ROUTES
+// 0. Test SFEZ Postgres has Moltin-mapped companies
+// router.get(apiversion + '/companies', storefront.listCompanies)
 describe('GET /api/v1/mol/companies', function() {
   it('should return all companies in SFEZ db', function(done) {
     chai.request(server)
@@ -28,12 +30,60 @@ describe('GET /api/v1/mol/companies', function() {
   });
 });
 
+// 1. Test SFEZ Postgres has specfic company
+// router.get(apiversion + '/companies/:companyId', storefront.readCompany)
+describe('GET /api/v1/mol/companies/1001', function() {
+  it('should return company 1001: Pacos Tacos from SFEZ db', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001')
+    .end(function(err, res) {
+    res.should.have.status(200);
+    res.should.be.json;
+    res.body.should.be.a('object');
+    res.body.should.have.property('id');
+    res.body.id.should.equal(1001);
+    res.body.should.have.property('name');
+    res.body.name.should.equal('Pacos Tacos');
+    res.body.should.have.property('order_sys_id');
+    res.body.order_sys_id.should.equal('1293770040725734215');
+    done();
+    });
+  });
+});
+
+// 2. Test retrieval of Moltin categories
+// router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
+describe('GET /api/v1/mol/companies/1001/categories', function() {
+  it('should return menu categories for 1001: Pacos Tacos from Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/categories')
+    .end(function(err, res) {
+      res.body.should.be.a('array');
+      res.body[0].should.have.property('slug');
+      res.body[0].slug.should.equal('pacostacos');
+      done();
+    });
+  });
+});
+
+// 4. Test retrieval of one Moltin category
+// router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory);
+describe('GET /api/v1/mol/companies/1001/categories/1278239102541496682', function() {
+  it('should return Breakfast category for 1001: Pacos Tacos from Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/categories/1278239102541496682')
+    .end(function(err, res) {
+    res.should.have.status(200);
+    res.should.be.json;
+    res.body.should.be.a('object');
+    res.body.should.have.property('title');
+    res.body.title.should.equal('Breakfast');
+    done();
+    });
+  });
+});
+
 /*
-// UNAUTHENTICATED ROUTES
-router.get(apiversion + '/companies', storefront.listCompanies)
-router.get(apiversion + '/companies/:companyId', storefront.readCompany)
-router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
-router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory);
 router.get(apiversion + '/menuitems', storefront.listMenuItems);
 router.get(apiversion + '/menuitems/:menuItemId', storefront.readMenuItem);
 router.get(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems);

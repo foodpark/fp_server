@@ -1,10 +1,9 @@
-
 var User = require ('../models/user.server.model'),
     Company = require ('../models/company.server.model'),
     Customer = require ('../models/customer.server.model'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
-    debug = require('debug')('storefront.server.controller');
+    debug = require('debug')('storefront');
 
 var getErrorMessage = function(err) {
     var message = '';
@@ -31,7 +30,7 @@ exports.getCompany=function *(id, next) {
     console.error('error getting company')
     throw(err)
   }
-  console.log(company)
+  debug(company)
   this.company = company
   yield next;
 }
@@ -43,26 +42,28 @@ exports.listCompanies=function *(next) {
     console.error('error getting companies')
     throw(err)
   }
-  console.log(companies)
+  debug(companies)
   this.body = companies
   return;
 }
 
-exports.readCategory=function(req,res,next) {
-	this.body(this.category);
+exports.readCategory=function *(next) {
+	this.body=this.category;
+  return;
 }
 
 exports.getCategory=function *(id, next) {
-  console.log('category id: '+ id)
-  console.log(company)
+  debug('category id: '+ id)
+  debug('company '+ this.company)
   try {
-    var category = (yield msc.findCategory(this.company, id))[0]
+    var category = yield msc.findCategory(id)
   } catch (err) {
-    console.error('error retrieving category from ordering system ')
+    console.error('error retrieving category from ordering system')
     throw(err)
   }
+  debug(category)
   this.category = category
-  return;
+  yield next;
 }
 
 exports.createCategory=function*(next) {
@@ -91,21 +92,22 @@ exports.createCategory=function*(next) {
 
 exports.listCategories=function *(next) {
   var data = this.body;
-  console.log(this.company)
+  debug(this.company)
   if (!data)  data = ''
-  console.log(data)
+  debug(data)
   try {
     var categories = (yield msc.listCategories(this.company, data))
   } catch (err) {
     console.error('error retrieving categories from ordering system ')
     throw(err)
   }
+  debug(categories)
   this.body = categories
   return;
 }
 
 exports.updateCategory=function *(next) {
-  console.log('update category called by' + req.user.id)
+  debug('update category called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
@@ -125,7 +127,7 @@ exports.updateCategory=function *(next) {
 }
 
 exports.deleteCategory=function *(next) {
-  console.log('delete category called by' + req.user.id)
+  debug('delete category called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
@@ -144,14 +146,14 @@ exports.deleteCategory=function *(next) {
 }
 
 exports.createMenuItem=function *(next) {
-  console.log('create menu item called by' + req.user.id)
+  debug('create menu item called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
     console.error('error creating menu item: could not find company for user')
     throw(err)
   }
-  console.log(company)
+  debug(company)
       /**
       Name	Slug	Field Type	Required?	Unique?	Title Column?
       *SKU	sku	string	Yes	Yes	No
@@ -196,7 +198,7 @@ exports.createMenuItem=function *(next) {
 }
 
 exports.listMenuItems=function *(next) {
-  console.log('list menu items called by' + req.user.id)
+  debug('list menu items called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
@@ -219,7 +221,7 @@ exports.readMenuItem=function *(next) {
 }
 
 exports.getMenuItem=function *(next,id) {
-  console.log('get menu item called by' + req.user.id)
+  debug('get menu item called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
@@ -237,7 +239,7 @@ exports.getMenuItem=function *(next,id) {
 }
 
 exports.updateMenuItem=function *(next) {
-  console.log('update menu item called by' + req.user.id)
+  debug('update menu item called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
@@ -245,7 +247,7 @@ exports.updateMenuItem=function *(next) {
     throw(err)
   }
   var menuItem = req.menuItem
-  console.log(menuItem.company.data.id +'=='+ company.orderSysId)
+  debug(menuItem.company.data.id +'=='+ company.orderSysId)
   if (mi.company.data.id == company.orderSysId) {
     var data = req.body;
     try {
@@ -262,7 +264,7 @@ exports.updateMenuItem=function *(next) {
 }
 
 exports.deleteMenuItem=function *(next) {
-  console.log('delete menu item called by' + req.user.id)
+  debug('delete menu item called by' + req.user.id)
   try {
     var company = (yield Company.companyForUser(req.user.id))[0]
   } catch (err) {
@@ -270,7 +272,7 @@ exports.deleteMenuItem=function *(next) {
     throw(err)
   }
   var menuItem = req.menuItem
-  console.log(menuItem.company.data.id +'=='+ company.orderSysId)
+  debug(menuItem.company.data.id +'=='+ company.orderSysId)
   if (menuItem.company.data.id == company.orderSysId) {
     try {
       var item = (yield msc.deleteMenuItem(menuItem))[0]

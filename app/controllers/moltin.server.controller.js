@@ -1,4 +1,4 @@
-var debug = require('debug')('moltin.server.controller'),
+var debug = require('debug')('moltin'),
     sts = require('./security.server.controller'),
     FormData = require('form-data'),
     http = require ('http'),
@@ -168,22 +168,25 @@ exports.createDefaultCategory=function(moltincompany, callback) {
   })
 };
 
-var requestEntities = function(flow, method, data, id) {
-  console.log (flow)
 
+var requestEntities = function(flow, method, data, id, params) {
   return new Promise(function(resolve, reject) {
     getBearerToken(function(token) {
       if (token instanceof Error) {
         reject(token);
         return;
       }
-      console.log('token : '+ token)
+      debug('token : '+ token)
       var oid = '';
       if (id) oid = '/'+id
+      var urlParams = '';
+      if (params) urlParams = '?'+params;
+      var url = config.moltinStoreUrl + flow + oid + urlParams
+      debug('url : '+ url)
       request(
         {
           method: method,
-          url: config.moltinStoreUrl + flow + oid,
+          url: url,
           json: data,
           headers: {
             'Authorization': 'Bearer '+ token
@@ -191,17 +194,15 @@ var requestEntities = function(flow, method, data, id) {
         },
         function (err, res, body) {
           if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
-            debug(body)
-            var bodyJson = JSON.stringify(res);
-            bodyJson = JSON.parse(bodyJson).body;
-            //debug(bodyJson.result)
+            var bodyJson = JSON.parse(body);
+            debug(bodyJson.result)
             resolve(bodyJson.result)
             return;
           }
           else {
             console.error('Response Status: ' + res.statusCode)
             if (err) {
-              console.error('err'+ err);
+              console.error(err)
               reject(err)
               return;
             }
@@ -229,29 +230,26 @@ exports.createCategory=function(company, catTitle, catParent) {
   debug(data)
   return requestEntities(CATEGORIES, POST, data)
 };
-exports.findCategory=function(company, categoryId, callback) {
-  return requestEntities(CATEGORIES, GET, {id:categoryId, company:company.orderSysId}, callback)
+exports.findCategory=function *(categoryId) {
+  debug('category: '+categoryId)
+  return requestEntities(CATEGORIES, GET, '', categoryId)
 };
-exports.listCategories=function *(company, data) {
-  console.log(company.order_sys_id)
-  if (data) data.company = company.order_sys_id
-  else data = {company: {data: {id: company.order_sys_id}}}
-  console.log(data)
+exports.listCategories=function *(company) {
+  debug(company.order_sys_id)
   try {
-    var results = yield requestEntities(CATEGORIES, GET, data)
+    var results = yield requestEntities(CATEGORIES, GET, '', '', 'company='+company.order_sys_id)
   } catch (err) {
-    console.log('error calling moltin controller')
+    console.error('error calling moltin controller')
+    console.error(err)
     throw (err)
   }
-  console.log(results)
   return results
 };
-exports.updateCategory=function(company, category, data, callback) {
-  data.company = company.orderSysId
-  return requestEntities(CATEGORIES, PUT, data, callback, category)
+exports.updateCategory=function(company, category, data) {
+  return requestEntities(CATEGORIES, PUT, data, category)
 };
-exports.deleteCategory=function(category, callback) {
-  return requestEntities(CATEGORIES, DELETE, '', callback, category)
+exports.deleteCategory=function(category) {
+  return requestEntities(CATEGORIES, DELETE, '', category)
 };
 
 exports.createMenuItem=function(company, title, status, price, category, description, callback) {
