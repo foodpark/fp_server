@@ -227,7 +227,7 @@ exports.register = function*(next) {
       role: role,
       provider: 'local',
       provider_id: 'local',
-      provider_data: ''
+      provider_data: '{}'
     };
 
     console.log('register: creating user');

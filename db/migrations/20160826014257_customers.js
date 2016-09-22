@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex, Promise){}; /*function(knex, Promise) {
   return Promise.all([
     knex.schema.createTable('customers', function(t) {
       t.increments();
@@ -21,8 +21,8 @@ exports.up = function(knex, Promise) {
       t.timestamps();
     }),
   ]);
-};
+};*/
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex, Promise){}; /*function(knex, Promise) {
   return Promise.all([knex.schema.dropTable('customers')]);
-};
+};*/
