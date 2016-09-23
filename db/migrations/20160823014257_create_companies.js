@@ -18,6 +18,7 @@ exports.up = function(knex, Promise) {
       t.string('state');
       t.string('country');
       t.string('taxband');
+      t.specificType('tags', 'json');
       t.integer('user_id').references('users.id');
 
       t.timestamps();

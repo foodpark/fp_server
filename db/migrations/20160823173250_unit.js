@@ -9,8 +9,7 @@ exports.up = function(knex, Promise) {
       t.string('password');
       t.integer('number');
       t.string('qr_code');
-      t.float('latitude');
-      t.float('longitude');
+      t.string('description');
 
       t.integer('unit_order_sys_id');
       t.integer('company_id').references('companies.id');

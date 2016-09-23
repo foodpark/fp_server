@@ -7,9 +7,9 @@ exports.up = function(knex, Promise) {
     }).then(function() {
       return knex.raw('INSERT INTO review_states (id,name,allowed_transitions) VALUES ' +
         '(1,\'New\',\'{2,3,4}\'),' +
-        '(2,\'Approved\',\'{3}\'),') +
-        '(3,\'Updated\',\'{2,4}\'),') +
-        '(4,\'Disapproved\',\'{3}\'),');
+        '(2,\'Approved\',\'{3}\'),' +
+        '(3,\'Updated\',\'{2,4}\'),' +
+        '(4,\'Disapproved\',\'{3}\');' );
     })
   ]);
 };

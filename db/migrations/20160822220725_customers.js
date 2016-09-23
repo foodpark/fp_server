@@ -6,7 +6,8 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('customers', function(t) {
       t.increments();
 
-      t.string('name');
+      t.string('order_sys_id');
+
       t.string('description');
       t.string('photo');
 

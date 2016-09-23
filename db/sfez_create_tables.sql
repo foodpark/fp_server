@@ -50,10 +50,7 @@ CREATE TABLE locations (
   secondary_loc_text text,
   regex_seed text,
   hitcount integer,
-  city text,
-  state text,
-  postal_code text,
-  country text,
+  city_id integer,
   latitude float8,
   longitude float8,
   created_at timestamp without time zone DEFAULT now(),
@@ -86,6 +83,7 @@ CREATE TABLE admins (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
 );
+
 
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY,
@@ -136,7 +134,7 @@ CREATE TABLE units (
     description text,
     username text,
     password text,
-    qrcode text,
+    qr_code text,
     unit_order_sys_id integer,
     company_id integer REFERENCES companies(id),
     unit_mgr_id integer REFERENCES users(id),
@@ -147,12 +145,36 @@ CREATE TABLE units (
 
 CREATE TABLE checkins (
   id SERIAL PRIMARY KEY,
+  check_in timestamp,
+  check_out timestamp,
+  latitude float8,
+  longitude float8,
   unit_id integer REFERENCES units(id),
-  location point NOT NULL,
-  food_park_id integer REFERENCES food_parks(id),
-  checkin TIMESTAMP without time zone DEFAULT now(),
+  company_id integer REFERENCES companies(id),
+  created_at timestamp without time zone DEFAULT now(),
   updated_at timestamp without time zone DEFAULT now()
 );
+
+CREATE TABLE checkin_history (
+  id SERIAL PRIMARY KEY,
+  unit_name text,
+  unit_id integer REFERENCES units(id),
+  company_name text,
+  company_id integer REFERENCES companies(id),
+  user_id integer REFERENCES users(id),
+  service_cancellation_time timestamp,
+  check_in timestamp,
+  check_out timestamp,
+  latitude float8,
+  longitude float8,
+  food_park_name text,
+  food_park_id integer REFERENCES food_parks(id),
+  note text,
+  display_address text,
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now()
+);
+
 
 CREATE TABLE favorites (
   customer_id integer REFERENCES customers(id),
@@ -161,6 +183,7 @@ CREATE TABLE favorites (
   created_at timestamp without time zone DEFAULT now(),
   PRIMARY KEY (customer_id, unit_id, company_id)
 );
+
 
 CREATE TABLE order_history (
   id SERIAL PRIMARY KEY,
@@ -192,11 +215,16 @@ CREATE TABLE loyalty_used (
   updated_at timestamp without time zone DEFAULT now()
 );
 
+CREATE TABLE review_states (
+  id SERIAL PRIMARY KEY,
+  name text NOT NULL UNIQUE,
+  allowed_transitions integer[]
+);
 
 CREATE TABLE review_approvals (
     id SERIAL PRIMARY KEY,
     review_id integer,
-    admin_id integer REFERENCES admins(id),
+    reviewer_id integer REFERENCES admins(id),
     status text,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
@@ -210,11 +238,32 @@ CREATE TABLE reviews (
     customer_id integer REFERENCES customers(id),
     company_id integer REFERENCES companies(id),
     unit_id integer REFERENCES units(id),
-    status text,
+    status text REFERENCES review_states(name),
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
 );
 
+
+CREATE TABLE search_preferences (
+    id SERIAL PRIMARY KEY,
+    customer_id integer REFERENCES customers(id),
+    distance float8,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
+
+CREATE TABLE territories (
+    id SERIAL PRIMARY KEY,
+    common_name text,
+    unique_name text,
+    state text,
+    country text,
+    timezone text,
+    latitude float8,
+    longitude float8,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
 
 
 COPY roles (id, type) FROM stdin;
@@ -231,6 +280,14 @@ COPY unit_types (id, type) FROM stdin;
 3	RESTAURANT
 \.
 SELECT pg_catalog.setval('unit_types_id_seq', 4, true);
+
+COPY review_states (id, name, allowed_transitions) FROM stdin;
+1	New	{2,3,4}
+2	Approved	{3}
+3	Updated	{2,4}
+4	Disapproved	{3}
+\.
+SELECT pg_catalog.setval('review_states_id_seq', 5, true);
 
 
 GRANT ALL ON SCHEMA public TO postgres;
