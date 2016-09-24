@@ -18,6 +18,7 @@
     .order_page .menudp {margin-top: 0px; padding-top: 10px; padding-bottom: 20px;}
     .order_page .menudp img{width: 100%; height: auto; margin-top: 18px;}
     .order_page h2{font-size: 20px; padding-top: 11px;}
+    .sidenav .menudp h2{margin-top: 24px;}
     .order_page.sidenav a{font-size: 16px;}
     .order_page.sidenav .submenu {list-style: none; padding-left: 15px;}
     .list_contener .list em{width: 45%;}
@@ -51,14 +52,14 @@
     .shell h1 , .shell h2 span{font-size: 18px; line-height: 40px; vertical-align: top}
     .onoffswitch-label{margin-top: 0; margin-top: 15px; height: 28px;}
     .onoffswitch{width: 60px;}
-    .onoffswitch-label:before{width: 28px; right: 30px;}
+    .onoffswitch-label:before{width: 28px; right: 30px; height: 28px;}
     .shell span h1{font-size: 25px; line-height: 35px;}
     .shell .bttn{padding-top: 0; padding-bottom: 0;}
     .shell .bttn .add_btn a{padding: 10px 35px;}
 
     /* Main Menu Vendoe */
     .map_my_food form .btn{margin-bottom: 0;}
-    .nav-tabs li a{margin-top: 15px; margin-bottom: 20px; font-size: 20px;}
+    .nav-tabs li a{margin-top: 34px; margin-bottom: 30px; font-size: 20px;}
     .nav-tabs > li.active > a{font-size: 20px;}
 
     /* Order Menagement */
@@ -117,8 +118,8 @@
     .list_contener .list em{width: 55%;}
     .btn.btn-default{font-size: 16px; padding: 10px 20px; font-weight: 600;}
 
-    .nav-tabs li a{font-size: 20px; margin-top: 15px; margin-bottom: 15px;}
-    .main_menu_edit .btn{font-size: 18px;}
+    .nav-tabs li a{font-size: 16px; margin-top: 15px; margin-bottom: 15px;}
+    .main_menu_edit .btn{font-size: 16px;}
     .shell h1 , .shell h2 span{font-size: 25px; line-height: 50px; vertical-align: top}
     .shell i{vertical-align: top}
     .list_bar ul li:last-child{border: none}
@@ -135,9 +136,10 @@
     /* Add Otion to Menu item */
     .shell i{font-size: 30px;}
     .shell h1 , .shell h2 span{font-size: 18px; line-height: 30px; vertical-align: top}
+    .check_in .shell h1{font-size: 29px;}
     .onoffswitch-label{margin-top: 0; margin-top: 15px; height: 28px;}
     .onoffswitch{width: 60px;}
-    .onoffswitch-label:before{width: 28px; right: 30px;}
+    .onoffswitch-label:before{width: 28px; right: 30px; height: 28px;}
     .shell span h1{font-size: 25px; line-height: 35px;}
     .shell .bttn{padding-top: 0; padding-bottom: 0;}
     .shell .bttn .add_btn a{padding: 10px 35px;}
@@ -196,4 +198,23 @@
     .settings .fa-stack{margin-bottom: 20px;}
     .social_media input[type="text"]{margin-left: 45px;}
     .sign_in.profile .fb_btn span{display: block; padding-bottom: 15px;}
+
+    /* Loyalty */
+    .loyalty .list_contener .list .right_section h4{margin-top: 18px;}
+    .loyalty .list_contener .list .right_section a{padding-top: 26px;}
+
+    .special_list .inner_btn{font-size: 16px; margin-top: 0;}
+    .special_list .inner_btn img{width: 20px;}
+    .daily_special h2{font-size: 25px; }
+    .daily_special .dropdown .dropdown-toggle{font-size: 14px;}
+    .entree p{font-size: 20px;}
+
+    /* Check IN */
+    .dropdown .dropdown-toggle#dropdownMenu1{font-size: 18px;}
+    .check_in p.large{font-size: 35px;}
+
+    /* Customer */
+    .customer h3{max-width: 65px;}
+    .customer .visit_of h3{max-width: none;}
+    .customer .visit_of a.filt_arow{position: relative;top: -22px;}
 }

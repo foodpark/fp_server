@@ -382,6 +382,8 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 /* Top heading */
 .top_head {height: 100px; background-color: #edede6;}
 .top_head h2{color: #8e8e8a; line-height: 70px; padding-top: 15px; margin-top: 20px; margin-bottom: 20px;}
+.top_head h1{color: #8e8e8a; line-height: 70px; padding-top: 15px; margin-top: 20px; margin-bottom: 20px;}
+.shell .top_head h1{font-size: 30px;}
 /* Default lists */
 .list_contener .list{width:100%; padding: 15px 0; background-color: #edede6; border-top: 1px solid #ebcb41; border-bottom: 1px solid #ebcb41; -o-transition: 0.4s ease all; -webkit-transition: 0.4s ease all; transition: 0.4s ease all;}
 .list_contener .list.no_power { border-color: #dad8d1 !important}
@@ -402,8 +404,8 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .list_contener .list.pick_up .right_txt span{ color: #19627f;}
 .list_contener .list span{color: #9f1f63;}
 .loading_contener{position: fixed; width: 100%; height: 100%; background-color: #67c4ea;  z-index: 9999}
-.loading_contener .loading{ margin: 0 auto; text-align: center; position: absolute; left:50%; margin-left: -45px; top: 42%; }
-.loading_contener .loading img{-webkit-animation: infinite-spinning 2s infinite linear; animation: infinite-spinning 2s infinite linear;}
+.loading_contener .loading{ margin: 0 auto; text-align: center; position: absolute; left:50%; margin-left: -45px; top: 42%; width: 125px;}
+.loading_contener .loading img{-webkit-animation: infinite-spinning 2s infinite linear; animation: infinite-spinning 2s infinite linear; width: 100%;}
 
 /* Add another menu */
 .shell span h1{font-size: 30px; line-height: 40px; margin-top: 10px;}
@@ -434,6 +436,7 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .check_in_time .map{padding-top: 45px;}
 
 /* Order Managemeant */
+.popup_contener .popup_inner.order_pop{max-width: 650px;}
 .order_list .list.active{background-color: #fff;}
 .order_list .order_mng {background-color: #fff; background-image: url(../img/ord_mng_bg.png); background-repeat: repeat-x; display: none;}
 .order_list .order_mng h4{margin: 0; padding: 15px 0; text-align: center}
@@ -462,7 +465,13 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .order_list .order_mng ul li.queue a img{visibility: visible; opacity: 1;}
 .ord_cont{padding-bottom: 15px;}
 .multi_choise .checkbox label{display: block;}
-.multi_choise .checkbox label span{display: inline-block; width: 35%}
+.singl_choise .checkbox label{display: block;}
+.multi_choise .checkbox label span{display: inline-block; width: 35%; line-height: 25px;}
+.singl_choise .checkbox label span{display: inline-block; width: 35%; line-height: 25px;}
+.del_icon{display: inline-block; width: 20px; height: 20px; background-image: url(../img/del.png); background-repeat: no-repeat; background-position: center; background-size: 100%; vertical-align: top; margin-right: 5px; margin-top: 5px; position: absolute;right: 0;top: 0;}
+.del_icon.right_sec{right: -220px;}
+.edit_icon{display: inline-block; width: 20px; height: 20px; background: url(../img/edit_icon_2.png) center no-repeat; background-size: 20px;}
+.select_data em{font-style: normal;}
 .form-group .pl0{padding-left: 0;}
 .pl0{padding-left: 0;}
 .mt30{margin-top: 30px !important;}
@@ -500,7 +509,7 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 /*The number of the step and the connector before it = green*/
 #progressbar li.active:before, #progressbar li.active:after {background: #67c4ea;color: white;}
 
-#msform {margin: 50px auto;text-align: center;position: relative;}
+#msform {margin: 50px auto;text-align: center;position: relative; margin-bottom: 85px;}
 #msform .btn-upload img{margin-top: 0; margin-bottom: 0;}
 #msform .registeration_one .btn-upload{padding-bottom: 10px;}
 #msform .registeration_one .btn-upload h2{font-size: 15px; line-height: 18px;}
@@ -553,6 +562,7 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .bootstrap-tagsinput .tag [data-role="remove"]{position: absolute;right: -35px;}
 #msform .register_radio img{width: 35px; margin: 0;}
 #msform .register_radio .radio label:before{bottom: 4px;}
+#msform .btn.btn-default.bottom_btn{position: absolute;left: 50%;bottom: -50px;padding: 11px; font-size: 15px; width: 215px; margin-left: -107px; border-radius: 5px;}
 
 .bottom_content{margin-top: 45px; padding-left: 25px;}
 .bottom_content h2{margin-bottom: 15px;}
@@ -573,6 +583,7 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .check_in.checkin_fifth p.large{padding-bottom: 25px;}
 .check_in img{width: 35%;}
 .check_in .shell .dropdown-toggle span{ float: right;margin-top: 16px;}
+.check_in #dropdownMenu1{margin-bottom: 20px;}
 
 /* Special */
 .entree{padding-bottom: 0px;}
@@ -602,15 +613,17 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .dail_spe.list_contener .redeem{padding-top: 35px;}
 .pr0{padding-right: 0;}
 .bttn .add_btn a{width: 100%; text-align: center}
+.iner_menu {padding-left: 35px;}
 
 /* Add Option category */
-.first_section , .third_section , .second_section{display: none;}
+.first_section , .third_section , .second_section{}
 .second_val .checkbox{word-wrap: break-word}
 .bar_1 ,.bar_2,.bar_3{margin-bottom: 10px;}
 .bar_1 .btn.btn-default , .bar_2 .btn.btn-default, .bar_3 .btn.btn-default{margin: 0; height: 50px; font-size: 18px; padding: 12px 0; text-align: center}
 
-.shell .option_main span{margin-left: 10px; color: #000; display: inline-block;}
-.option_main p{ padding-left: 55px; font-size: 18px;}
+.shell .option_main span{margin-left: 6px; color: #000; display: inline-block; vertical-align: top;}
+.shell .option_main em{font-style: normal; margin-left: 5px;}
+.option_main p{ padding-left: 15px; font-size: 18px;}
 .option_main a{margin-left: 5px;}
 
 /* Main Edit Menu */
@@ -621,6 +634,12 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .main_menu_edit .tab-pane p img{margin-right: 15px;}
 .main_menu_edit .tab-pane .pl15{padding-left: 45px;}
 .main_menu_edit.shell .grey_head h2{margin-top: 5px;}
+.tab-content.del_btn{margin-left: 10px;}
+.on_off{position: relative;}
+.on_off .onoffswitch{position: absolute; top: 0; right: -50px;}
+.on_off .onoffswitch .onoffswitch-label{margin: 0;}
+.popup_inner .btn.btn-default.color_2{ line-height: 25px;}
+.popup_inner .btn.btn-default.color_2:hover{ background-color: #9a2161;border-color: transparent;}
 
 /* Pop Up */
 .overlay{visibility: hidden; position: fixed; width: 100%; height: 100%; opacity: 0; z-index:99999; -o-transition: 0.4s ease all; -moz-transition: 0.4s ease all; -webkit-transition: 0.4s ease all; transition: 0.4s ease all; top: 0; }
@@ -635,6 +654,9 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .popup_contener .pop_list span{min-width: 75%; display: inline-block;}
 .popup_contener .pop_list img{width: 20px;}
 .popup_contener .pop_list .btn{ height: 50px;padding: 10px;margin-top: 0px; text-decoration: none; margin-bottom: 20px;}
+.popup_contener .popup_inner .top_head{background-color: transparent}
+.popup_contener #single_val .repeat em{vertical-align: top;}
+.popup_inner .singl_choise .checkbox label span , .popup_inner .singl_choise .checkbox label em , .popup_inner .multi_choise .checkbox label span , .popup_inner .multi_choise .checkbox label em{font-size: 15px; vertical-align: top;}
 
 /* loyalty */
 .loyalty .list_contener .list h3{ color: #000; margin-bottom: 0;}
@@ -729,30 +751,66 @@ header.move_content .sign_in{right: auto; left: 15px; margin-bottom: 15px;}
 .type .type_select{position: absolute; width: 100%;left: 0; top: 100%;padding: 0; list-style: none; background-color: #dfdbd4; border-radius: 5px; text-align: center; display: none; z-index: 999;}
 ul.type_select img{margin-bottom: 15px;}
 
+/* Customer */
+.relative{position: relative;}
+.numbers{position: absolute;left: -20px;top: 0%; font-size: 21px; line-height: 21px;}
+.customer_list p{ color: #2b8eb7; font-size: 18px;}
+.customer_list span{ color: #981d5e;}
+.customer_list .visit_of p{ color: #981d5e;}
+.customer_list div{word-wrap: break-word}
+.filt_arow { display: inline-block; }
+.relative h3{display: inline-block; vertical-align: top;}
+.relative .filt_arow{margin-top: 25px; position: relative; left: -8px;}
+.relative .filt_arow img{transform: rotate(180deg);}
+.filt_arow img{width: 15px; vertical-align: top; padding-top: 2px;}
+
+/**/
+.add_exr{float: right; font-size: 15px; color: #000; margin-right: 10px; line-height: 25px;}
+.add_exr.edit_exr{color: #fff; margin-left: 10px;}
+.edit_exr{padding: 5px; background-color: #67c4ea; margin-right: 0 !important;border-radius: 5px; padding-left: 10px;}
+.add_exr.edit_exr img{vertical-align: middle; width: 15px !important; margin-left: 10px;}
+.add_exr img{display: inline-block; vertical-align: top; margin-right: 5px;}
+.extra_pop .btn.btn-default{padding: 15px ;text-align: center; font-size: 15px; border: none;}
+.extra_pop .btn.btn-default:hover{ background-color: #6e1c48;}
+.extra_pop p{font-size: 15px;}
+.extra_pop a.del_btn{float: right;}
+.extra_pop a.del_btn img{width: 15px;}
+.extra_left {padding-top: 20px;}
+.extra_left img{margin-right: 15px;}
+.extra_left h3{line-height: 30px; margin-top: 10px;}
+#add_extra{margin: 0; height: 50px; font-size: 15px ;padding: 15px;}
+.btn.btn-default.new_btn{display:block; width: auto;padding: 15px; font-size: 15px; margin: 0 auto;  width: 350px; margin-top: 20px;}
+.pop_del{float: right;}
+.pop_del img{width: 20px;}
+.shell  .extra_left.option_main span{vertical-align: middle; margin-left: 0;}
+.top_list{padding-left: 0;}
+.top_list li{display: inline-block; float:left; list-style: none; width: 5%;}
+.top_list li+li{width: 53%;padding-left: 2%;}
+.top_list li+li+li{width: 6%; padding-left: 0;}
+.top_list li+li+li+li{width: 5%;margin-left: 1%;}
+.top_list li+li+li+li+li{width: 7%;margin-left: 1%;}
+.top_list li+li+li+li+li+li{width: 7%;margin-left: 4.5%;}
+.list_contnt a{margin-right: 25px !important;}
+.list_contnt img{width: 30px;}
+.list_contnt span{margin-left: 15px;}
+.new_sys.checkbox .del_icon{ margin-right: 25px;margin-top: 12px;}
+.top_head.menu_item{height: 70px;}
+.top_head.menu_item h1{margin-bottom: 0; height: 70px;}
+.form-control.color_2{background-color: #9a2161; color: #fff; border-radius: 0 !important; margin-bottom: 15px;}
+.top_border{border-top: 1px solid #dfdbd4; margin-top: 20px;}
+.mt15{margin-top: 15px !important;}
 /* Edit by M */
 .navbar-header img{max-width: 106px;}
 header .navbar-header h2:after{display: none;}
-.dropdown .dropdown-toggle#dropdownMenu1 {text-transform: uppercase;padding: 25px;font-size: 23px;}
+.dropdown .dropdown-toggle#dropdownMenu1 {text-transform: uppercase;padding: 25px;font-size: 23px; white-space: normal;}
+.dropdown .dropdown-toggle#dropdownMenu2 {text-transform: uppercase;padding: 25px;font-size: 23px; white-space: normal;}
 .top_head{min-height: 40px;}
 .col-sm-12.option_main h1 i.fa-pencil-square-o {font-size: 26px;line-height: normal;position: relative;top: 17px;}
-#menu_availability .onoffswitch {height: 38px;display: inline-block;vertical-align: top;position: relative;top: 7px;margin-left: 20px;}
+#menu_availability .onoffswitch {height: 38px;display: inline-block;vertical-align: top;position: relative;top: 7px;margin-left: 20px; float: right;}
 #menu_availability .onoffswitch label{margin: 0}
 #menu_availability h2 span, #menu_availability h1 span{ min-width: 27%;display: inline-block;}
 .no-cur{pointer-events: none !important}
 .shell h4 span{color: #222221}
 .pull-right{float: right}
-.edit_option.btn-default.btn {    background: #67c4ea;
-    width: 205px;
-    padding: 7px 0;
-    font-size: 20px;
-    font-weight: 500;
-    border-radius: 5px;
-    text-decoration: none;
-    vertical-align: top;
-    margin-top: 0;
-    display: block;
-    margin: 0 auto;
-    float: none !Important;
-    margin-bottom: 20px;
-    margin-top: 20px;}
-.edit_option.btn-default.btn:hover {background: #9f1f63}
+.edit_option.btn-default.btn { background: #67c4ea;width: 205px;padding: 7px 0;font-size: 20px;font-weight: 500;border-radius: 5px;text-decoration: none;vertical-align: top;margin-top: 0;display: block;margin: 0 auto;float: none !Important;margin-bottom: 20px;margin-top: 20px;}.edit_option.btn-default.btn:hover {background: #9f1f63}
+.m0{margin: 0 !important}
