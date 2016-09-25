@@ -11,8 +11,7 @@ chai.use(chaiHttp);
 // TEST MOLTIN INTEGRATIONS
 
 // UNAUTHENTICATED ROUTES
-// 0. Test SFEZ Postgres has Moltin-mapped companies
-// router.get(apiversion + '/companies', storefront.listCompanies)
+// 1. Test SFEZ Postgres has Moltin-mapped companies
 describe('GET /api/v1/mol/companies', function() {
   it('should return all companies in SFEZ db', function(done) {
     chai.request(server)
@@ -30,8 +29,7 @@ describe('GET /api/v1/mol/companies', function() {
   });
 });
 
-// 1. Test SFEZ Postgres has specfic company
-// router.get(apiversion + '/companies/:companyId', storefront.readCompany)
+// 2. Test SFEZ Postgres has specfic company
 describe('GET /api/v1/mol/companies/1001', function() {
   it('should return company 1001: Pacos Tacos from SFEZ db', function(done) {
     chai.request(server)
@@ -51,8 +49,7 @@ describe('GET /api/v1/mol/companies/1001', function() {
   });
 });
 
-// 2. Test retrieval of Moltin categories
-// router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
+// 3. Test retrieval of Moltin categories
 describe('GET /api/v1/mol/companies/1001/categories', function() {
   it('should return menu categories for 1001: Pacos Tacos from Moltin', function(done) {
     chai.request(server)
@@ -67,7 +64,6 @@ describe('GET /api/v1/mol/companies/1001/categories', function() {
 });
 
 // 4. Test retrieval of one Moltin category
-// router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory);
 describe('GET /api/v1/mol/companies/1001/categories/1278239102541496682', function() {
   it('should return Breakfast category for 1001: Pacos Tacos from Moltin', function(done) {
     chai.request(server)
@@ -83,16 +79,51 @@ describe('GET /api/v1/mol/companies/1001/categories/1278239102541496682', functi
   });
 });
 
-/*
-router.get(apiversion + '/menuitems', storefront.listMenuItems);
-router.get(apiversion + '/menuitems/:menuItemId', storefront.readMenuItem);
-router.get(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems);
-router.get(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
-router.get(apiversion + '/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories);
-router.get(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', storefront.readOptionCategory)
-router.get(apiversion + '/menuitems/:menuItemId/optionitems', storefront.listOptionItems);
-router.get(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', storefront.readOptionItem)
 
+// 5. Test retrieval of menu items for Company and Category
+describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems', function() {
+  it('should return menu items for 1001: Pacos Tacos - Tacos category from Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems')
+    .end(function(err, res) {
+      res.body.should.be.a('array');
+      res.body[0].should.have.property('slug');
+      res.body[0].slug.should.equal('independent');
+      done();
+    });
+  });
+});
+
+// 6. Test retrieval of a specific menu item for Company and Category
+describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557', function() {
+  it('should return The Independent Taco for 1001: Pacos Tacos - Tacos category from Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557')
+    .end(function(err, res) {
+      res.body.should.be.a('object');
+      res.body.should.have.property('slug');
+      res.body.slug.should.equal('independent');
+      done();
+    });
+  });
+});
+
+// 7. Test retrieval of option categories for specific menu item for Company and Category
+describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557/optioncategories', function() {
+  it('should return option categories for the Independent Taco for 1001: Pacos Tacos - Tacos category from Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557/optioncategories')
+    .end(function(err, res) {
+      res.body.should.be.a('array');
+      res.body[0].should.have.property('title');
+      res.body[0].title.should.equal('OptionItems');
+      done();
+    });
+  });
+});
+
+
+/*
 // AUTHENTICATED ROUTES
 // Test Categories
 router.post(apiversion + '/companies/:companyId/categories', auth.roleAuthorization("Owner"), storefront.createCategory)

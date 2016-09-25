@@ -12,7 +12,7 @@ var _ = require('lodash');
 
 exports.CUSTOMER = 'CUSTOMER';
 exports.OWNER    = 'OWNER';
-exports.SITE_MGR = 'SITEMGR';
+exports.UNIT_MGR = 'UNITMGR';
 exports.ADMIN    = 'ADMIN';
 
 var getErrorMessage = function(err) {
@@ -290,7 +290,7 @@ exports.register = function*(next) {
   this.body = { error: 'A user is already logged in.'};
 };
 
-exports.roleAuthorization = function(role) {
+exports.roleAuthorization = function(role, role2) {
   return function*(next) {
     debug(this.user);
     const user = this.user;
@@ -302,8 +302,13 @@ exports.roleAuthorization = function(role) {
       }
 
       if (foundUser.role == role) {
-        debug('found');
+        debug('found '+ role);
         return next();
+      } else if (role2) {
+        if (foundUser.role == role2) {
+          debug('found '+ role2)
+          return next();
+        }
       }
 
       debug('401 Unauthorized');

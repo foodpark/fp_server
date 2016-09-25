@@ -63,7 +63,7 @@ var oAuthMoltin = function (callback) {
         if (bearerToken) { // possibly need to refresh
           refreshBearerToken(callback);
         }
-        console.err('Authorization with Moltin failed')
+        console.error('Authorization with Moltin failed')
         if (res) {
           console.error("response.statusCode: " + res.statusCode);
           console.error("response.statusText: " + res.statusText);
@@ -276,13 +276,22 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
   debug(data)
   return requestEntities(MENU_ITEMS, POST, data, callback)
 };
-exports.findMenuItem=function(company, menuItemId, callback) {
-  return requestEntities(MENU_ITEMS, GET, {id:menuItemId, company:company.orderSysId}, callback)
+exports.findMenuItem=function(menuItemId) {
+  return requestEntities(MENU_ITEMS, GET, '', menuItemId)
 };
-exports.listMenuItems=function(company, data, callback) {
-  data.company = company.orderSysId
-  return requestEntities(MENU_ITEMS, GET, data, callback)
+
+exports.listMenuItems=function *(category) {
+  try {
+    var params = 'category='+ category.id
+    var results = yield requestEntities(MENU_ITEMS, GET, '', '', params)
+  } catch (err) {
+    console.error('error calling moltin controller')
+    console.error(err)
+    throw (err)
+  }
+  return results
 };
+
 exports.updateMenuItem=function(company, data, callback) {
   data.company = company.orderSysId
   return requestEntities(MENU_ITEMS, PUT, data, callback)
@@ -294,8 +303,6 @@ exports.deleteMenuItem=function(company, data, callback) {
 
 var menuOptionFlow = function (menuItemId, optionCategoryId) {
   var flow = MENU_ITEMS + '/' + menuItemId + OPTION_ITEMS
-  if (optionCategoryId) flow = flow + '/' + optionCategoryId
-  debug(flow)
   return flow
 }
 
@@ -308,17 +315,13 @@ exports.createOptionItem=function(menuItemId, optionCategoryId, title, modPrice,
   debug(data)
   return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), POST, data, callback)
 };
-exports.findOptionItem=function(menuItemId, optionCategoryId, optionItemId, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), GET, {id:optionItemId}, callback)
-};
-exports.listOptionItems=function(menuItemId, optionCategorId, data, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), GET, data, callback)
-};
+
 exports.updateOptionItem=function(menuItemId, optionCategoryId, optionItemId, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), PUT, data, callback)
+  var params = 'variations.id='+optionItemId
+  return requestEntities(menuOptionFlow(menuItemId), PUT, data, optionCategorId, params)
 };
 exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), DELETE, {id:optionItemId}, callback)
+  return requestEntities(menuOptionFlow(menuItemI), DELETE, {id:optionItemId}, callback)
 };
 
 exports.createOptionCategory=function(menuItemId, title, type, callback) {
@@ -328,11 +331,8 @@ exports.createOptionCategory=function(menuItemId, title, type, callback) {
   }
   return requestEntities(menuOptionFlow(menuItemId), POST, data, callback)
 };
-exports.findOptionCategory=function(menuItemId, optionCategoryId, data, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), GET, data, callback)
-};
-exports.listOptionCategories=function(menuItemId, data, callback) {
-  return requestEntities(menuOptionFlow(menuItemId), GET, data, callback)
+exports.listOptionCategories=function(menuItemId) {
+  return requestEntities(menuOptionFlow(menuItemId), GET)
 };
 exports.updateOptionCategory=function(menuItemId, optionCategoryId, data, callback) {
   return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), PUT, data, callback)
