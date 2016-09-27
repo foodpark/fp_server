@@ -166,7 +166,8 @@ exports.createDefaultCategory=function(moltincompany, callback) {
 };
 
 
-var requestEntities = function(flow, method, data, id, params) {
+var requestEntities = function (flow, method, data, id, params) {
+  debug('requestEntities')
   return new Promise(function(resolve, reject) {
     getBearerToken(function(token) {
       if (token instanceof Error) {
@@ -191,9 +192,9 @@ var requestEntities = function(flow, method, data, id, params) {
         },
         function (err, res, body) {
           if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
-            var bodyJson = JSON.parse(body);
-            debug(bodyJson.result)
-            resolve(bodyJson.result)
+            var result = JSON.parse(body).result
+            debug(result)
+            resolve(result)
             return;
           }
           else {
@@ -214,15 +215,15 @@ var requestEntities = function(flow, method, data, id, params) {
 }
 
 exports.createCategory=function(company, catTitle, catParent) {
-  var catSlug = company.baseSlug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
-  if (!catParent) catParent = company.defaultCategory;
+  var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
+  if (!catParent) catParent = company.default_cat;
   var data = {
     parent: catParent,
     slug : catSlug,
     status : 1,
     title : catTitle,
     description : catTitle,
-    company : company.orderSysId
+    company : company.order_sys_id
   }
   debug(data)
   return requestEntities(CATEGORIES, POST, data)
@@ -236,22 +237,21 @@ exports.listCategories=function *(company) {
   try {
     var results = yield requestEntities(CATEGORIES, GET, '', '', 'company='+company.order_sys_id)
   } catch (err) {
-    console.error('error calling moltin controller')
     console.error(err)
     throw (err)
   }
   return results
 };
-exports.updateCategory=function(company, category, data) {
-  return requestEntities(CATEGORIES, PUT, data, category)
+exports.updateCategory=function(categoryId, data) {
+  return requestEntities(CATEGORIES, PUT, data, categoryId)
 };
-exports.deleteCategory=function(category) {
-  return requestEntities(CATEGORIES, DELETE, '', category)
+exports.deleteCategory=function(categoryId) {
+  return requestEntities(CATEGORIES, DELETE, '', categoryId)
 };
 
 exports.createMenuItem=function(company, title, status, price, category, description, callback) {
   //generate unique sku
-  var sku = company.baseSlug + title.replace(/\W+/g, '-').toLowerCase();
+  var sku = company.base_slug + title.replace(/\W+/g, '-').toLowerCase();
   var slug = sku;
   var status = 1; // is live
   var stockLevel = 10000000;
@@ -271,7 +271,7 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
     requires_shipping : requiresShipping,
     catalog_only : catalogOnly,
     tax_band : config.defaultTaxBand,
-    company : company.orderSysId
+    company : company.order_sys_id
   }
   debug(data)
   return requestEntities(MENU_ITEMS, POST, data, callback)
@@ -293,11 +293,11 @@ exports.listMenuItems=function *(category) {
 };
 
 exports.updateMenuItem=function(company, data, callback) {
-  data.company = company.orderSysId
+  data.company = company.order_sys_id
   return requestEntities(MENU_ITEMS, PUT, data, callback)
 };
 exports.deleteMenuItem=function(company, data, callback) {
-  data.company = company.orderSysId
+  data.company = company.order_sys_id
   return requestEntities(MENU_ITEMS, DELETE, data, callback)
 };
 
@@ -339,7 +339,4 @@ exports.updateOptionCategory=function(menuItemId, optionCategoryId, data, callba
 };
 exports.deleteOptionCategory=function(menuItemId, optionCategoryId, callback) {
   return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), DELETE, '', callback)
-};
-exports.getOrderById=function(url) {
-  return requestEntities(url, GET);
 };

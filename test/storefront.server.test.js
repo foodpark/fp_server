@@ -64,10 +64,10 @@ describe('GET /api/v1/mol/companies/1001/categories', function() {
 });
 
 // 4. Test retrieval of one Moltin category
-describe('GET /api/v1/mol/companies/1001/categories/1278239102541496682', function() {
+describe('GET /api/v1/mol/categories/1278239102541496682', function() {
   it('should return Breakfast category for 1001: Pacos Tacos from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1001/categories/1278239102541496682')
+    .get('/api/v1/mol/categories/1278239102541496682')
     .end(function(err, res) {
     res.should.have.status(200);
     res.should.be.json;
@@ -81,11 +81,13 @@ describe('GET /api/v1/mol/companies/1001/categories/1278239102541496682', functi
 
 
 // 5. Test retrieval of menu items for Company and Category
-describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems', function() {
+describe('GET /api/v1/mol/categories/1278238821237916009/menuitems', function() {
   it('should return menu items for 1001: Pacos Tacos - Tacos category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems')
+    .get('/api/v1/mol/categories/1278238821237916009/menuitems')
     .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
       res.body.should.be.a('array');
       res.body[0].should.have.property('slug');
       res.body[0].slug.should.equal('independent');
@@ -95,11 +97,13 @@ describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitem
 });
 
 // 6. Test retrieval of a specific menu item for Company and Category
-describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557', function() {
+describe('GET /api/v1/mol/menuitems/1278238321226547557', function() {
   it('should return The Independent Taco for 1001: Pacos Tacos - Tacos category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557')
+    .get('/api/v1/mol/menuitems/1278238321226547557')
     .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('slug');
       res.body.slug.should.equal('independent');
@@ -109,11 +113,13 @@ describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitem
 });
 
 // 7. Test retrieval of option categories for specific menu item for Company and Category
-describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557/optioncategories', function() {
+describe('GET /api/v1/mol/menuitems/1278238321226547557/optioncategories', function() {
   it('should return option categories for the Independent Taco for 1001: Pacos Tacos - Tacos category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems/1278238321226547557/optioncategories')
+    .get('/api/v1/mol/menuitems/1278238321226547557/optioncategories')
     .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
       res.body.should.be.a('array');
       res.body[0].should.have.property('title');
       res.body[0].title.should.equal('OptionItems');
@@ -123,8 +129,48 @@ describe('GET /api/v1/mol/companies/1001/categories/1278238821237916009/menuitem
 });
 
 
-/*
+
 // AUTHENTICATED ROUTES
+
+var mochaId = ''
+
+// 8. Test creation of a Category for a specific Company
+describe('POST /api/v1/mol/companies/1001/categories', function() {
+  it('should create category  "Mocha" for 1001: Pacos Tacos in Moltin', function(done) {
+    chai.request(server)
+    .post('/api/v1/mol/companies/1001/categories')
+    .field('title','Mocha')
+    .field('parent','1293790256314712958')
+    .end(function(err, res) {
+      res.should.have.status(201);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Mocha');
+      console.log('category id '+ res.body.id)
+      mochaId = res.body.id
+      done();
+    });
+  });
+});
+
+// 9. Test deletion of a Category for a specific Company
+describe('DELETE /api/v1/mol/companies/1001/categories/'+ mochaId, function() {
+  it('should delete "Mocha" category for 1001: Pacos Tacos in Moltin', function(done) {
+    chai.request(server)
+    .delete('/api/v1/mol/companies/1001/categories/'+ mochaId)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('message');
+      res.body.message.should.equal('Category removed successfully');
+      done();
+    });
+  });
+});
+
+/*
 // Test Categories
 router.post(apiversion + '/companies/:companyId/categories', auth.roleAuthorization("Owner"), storefront.createCategory)
 router.put(apiversion + '/companies/:companyId/categories/:categoryId', auth.roleAuthorization("Owner"), storefront.updateCategory);

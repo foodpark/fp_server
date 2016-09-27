@@ -15,33 +15,35 @@ module.exports=function(app) {
 
 	router.use(passport.authenticate(['jwt','anonymous'], {session:false}));
 
-	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId', storefront.readMenuItem);
-	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory);
-	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
-
-	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories);
-	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', storefront.listMenuItems)
+	router.get(apiversion + '/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
+	router.get(apiversion + '/categories/:categoryId/menuitems', storefront.listMenuItems)
 	router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
 	router.get(apiversion + '/companies', storefront.listCompanies)
 
+	router.get(apiversion + '/menuitems/:menuItemId', storefront.readMenuItem)
+	router.get(apiversion + '/categories/:categoryId', storefront.readCategory)
+	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
 
-	router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem)
-	router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionCategory)
-	router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem)
-	router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createMenuItem)
-	router.post(apiversion + '/companies/:companyId/categories', auth.roleAuthorization(OWNER, ADMIN), storefront.createCategory)
+	router.post(apiversion + '/companies/:companyId/categories', storefront.createCategory)
+/*
+	router.post(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem
+	router.post(apiversion + '/menuitems/:menuItemId/optioncategories', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionCategory)
+	router.post(apiversion + '/menuitems/:menuItemId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem)
+	router.post(apiversion + '/categories/:categoryId/menuitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createMenuItem)
 
-	router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateOptionItem);
-	router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.updateOptionCategory);
-	router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateOptionItem);
-	router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateMenuItem);
-	router.put(apiversion + '/companies/:companyId/categories/:categoryId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateCategory);
+	router.put(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateOptionItem);
+	router.put(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.updateOptionCategory);
+	router.put(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateOptionItem);
+	router.put(apiversion + '/menuitems/:menuItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateMenuItem);
+	router.put(apiversion + '/categories/:categoryId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateCategory);
 
-	router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
-	router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionCategory);
-	router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
-	router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.deleteMenuItem);
-	router.delete(apiversion + '/companies/:companyId/categories/:categoryId', auth.roleAuthorization(OWNER, ADMIN), storefront.deleteCategory);
+	router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
+	router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionCategory);
+	router.delete(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
+	router.delete(apiversion + '/menuitems/:menuItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.deleteMenuItem);
+	router.delete(apiversion + '/categories/:categoryId', auth.roleAuthorization(OWNER, ADMIN), storefront.deleteCategory);
+
+*/
 
 	router.param('optionItemId', storefront.getOptionItem);
 	router.param('optionCategoryId', storefront.getOptionCategory);
