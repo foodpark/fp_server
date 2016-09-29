@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Queries = require('koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
+var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model')
 
@@ -108,6 +109,23 @@ function *beforeSaveUnit() {
   }
 }
 
+function *beforeSaveLoyaltyRewards() {
+  if (this.resteasy.operation == 'create') {
+    if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
+      var coId = m[1];
+      var exists = (yield LoyaltyRewards.isCompanyFound(coId))[0];
+      console.log('LoyaltyRewards.isCompanyFound:')
+      console.log(exists);
+      // if vendor already has loyalty rewards defined for their company ID, do not allow a second set to be saved.
+      if (exists) {
+        this.throw('Company has existing rewards defined. Use PUT/PATCH to modify.',405);
+      }
+    } else {
+      throw new Error ('No company context found for loyalty rewards');
+    }
+  }
+}
+
 function *afterCreateReview(review) {
   var reviewApproval = { review_id: review.id, updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
 
@@ -139,23 +157,23 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
-        } else if (this.params.table == 'food_parks' || this.params.table == 'roles') {
+        } else if (this.params.table == 'food_parks' || this.params.table == 'roles' || this.params.table == 'loyalty_rewards') {
             if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
               this.throw('Create Unauthorized - Owners only',401);
             } // else continue          }
           }
       } else if (operation == 'update' || operation == 'delete') {
-        if (this.params.table == 'companies' || this.params.table == 'units') {
+        if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
             this.throw('Update Unauthorized - Owners only',401);
           } else {
             // verify user is modifying the correct company
             var coId = this.params.id
-            if (!this.params.table == 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
+            if (this.params.table != 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
               coId = m[1]
             }
             console.log('verifying owner')
-            var valid = (yield Company.verifyOwner(this.params.id, this.passport.user.id))[0]
+            var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
             console.log(valid)
             if (!valid) {
               this.throw('Update Unauthorized - incorrect Owner',401);
@@ -193,6 +211,8 @@ module.exports = {
         yield beforeSaveReview.call(this);
       } else if (this.resteasy.table == 'units') {
         yield beforeSaveUnit.call(this);
+      } else if (this.resteasy.table == 'loyalty_rewards') {
+        yield beforeSaveLoyaltyRewards.call(this);
       }
     },
 
