@@ -1,12 +1,11 @@
 var sts = require('./security.server.controller'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
-    passport = require('passport'),
     User = require('../models/user.server.model'),
     Company = require('../models/company.server.model'),
     Customer = require('../models/customer.server.model'),
     Admin = require('../models/admin.server.model'),
-    debug = require('debug')('authentication.server.controller');
+    debug = require('debug')('authentication');
 
 var _ = require('lodash');
 
@@ -36,24 +35,30 @@ var getErrorMessage = function(err) {
   return message;
 };
 
-var setUserInfo = function(user) {
-  return {
+var setUserInfo = function (user) {
+  debug('setUserInfo')
+  var info = {
     id: user.id,
     username: user.username,
-    role: user.role,
-  };
+    role: user.role
+  }
+  debug(info)
+  return info
 };
 
-exports.login = function*(next) {
-  // login has been processed through passport
-  console.log('login complete')
-  console.log(this.user)
-  var userInfo = setUserInfo(user);
+exports.login = function *(next) {
+  debug('login complete')
+  debug(this.passport.user)
+  debug('calling')
+  userInfo = setUserInfo(this.passport.user)
+  debug('done')
+  debug('userInfo: '+ userInfo)
   this.status = 200;
   this.body = {
     token: 'JWT ' + sts.generateToken(userInfo),
-    user: userInfo,
+    user: userInfo
   };
+  debug(this.body)
   return;
 };
 
@@ -82,14 +87,14 @@ exports.renderRegister = function*(next) {
 };
 
 var createMoltinCompany = function(company, callback) {
-  console.log('create Moltin company: entry');
+  debug('create Moltin company: entry');
   msc.createCompany(company, function(comp) {
     if (comp instanceof Error) {
       console.error(comp);
       return callback(comp);
     }
 
-    console.log('create Moltin company: leaving');
+    debug('create Moltin company: leaving');
     return callback(null, comp);
   });
 };
@@ -107,8 +112,8 @@ var createMoltinDefaultCategory = function(company, callback) {
 
 var createCompany = function(company_name, email, userId) {
   return new Promise(function(resolve, reject) {
-    console.log('create company: userId is ');
-    console.log(userId);
+    debug('create company: userId is ');
+    debug(userId);
     var company = {
       name: company_name,
       email: email,
@@ -122,7 +127,7 @@ var createCompany = function(company_name, email, userId) {
         return;
       }
 
-      console.log('moltin company successfully created : ' + moltinCompany.id);
+      debug('moltin company successfully created : ' + moltinCompany.id);
       company.orderSysId = moltinCompany.id;
       createMoltinDefaultCategory(moltinCompany, function(err, moltinCat) {
         if (err) {
@@ -131,16 +136,16 @@ var createCompany = function(company_name, email, userId) {
           reject(err);
         }
 
-        console.log('moltin category successfully created : ' + moltinCat.id);
+        debug('moltin category successfully created : ' + moltinCat.id);
         Company.createCompany(company_name, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug,
                               function(err, company) {
-                                console.log('returned from db insert')
+                                debug('returned from db insert')
                                 if (err) {
                                   console.error('createCompany: error creating company');
                                   console.error(err);
                                   reject(err);
                                 } else {
-                                  console.log(company)
+                                  debug(company)
                                   resolve(company);
                                 }
                               });
@@ -150,7 +155,7 @@ var createCompany = function(company_name, email, userId) {
 };
 
 exports.register = function*(next) {
-  console.log("register")
+  debug("register")
   if (!this.isAuthenticated()) {
     const first_name = this.body.first_name;
     const last_name = this.body.last_name;
@@ -190,7 +195,7 @@ exports.register = function*(next) {
         this.body = {error: 'Please enter a company name.'}
         return;
       }
-      console.log('register: checking for duplicate company name');
+      debug('register: checking for duplicate company name');
       try {
         existingCompany = (yield Company.companyForCompanyName(company_name))[0];
       } catch (err) {
@@ -205,7 +210,7 @@ exports.register = function*(next) {
       }
     }
 
-    console.log('register: checking for duplicate user name/email');
+    debug('register: checking for duplicate user name/email');
     try {
       existingUser = (yield User.userForUsername(email))[0];
     } catch (err) {
@@ -230,7 +235,7 @@ exports.register = function*(next) {
       provider_data: '{}'
     };
 
-    console.log('register: creating user');
+    debug('register: creating user');
     try {
       var userObject =  (yield User.createUser(user))[0];
     } catch (err) {
@@ -240,7 +245,7 @@ exports.register = function*(next) {
     }
 
     if (role == 'OWNER') {
-      console.log('register: creating company');
+      debug('register: creating company');
 
       try {
         var company  = yield createCompany(company_name, email, userObject.id);
@@ -251,7 +256,7 @@ exports.register = function*(next) {
       }
 
     } else if (role == 'CUSTOMER') {
-      console.log('register: creating customer');
+      debug('register: creating customer');
 
       try {
         var customerId = yield Customer.createCustomer(userObject.id);
@@ -262,7 +267,7 @@ exports.register = function*(next) {
       }
 
     } else if (role == 'ADMIN') {
-      console.log('register: creating admin');
+      debug('register: creating admin');
 
       try {
         var adminId = yield Admin.createAdmin(userObject.id);
@@ -276,12 +281,12 @@ exports.register = function*(next) {
       throw new Error('unknown role '+ role)
     }
 
-    console.log('register: completed. Authenticating user...')
+    debug('register: completed. Authenticating user...')
     var userInfo = setUserInfo(user);
     this.status = 201;
     this.body = {
       token: 'JWT ' + sts.generateToken(userInfo),
-      user: userInfo,
+      user: userInfo
     };
     return;
   }
@@ -290,33 +295,29 @@ exports.register = function*(next) {
   this.body = { error: 'A user is already logged in.'};
 };
 
-exports.roleAuthorization = function(role, role2) {
-  return function*(next) {
-    debug(this.user);
-    const user = this.user;
-    User.getSingleUser(user.id, function(err, foundUser) {
-      if (err) {
-        debug(err);
-        res.status(422).json({ error: 'No user was found.' });
-        return next(err);
-      }
-
-      if (foundUser.role == role) {
-        debug('found '+ role);
-        return next();
-      } else if (role2) {
-        if (foundUser.role == role2) {
-          debug('found '+ role2)
-          return next();
-        }
-      }
-
-      debug('401 Unauthorized');
-      res.status(401).json({ error: 'You are not authorized to view this content.' });
-      return next('Unauthorized');
-    });
-  };
-};
+exports.roleAuthorization = function *(role, role2) {
+  debug('roleAuthorization')
+  debug(this.passport.user);
+  if (this.passport.user) {
+    try {
+     var user = (yield User.getSingleUser(this.passport.user.id))[0]
+     debug(user)
+    } catch (err) {
+      debug(err);
+      this.status = 422
+      this.body = { error: 'No user was found.' }
+      return;
+    }
+    if (user.role == role || user.role == role2) {
+      debug('found '+ user.role)
+      yield next();
+    }
+    debug('401 Unauthorized');
+    this.status = 401
+    this.body = { error: 'You are not authorized to view this content.' }
+    return;
+  }
+}
 
 exports.logout = function(req, res) {
   req.logout();

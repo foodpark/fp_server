@@ -32,5 +32,6 @@ require('./app/routes')(app);
 
 var server = app.listen(config.port);
 module.exports = app;
-module.exports = server;
+module.exports = server; // support unit test
+
 console.log(process.env.NODE_ENV + ' server running at http://localhost:' + config.port);
