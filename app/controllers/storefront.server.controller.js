@@ -73,6 +73,7 @@ exports.createCategory=function *(next) {
   if (!user) {
     this.status=401
     this.body={ error: 'User not authenticated.'}
+    return;
   }
   debug(user)
   debug(auth.OWNER)
@@ -114,9 +115,8 @@ exports.listCategories=function *(next) {
   return;
 }
 
-exports.updateCategory=function *(id) {
+exports.updateCategory=function *(id, next) {
   debug('updateCategory')
-  debug(id)
   var data = this.body
   debug(data)
   try {
@@ -130,13 +130,12 @@ exports.updateCategory=function *(id) {
   return;
 }
 
-exports.deleteCategory=function *(id) {
-  debug('deleteCategory')
-  debug(this.category)
+exports.deleteCategory=function *(next) {
+  debug('deleteCategory: id '+ this.category.id)
   try {
-    var results = (yield msc.deleteCategory(id))[0]
+    var results = yield msc.deleteCategory(this.category.id)
   } catch (err) {
-    console.error('error deleting category ('+ id +')')
+    console.error('error deleting category ('+ this.category.id +')')
     throw(err)
   }
   debug(results)

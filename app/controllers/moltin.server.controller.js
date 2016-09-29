@@ -192,7 +192,13 @@ var requestEntities = function (flow, method, data, id, params) {
         },
         function (err, res, body) {
           if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
-            var result = JSON.parse(body).result
+            debug(body)
+            debug(res.headers)
+            debug(body.result)
+            debug('parsing...')
+            var result = body.result
+            if (method == GET) result = JSON.parse(body).result
+            if (method == DELETE) result = JSON.parse(body)
             debug(result)
             resolve(result)
             return;

@@ -25,6 +25,9 @@ module.exports=function(app) {
 	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
 
 	router.post(apiversion + '/companies/:companyId/categories', storefront.createCategory)
+
+	router.delete(apiversion + '/categories/:categoryId', storefront.deleteCategory);
+
 /*
 	router.post(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem
 	router.post(apiversion + '/menuitems/:menuItemId/optioncategories', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionCategory)
@@ -41,7 +44,6 @@ module.exports=function(app) {
 	router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionCategory);
 	router.delete(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
 	router.delete(apiversion + '/menuitems/:menuItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.deleteMenuItem);
-	router.delete(apiversion + '/categories/:categoryId', auth.roleAuthorization(OWNER, ADMIN), storefront.deleteCategory);
 
 */
 

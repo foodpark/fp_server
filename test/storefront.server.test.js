@@ -132,38 +132,61 @@ describe('GET /api/v1/mol/menuitems/1278238321226547557/optioncategories', funct
 
 // AUTHENTICATED ROUTES
 
+var token  = ''
 var mochaId = ''
-
 // 8. Test creation of a Category for a specific Company
 describe('POST /api/v1/mol/companies/1001/categories', function() {
-  it('should create category  "Mocha" for 1001: Pacos Tacos in Moltin', function(done) {
+  it('should login and retrieve JWT token', function(done) {
     chai.request(server)
-    .post('/api/v1/mol/companies/1001/categories')
-    .field('title','Mocha')
-    .field('parent','1293790256314712958')
-    .end(function(err, res) {
-      res.should.have.status(201);
+    .post('/auth/login')
+    .field("username", "mp4@gmail.com")
+    .field("password", "mp4")
+    .end(function (err, res) {
+      res.should.have.status(200);
       res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha');
-      console.log('category id '+ res.body.id)
-      mochaId = res.body.id
+      res.body.should.have.property('user');
+      res.body.user.should.have.property('id');
+      res.body.user.id.should.equal(11004);
+      res.body.user.should.have.property('username');
+      res.body.user.username.should.equal('mp4@gmail.com');
+      res.body.user.should.have.property('role');
+      res.body.user.role.should.equal('OWNER');
+      res.body.should.have.property('token');
+      // Save the JWT token
+      token = res.body.token
       done();
     });
   });
-});
-
-// 9. Test deletion of a Category for a specific Company
-describe('DELETE /api/v1/mol/companies/1001/categories/'+ mochaId, function() {
-  it('should delete "Mocha" category for 1001: Pacos Tacos in Moltin', function(done) {
+  it('should create category  "Mocha" for 1001: Pacos Tacos in Moltin', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1001/categories/'+ mochaId)
+    .post('/api/v1/mol/companies/1001/categories')
+    .set('Authorization', token)
+    .field('title','Mocha')
+    .field('parent','1293790256314712958')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('message');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Mocha');
+      // Save the newly created category id
+      mochaId = res.body.id
+      done();
+    });
+  });
+  it('should delete "Mocha" category for 1001: Pacos Tacos in Moltin', function(done) {
+    chai.request(server)
+    .delete('/api/v1/mol/categories/'+ mochaId)
+    .set('Authorization', token)
+    .end(function(err, res) {
+      console.log('res body')
+      console.log(res)
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('status')
+      res.body.status.should.equal(true)
+      res.body.should.have.property('message')
       res.body.message.should.equal('Category removed successfully');
       done();
     });
