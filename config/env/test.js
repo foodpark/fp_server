@@ -9,5 +9,6 @@ module.exports = {
   clientId: 'QtDrN2fxN3JGsKQvNgtahF5jz1MPP6kVV4wZTavq15',
   client_secret: 'K5M1sc3PZuBVU3gn5iMzymWGecDk1HT90ZrjWVra6P',
   grant_type: 'client_credentials',
-  defaultTaxBand: '1314876088337301664' // Brazil ICMS
+  defaultTaxBand: '1314876088337301664', // Brazil ICMS
+  googleApiKey: 'AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI'
 };

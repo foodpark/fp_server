@@ -13,7 +13,7 @@ var getMessage = function(){
 	console.log("Getting Message")
 	var message = new gcm.Message();
 	message.addData('title',"SFEZ Food");
-  	return message;
+  return message;
 }
 
 var tokens = function(token){
@@ -62,6 +62,7 @@ exports.orderAcceptDeclice = function*(next){
 	}
 	this.body = orderObject;
 }
+
 exports.sendPush = function*(next){
 	var sender = new gcm.Sender(config.googleApiKey);
 	sender.send(getMessage(), { registrationTokens: tokens(this.query.deviceToken) }, function (err, response) {
@@ -80,6 +81,7 @@ var informVendorOrderCreated = function(deviceId, order){
 	message.addData('type', ORDER_CREATED);
 	sendPushNotification(message, deviceId);
 }
+
 exports.eventTrack = function*(next){
 	console.log("*********************** response from webhook *******************")
 	console.log(this.body," Webhook ****************************8 ");
@@ -96,6 +98,7 @@ exports.setDeviceToken = function*(next){
 	console.log("deviceToken ", deviceInfo)
 	this.body = {};
 }
+
 var getDeviceToken = function(userEmail){
 	return deviceInfo[userEmail];
 }

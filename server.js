@@ -11,6 +11,7 @@ var passport = Passport();
 
 var config = require('./config/config');
 var dbConfig = require('./config/knex');
+var firebase = require("firebase");
 
 var app = Koa();
 
@@ -33,5 +34,10 @@ require('./app/routes')(app);
 var server = app.listen(config.port);
 module.exports = app;
 module.exports = server; // support unit test
+
+firebase.initializeApp({
+  serviceAccount: "./config/SFEZ-10ff25a209ed.json",
+  databaseURL: "https://sfez-17981.firebaseio.com/"
+});
 
 console.log(process.env.NODE_ENV + ' server running at http://localhost:' + config.port);

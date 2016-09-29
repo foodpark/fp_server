@@ -16,5 +16,5 @@ module.exports = {
     sumupAuthUrl:"https://api.sumup.com/oauth",
     sumupUrl:"https://api.sumup.com"
   },
-  googleApiKey:"AIzaSyB9NG4YuvIlIJztHqlEx9w5GWO6ZM7Ojx4"
+  googleApiKey:'AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI'
 };
