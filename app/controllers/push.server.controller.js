@@ -1,7 +1,7 @@
 var config = require('../../config/config')
 var moltin = require('./moltin.server.controller');
 
-var gcm = require('node-gcm');
+var fcm = require('fcm-node');
 
 var deviceInfo = {};
 
@@ -9,16 +9,10 @@ const ORDER = '/orders';
 const ORDER_CREATED = 'ORDER_CREATED';
 const ORDER_ACCEPTED_STATUS = 'ORDER_ACCEPTED_STATUS';
 
-var getMessage = function(){
-	console.log("Getting Message")
-	var message = new gcm.Message();
-	message.addData('title',"SFEZ Food");
-  return message;
-}
-
-var tokens = function(token){
-	var registrationTokens = [token];
-	return registrationTokens;
+var getMessage = function(deviceId){
+	return {
+		to:deviceId
+	};
 }
 
 /*
@@ -28,19 +22,21 @@ var informCutomer = function(deviceId, orderId, orderStatus){
 	console.log("*********** Info Customer *****************");
 	console.log("Customer Device Info ", deviceId, orderId, orderStatus);
 	var orderStatusMessage = (orderStatus+'' == 'true')?'Your order accepted by vendor':'Your order decline by vendor';
-	var message = getMessage();
-	message.addData('order',orderId);
-	message.addData('message',orderStatusMessage);
-	message.addData('type', ORDER_ACCEPTED_STATUS);
-	sendPushNotification(message, deviceId);
+	var message = getMessage(deviceId);
+	message.data = {'order':orderId, type:ORDER_ACCEPTED_STATUS, order_status:orderStatus};
+	message.notification = {'title':"SFEZ Food",'message':orderStatusMessage};
+	sendPushNotification(message);
 }
 
-var sendPushNotification = function(message, deviceToken){
-	if(message && deviceToken){
-		var sender = new gcm.Sender(config.googleApiKey);
-		sender.send(message, { registrationTokens: tokens(deviceToken) }, function (err, response) {
-  			if(err) console.error(err);
-  			else    console.log(response);
+var sendPushNotification = function(message){
+	if(message){
+		var sender = new FCM.Sender(config.googleApiKey);
+		sender.send(message, function (err, response) {
+			if (err) {
+				console.log("Something has gone wrong!");
+			} else {
+				console.log("Successfully sent with response: ", response);
+			}
 		});
 	}
 }
@@ -75,11 +71,10 @@ exports.sendPush = function*(next){
 
 
 var informVendorOrderCreated = function(deviceId, order){
-	var message = getMessage();
-	message.addData('order',order);
-	message.addData('message','An order created. Do you want to accept?');
-	message.addData('type', ORDER_CREATED);
-	sendPushNotification(message, deviceId);
+	var message = getMessage(deviceId);
+	message.data = {'order':order, type:ORDER_CREATED};
+	message.notification = {'title':"SFEZ Food",'message':'An order created. Do you want to accept?'};
+	sendPushNotification(message);
 }
 
 exports.eventTrack = function*(next){

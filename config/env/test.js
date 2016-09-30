@@ -10,5 +10,11 @@ module.exports = {
   client_secret: 'K5M1sc3PZuBVU3gn5iMzymWGecDk1HT90ZrjWVra6P',
   grant_type: 'client_credentials',
   defaultTaxBand: '1314876088337301664', // Brazil ICMS
-  googleApiKey: 'AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI'
+  googleApiKey: 'AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI',
+  sumup:{
+    clientId:"com.sumup.apisampleapp",
+    client_secret:"6332ad54-eb47-4b41-8390-074f062da085",
+    sumupAuthUrl:"https://api.sumup.com/oauth",
+    sumupUrl:"https://api.sumup.com"
+  }
 };

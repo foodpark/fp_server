@@ -43,14 +43,7 @@ var oAuthSumUp = function(callback){
 };
 
 var getBearerToken = function(callback) {
-  console.log('start');
-  if (sumupAccessToken=='') {
-    console.log('get new bearer token')
-    oAuthSumUp(callback);
-    return
-  }
-  console.log('return existing bearer token')
-  callback(sumupAccessToken);
+  oAuthSumUp(callback);
 };
 
 

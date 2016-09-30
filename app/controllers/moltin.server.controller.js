@@ -346,3 +346,11 @@ exports.updateOptionCategory=function(menuItemId, optionCategoryId, data, callba
 exports.deleteOptionCategory=function(menuItemId, optionCategoryId, callback) {
   return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), DELETE, '', callback)
 };
+
+exports.getOrderById=function(url) {
+  return requestEntities(url, GET);
+};
+
+exports.getOrder = function(url){
+  return requestEntities(url, GET);
+}

@@ -14,6 +14,7 @@
     "chai-http": "^3.0.0",
     "debug": "^2.2.0",
     "ejs": "^2.4.2",
+    "fcm-node": "^1.0.15",
     "firebase": "^3.4.1",
     "gmaps": "0.4.24",
     "jsonwebtoken": "^7.1.6",
