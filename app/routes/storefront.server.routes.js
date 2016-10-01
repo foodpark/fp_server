@@ -15,18 +15,20 @@ module.exports=function(app) {
 
 	router.use(passport.authenticate(['jwt','anonymous'], {session:false}));
 
-	router.get(apiversion + '/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
-	router.get(apiversion + '/categories/:categoryId/menuitems', storefront.listMenuItems)
+	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
+	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', storefront.listMenuItems)
 	router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
 	router.get(apiversion + '/companies', storefront.listCompanies)
 
-	router.get(apiversion + '/menuitems/:menuItemId', storefront.readMenuItem)
-	router.get(apiversion + '/categories/:categoryId', storefront.readCategory)
+	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
+	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
 	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
 
 	router.post(apiversion + '/companies/:companyId/categories', storefront.createCategory)
 
-	router.delete(apiversion + '/categories/:categoryId', storefront.deleteCategory);
+  router.put(apiversion + '/companies/:companyId/categories/:categoryId', storefront.updateCategory);
+
+	router.delete(apiversion + '/companies/:companyId/categories/:categoryId', storefront.deleteCategory);
 
 /*
 	router.post(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem
@@ -38,7 +40,6 @@ module.exports=function(app) {
 	router.put(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.updateOptionCategory);
 	router.put(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateOptionItem);
 	router.put(apiversion + '/menuitems/:menuItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateMenuItem);
-	router.put(apiversion + '/categories/:categoryId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateCategory);
 
 	router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
 	router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionCategory);

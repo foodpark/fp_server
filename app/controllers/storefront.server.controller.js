@@ -69,36 +69,35 @@ exports.getCategory=function *(id, next) {
 
 exports.createCategory=function *(next) {
   debug('createcategory')
-  var user = this.passport.user
-  if (!user) {
-    this.status=401
-    this.body={ error: 'User not authenticated.'}
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    var user = this.passport.user
+    debug(user)
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error creating category: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.body)
+    debug(this.body.title)
+    debug(this.body.parent)
+    var title = this.body.title;
+    var parent = this.body.parent;
+    if (!title) {
+      this.status=422
+      this.body={ error: 'Please enter a title for the category.'}
+    }
+    try {
+      debug(this.company)
+      var category = yield msc.createCategory(this.company, title, parent)
+    } catch (err) {
+        console.error('error creating category in ordering system ')
+        throw(err)
+    }
+    this.body = category
     return;
+  } else {
+    this.status=401
+    this.body = {error: 'User not authorized'}
   }
-  debug(user)
-  debug(auth.OWNER)
-  if (user.role == auth.OWNER && user.id != this.company.user_id) {
-      console.error('error creating category: Owner '+ user.id + 'not associated with '+ this.company.name)
-      throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
-  }
-  debug(this.body)
-  debug(this.body.title)
-  debug(this.body.parent)
-  var title = this.body.title;
-  var parent = this.body.parent;
-  if (!title) {
-    this.status=422
-    this.body={ error: 'Please enter a title for the category.'}
-  }
-  try {
-    debug(this.company)
-    var category = yield msc.createCategory(this.company, title, parent)
-  } catch (err) {
-      console.error('error creating category in ordering system ')
-      throw(err)
-  }
-  this.body = category
-  return;
 }
 
 exports.listCategories=function *(next) {
@@ -115,32 +114,52 @@ exports.listCategories=function *(next) {
   return;
 }
 
-exports.updateCategory=function *(id, next) {
+exports.updateCategory=function *(next) {
   debug('updateCategory')
-  var data = this.body
-  debug(data)
-  try {
-    var results = (yield msc.updateCategory(id, data))[0]
-  } catch (err) {
-    console.error('error updating category ('+ id +')')
-    throw(err)
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error updating category: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    var data = this.body
+    debug('data '+ data.toString())
+    try {
+      var results = yield msc.updateCategory(this.category.id, data)
+    } catch (err) {
+      console.error('error updating category ('+ id +')')
+      throw(err)
+    }
+    debug(results)
+    this.body = results
+    return;
+  } else {
+    this.status=401
+    this.body = {error: 'User not authorized'}
   }
-  debug(results)
-  this.body = results
-  return;
 }
 
 exports.deleteCategory=function *(next) {
   debug('deleteCategory: id '+ this.category.id)
-  try {
-    var results = yield msc.deleteCategory(this.category.id)
-  } catch (err) {
-    console.error('error deleting category ('+ this.category.id +')')
-    throw(err)
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error deleting category: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    try {
+      var results = yield msc.deleteCategory(this.category.id)
+    } catch (err) {
+      console.error('error deleting category ('+ this.category.id +')')
+      throw(err)
+    }
+    debug(results)
+    this.body = results
+    return;
+  } else {
+    this.status=401
+    this.body = {error: 'User not authorized'}
   }
-  debug(results)
-  this.body = results
-  return;
 }
 
 exports.createMenuItem=function *(next) {

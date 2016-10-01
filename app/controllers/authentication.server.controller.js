@@ -320,6 +320,25 @@ exports.roleAuthorization = function *(role, role2) {
   }
 }
 
+exports.isAuthorized = function *(role, role2) {
+  debug('isAuthorized')
+  debug(this.passport.user);
+  if (this.passport.user) {
+    try {
+     var user = (yield User.getSingleUser(this.passport.user.id))[0]
+     debug(user)
+    } catch (err) {
+      debug(err);
+      throw new Error('No user was found for id '+ this.passport.user.id)
+    }
+    if (user.role == role || user.role == role2) {
+      debug('found '+ user.role)
+      yield next();
+    }
+    return false
+  }
+}
+
 exports.logout = function(req, res) {
   req.logout();
   res.redirect('/');
