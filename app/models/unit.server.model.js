@@ -1,6 +1,5 @@
 var knex = require('../../config/knex');
 var Checkin = require ('../models/checkin.server.model');
-var Promise = require('bluebird');
 
 /**
 CREATE TABLE units (

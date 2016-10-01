@@ -47,6 +47,7 @@ var setUserInfo = function (user) {
 };
 
 exports.login = function *(next) {
+  console.log('login complete')
   debug('login complete')
   debug(this.passport.user)
   debug('calling')

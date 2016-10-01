@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
-    "bluebird": "^3.4.1",
-    "chai-http": "^3.0.0",
     "debug": "^2.2.0",
     "ejs": "^2.4.2",
     "fcm-node": "^1.0.15",
@@ -36,8 +34,6 @@
     "koa-views": "^4.1.0",
     "lodash": "^4.16.1",
     "lodash.once": "^4.1.1",
-    "moltin": "^1.0.0",
-    "mongoose": "^4.5.3",
     "node-gcm": "^0.14.4",
     "node-uuid": "1.4.3",
     "nodemailer": "^2.6.4",

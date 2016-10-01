@@ -1,11 +1,7 @@
-var debug = require('debug')('moltin'),
-    sts = require('./security.server.controller'),
-    config = require('../../config/config'),
-    request = require('request'),
-    moltin = require('moltin')({
-      publicId: config.clientId,
-      secretKey: config.client_secret
-    });
+var debug = require('debug')('moltin');
+var sts = require('./security.server.controller');
+var config = require('../../config/config');
+var request = require('request');
 
 
 const DELETE = 'DELETE';

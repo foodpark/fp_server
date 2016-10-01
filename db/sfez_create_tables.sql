@@ -27,10 +27,24 @@ CREATE TABLE unit_types (
     type text NOT NULL UNIQUE
 );
 
+CREATE TABLE territories (
+    id SERIAL PRIMARY KEY,
+    city text,
+    territory text,
+    state text,
+    country text,
+    timezone text,
+    latitude float8,
+    longitude float8,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
+
 CREATE TABLE food_parks (
     id SERIAL PRIMARY KEY,
     name text NOT NULL,
     photo text,
+    territory_id integer REFERENCES territories(id),
     city text,
     state text,
     postal_code text,
@@ -41,7 +55,6 @@ CREATE TABLE food_parks (
     updated_at timestamp without time zone DEFAULT now()
 );
 
-
 CREATE TABLE locations (
   id SERIAL PRIMARY KEY,
   name text,
@@ -50,7 +63,7 @@ CREATE TABLE locations (
   secondary_loc_text text,
   regex_seed text,
   hitcount integer,
-  city_id integer,
+  territory_id integer REFERENCES territories(id),
   latitude float8,
   longitude float8,
   created_at timestamp without time zone DEFAULT now(),
@@ -136,6 +149,7 @@ CREATE TABLE units (
     password text,
     qr_code text,
     unit_order_sys_id integer,
+    territory_id integer REFERENCES territories(id),
     company_id integer REFERENCES companies(id),
     unit_mgr_id integer REFERENCES users(id),
     created_at timestamp without time zone DEFAULT now(),
@@ -190,6 +204,15 @@ CREATE TABLE order_history (
   order_sys_order_id integer,
   amount money,
   purchase_date timestamp,
+  payment_time timestamp,
+  pickup_time timestamp,
+  longitude float8,
+  latitude float8,
+  prep_time_notice float,
+  customer_order_window integer,
+  status text,
+  messages text,
+  qr_audit text,
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),
   company_id integer REFERENCES companies(id),
@@ -206,6 +229,17 @@ CREATE TABLE loyalty (
   created_at timestamp without time zone DEFAULT now(),
   updated_at timestamp without time zone DEFAULT now()
 );
+
+CREATE TABLE loyalty_rewards (
+  id SERIAL PRIMARY KEY,
+  company_id integer REFERENCES companies(id),
+  gold_reward_item text,
+  silver_reward_item text,
+  bronze_reward_item text,
+  created_at timestamp without time zone DEFAULT now(),
+  updated_at timestamp without time zone DEFAULT now()
+);
+
 
 CREATE TABLE loyalty_used (
   id SERIAL PRIMARY KEY,
@@ -247,23 +281,12 @@ CREATE TABLE reviews (
 CREATE TABLE search_preferences (
     id SERIAL PRIMARY KEY,
     customer_id integer REFERENCES customers(id),
+    territory_id integer REFERENCES territories(id),
     distance float8,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
 );
 
-CREATE TABLE territories (
-    id SERIAL PRIMARY KEY,
-    common_name text,
-    unique_name text,
-    state text,
-    country text,
-    timezone text,
-    latitude float8,
-    longitude float8,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
 
 
 COPY roles (id, type) FROM stdin;
