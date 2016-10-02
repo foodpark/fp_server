@@ -251,9 +251,9 @@ exports.deleteCategory=function(categoryId) {
   return requestEntities(CATEGORIES, DELETE, '', categoryId)
 };
 
-exports.createMenuItem=function(company, title, status, price, category, description, callback) {
+exports.createMenuItem=function(company, title, status, price, category, description) {
   //generate unique sku
-  var sku = company.base_slug + title.replace(/\W+/g, '-').toLowerCase();
+  var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
   var slug = sku;
   var status = 1; // is live
   var stockLevel = 10000000;
@@ -276,7 +276,7 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
     company : company.order_sys_id
   }
   debug(data)
-  return requestEntities(MENU_ITEMS, POST, data, callback)
+  return requestEntities(MENU_ITEMS, POST, data)
 };
 exports.findMenuItem=function(menuItemId) {
   return requestEntities(MENU_ITEMS, GET, '', menuItemId)
@@ -294,13 +294,11 @@ exports.listMenuItems=function *(category) {
   return results
 };
 
-exports.updateMenuItem=function(company, data, callback) {
-  data.company = company.order_sys_id
-  return requestEntities(MENU_ITEMS, PUT, data, callback)
+exports.updateMenuItem=function(menuItemId, data) {
+  return requestEntities(MENU_ITEMS, PUT, data, menuItemId)
 };
-exports.deleteMenuItem=function(company, data, callback) {
-  data.company = company.order_sys_id
-  return requestEntities(MENU_ITEMS, DELETE, data, callback)
+exports.deleteMenuItem=function(menuItemId) {
+  return requestEntities(MENU_ITEMS, DELETE, '', menuItemId)
 };
 
 var menuOptionFlow = function (menuItemId, optionCategoryId) {

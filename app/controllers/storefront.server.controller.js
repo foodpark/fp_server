@@ -76,9 +76,6 @@ exports.createCategory=function *(next) {
         console.error('error creating category: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    debug(this.body)
-    debug(this.body.title)
-    debug(this.body.parent)
     var title = this.body.title;
     var parent = this.body.parent;
     if (!title) {
@@ -95,8 +92,10 @@ exports.createCategory=function *(next) {
     this.body = category
     return;
   } else {
+    console.error('createCategory: User not authorized')
     this.status=401
     this.body = {error: 'User not authorized'}
+    return;
   }
 }
 
@@ -122,20 +121,30 @@ exports.updateCategory=function *(next) {
         console.error('error updating category: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    var data = this.body
-    debug('data '+ data.toString())
-    try {
-      var results = yield msc.updateCategory(this.category.id, data)
-    } catch (err) {
-      console.error('error updating category ('+ id +')')
-      throw(err)
+    debug(this.category.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.category.company.data.id == this.company.order_sys_id) {
+      var data = this.body
+      debug('data '+ data.toString())
+      try {
+        var results = yield msc.updateCategory(this.category.id, data)
+      } catch (err) {
+        console.error('error updating category ('+ id +')')
+        throw(err)
+      }
+      debug(results)
+      this.body = results
+      return;
+    } else {
+      console.error('updateCategory: Category does not belong to company')
+      this.status=422
+      this.body = {error: 'Category does not belong to company'}
+      return;
     }
-    debug(results)
-    this.body = results
-    return;
   } else {
+    console.error('updateCategory: User not authorized')
     this.status=401
     this.body = {error: 'User not authorized'}
+    return;
   }
 }
 
@@ -147,31 +156,43 @@ exports.deleteCategory=function *(next) {
         console.error('error deleting category: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    try {
-      var results = yield msc.deleteCategory(this.category.id)
-    } catch (err) {
-      console.error('error deleting category ('+ this.category.id +')')
-      throw(err)
+    debug(this.category.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.category.company.data.id == this.company.order_sys_id) {
+      try {
+        var results = yield msc.deleteCategory(this.category.id)
+      } catch (err) {
+        console.error('error deleting category ('+ this.category.id +')')
+        throw(err)
+      }
+      debug(results)
+      this.body = results
+      return;
+    } else {
+      console.error('deleteCategory: Category does not belong to company')
+      this.status=422
+      this.body = {error: 'Category does not belong to company'}
+      return;
     }
-    debug(results)
-    this.body = results
-    return;
   } else {
+    console.error('deleteCategory: User not authorized')
     this.status=401
     this.body = {error: 'User not authorized'}
+    return;
   }
 }
 
 exports.createMenuItem=function *(next) {
-  debug('create menu item called by' + req.user.id)
-  try {
-    var company = (yield Company.companyForUser(req.user.id))[0]
-  } catch (err) {
-    console.error('error creating menu item: could not find company for user')
-    throw(err)
-  }
-  debug(company)
-      /**
+  debug('createMenuItem')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('createMenuItem: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error creating menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.category.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.category.company.data.id == this.company.order_sys_id) {
+      /** MOLTIN PRODUCT FIELDS
       Name	Slug	Field Type	Required?	Unique?	Title Column?
       *SKU	sku	string	Yes	Yes	No
       *Product Title	title	string	Yes	No	Yes
@@ -193,26 +214,41 @@ exports.createMenuItem=function *(next) {
       Brand	brand	relationship	No	No	No
       *Tax Band	tax_band	tax-band	Yes	No	No
       *Company	company	relationship	Yes **/
-  const title = req.body.title;
-  const price = req.body.price;
-  const status = req.body.status;
-  const category = req.body.category;
-  const description = req.body.description;
+      const company = this.company
+      const title = this.body.title;
+      const price = this.body.price;
+      const status = this.body.status;
+      const category = this.category.id;
+      const description = this.body.description;
 
-  if (!status) status = 1; // live by default TODO: turn draft by default when menu availability completed
-  if (!title) {return res.status(422).send({ error: 'Title is required.'});}
-  if (!price) {return res.status(422).send({ error: 'Price is required.'});}
-  if (!category) {return res.status(422).send({ error: 'Category is required.'});}
-  if (!description) {return res.status(422).send({ error: 'Description is required.'});}
-  try {
-    var menuItem = (yield msc.createMenuItem(company, title, status, price, category, description))[0]
-  } catch (err) {
-    console.error('error creating menu item in ordering system ')
-    throw(err)
+      if (!status) status = 1; // live by default TODO: turn draft by default when menu availability completed
+      if (!title) {return res.status(422).send({ error: 'Title is required.'});}
+      if (!price) {return res.status(422).send({ error: 'Price is required.'});}
+      if (!description) {return res.status(422).send({ error: 'Description is required.'});}
+      try {
+        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description)
+      } catch (err) {
+        console.error(err)
+        console.error('error creating menu item in ordering system ')
+        throw(err)
+      }
+      debug(menuItem)
+      this.body = menuItem
+      return;
+    } else {
+      console.error('createMenuItem: Category does not belong to company')
+      this.status=422
+      this.body = {error: 'Category does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('createMenuItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
   }
-  this.body = menuItem
-  return;
 }
+
 exports.listMenuItems=function *(next) {
   var data = this.body;
   debug(this.category)
@@ -240,7 +276,7 @@ exports.getMenuItem=function *(id, next) {
   try {
     var results = yield msc.findMenuItem(id)
   } catch (err) {
-    console.error('error retrieving category from ordering system')
+    console.error('error retrieving menu item from ordering system')
     throw(err)
   }
   debug(results)
@@ -249,51 +285,69 @@ exports.getMenuItem=function *(id, next) {
 }
 
 exports.updateMenuItem=function *(next) {
-  debug('update menu item called by' + req.user.id)
-  try {
-    var company = (yield Company.companyForUser(req.user.id))[0]
-  } catch (err) {
-    console.error('error updating menu item: could not find company for user')
-    throw(err)
-  }
-  var menuItem = req.menuItem
-  debug(menuItem.company.data.id +'=='+ company.orderSysId)
-  if (mi.company.data.id == company.orderSysId) {
-    var data = req.body;
-    try {
-      var item = (yield msc.updateMenuItem(company, menuItem, data))[0]
-    } catch (err) {
-      console.error('error updating menu item from ordering system ')
-      throw(err)
+  debug('updateMenuItem')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('updateMenuItem: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error updating menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    this.body = item
-    return;
+    debug(this.menuItem.company.data.id +'=='+ this.company.orderSysId)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      var data = this.body;
+      try {
+        var item = yield msc.updateMenuItem(this.menuItem.id, data)
+      } catch (err) {
+        console.error('error updating menu item in ordering system ')
+        throw(err)
+      }
+      this.body = item
+      return;
+    } else {
+      console.error('updateMenuItem: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
   } else {
-    return sendErrorResponse('Menu item does not belong to company', res, 422)
+    console.error('updateMenuItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
   }
 }
 
 exports.deleteMenuItem=function *(next) {
-  debug('delete menu item called by' + req.user.id)
-  try {
-    var company = (yield Company.companyForUser(req.user.id))[0]
-  } catch (err) {
-    console.error('error deleting menu item: could not find company for user')
-    throw(err)
-  }
-  var menuItem = req.menuItem
-  debug(menuItem.company.data.id +'=='+ company.orderSysId)
-  if (menuItem.company.data.id == company.orderSysId) {
-    try {
-      var item = (yield msc.deleteMenuItem(menuItem))[0]
-    } catch (err) {
-      console.error('error deleting menu item from ordering system ')
-      throw(err)
+  debug('deleteMenuItem')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('deleteMenuItem: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error deleting menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    this.body = item
-    return
+    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      try {
+        var message = yield msc.deleteMenuItem(this.menuItem.id)
+      } catch (err) {
+        console.error('error deleting menu item in ordering system ')
+        throw(err)
+      }
+      this.body = message
+      return;
+    } else {
+      console.error('deleteMenuItem: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
   } else {
-    return sendErrorResponse('Menu item does not belong to company', res, 422)
+    console.error('deleteMenuItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
   }
 }
 

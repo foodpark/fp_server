@@ -1,5 +1,6 @@
-var crypto = require('crypto'),
-    knex = require('../../config/knex');
+var crypto = require('crypto');
+var knex = require('../../config/knex');
+var debug = require('debug')('user.model');
 /**
 
 CREATE TABLE users (
@@ -35,7 +36,7 @@ exports.userForUsername = function(username) {
 
 /* Used for LocalStrategy login */
 exports.getUserByUsername = function(username, callback) {
-  console.log('user model: get user by '+ username)
+  debug('user model: get user by '+ username)
   return knex('users').select('*').where('username', 'ILIKE', username).asCallback(callback)
 };
 

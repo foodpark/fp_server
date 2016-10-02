@@ -1,17 +1,18 @@
-var passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
-    User = require ('../../app/models/user.server.model');
+var passport = require('passport');
+var LocalStrategy = require('passport-local').Strategy;
+var User = require ('../../app/models/user.server.model');
+var debug = require('debug')('strategies.local');
 
 module.exports = function() {
     const localLogin = new LocalStrategy(function(username, password, done) {
-        console.log('logging in user '+ username)
+        debug('logging in user '+ username)
         User.getUserByUsername(username, function(err, results) {
           if (err) {
             console.error('error during login: '+ err)
             return done(err);
           }
           var user = results[0]
-          console.log(user)
+          debug(user)
           if (!user) {
             console.error('error during login: could not find user')
             return done(null, false, {message: 'We could not verify your login details. Really sorry. Please try again.'});

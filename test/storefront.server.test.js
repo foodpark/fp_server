@@ -144,6 +144,10 @@ describe('CRUD /api/v1/mol/companies/1001/categories', function() {
     .end(function (err, res) {
       res.should.have.status(200);
       res.should.be.json;
+      res.body.should.be.a('object')
+      // Save the JWT token
+      token = res.body.token
+
       res.body.should.have.property('user');
       res.body.user.should.have.property('id');
       res.body.user.id.should.equal(11004);
@@ -152,8 +156,6 @@ describe('CRUD /api/v1/mol/companies/1001/categories', function() {
       res.body.user.should.have.property('role');
       res.body.user.role.should.equal('OWNER');
       res.body.should.have.property('token');
-      // Save the JWT token
-      token = res.body.token
       done();
     });
   });
@@ -167,10 +169,11 @@ describe('CRUD /api/v1/mol/companies/1001/categories', function() {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha');
       // Save the newly created category id
       mochaId = res.body.id
+
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Mocha');
       done();
     });
   });
@@ -212,6 +215,135 @@ describe('CRUD /api/v1/mol/companies/1001/categories', function() {
       res.body.status.should.equal(true)
       res.body.should.have.property('message')
       res.body.message.should.equal('Category removed successfully');
+      done();
+    });
+  });
+});
+
+token = ''
+mochaId = ''
+
+// 9. Test CRUD of a Menu Item for a specific Company/Category
+describe('CRUD /api/v1/mol/companies/1001/categories/1278238821237916009/menuitems', function() {
+  it('should login and retrieve JWT token', function(done) {
+    chai.request(server)
+    .post('/auth/login')
+    .field("username", "mp4@gmail.com")
+    .field("password", "mp4")
+    .end(function (err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object')
+      // Save the JWT token
+      token = res.body.token
+
+      res.body.should.have.property('user');
+      res.body.user.should.have.property('id');
+      res.body.user.id.should.equal(11004);
+      res.body.user.should.have.property('username');
+      res.body.user.username.should.equal('mp4@gmail.com');
+      res.body.user.should.have.property('role');
+      res.body.user.role.should.equal('OWNER');
+      res.body.should.have.property('token');
+      done();
+    });
+  });
+  it('should create menu item "Mocha Taco" for 1001: Pacos Tacos - Taco category in Moltin', function(done) {
+    chai.request(server)
+    .post('/api/v1/mol/companies/1001/categories/1278238821237916009/menuitems')
+    .set('Authorization', token)
+    .field('title','Mocha Taco')
+    .field('price','4.95')
+    .field('status','1')
+    .field('category','1278238821237916009')
+    .field('description','Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla')
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      // Save the newly created id
+      mochaId = res.body.id
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Mocha Taco');
+
+      res.body.should.have.property('price');
+      res.body.price.value.should.equal('R$5.99');
+
+      res.body.should.have.property('status');
+      res.body.status.value.should.equal('Live');
+
+      res.body.should.have.property('category');
+      res.body.category.value.should.equal('Tacos');
+
+      res.body.should.have.property('description');
+      res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+      done();
+    });
+  });
+  it('should read "Mocha Taco" menu item for 1001: Pacos Tacos - Taco category in Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/menuitems/'+ mochaId)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Mocha Taco');
+
+      res.body.should.have.property('price');
+      res.body.price.value.should.equal('R$5.99');
+
+      res.body.should.have.property('status');
+      res.body.status.value.should.equal('Live');
+
+      res.body.should.have.property('category');
+      res.body.category.value.should.equal('Tacos');
+
+      res.body.should.have.property('description');
+      res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+      done();
+    });
+  });
+  it('should update "Mocha Taco" to "Mocha Avalanche Taco" item title & price for 1001: Pacos Tacos - Taco category in Moltin', function(done) {
+    chai.request(server)
+    .put('/api/v1/mol/companies/1001/menuitems/'+ mochaId)
+    .set('Authorization', token)
+    .field('title','Mocha Avalanche Taco')
+    .field('price','6.95')
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Mocha Avalanche Taco');
+
+      res.body.should.have.property('price');
+      res.body.price.value.should.equal('R$7.99');
+
+      res.body.should.have.property('status');
+      res.body.status.value.should.equal('Live');
+
+      res.body.should.have.property('category');
+      res.body.category.value.should.equal('Tacos');
+
+      res.body.should.have.property('description');
+      res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+
+      done();
+    });
+  });
+  it('should delete '+mochaId+': "Mocha Avalanche Taco" menu time for 1001: Pacos Tacos - Taco catgory in Moltin', function(done) {
+    chai.request(server)
+    .delete('/api/v1/mol/companies/1001/menuitems/'+ mochaId)
+    .set('Authorization', token)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('status')
+      res.body.status.should.equal(true)
+      res.body.should.have.property('message')
+      res.body.message.should.equal('Product removed successfully');
       done();
     });
   });

@@ -47,7 +47,6 @@ var setUserInfo = function (user) {
 };
 
 exports.login = function *(next) {
-  console.log('login complete')
   debug('login complete')
   debug(this.passport.user)
   debug('calling')
@@ -333,8 +332,10 @@ exports.isAuthorized = function *(role, role2) {
     }
     if (user.role == role || user.role == role2) {
       debug('found '+ user.role)
-      yield next();
+      return true;
     }
+    return false
+  } else {
     return false
   }
 }
