@@ -364,33 +364,53 @@ var optionItemCreator = function *(menuItemId, optionCategoryId, title, modPrice
 }
 
 exports.createOptionItem=function *(next) {
-  debug('updateOptionItem')
-  var title = this.body.title
-  if (!title) {
-    this.status = 422
-    this.body = { error: 'Title is required.'}
+  debug('createOptionItem')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('createOptionItem: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('createOptionItem: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      var title = this.body.title
+      if (!title) {
+        this.status = 422
+        this.body = { error: 'Title is required.'}
+        return;
+      }
+      var modPrice = this.body.modprice
+      debug(this.menuItem)
+      var optionCategoryId = ''
+      if (this.optionCategory) {
+        debug(optionCategory)
+        optionCategoryId = this.optionCategory.id
+      } else {
+        debug('No option category provided')
+      }
+      try {
+        var results = yield optionItemCreator(this.menuItem.id, optionCategoryId, title, modPrice)
+      } catch (err) {
+        console.error('createOptionItem: Error creating option item ('+ title +', '+ modPrice +')')
+        throw(err)
+      }
+      debug(results)
+      this.body = results
+      return;
+    } else {
+      console.error('createOptionItem: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('createOptionItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
     return;
   }
-  var modPrice = this.body.modprice
-  debug(this.menuItem)
-  var optionCategoryId = ''
-  if (this.optionCategory) {
-    debug(optionCategory)
-    optionCategoryId = this.optionCategory.id
-  } else {
-    debug('No option category provided')
-  }
-  try {
-    var results = (yield optionCategoryCreator(this.menuItem.id, optionCategoryId, title, modPrice))[0]
-  } catch (err) {
-    console.error('error creating option item ('+ title +', '+ modPrice +')')
-    throw(err)
-  }
-  debug(results)
-  this.body = results
-  return;
 }
-
 
 exports.updateOptionItem=function *(id) {
   debug('updateOptionItem')
@@ -413,27 +433,78 @@ exports.updateOptionItem=function *(id) {
   debug(results)
   this.body = results
   return;
+
+  debug('updateOptionItem')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('updateOptionItem: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('updateOptionItem: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.menuItem.company.data.id +'=='+ this.company.orderSysId)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      var data = this.body;
+      /* on update Option Category would always be present, incl. 'OptionItems' category
+      var optionCategoryId = ''
+      if (this.optionCategory) {
+        debug('updateOptionItem: Has option category')
+        debug(this.optionCategory)
+        optionCatgoryId = this.optionCategory.id
+      }*/
+      try {
+        var results = yield msc.updateOptionItem(this.menuItem.id, this.optionCategory.id, id, data)
+      } catch (err) {
+        console.error('updateOptionItem: Error updating option item in ordering system ')
+        throw(err)
+      }
+      this.body = results
+      return;
+    } else {
+      console.error('updateOptionItem: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('updateOptionItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
 }
 
 exports.deleteOptionItem=function *(id) {
   debug('deleteOptionItem')
-  debug(this.menuItem)
-  var optionCategoryId = ''
-  if (this.optionCategory) {
-    debug(this.optionCategory)
-    optionCategoryId = this.optionCategory.id
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('deleteOptionItem: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('deleteOptionItem: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      try {
+        var message = yield msc.deleteOptionItem(this.menuItem.id, this.optionCategory.id, id)
+      } catch (err) {
+        console.error('deleteOptionItem: Error deleting option item in ordering system ')
+        throw(err)
+      }
+      this.body = message
+      return;
+    } else {
+      console.error('deleteOptionItem: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
   } else {
-    debug('No option category provided')
+    console.error('deleteOptionItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
   }
-  try {
-    var results = (yield msc.deleteOptionItem(this.menuItem.id, optionCategoryId, id))[0]
-  } catch (err) {
-    console.error('error deleting option item ('+ id +')')
-    throw(err)
-  }
-  debug(results)
-  this.body = results
-  return;
 }
 
 var optionCategoryCreator = function (menuItemId, parent, title, type) {
