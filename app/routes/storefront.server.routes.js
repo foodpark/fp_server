@@ -28,27 +28,21 @@ module.exports=function(app) {
 
 	router.post(apiversion + '/companies/:companyId/categories', requireJWT, storefront.createCategory)
   router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', requireJWT, storefront.createMenuItem)
+  router.post(apiversion + '/companies/:companyId//menuitems/:menuItemId/optionitems', requireJWT, storefront.createOptionItem)
+  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', requireJWT, storefront.createOptionCategory)
   router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', requireJWT, storefront.createOptionItem)
 
   router.put(apiversion + '/companies/:companyId/categories/:categoryId', requireJWT, storefront.updateCategory);
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.updateMenuItem);
+	router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
+  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
 
 	router.delete(apiversion + '/companies/:companyId/categories/:categoryId',requireJWT, storefront.deleteCategory);
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.deleteMenuItem);
+  router.delete(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT,  storefront.deleteOptionItem);
+  router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.deleteOptionCategory);
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT,  storefront.deleteOptionItem);
-
-/*
-	router.post(apiversion + '/menuitems/:menuItemId/optioncategories', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionCategory)
-	router.post(apiversion + '/menuitems/:menuItemId/optionitems', auth.roleAuthorization(OWNER, ADMIN), storefront.createOptionItem)
-
-	router.put(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.updateOptionCategory);
-	router.put(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN), storefront.updateOptionItem);
-
-	router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionCategory);
-	router.delete(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization(OWNER, ADMIN),  storefront.deleteOptionItem);
-
-*/
 
 	router.param('optionItemId', storefront.getOptionItem);
 	router.param('optionCategoryId', storefront.getOptionCategory);

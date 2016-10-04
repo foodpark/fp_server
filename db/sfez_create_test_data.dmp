@@ -39,11 +39,11 @@ COPY customers (id, order_sys_id, description, facebook, twitter, photo, power_r
 \.
 SELECT pg_catalog.setval('customers_id_seq', 9004, true);
 
-COPY units (id, name, number, type, description, username, password, qr_code, unit_order_sys_id, company_id, unit_mgr_id) FROM stdin;
-2001	Thaitanic Truck 1	1	TRUCK	\N	mptruck61	mptruck61	\N	\N	1002	11007
-2002	Thaitanic Cart 1	1	CART	\N	mptruck64	mptruck64	\N	\N	1002	11008
-2003	Pacos Tacos Truck 1	1	TRUCK	\N	mptruck64five	mptruck64five	\N	\N	1001	11009
-2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010
+COPY units (id, name, number, type, description, username, password, qr_code, unit_order_sys_id, company_id, unit_mgr_id, customer_order_window) FROM stdin;
+2001	Thaitanic Truck 1	1	TRUCK	\N	mptruck61	mptruck61	\N	\N	1002	11007	15
+2002	Thaitanic Cart 1	1	CART	\N	mptruck64	mptruck64	\N	\N	1002	11008	20
+2003	Pacos Tacos Truck 1	1	TRUCK	\N	mptruck64five	mptruck64five	\N	\N	1001	11009	10
+2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010	15
 \.
 SELECT pg_catalog.setval('units_id_seq', 2005, true);
 
