@@ -43,19 +43,18 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('checkins').select('*').whereBetween('latitude', [minlat, maxlat]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime).on('query-response', function(response, obj, builder) {}).then( function(response) {
-    console.log('checkins ' + response);
-    var idList = response.map(function(obj){
-     return obj['unit_id'];
-    });
-    return idList;
-  }).then( function(idList) {
-      console.log('idlist ' + idList);
-     return knex('units').select('*').whereIn('id', idList).on('query-response', function(response, obj, builder) {}).then( function(response) {
-        console.log('response ' + response);
-        return response;
-    }).catch(console.log.bind(console));
-  }).catch(console.log.bind(console));
+  return knex('checkins').select(['units.id as id','units.name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','checkins.latitude','checkins.longitude','checkins.company_id']).whereBetween('latitude', [minlat, maxlat]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime).innerJoin('units','units.id','checkins.unit_id').on('query-response', function(response, obj, builder) {});
+  //.then( function(response) {
+  //  var idList = response.map(function(obj){
+  //   return obj['unit_id'];
+  //  });
+  //  return idList;
+  //}).then( function(idList) {
+  //  //fix response object: only return desired columns AND join the lat-lon
+  //   return knex('units').select(['id','name','number','type','description','qr_code','unit_order_sys_id','company_id','updated_at']).whereIn('id', idList).on('query-response', function(response, obj, builder) {}).then( function(response) {
+  //      return response;
+  //  }).catch(console.log.bind(console));
+  //}).catch(console.log.bind(console));
 };
 
 exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
