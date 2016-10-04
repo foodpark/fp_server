@@ -353,7 +353,7 @@ exports.deleteMenuItem=function *(next) {
 
 var optionItemCreator = function *(menuItemId, optionCategoryId, title, modPrice) {
   try {
-    var optionItem = (yield msc.createOptionItem(menuItemId, optionCategoryId, title, modPrice))[0]
+    var optionItem = yield msc.createOptionItem(menuItemId, optionCategoryId, title, modPrice)
   } catch (err) {
     console.error('error creating option item in ordering system')
     throw(err)
@@ -413,27 +413,6 @@ exports.createOptionItem=function *(next) {
 }
 
 exports.updateOptionItem=function *(id) {
-  debug('updateOptionItem')
-  debug(this.menuItem)
-  var optionCategoryId = ''
-  if (this.optionCategory) {
-    debug(this.optionCategory)
-    optionCategoryId = this.optionCategory.id
-  } else {
-    debug('No option category provided')
-  }
-  debug(this.body)
-  var data = this.body
-  try {
-    var results = (yield msc.updateOptionItem(this.menuItem.id, this.optionCategory.id, id, data))[0]
-  } catch (err) {
-    console.error('error updating option item ('+ id +')')
-    throw(err)
-  }
-  debug(results)
-  this.body = results
-  return;
-
   debug('updateOptionItem')
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('updateOptionItem: Role authorized')
