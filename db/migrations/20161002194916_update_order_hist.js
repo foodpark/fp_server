@@ -29,10 +29,11 @@ exports.down = function(knex, Promise) {
       t.float('latitude');
       t.float('longitude');
       t.renameColumn('initiation_time', 'purchase_date');
-      t.renamecolumn('actual_pickup_time', 'pickup_time');
+      t.renameColumn('actual_pickup_time', 'pickup_time');
       t.renameColumn('prep_notice_time', 'prep_time_notice');
       t.renameColumn('qr_code', 'qr_audit');
       t.dropColumn('desired_pickup_time');
+      t.dropForeign("checkin_id");
       t.dropColumn('checkin_id');
     }),
     knex.schema.table("units", function (t) {

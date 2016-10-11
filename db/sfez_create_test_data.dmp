@@ -25,6 +25,14 @@ COPY users (id, first_name, last_name, username, password, role, provider, provi
 \.
 SELECT pg_catalog.setval('users_id_seq', 11011, true);
 
+COPY territories (id, territory, city, state, country, timezone, latitude, longitude, created_at) FROM stdin;
+1	 Natal-RN	Natal	RN	Brazil	Buenos Aires	-5.777182	-35.200323	2016-09-06 23:00:00.000000
+2	 Sao Paolo-SP	Sao Paolo	Brasilia	-23.55	-46.633333	2016-09-06 23:00:00.000000
+3	 Pipa-RN	Pipa	RN	Brazil	Buenos Aires	-6.228994	-35.048776	2016-09-06 23:00:00.000000
+4	 Austin-TX	Austin	TX	USA	Central Time (US & Canada)	30.264317	-97.738228	2016-09-06 23:00:00.000000
+\.
+SELECT pg_catalog.setval('territories_id_seq', 5, true);
+
 COPY companies (id, name, order_sys_id, base_slug, default_cat, description, email, facebook, twitter, photo, featured_dish, hours, schedule, city, state, country, taxband, user_id, created_at) FROM stdin;
 1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	Fresh street food tacos	tacos@pacos.com	www.facebook.com/pacostacos	@pacostacos	\N	\N	11am-8pm	M-F	\N	\N	\N	\N	11004	2016-08-26 21:31:52.102331
 1002	Thaitanic	1293768990807556920	thaitanic-1471829851769	1322127087452029500	Authentic Thai	info@thaitanic.com	www.facebook.com/thaitanic	@thaitan	\N	\N	3pm-5pm	TWTF	\N	\N	\N	\N	11005	2016-08-21 21:37:32.594516
