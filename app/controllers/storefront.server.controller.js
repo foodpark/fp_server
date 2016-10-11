@@ -25,7 +25,8 @@ exports.readCompany=function *(next) {
 }
 
 exports.getCompany=function *(id, next) {
-  debug('getcompany: company id: '+ id)
+  debug('getCompany')
+  debug('id ' + id)
   try {
     var company = (yield Company.getSingleCompany(id))[0]
   } catch (err) {
@@ -55,7 +56,8 @@ exports.readCategory=function *(next) {
 }
 
 exports.getCategory=function *(id, next) {
-  debug('getcategory: category id: '+ id)
+  debug('getCategory')
+  debug('id '+ id)
   try {
     var category = yield msc.findCategory(id)
   } catch (err) {
@@ -68,7 +70,7 @@ exports.getCategory=function *(id, next) {
 }
 
 exports.createCategory=function *(next) {
-  debug('createcategory')
+  debug('createCategory')
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     var user = this.passport.user
     debug(user)
@@ -149,7 +151,8 @@ exports.updateCategory=function *(next) {
 }
 
 exports.deleteCategory=function *(next) {
-  debug('deleteCategory: id '+ this.category.id)
+  debug('deleteCategory')
+  debug('id '+ this.category.id)
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     var user = this.passport.user
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
@@ -272,7 +275,8 @@ exports.readMenuItem=function *(next) {
 }
 
 exports.getMenuItem=function *(id, next) {
-  debug('getMenuItem: id: '+ id)
+  debug('getMenuItem')
+  debug('id '+ id)
   try {
     var results = yield msc.findMenuItem(id)
   } catch (err) {
@@ -282,6 +286,18 @@ exports.getMenuItem=function *(id, next) {
   debug(results)
   this.menuItem = results
   yield next;
+}
+
+var internalGetMenuItem = function *(id) {
+  debug('internalGetMenuItem')
+  debug('id '+ id)
+  try {
+    var results = yield msc.findMenuItem(id)
+  } catch (err) {
+    console.error('error retrieving menu item from ordering system')
+    throw(err)
+  }
+  return results
 }
 
 exports.updateMenuItem=function *(next) {
@@ -320,6 +336,7 @@ exports.updateMenuItem=function *(next) {
 
 exports.deleteMenuItem=function *(next) {
   debug('deleteMenuItem')
+  debug('id '+ this.menuItem.id)
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('deleteMenuItem: Role authorized')
     var user = this.passport.user
@@ -412,7 +429,7 @@ exports.createOptionItem=function *(next) {
   }
 }
 
-exports.updateOptionItem=function *(id) {
+exports.updateOptionItem=function *(next) {
   debug('updateOptionItem')
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('updateOptionItem: Role authorized')
@@ -453,19 +470,22 @@ exports.updateOptionItem=function *(id) {
   }
 }
 
-exports.deleteOptionItem=function *(id) {
+exports.deleteOptionItem=function *(next) {
   debug('deleteOptionItem')
+  debug('menu item '+ this.params.menuItemId)
+  debug('optionCategory '+ this.params.optionCategoryId)
+  debug('option Item '+ this.params.optionItemId)
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('deleteOptionItem: Role authorized')
     var user = this.passport.user
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
         console.error('deleteOptionItem: Owner '+ user.id + 'not associated with '+ this.company.name)
-        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+        throw('Owner '+ user.id + ' not associated with '+ this.company.name)
     }
     debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
     if (this.menuItem.company.data.id == this.company.order_sys_id) {
       try {
-        var message = yield msc.deleteOptionItem(this.menuItem.id, this.optionCategory.id, id)
+        var message = yield msc.deleteOptionItem(this.menuItem.id, this.params.optionCategoryId, id)
       } catch (err) {
         console.error('deleteOptionItem: Error deleting option item in ordering system ')
         throw(err)
@@ -486,13 +506,13 @@ exports.deleteOptionItem=function *(id) {
   }
 }
 
-var optionCategoryCreator = function (menuItemId, parent, title, type) {
-  return msc.createOptionCategory(menuItemId, parent, title, type)
+var optionCategoryCreator = function (menuItemId, title, type) {
+  return msc.createOptionCategory(menuItemId, title, type)
 }
 
 exports.createOptionCategory=function *(next) {
   debug('createOptionCategory')
-  debug(this.menuItem)
+  debug('menu item '+ this.params.menuItemId)
   debug(this.body)
   var title = this.body.title
   if (!title) {
@@ -500,18 +520,11 @@ exports.createOptionCategory=function *(next) {
     this.body = { error: 'Title is required.'}
     return;
   }
-  var parent = this.parent
-  if (!parent) {
-    this.status=422
-    this.body = { error: 'Parent category is required.'}
-    return;
-  }
   var type = 'variant'
-  var data = this.body
   try {
-    var results = (yield optionCategoryCreator(this.menuItem.id, parent, title, type))[0]
+    var results = yield optionCategoryCreator(this.params.menuItemId, title, type)
   } catch (err) {
-    console.error('error updating option category '+ this.optionCategory.title +' ('+ id +')')
+    console.error('error updating option category '+ title)
     throw(err)
   }
   debug(results)
@@ -522,11 +535,11 @@ exports.createOptionCategory=function *(next) {
 
 exports.listOptionCategories=function *(next) {
   debug('listOptionItems')
-  debug(this.menuItem)
+  debug('menu item '+ this.params.menuItemId)
   try {
-    var results = yield msc.listOptionCategories(this.menuItem.id)
+    var results = yield msc.listOptionCategories(this.params.menuItemId)
   } catch (err) {
-    console.error('error retrieving option categories from ordering system ')
+    console.error('listOptionCategories: Error retrieving option categories from ordering system ')
     throw(err)
   }
   debug(results)
@@ -534,48 +547,112 @@ exports.listOptionCategories=function *(next) {
   return;
 }
 
-exports.getOptionCategory=function *(id) {
-  debug('getOptionCategory: id: '+ id)
-  debug(this.menuItem)
-  debug(id)
+exports.readOptionCategory= function *(next) {
+  debug('readOptionCategory')
+  debug('optionCategory ' +this.params.optionCategoryId)
+  debug('company '+ this.params.companyId)
+  debug('menu item '+ this.params.menuItemId)
   try {
-    var results = yield msc.findOptionCategory(this.menuItem.id, id)
+    var results = yield msc.findOptionCategory(this.params.menuItemId, this.params.optionCategoryId)
   } catch (err) {
-    console.error('error getting category ('+ id +') from ordering system')
+    console.error('readOptionCategory: error getting option category ('+ id +') from ordering system')
     throw(err)
   }
   debug(results)
-  this.optionCategory = results
-  yield next;
+  this.body = results
+  return;
 }
 
 exports.updateOptionCategory=function *(next) {
   debug('updateOptionCategory')
-  debug(this.menuItem)
-  debug(this.optionCategory)
-  debug(this.body)
-  var data = this.body
-  try {
-    var results = (yield msc.updateOptionCategory(this.menuItem.id, this.optionCategory.id, data))[0]
-  } catch (err) {
-    console.error('error updating option category '+ this.optionCategory.title +' ('+ id +')')
-    throw(err)
+  debug('menu item '+this.params.menuItemId)
+  debug('option category '+ this.params.optionCategoryId)
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('...Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('updateOptionCategory: Error updating option category: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    if (!this.menuItem) {
+      try {
+        debug('...getting menu item ')
+        this.menuItem = yield internalGetMenuItem(this.params.menuItemId)
+      }  catch (err) {
+        console.error('updateOptionCategory: Error retreiving menu item ('+ this.params.menuItemId +')')
+        throw(err)
+      }
+    }
+    debug('...'+ this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      debug(this.body)
+      var data = this.body
+      try {
+        var results = yield msc.updateOptionCategory(this.params.menuItemId, this.params.optionCategoryId, data)
+      } catch (err) {
+        console.error('updateOptionCategory: Error updating option category '+ this.optionCategory.title +' ('+ id +')')
+        throw(err)
+      }
+      debug(results)
+      this.body = results
+      return;
+
+    } else {
+      console.error('updateOptionCategory: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('updateOptionCategory: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
   }
-  debug(results)
-  this.body = results
-  return;
 }
 
-exports.deleteOptionCategory=function *(id) {
-  debug('updateOptionCategory')
-  debug(this.menuItem)
-  try {
-    var results = (yield msc.deleteOptionCategory(this.menuItem.id, id))[0]
-  } catch (err) {
-    console.error('error deleting option category '+ this.optionCategory.title +' ('+ id +')')
-    throw(err)
+exports.deleteOptionCategory=function *(next) {
+  debug('deleteOptionCategory')
+  debug('...menu item '+this.params.menuItemId)
+  debug('...option category '+ this.params.optionCategoryId)
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('...Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('deleteOptionCategory: Error deleting option category: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    if (!this.menuItem) {
+      try {
+        debug('...getting menu item ')
+        this.menuItem = yield internalGetMenuItem(this.params.menuItemId)
+      }  catch (err) {
+        console.error('deleteOptionCategory: Error retreiving menu item ('+ this.params.menuItemId +')')
+        throw(err)
+      }
+    }
+    debug('...'+ this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      try {
+        var results = yield msc.deleteOptionCategory(this.params.menuItemId, this.params.optionCategoryId)
+      } catch (err) {
+        console.error('deleteOptionCategory: Error deleting option category ('+ this.params.optionCategoryId +')')
+        throw(err)
+      }
+      debug(results)
+      this.body = results
+      return;
+
+    } else {
+      console.error('deleteOptionCategory: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('deleteOptionCategory: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
   }
-  debug(results)
-  this.body = results
-  return;
 }

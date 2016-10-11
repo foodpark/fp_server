@@ -57,7 +57,7 @@ CREATE TABLE food_parks (
 
 CREATE TABLE locations (
   id SERIAL PRIMARY KEY,
-  name text,
+  name text NOT NULL,
   type text,
   main_loc_text text,
   secondary_loc_text text,
@@ -127,7 +127,7 @@ CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
     order_sys_id text,
     description text,
-    device_id text,
+    device_id integer,
     fcm_id text,
     facebook text,
     twitter text,

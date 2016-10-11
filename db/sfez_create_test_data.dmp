@@ -63,3 +63,12 @@ COPY review_approvals (id, review_id, reviewer_id, status, created_at, updated_a
 4	7	\N	\N	2016-09-07 19:38:49.741905	2016-09-07 19:38:49.741905
 \.
 SELECT pg_catalog.setval('review_approvals_id_seq', 5, true);
+
+COPY order_history (order_sys_order_id, initiation_time, amount, customer_id, unit_id, company_id, status, desired_pickup_time, actual_pickup_time, qr_code) FROM stdin;
+696	2016-10-09 16:40:58.210291-05	10.00	9003	2001	1002	picked_up	2016-10-09 17:00:58.210291-05	2016-10-09 16:59:30.001837-05	a92b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022
+697	2016-10-09 16:45:22.362132-05	7.00	9003	2001	1002	ready	2016-10-09 17:05:22.362132-05	\N	d12b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022
+698	2016-10-09 16:50:45.184934-05	5.00	9001	2001	1002	cooking	2016-10-09 17:10:45.184934-05	\N	b32b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022
+699	2016-10-09 16:55:13.892119-05	11.00	9002	2001	1002	in_queue	2016-10-09 17:15:13.892119-05	\N	a62b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022
+701	2016-10-09 17:00:05.837234-05	9.00	9001	2001	1002	order_requested	2016-10-09 17:20:05.837234-05	\N	\N
+\.
+SELECT pg_catalog.setval('order_history_id_seq', 701, true);

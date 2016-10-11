@@ -149,23 +149,23 @@ module.exports = {
       console.log('checking authorization of ' + operation + ' on ')
       console.log(this.params)
       if (operation == 'create') {
-        if (this.params.table == 'companies' || this.params.table == 'units') {
-          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
-            this.throw('Create Unauthorized - Owners only',401);
+        if (this.params.table == 'companies' || this.params.table == 'food_parks' || this.params.table == 'roles' ) {
+          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
+            this.throw('Create Unauthorized - Admin only',401);
+          } // else continue
+        } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
+            this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
         } else if (this.params.table == 'customers' || this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
-        } else if (this.params.table == 'food_parks' || this.params.table == 'roles' || this.params.table == 'loyalty_rewards') {
-            if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
-              this.throw('Create Unauthorized - Owners only',401);
-            } // else continue          }
-          }
+        }
       } else if (operation == 'update' || operation == 'delete') {
         if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
-          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'OWNER') {
-            this.throw('Update Unauthorized - Owners only',401);
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
+            this.throw('Update Unauthorized - Owners/Admin only',401);
           } else {
             // verify user is modifying the correct company
             var coId = this.params.id

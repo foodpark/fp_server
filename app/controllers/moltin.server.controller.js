@@ -188,9 +188,6 @@ var requestEntities = function (flow, method, data, id, params) {
         },
         function (err, res, body) {
           if (!err && (res.statusCode === 200 || res.statusCode === 201) ) {
-            debug(body)
-            debug(res.headers)
-            debug(body.result)
             debug('parsing...')
             var result = body.result
             if (method == GET) result = JSON.parse(body).result
@@ -306,14 +303,18 @@ var menuOptionFlow = function (menuItemId, optionCategoryId) {
   return flow
 }
 
-exports.createOptionItem=function(menuItemId, optionCategoryId, title, modPrice, callback) {
+exports.createOptionItem=function(menuItemId, optionCategoryId, title, modPrice) {
   if (!modPrice) modPrice = 0
   var data = {
     title : title,
     mod_price : modPrice
   }
   debug(data)
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), POST, data, callback)
+  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), POST, data)
+};
+
+exports.findOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
+  return requestEntities(MENU_ITEMS, GET, '', menuItemId)
 };
 
 exports.updateOptionItem=function(menuItemId, optionCategoryId, optionItemId, callback) {
@@ -324,21 +325,24 @@ exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId, ca
   return requestEntities(menuOptionFlow(menuItemI), DELETE, {id:optionItemId}, callback)
 };
 
-exports.createOptionCategory=function(menuItemId, title, type, callback) {
+exports.createOptionCategory=function(menuItemId, title, type) {
   var data = {
     title : title,
     type : type
   }
-  return requestEntities(menuOptionFlow(menuItemId), POST, data, callback)
+  return requestEntities(menuOptionFlow(menuItemId), POST, data)
 };
 exports.listOptionCategories=function(menuItemId) {
   return requestEntities(menuOptionFlow(menuItemId), GET)
 };
+exports.findOptionCategory=function(menuItemId, optionCategoryId) {
+  return requestEntities(menuOptionFlow(menuItemId), GET, '', optionCategoryId)
+};
 exports.updateOptionCategory=function(menuItemId, optionCategoryId, data, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), PUT, data, callback)
+  return requestEntities(menuOptionFlow(menuItemId), PUT, data, optionCategoryId)
 };
 exports.deleteOptionCategory=function(menuItemId, optionCategoryId, callback) {
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), DELETE, '', callback)
+  return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
 };
 
 exports.getOrderById=function(url) {
