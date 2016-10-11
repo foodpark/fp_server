@@ -17,7 +17,7 @@ module.exports=function(app) {
 
 	router.use(passport.authenticate(['jwt','anonymous'], {session:false}));
 
-  router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems)
+  //router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems)
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', storefront.listMenuItems)
 	router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
