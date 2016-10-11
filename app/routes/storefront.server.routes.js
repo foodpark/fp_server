@@ -24,7 +24,7 @@ module.exports=function(app) {
 	router.get(apiversion + '/companies', storefront.listCompanies)
 
 
-  router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
+//  router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
   router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', storefront.readOptionCategory)
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
