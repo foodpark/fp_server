@@ -168,11 +168,16 @@ CREATE TABLE checkins (
   check_out timestamp,
   latitude float8,
   longitude float8,
+  display_address text,
+  food_park_name text,
+  note text,
+  food_park_id integer REFERENCES food_parks(id),
   unit_id integer REFERENCES units(id),
   company_id integer REFERENCES companies(id),
   created_at timestamp without time zone DEFAULT now(),
   updated_at timestamp without time zone DEFAULT now()
 );
+
 
 CREATE TABLE checkin_history (
   id SERIAL PRIMARY KEY,

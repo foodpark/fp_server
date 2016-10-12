@@ -27,7 +27,7 @@ SELECT pg_catalog.setval('users_id_seq', 11011, true);
 
 COPY territories (id, territory, city, state, country, timezone, latitude, longitude, created_at) FROM stdin;
 1	 Natal-RN	Natal	RN	Brazil	Buenos Aires	-5.777182	-35.200323	2016-09-06 23:00:00.000000
-2	 Sao Paolo-SP	Sao Paolo	Brasilia	-23.55	-46.633333	2016-09-06 23:00:00.000000
+2	 Sao Paolo-SP	Sao Paolo	RN	Brazil	Brasilia	-23.55	-46.633333	2016-09-06 23:00:00.000000
 3	 Pipa-RN	Pipa	RN	Brazil	Buenos Aires	-6.228994	-35.048776	2016-09-06 23:00:00.000000
 4	 Austin-TX	Austin	TX	USA	Central Time (US & Canada)	30.264317	-97.738228	2016-09-06 23:00:00.000000
 \.

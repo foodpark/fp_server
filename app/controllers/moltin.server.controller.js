@@ -11,7 +11,8 @@ const PUT = 'PUT';
 
 const CATEGORIES = '/categories';
 const MENU_ITEMS = '/products';
-const OPTION_ITEMS = '/modifiers';
+const OPTION_CATEGORIES = '/modifiers';
+const OPTION_ITEMS = '/variations';
 
 var bearerToken='';
 
@@ -298,31 +299,45 @@ exports.deleteMenuItem=function(menuItemId) {
   return requestEntities(MENU_ITEMS, DELETE, '', menuItemId)
 };
 
-var menuOptionFlow = function (menuItemId, optionCategoryId) {
-  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_ITEMS
+var menuOptionFlow = function (menuItemId, optionCategoryId, showOptionItems) {
+  debug('menuOptionFlow')
+  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_CATEGORIES
+  if (optionCategoryId) {
+    debug('...option category id '+ optionCategoryId)
+    flow = flow + '/' + optionCategoryId
+    if (showOptionItems) {
+      debug('...option items ')
+      flow = flow + OPTION_ITEMS
+    }
+  }
+  debug(flow)
   return flow
 }
 
 exports.createOptionItem=function(menuItemId, optionCategoryId, title, modPrice) {
-  if (!modPrice) modPrice = 0
+  if (!modPrice) modPrice = "=0.00"
   var data = {
     title : title,
     mod_price : modPrice
   }
   debug(data)
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId), POST, data)
+  return requestEntities(menuOptionFLow(menuItemId, optionCategoryId, true), POST, data)
 };
 
+exports.listOptionItems=function(menuItemId, optionCategoryId) {
+  debug('listOptionItems')
+  var flow = menuOptionFlow(menuItemId, optionCategoryId, true)
+  return requestEntities(flow, GET)
+};
 exports.findOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
-  return requestEntities(MENU_ITEMS, GET, '', menuItemId)
+  return requestEntities(menuOptionFLow(menuItemId, optionCategoryId, true), GET, '', optionItemId)
 };
 
-exports.updateOptionItem=function(menuItemId, optionCategoryId, optionItemId, callback) {
-  var params = 'variations.id='+optionItemId
-  return requestEntities(menuOptionFlow(menuItemId), PUT, data, optionCategorId, params)
+exports.updateOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
+  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId, true), PUT, data, optionItemId)
 };
-exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId, callback) {
-  return requestEntities(menuOptionFlow(menuItemI), DELETE, {id:optionItemId}, callback)
+exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
+  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId, true), DELETE, '', optionItemId)
 };
 
 exports.createOptionCategory=function(menuItemId, title, type) {
@@ -338,10 +353,10 @@ exports.listOptionCategories=function(menuItemId) {
 exports.findOptionCategory=function(menuItemId, optionCategoryId) {
   return requestEntities(menuOptionFlow(menuItemId), GET, '', optionCategoryId)
 };
-exports.updateOptionCategory=function(menuItemId, optionCategoryId, data, callback) {
+exports.updateOptionCategory=function(menuItemId, optionCategoryId, data) {
   return requestEntities(menuOptionFlow(menuItemId), PUT, data, optionCategoryId)
 };
-exports.deleteOptionCategory=function(menuItemId, optionCategoryId, callback) {
+exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
   return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
 };
 
