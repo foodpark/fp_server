@@ -1,5 +1,6 @@
 //var Router = require('koa-router');
 var order = require('../../app/controllers/order.server.controller');
+var config = require('../../config/config');
 var Router = require('koa-router');
 
 
