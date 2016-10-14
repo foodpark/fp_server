@@ -5,8 +5,9 @@ var Router = require('koa-router');
 
 module.exports=function(app) {
 	var router = new Router();
+	var apiversion = '/api/'+ config.apiVersion + '/mol';
 
-	router.get('/vendor/orders', order.getOrders);
+	router.get(apiversion + '/orders', order.getOrders);
 
 	app.use(router.routes());
   app.use(router.allowedMethods())
