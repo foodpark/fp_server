@@ -117,6 +117,7 @@ CREATE TABLE companies (
     country text,
     taxband text,
     tags json,
+    stub boolean.
     user_id integer REFERENCES users(id),
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
