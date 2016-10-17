@@ -222,7 +222,7 @@ CREATE TABLE order_history (
   status text, -- json
   messages text, -- json
   qr_code text,
-  moltin_order_detail json,
+  order_sys_order_detail json,
   checkin_id integer REFERENCES checkins(id),
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),

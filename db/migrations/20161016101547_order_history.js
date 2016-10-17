@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
   return Promise.all([
       knex.schema.table("order_history", function (t) {
-        t.specificType('moltin_order_detail', 'json');
+        t.specificType('order_sys_order_detail', 'json');
       })
   ]);
 };
@@ -9,7 +9,7 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
   return Promise.all([
       knex.schema.table("order_history", function (t) {
-         t.dropColumn('moltin_order_detail');
+         t.dropColumn('order_sys_order_detail');
      })
   ]);
 };
