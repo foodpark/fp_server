@@ -11,7 +11,8 @@ var passport = Passport();
 
 var config = require('./config/config');
 var dbConfig = require('./config/knex');
-var firebase = require("firebase");
+var firebase = require('firebase');
+var cors = require('kcors');
 
 var app = Koa();
 
@@ -29,6 +30,11 @@ app.use(passport.session());
 
 //This is a temporary home for vendor UI. Uses koa-static-folder and koa-send to send assets
 app.use(serve('./public/vendors'));
+
+// Enable Cross-Origin requestEntities
+// TODO: THIS IS NOT A PRODUCTION CONFIGURATION
+app.use(cors());
+
 require('./app/routes')(app);
 
 var server = app.listen(config.port);

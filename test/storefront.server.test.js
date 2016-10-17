@@ -57,11 +57,14 @@ describe('GET /api/v1/mol/companies/1001/categories', function() {
     .end(function(err, res) {
       res.body.should.be.a('array');
       res.body[0].should.have.property('slug');
-      res.body[0].slug.should.equal('pacostacos');
+      res.body[0].should.have.property('company');
+      res.body[0].company.value.should.equal('Paco\'s Tacos');
       done();
     });
   });
 });
+
+
 
 // Test retrieval of one Moltin category
 describe('GET /api/v1/mol/companies/1001/categories/1278239102541496682', function() {
@@ -434,7 +437,6 @@ describe('CRUD /api/v1/mol/companies/1001/menuitems/1278238321226547557/optionca
     .post('/api/v1/mol/companies/1001/menuitems/1278238321226547557/optioncategories')
     .set('Authorization', token)
     .field('title','Pickles')
-    .field('parent','1278238821237916009')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -549,7 +551,7 @@ describe('CRUD /api/v1/mol/companies/1001/menuitems/1278238321226547557/optionca
   });
   it('should read "Spelt" option item for the "Shell" option category of the Independent Taco for Pacos Tacos - Taco category in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1001/menuitems/1278238321226547557/optioncategories/1335588095105433655/optionitems'+ mochaId)
+    .get('/api/v1/mol/companies/1001/menuitems/1278238321226547557/optioncategories/1335588095105433655/optionitems/'+ mochaId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -595,16 +597,136 @@ describe('CRUD /api/v1/mol/companies/1001/menuitems/1278238321226547557/optionca
     });
   });
 });
-/*
 
 
-// Test OptionCategory's Option Items (the single-select options)
-router.post(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', auth.roleAuthorization("Owner"), storefront.createOptionItem)
-router.put(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization("Owner"), storefront.updateOptionItem);
-router.delete(apiversion + '/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
 
-// Test Option Items (the multi-select options)
-router.post(apiversion + '/menuitems/:menuItemId/optionitems', auth.roleAuthorization("Owner"), storefront.createOptionItem)
-router.put(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization("Owner"), storefront.updateOptionItem);
-router.delete(apiversion + '/menuitems/:menuItemId/optionitems/:optionItemId', auth.roleAuthorization("Owner"),  storefront.deleteOptionItem);
-*/
+token = ''
+mochaId = ''
+var optItemsCat = ''
+
+// Test CRUD of multi-select Option Items for a specific Company/Menu Item
+describe('CRUD /api/v1/mol/companies/1001/menuitems/1362631894797124274/optionitems', function() {
+  it('should login and retrieve JWT token', function(done) {
+    chai.request(server)
+    .post('/auth/login')
+    .field("username", "mp4@gmail.com")
+    .field("password", "mp4")
+    .end(function (err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object')
+      // Save the JWT token
+      token = res.body.token
+
+      res.body.should.have.property('user');
+      res.body.user.should.have.property('id');
+      res.body.user.id.should.equal(11004);
+      res.body.user.should.have.property('username');
+      res.body.user.username.should.equal('mp4@gmail.com');
+      res.body.user.should.have.property('role');
+      res.body.user.role.should.equal('OWNER');
+      res.body.should.have.property('token');
+      done();
+    });
+  });
+  it('should create option item "Iced" for the Coffee menu item for Pacos Tacos - Drinks category in Moltin', function(done) {
+    chai.request(server)
+    .post('/api/v1/mol/companies/1001/menuitems/1362631894797124274/optionitems')
+    .set('Authorization', token)
+    .field('title','Iced')
+    .field('mod_price','+0.00')
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      // Save the newly created id
+      mochaId = res.body.id
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Iced');
+
+      res.body.should.have.property('mod_price');
+      res.body.mod_price.should.equal('+0.00');
+      done();
+    });
+  });
+  it('should read the "OptionItems" option category for the Coffee menu item for Pacos Tacos - Drinks category in Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/menuitems/1362631894797124274/optioncategories')
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('array');
+      res.body[0].should.have.property('id');
+      optItemsCat = res.body[0].id;
+
+      res.body[0].should.have.property('title');
+      res.body[0].title.should.equal('OptionItems');
+
+      res.body[0].should.have.property('type');
+      res.body[0].type.should.equal('single');
+      done();
+    });
+  });
+  it('should read "Iced" option item for the "OptionItems" option category for the Coffee menu item', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/1001/menuitems/1362631894797124274/optioncategories/'+ optItemsCat +'/optionitems/'+ mochaId)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Iced');
+
+      res.body.should.have.property('mod_price');
+      res.body.mod_price.should.equal('+0.00');
+      done();
+    });
+  });
+  it('should update "Iced" option item title to "Blended" ', function(done) {
+    chai.request(server)
+    .put('/api/v1/mol/companies/1001/menuitems/1362631894797124274/optioncategories/'+ optItemsCat +'/optionitems/'+ mochaId)
+    .set('Authorization', token)
+    .field('title','Blended')
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Blended');
+
+      res.body.should.have.property('mod_price');
+      res.body.mod_price.should.equal('+0.00');
+      done();
+    });
+  });
+  it('should delete the "Blended" option item ', function(done) {
+    chai.request(server)
+    .delete('/api/v1/mol/companies/1001/menuitems/1362631894797124274/optioncategories/'+ optItemsCat +'/optionitems/'+ mochaId)
+    .set('Authorization', token)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('status')
+      res.body.status.should.equal(true)
+      res.body.should.have.property('message')
+      res.body.message.should.equal('Variation removed successfully');
+      done();
+    });
+  });
+  it('should delete "OptionItems" option category ', function(done) {
+    chai.request(server)
+    .delete('/api/v1/mol/companies/1001/menuitems/1362631894797124274/optioncategories/'+ optItemsCat )
+    .set('Authorization', token)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('status')
+      res.body.status.should.equal(true)
+      res.body.should.have.property('message')
+      res.body.message.should.equal('Modifier removed successfully');
+      done();
+    });
+  });
+});

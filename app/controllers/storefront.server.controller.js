@@ -1,10 +1,11 @@
 var User = require ('../models/user.server.model'),
     Company = require ('../models/company.server.model'),
     Customer = require ('../models/customer.server.model'),
-    auth = require('./authentication.server.controller')
+    auth = require('./authentication.server.controller'),
     msc = require('./moltin.server.controller'),
     config = require('../../config/config'),
     debug = require('debug')('storefront');
+var _ = require('lodash');
 
 var getErrorMessage = function(err) {
     var message = '';
@@ -187,12 +188,13 @@ exports.deleteCategory=function *(next) {
 exports.createMenuItem=function *(next) {
   debug('createMenuItem')
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
-    debug('createMenuItem: Role authorized')
+    debug('...Role authorized')
     var user = this.passport.user
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
         console.error('error creating menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
+    debug('...user authorized')
     debug(this.category.company.data.id +'=='+ this.company.order_sys_id)
     if (this.category.company.data.id == this.company.order_sys_id) {
       /** MOLTIN PRODUCT FIELDS
@@ -441,15 +443,27 @@ exports.createOptionItem=function *(next) {
         this.body = { error: 'Title is required.'}
         return;
       }
-      var modPrice = this.body.modprice
-      debug(this.menuItem)
+      var modPrice = this.body.mod_price
+      debug('...title '+ title)
+      debug('...mod_price '+ modPrice)
 
-      //TODO: if no optioncategoryId, must try to retrieve, then create default Option Items
-      //TODO: double-check if possible to retrieve modifier by name - Moltin says not possible so could end up
-      //TODO: with a painful problem: >1 OptionItem categories
-
+      var optionCategoryId = this.params.optionCategoryId
+      // if no optioncategoryId, must find or create the OptionItems category
+      if (!optionCategoryId) {
+        debug('...no option category provided. Must be for OptionItems category. Finding...')
+        var optItemCat = _.findKey(this.menuItem.modifiers, { 'title': 'OptionItems'});
+        if (!optItemCat) {
+          debug('...no OptionItems category found. Creating new...')
+          var results = yield msc.createOptionCategory(this.menuItem.id, 'OptionItems', 'single')
+          optItemCat = results.id
+        } else {
+          debug('...found OptionItems category')
+        }
+        optionCategoryId = optItemCat
+      }
+      debug('...optionCategoryId '+ optionCategoryId)
       try {
-        var results = yield optionItemCreator(this.menuItem.id, this.params.optionCategoryId, title, modPrice)
+        var results = yield msc.createOptionItem(this.menuItem.id, optionCategoryId, title, modPrice)
       } catch (err) {
         console.error('createOptionItem: Error creating option item ('+ title +', '+ modPrice +')')
         throw(err)
@@ -541,7 +555,7 @@ exports.deleteOptionItem=function *(next) {
     debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
     if (this.menuItem.company.data.id == this.company.order_sys_id) {
       try {
-        var message = yield msc.deleteOptionItem(this.menuItem.id, this.params.optionCategoryId, id)
+        var message = yield msc.deleteOptionItem(this.menuItem.id, this.params.optionCategoryId, this.params.optionItemId)
       } catch (err) {
         console.error('deleteOptionItem: Error deleting option item  ('+ this.params.optionItemId +')')
         throw(err)
@@ -562,90 +576,66 @@ exports.deleteOptionItem=function *(next) {
   }
 }
 
-
-var optionCategoryCreator = function (menuItemId, title, type) {
-  return msc.createOptionCategory(menuItemId, title, type)
-}
-
-// this.menuitem -> this.params.menuItemId
-// this.params.optionCategoryId
-// this.params.optionItemId
-// data
-
-var executeRequest=function *(func, params, next) {
-  debug('execute request')
-  debug('...menu item '+ params.menuItemId)
-  debug('...optionCategory '+ params.optionCategoryId)
-  debug('...optionItem '+ params.optioItmeId)
-
-  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
-    debug('...role authorized')
-    var user = this.passport.user
-    if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('Owner '+ user.id + 'not associated with '+ this.company.name)
-        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
-    }
-    if (!this.menuItem) {
-      try {
-        debug('...getting menu item ')
-        this.menuItem = yield internalGetMenuItem(this.params.menuItemId)
-      }  catch (err) {
-        console.error('Error retreiving menu item ('+ this.params.menuItemId +')')
-        throw(err)
-      }
-    }
-    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
-    if (this.menuItem.company.data.id == this.company.order_sys_id) {
-
-      try {
-        var results = yield func(params)
-      } catch (err) {
-        console.error('Error performing action ('+ params +')')
-        throw(err)
-      }
-      debug(results)
-      this.body = results
-      return;
-    } else {
-      console.error('Menu item does not belong to company')
-      this.status=422
-      this.body = {error: 'Menu item does not belong to company'}
-      return;
-    }
-  } else {
-    console.error('User not authorized')
-    this.status=401
-    this.body = {error: 'User not authorized'}
-    return;
-  }
-}
-
-exports.createOptionCategory=function *(next) {
+exports.createOptionCategory=function *(func, params, next) {
   debug('createOptionCategory')
-  debug('menu item '+ this.params.menuItemId)
-  debug(this.body)
+  debug('...menu item '+ this.params.menuItemId)
   var title = this.body.title
   if (!title) {
     this.status=422
     this.body = { error: 'Title is required.'}
     return;
   }
-  var params = {
-    title: title,
-    type: 'variant',
-    menuItemId: this.params.menuItemId
-  }
-  try {
-    var results = yield executeRequest(optionCategoryCreator, params)
-  } catch (err) {
-    console.error('error updating option category '+ title)
-    throw(err)
-  }
-  debug(results)
-  this.body = results
-  return;
-}
 
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('...role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('createOptionCategory: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('createOptionCategory: Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug('...user authorized')
+    if (!this.menuItem) {
+      try {
+        debug('...getting menu item ')
+        this.menuItem = yield internalGetMenuItem(this.params.menuItemId)
+      }  catch (err) {
+        console.error('createOptionCategory: Error retreiving menu item ('+ this.params.menuItemId +')')
+        throw(err)
+      }
+    }
+    debug('...checking menu item belongs to company owner')
+    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      try {
+        var title = this.body.title
+        if (!title) {
+          this.status=422
+          this.body = { error: 'Title is required.'}
+          return;
+        }
+
+        debug('...calling moltin create option category')
+        var results = yield msc.createOptionCategory(this.menuItem.id, title, 'variant')
+      } catch (err) {
+        console.error('createOptionCategory: Error creating '+ title +' option category')
+        throw(err)
+      }
+      debug(results)
+      this.body = results
+      return;
+    } else {
+      console.error('createOptionCategory: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('createOptionCategory: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
 
 exports.listOptionCategories=function *(next) {
   debug('listOptionItems')
