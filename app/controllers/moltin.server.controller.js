@@ -16,7 +16,8 @@ const OPTION_ITEMS = '/variations';
 
 var bearerToken='';
 
-var refreshBearerToken = function *(next) {
+var refreshBearerToken = function () {
+  debug('refreshBearerToken');
   request.post({
       url: config.moltinAuthUrl,
       form: {
@@ -31,12 +32,12 @@ var refreshBearerToken = function *(next) {
   .then(function (res) {
     var data = qs.parse(res.body);
     bearerToken=body.access_token;
-    return bearerToken;
+    return bearerToken
   })
   .catch( function(err) {
     console.error("refreshBearerToken: statusCode: " + err.statusCode);
     console.error("refreshBearerToken: statusText: " + err.statusText);
-    throw (err)
+    return err
 
   })
 }
@@ -84,89 +85,41 @@ var getBearerToken = function *(next) {
   return bearerToken
 };
 
-exports.createCompany=function(sfezCompany, callback) {
-  getBearerToken(function(token) {
-    if (token instanceof Error) return callback(token);
-    debug('company name : '+ sfezCompany.name)
-    debug('company email : '+ sfezCompany.email)
-    debug('token : '+ token)
-    request.post({
-      url: config.moltinStoreUrl + "/flows/companies/entries",
-      json: {
-        'name': sfezCompany.name,
-        'email': sfezCompany.email
-      },
-      headers: {
-        'Authorization': 'Bearer '+ token
-      },
-      maxAttempts: 1,
-      retryDelay: 150,  // wait for 150 ms before trying again
-    },
-    function (err, res, body) {
-      if (!err && (res.statusCode === 200 || res.statusCode ===201)) {
-        debug(res.body)
-        var bodyJson = JSON.stringify(res);
-        bodyJson = JSON.parse(bodyJson).body;
-        debug(bodyJson.result)
-        return callback(bodyJson.result);
-      }
-      else {
-        console.error(err);
-        console.error(body);
-        var resError = JSON.stringify(body);
-        resError = JSON.parse(resError);
-        console.error("response.statusCode: " + res.statusCode);
-        console.error("response.statusText: " + res.statusText);
-        callback (Error(resError.errors));
-      }
-    })
-  })
-};
-exports.createDefaultCategory=function(moltincompany, callback) {
-  getBearerToken(function(token) {
-    if (token instanceof Error) return callback(token);
-    debug('company name : '+ moltincompany.name)
-    debug('company email : '+ moltincompany.email)
-    debug('token : '+ token)
-    var date = new Date().getTime()
-    debug('date '+ date)
-    var slug = moltincompany.name.replace(/\W+/g, '-').toLowerCase();
-    slug = slug + '-' + date;
-    debug('slug '+ slug)
-    request.post({
-      url: config.moltinStoreUrl + "/categories",
-      json: {
-        'slug': slug,
-        'status': 1,
-        'title': moltincompany.name + ' Menu',
-        'description': moltincompany.name + ' Menu',
-        'company': moltincompany.id
-      },
-      headers: {
-        'Authorization': 'Bearer '+ token
-      },
-      maxAttempts: 1,
-      retryDelay: 150,  // wait for 150 ms before trying again
-    },
-    function (err, res, body) {
-      if (!err && (res.statusCode === 200 || res.statusCode === 201)) {
-        debug(res.body)
-        var bodyJson = JSON.stringify(res);
-        bodyJson = JSON.parse(bodyJson).body;
-        debug(bodyJson.result)
-        return callback(bodyJson.result);
-      }
-      else {
-        console.error(err);
-        console.error(body);
-        var resError = JSON.stringify(body);
-        resError = JSON.parse(resError);
-        console.error("response.statusCode: " + res.statusCode);
-        console.error("response.statusText: " + res.statusText);
-        callback (Error(resError.errors));
-      }
-    })
-  })
+exports.createCompany=function *(sfezCompany) {
+  debug('createCompany')
+  var flow = '/flows/companies/entries'
+  var data = {
+    'name': sfezCompany.name,
+    'email': sfezCompany.email
+  }
+  debug(data)
+  try {
+    var result = yield requestEntities(flow, POST, data)
+  } catch (err) {
+    console.error(err)
+    throw(err)
+  }
+  debug(result)
+  return result
+}
+
+exports.createDefaultCategory=function(moltincompany) {
+  debug('company name : '+ moltincompany.name)
+  debug('company email : '+ moltincompany.email)
+  var date = new Date().getTime()
+  debug('date '+ date)
+  var slug = moltincompany.name.replace(/\W+/g, '-').toLowerCase();
+  slug = slug + '-' + date;
+  debug('slug '+ slug)
+  var flow = "/categories"
+  var data = {
+    'slug': slug,
+    'status': 1,
+    'title': moltincompany.name + ' Menu',
+    'description': moltincompany.name + ' Menu',
+    'company': moltincompany.id
+  }
+  return requestEntities(flow, POST, data)
 };
 
 var sendRequest = function *(url, method, data, token, retry_count) {
@@ -185,15 +138,20 @@ var sendRequest = function *(url, method, data, token, retry_count) {
     .then( function (res) {
       if (res.error) {
         if (res.error == 'Access token is not valid') {
+          debug('Access token expired')
           if (!retry_count) retry_count = 0
-          if (retry_count <= 3) {
-            try {
-              token = yield * refreshBearerToken();
-            } catch (err) {
-              console.err(err)
-              reject (err)
-            }
-            resolve (sendRequest(url, method, data, token, retryCount++))
+          debug('retry count is '+ retry_count)
+          if (retry_count < 3) {
+            debug('refreshing bearer token')
+            refreshBearerToken(function(err,token) {
+              if (err) {
+                bearerToken = ''
+                console.err(err)
+                return (err)
+              } else {
+                return sendRequest(url, method, data, token, retryCount++)
+              }
+            })
           }
         }
         console.error("sendRequest: statusCode: " + res.statusCode);
@@ -211,7 +169,6 @@ var sendRequest = function *(url, method, data, token, retry_count) {
         if (method == DELETE) result = JSON.parse(res.body)
         resolve (result)
         return;
-
       }
     })
     .catch( function (err) {

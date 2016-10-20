@@ -5,7 +5,7 @@ var sts = require('./security.server.controller'),
     Company = require('../models/company.server.model'),
     Customer = require('../models/customer.server.model'),
     Admin = require('../models/admin.server.model'),
-    debug = require('debug')('authentication');
+    debug = require('debug')('auth');
 
 var _ = require('lodash');
 
@@ -86,72 +86,68 @@ exports.renderRegister = function*(next) {
   }
 };
 
-var createMoltinCompany = function(company, callback) {
-  debug('create Moltin company: entry');
-  msc.createCompany(company, function(comp) {
-    if (comp instanceof Error) {
-      console.error(comp);
-      return callback(comp);
-    }
-
-    debug('create Moltin company: leaving');
-    return callback(null, comp);
-  });
+var createMoltinCompany = function *(company) {
+  debug('createMoltinCompany');
+  try {
+    var results = yield msc.createCompany(company)
+  } catch (err) {
+    console.error(err);
+    throw (err);
+  }
+  debug('createMoltinCompany: moltin company created');
+  return results
 };
 
-var createMoltinDefaultCategory = function(company, callback) {
-  msc.createDefaultCategory(company, function(category) {
-    if (category instanceof Error) {
-      console.error(category);
-      return callback(category);
-    }
-
-    return callback(null, category);
-  });
+var createMoltinDefaultCategory = function *(company) {
+  debug('createMoltinDefaultCategory');
+  try {
+    var results = yield msc.createDefaultCategory(company)
+  } catch (err) {
+    console.error(err);
+    throw (err);
+  }
+  return results;
 };
 
-var createCompany = function(company_name, email, userId) {
-  return new Promise(function(resolve, reject) {
-    debug('create company: userId is ');
-    debug(userId);
-    var company = {
-      name: company_name,
-      email: email,
-      userId: userId,
-    };
-    createMoltinCompany(company, function(err, moltinCompany) {
-      if (err) {
-        console.error('createCompany: error during Moltin company creation');
-        console.error(err);
-        reject(err);
-        return;
-      }
+var createCompany = function *(company_name, email, userId) {
+  debug('createCompany');
+  debug('user id is '+ userId);
+  var company = {
+    name: company_name,
+    email: email,
+    userId: userId,
+  };
+  try {
+    var moltinCompany = yield createMoltinCompany(company)
+  } catch (err) {
+    console.error('createCompany: error during Moltin company creation');
+    console.error(err);
+    throw (err);
+    return;
+  }
+  debug('moltin company successfully created : ' + moltinCompany.id);
+  company.orderSysId = moltinCompany.id;
+  try {
+    var moltinCat = yield createMoltinDefaultCategory(moltinCompany)
+  } catch (err) {
+    console.error('createCompany: error during Moltin default category creation');
+    console.error(err);
+    // TODO: Either delete Moltin company and SFEZ user, or queue for category creation
+    throw (err);
+  }
 
-      debug('moltin company successfully created : ' + moltinCompany.id);
-      company.orderSysId = moltinCompany.id;
-      createMoltinDefaultCategory(moltinCompany, function(err, moltinCat) {
-        if (err) {
-          console.error('createCompany: error during Moltin default category creation');
-          console.error(err);
-          reject(err);
-        }
+  debug('moltin category successfully created : ' + moltinCat.id);
+  try {
+    var sfezCompany = yield Company.createCompany(company_name, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug)
+  } catch (err) {
+    console.error('createCompany: error creating company');
+    console.error(err);
 
-        debug('moltin category successfully created : ' + moltinCat.id);
-        Company.createCompany(company_name, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug,
-                              function(err, company) {
-                                debug('returned from db insert')
-                                if (err) {
-                                  console.error('createCompany: error creating company');
-                                  console.error(err);
-                                  reject(err);
-                                } else {
-                                  debug(company)
-                                  resolve(company);
-                                }
-                              });
-      });
-    });
-  });
+    // TODO: add compensating transactions
+    throw (err);
+  }
+  debug(sfezCompany)
+  return sfezCompany;
 };
 
 exports.register = function*(next) {
@@ -252,6 +248,14 @@ exports.register = function*(next) {
       } catch (err) {
         console.error('register: error creating company');
         console.error(err)
+        // clean up user
+        debug('deleting user '+ userObject.id)
+        try {
+          var del = yield User.deleteUser(userObject.id)
+        } catch (delErr) {
+          console.err('register: error cleaning up user')
+          throw delErr
+        }
         throw err;
       }
 
@@ -282,7 +286,7 @@ exports.register = function*(next) {
     }
 
     debug('register: completed. Authenticating user...')
-    var userInfo = setUserInfo(user);
+    var userInfo = setUserInfo(userObject);
     this.status = 201;
     this.body = {
       token: 'JWT ' + sts.generateToken(userInfo),
