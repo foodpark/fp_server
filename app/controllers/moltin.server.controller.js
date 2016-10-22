@@ -122,8 +122,15 @@ exports.createDefaultCategory=function(moltincompany) {
   return requestEntities(flow, POST, data)
 };
 
-var sendRequest = function *(url, method, data, token, retry_count) {
+var sendRequest = function *(url, method, data) {
   debug('sendRequest')
+  try {
+    var token = yield getBearerToken()
+    debug('...token '+ token)
+  } catch (err) {
+    console.error(err)
+    throw (err)
+  }
   return new Promise(function(resolve, reject) {
     request({
       method: method,
@@ -136,40 +143,21 @@ var sendRequest = function *(url, method, data, token, retry_count) {
       retryDelay: 150,  // wait for 150 ms before trying again
     })
     .then( function (res) {
-      if (res.error) {
-        if (res.error == 'Access token is not valid') {
-          debug('Access token expired')
-          if (!retry_count) retry_count = 0
-          debug('retry count is '+ retry_count)
-          if (retry_count < 3) {
-            debug('refreshing bearer token')
-            refreshBearerToken(function(err,token) {
-              if (err) {
-                bearerToken = ''
-                console.err(err)
-                return (err)
-              } else {
-                return sendRequest(url, method, data, token, retryCount++)
-              }
-            })
-          }
-        }
-        console.error("sendRequest: statusCode: " + res.statusCode);
-        console.error("sendRequest: error: " + res.error);
-        reject (res.error)
-      } else {
-        if (res.body.status == false && res.body.errors) {
-          reject(res.body.errors)
-          return;
-        }
-        debug('sendRequest: parsing...')
-        var result = res.body.result
-        debug(result)
-        if (method == GET) result = JSON.parse(res.body).result
-        if (method == DELETE) result = JSON.parse(res.body)
-        resolve (result)
-        return;
+      debug('status code '+ res.statusCode)
+      debug('sendRequest: parsing...')
+      debug(res.body)
+      if (res.statusCode == 401 ) { // Unauthorized
+        debug('...Access token expired')
+        debug('...clear bearer token and throw error')
+        bearerToken = '';
+        reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
+      var result = res.body.result
+      if (method == GET) result = JSON.parse(res.body).result
+      if (method == DELETE) result = JSON.parse(res.body)
+      resolve (result)
+      return;
+
     })
     .catch( function (err) {
       console.error("...statusCode: " + err.statusCode);
@@ -181,13 +169,6 @@ var sendRequest = function *(url, method, data, token, retry_count) {
 
 var requestEntities = function *(flow, method, data, id, params) {
   debug('requestEntities')
-  try {
-    var token = yield getBearerToken()
-    debug('...token '+ token)
-  } catch (err) {
-    console.error(err)
-    throw (err)
-  }
   debug('... id is '+ id)
   var oid = '';
   if (id) oid = '/'+id
@@ -196,11 +177,22 @@ var requestEntities = function *(flow, method, data, id, params) {
   var url = config.moltinStoreUrl + flow + oid + urlParams
   debug('...url : '+ url)
   try {
-    var result = yield sendRequest(url, method, data, token)
+    var result = yield sendRequest(url, method, data)
   } catch (err) {
     console.error(err)
-    throw(err)
+    if (err.statusCode == 401) {
+      // try again with fresh bearerToken
+      try {
+        result = yield sendRequest(url, method, data)
+      } catch (err) {
+        console.error(err)
+        throw(err)
+      }
+    } else {
+        throw(err)
+      }
   }
+  debug('requestEntities: ...returning')
   debug(result)
   return result
 }

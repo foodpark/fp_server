@@ -128,7 +128,7 @@ CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
     order_sys_id text,
     description text,
-    device_id integer,
+    device_id text,
     fcm_id text,
     facebook text,
     twitter text,
@@ -154,6 +154,7 @@ CREATE TABLE units (
     password text,
     qr_code text,
     fcm_id text,
+    device_id text,
     unit_order_sys_id integer,
     territory_id integer REFERENCES territories(id),
     company_id integer REFERENCES companies(id),
@@ -212,7 +213,7 @@ CREATE TABLE favorites (
 
 CREATE TABLE order_history (
   id SERIAL PRIMARY KEY,
-  order_sys_order_id integer,
+  order_sys_order_id text,
   amount money,
   initiation_time timestamp,
   payment_time timestamp,
@@ -234,7 +235,7 @@ CREATE TABLE order_history (
 
 CREATE TABLE loyalty (
   id SERIAL PRIMARY KEY,
-  amount integer,
+  amount money,
   customer_id integer REFERENCES customers(id),
   company_id integer REFERENCES companies(id),
   created_at timestamp without time zone DEFAULT now(),
