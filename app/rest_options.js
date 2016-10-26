@@ -162,39 +162,47 @@ module.exports = {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
         }
+        console.log("...authorized")
       } else if (operation == 'update' || operation == 'delete') {
         if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update Unauthorized - Owners/Admin only',401);
           } else {
-            // verify user is modifying the correct company
-            var coId = this.params.id
-            if (this.params.table != 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
-              coId = m[1]
+            if (this.passport.user.role == 'OWNER') {
+              // verify user is modifying the correct company
+              var coId = this.params.id
+              if (this.params.table != 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
+                coId = m[1]
+              }
+              console.log('verifying owner')
+              var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
+              console.log(valid)
+              if (!valid) {
+                this.throw('Update Unauthorized - incorrect Owner',401);
+              } // else continue
+              console.log(valid)
             }
-            console.log('verifying owner')
-            var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
-            console.log(valid)
-            if (!valid) {
-              this.throw('Update Unauthorized - incorrect Owner',401);
-            } // else continue
+            console.log("...authorized")
           }
         } else if (this.params.table == 'customers' ||  this.params.table == 'favorites' || this.params.table == 'reviews') {
-          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update Unauthorized - Customers only',401);
           } else {
-            // verify user is modifying the correct review
-            var custId = this.params.id
-            if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
-              custId = m[1]
+            if (this.passport.user.role == 'CUSTOMER') {
+              // verify user is modifying the correct review
+              var custId = this.params.id
+              if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
+                custId = m[1]
+              }
+              console.log('verifying customer')
+              var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
+              console.log(valid)
+              if (!valid) {
+                this.throw('Update Unauthorized - User may not update this customer',401);
+              } // else continue
+              console.log(valid)
             }
-            console.log('verifying customer')
-            var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
-            console.log(valid)
-            if (!valid) {
-              this.throw('Update Unauthorized - User may not update this customer',401);
-            } // else continue
-            console.log(valid)
+            console.log("...authorized")
           }
         }
 

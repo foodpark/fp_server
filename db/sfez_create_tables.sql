@@ -101,9 +101,9 @@ CREATE TABLE admins (
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY,
     name text NOT NULL UNIQUE,
-    order_sys_id text NOT NULL,
-    base_slug text NOT NULL,
-    default_cat text NOT NULL,
+    order_sys_id text,
+    base_slug text,
+    default_cat text,
     description text,
     email text,
     phone text,
@@ -225,7 +225,7 @@ CREATE TABLE order_history (
   status text, -- json
   messages text, -- json
   qr_code text,
-  manual_pickup boolean,
+  manual_pickup boolean DEFAULT false,
   order_sys_order_detail json,
   checkin_id integer REFERENCES checkins(id),
   customer_id integer REFERENCES customers(id),

@@ -22,8 +22,12 @@ COPY users (id, first_name, last_name, username, password, role, provider, provi
 11008	\N	\N	mptruck64	5db0aeb457f45ddb90c35b39569c1348	UNITMGR	local	local	{}	2016-08-30 21:12:08.717913
 11009	\N	\N	mptruck64five	dda2549944250c6c038797b463e7de99	UNITMGR	local	local	{}	2016-08-30 21:22:22.983667
 11010	\N	\N	trucker1	2c914a017cf7354e6c6319afe0b664b2	UNITMGR	local	local	{}	2016-09-06 23:57:26.291924
+11011	Dennis	Nichols	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	ADMIN	local	local	{}	2016-10-20 23:33:15.004572
+11012	Luiz	Cobello	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	ADMIN	local	local	{}	2016-10-22 18:42:04.179585
+11013	Marcos	Hirano	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	ADMIN	local	local	{}	2016-10-22 18:41:25.721489
 \.
-SELECT pg_catalog.setval('users_id_seq', 11011, true);
+SELECT pg_catalog.setval('users_id_seq', 11014, true);
+
 
 COPY territories (id, territory, city, state, country, timezone, latitude, longitude, created_at) FROM stdin;
 1	 Natal-RN	Natal	RN	Brazil	Buenos Aires	-5.777182	-35.200323	2016-09-06 23:00:00.000000
@@ -32,6 +36,13 @@ COPY territories (id, territory, city, state, country, timezone, latitude, longi
 4	 Austin-TX	Austin	TX	USA	Central Time (US & Canada)	30.264317	-97.738228	2016-09-06 23:00:00.000000
 \.
 SELECT pg_catalog.setval('territories_id_seq', 5, true);
+
+COPY admins (id, description, photo, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
+1	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
+2	\N	\N	f	\N	\N	\N	11012	2016-10-22 18:42:04.186193	2016-10-22 18:42:04.186193
+3	\N	\N	f	\N	\N	\N	11013	2016-10-22 18:41:25.893483	2016-10-22 18:41:25.893483
+\.
+SELECT pg_catalog.setval('admins_id_seq', 4, true);
 
 COPY companies (id, name, order_sys_id, base_slug, default_cat, description, email, facebook, twitter, photo, featured_dish, hours, schedule, city, state, country, taxband, user_id, created_at) FROM stdin;
 1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	Fresh street food tacos	tacos@pacos.com	www.facebook.com/pacostacos	@pacostacos	\N	\N	11am-8pm	M-F	\N	\N	\N	\N	11004	2016-08-26 21:31:52.102331
@@ -54,7 +65,6 @@ COPY units (id, name, number, type, description, username, password, qr_code, un
 2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010	15
 \.
 SELECT pg_catalog.setval('units_id_seq', 2005, true);
-
 
 COPY reviews (id, comment, rating, answers, customer_id, company_id, unit_id, status, created_at) FROM stdin;
 4	Very clean and the customer service is excellent.	4.8	{"answer": 4, "question": "Food good?"}	9002	1003	2004	\N	2016-09-07 19:33:13.598095
