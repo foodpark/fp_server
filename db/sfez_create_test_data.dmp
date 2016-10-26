@@ -8,8 +8,18 @@ COPY food_parks (id, name, city, state, postal_code, country, latitude, longitud
 3006	Natal Shopping Food Park - Av. das Brancas Dunas	Natal	RN	\N	BR	-5.842563	-35.210624	2016-08-21 23:12:10.112015
 3007	Bar 54 Food Park - Rua Porto Mirim	Natal	RN	\N	BR	-5.874674	-35.183514	2016-08-29 20:54:42.540882
 3008	Bar Trove Food Park - Rua Presidente José Bento	Natal	RN	\N	BR	-5.805748	-35.214705	2016-08-30 21:12:08.717913
+3009	Food By Food West	Austin	TX	78723	US	30.298	-97.707	2016-08-21 23:31:43.131352
+3010	Growler Food Park	Pflugerville	TX	78660	US	30.449	-97.607	2016-08-21 23:01:03.622149
+3011	Food Park at La Frontera	Round Rock	TX	78681	US	30.481	-97.677	2016-08-21 23:01:50.563872
+3012	Las Palmas Food Bazaar	Miami	FL	33136	US	25.792	-80.196	2016-08-21 23:03:07.177813
+3013	Tropical Food Court	Fort Lauderdale	FL	33304	US	26.136	-80.137	2016-08-21 23:05:04.914807
+3014	Snappy Food Park	Coral Gables	FL	33146	US	25.729	-80.261	2016-08-21 23:12:10.112015
+3015	LoDo TrPk	Denver	CO	80202	US	39.751	-105.000	2016-08-29 20:54:42.540882
+3016	Del Mar	Aurora	CO	80042	US	39.728	-104.844	2016-08-30 21:12:08.717913
+3017	Foothills Food Court	Lakewood	CO	80226	US	39.711	-105.084	2016-08-30 21:12:08.717913
 \.
-SELECT pg_catalog.setval('food_parks_id_seq', 3009, true);
+SELECT pg_catalog.setval('food_parks_id_seq', 30018, true);
+
 
 COPY users (id, first_name, last_name, username, password, role, provider, provider_id, provider_data, created_at) FROM stdin;
 11001	Stacy	Tran	mp12	5a4636076012403dd394fa20f49fcd9c	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352
@@ -34,8 +44,17 @@ COPY territories (id, territory, city, state, country, timezone, latitude, longi
 2	 Sao Paolo-SP	Sao Paolo	RN	Brazil	Brasilia	-23.55	-46.633333	2016-09-06 23:00:00.000000
 3	 Pipa-RN	Pipa	RN	Brazil	Buenos Aires	-6.228994	-35.048776	2016-09-06 23:00:00.000000
 4	 Austin-TX	Austin	TX	USA	Central Time (US & Canada)	30.264317	-97.738228	2016-09-06 23:00:00.000000
+5	 Pflugerville-TX	Pflugerville	TX	USA	Central Time (US & Canada)	30.440	-97.620	2016-09-06 23:00:00.000000
+6	 Round Rock-TX	Round Rock	TX	USA	Central Time (US & Canada)	30.508	-97.678	2016-09-06 23:00:00.000000
+7	 Fort Lauderdale-TX	Fort Lauderdale	FL	USA	Eastern Time (US & Canada)	26.122	-80.137	2016-09-06 23:00:00.000000
+8	 Miami-FL	Miami	FL	USA	Eastern Time (US & Canada)	25.762	-80.190	2016-09-06 23:00:00.000000
+9	 Coral Gables-FL	Coral Gables	FL	USA	Eastern Time (US & Canada)	25.722	-80.269	2016-09-06 23:00:00.000000
+10	 Denver-CO	Denver	CO	USA	Mountain Time (US & Canada)	39.746	-104.992	2016-09-06 23:00:00.000000
+11	 Aurora-CO	Aurora	CO	USA	Mountain Time (US & Canada)	39.725	-104.847	2016-09-06 23:00:00.000000
+12	 Lakewood-CO	Lakewood	CO	USA	Mountain Time (US & Canada)	39.711	-105.081	2016-09-06 23:00:00.000000
 \.
-SELECT pg_catalog.setval('territories_id_seq', 5, true);
+SELECT pg_catalog.setval('territories_id_seq', 13, true);
+
 
 COPY admins (id, description, photo, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
 1	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
