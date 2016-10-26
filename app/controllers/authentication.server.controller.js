@@ -42,6 +42,8 @@ var setUserInfo = function (user) {
     username: user.username,
     role: user.role
   }
+  debug(user)
+  if (user.company_id) info.company_id = user.company_id
   debug(info)
   return info
 };
@@ -244,7 +246,7 @@ exports.register = function*(next) {
       debug('register: creating company');
 
       try {
-        var company  = yield createCompany(company_name, email, userObject.id);
+        var company  = (yield createCompany(company_name, email, userObject.id))[0];
       } catch (err) {
         console.error('register: error creating company');
         console.error(err)
@@ -258,6 +260,10 @@ exports.register = function*(next) {
         }
         throw err;
       }
+      debug(company)
+      debug('...company created with id '+ company.id)
+      userObject.company_id = company.id
+      debug(userObject)
 
     } else if (role == 'CUSTOMER') {
       debug('register: creating customer');
