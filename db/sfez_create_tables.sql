@@ -118,7 +118,7 @@ CREATE TABLE companies (
     state text,
     country text,
     taxband text,
-    tags json,
+    tags text,
     stub boolean,
     user_id integer REFERENCES users(id),
     created_at timestamp without time zone DEFAULT now(),
