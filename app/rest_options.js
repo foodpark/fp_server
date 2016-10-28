@@ -4,7 +4,8 @@ var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var User = require('./models/user.server.model');
-var Unit = require('./models/unit.server.model')
+var Unit = require('./models/unit.server.model');
+var debug = require('debug')('rest_options');
 
 function *beforeSaveReview() {
   console.log('beforeSaveReview: user is ')
@@ -107,6 +108,11 @@ function *beforeSaveUnit() {
       }
     }
   }
+}
+
+function *beforeSaveCompanies() {
+  debug('beforeSaveCompanies')
+  debug(this.resteasy.object)
 }
 
 function *beforeSaveLoyaltyRewards() {
@@ -215,12 +221,17 @@ module.exports = {
     },
 
     beforeSave: function *() {
+      debug('this.resteasy.table')
       if (this.resteasy.table == 'reviews') {
         yield beforeSaveReview.call(this);
       } else if (this.resteasy.table == 'units') {
         yield beforeSaveUnit.call(this);
       } else if (this.resteasy.table == 'loyalty_rewards') {
+        debug('saving loyalty rewards')
         yield beforeSaveLoyaltyRewards.call(this);
+      } else if (this.resteasy.table == 'companies') {
+        debug('saving companies')
+        yield beforeSaveCompanies.call(this);
       }
     },
 

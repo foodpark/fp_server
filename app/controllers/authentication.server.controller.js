@@ -53,6 +53,16 @@ exports.login = function *(next) {
   debug(this.passport.user)
   debug('calling')
   userInfo = setUserInfo(this.passport.user)
+  if (this.passport.user.role == 'OWNER') {
+    try {
+      var company = (yield Company.companyForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.company_id = company.id
+  }
   debug('done')
   debug('userInfo: '+ userInfo)
   this.status = 200;
