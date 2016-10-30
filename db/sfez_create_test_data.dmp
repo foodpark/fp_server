@@ -85,6 +85,16 @@ COPY units (id, name, number, type, description, username, password, qr_code, un
 \.
 SELECT pg_catalog.setval('units_id_seq', 2005, true);
 
+COPY checkins (id, check_in, check_out, latitude, longitude, display_address, food_park_name, note, food_park_id, unit_id, company_id, created_at, updated_at) FROM stdin;
+1	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.81163600000000002	-35.2090430000000012	\N	\N	\N	\N	2003	1003	2016-10-28 01:09:25.425267	2016-10-28 01:09:25.425267
+2	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.76750499999999988	-35.199499000000003	\N	\N	\N	\N	2004	1003	2016-10-28 01:09:28.154896	2016-10-28 01:09:28.154896
+3	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.78073999999999977	-35.2068099999999973	\N	\N	\N	\N	2002	1002	2016-10-28 01:09:30.953065	2016-10-28 01:09:30.953065
+4	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.7795399999999999	-35.1927609999999973	\N	\N	\N	\N	2001	1002	2016-10-28 01:09:33.199263	2016-10-28 01:09:33.199263
+5	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.78810399999999969	-35.1892759999999996	\N	\N	\N	\N	2003	1001	2016-10-28 01:09:36.319803	2016-10-28 01:09:36.319803
+\.
+SELECT pg_catalog.setval('checkins_id_seq', 6, true);
+
+
 COPY reviews (id, comment, rating, answers, customer_id, company_id, unit_id, status, created_at) FROM stdin;
 4	Very clean and the customer service is excellent.	4.8	{"answer": 4, "question": "Food good?"}	9002	1003	2004	\N	2016-09-07 19:33:13.598095
 5	Broad selection of quality food and creative menu.	4.9	{"answer": 4, "question": "Food good?"}	9003	1002	2001	\N	2016-09-07 19:36:06.711809
