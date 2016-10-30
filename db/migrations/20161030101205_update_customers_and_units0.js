@@ -6,6 +6,9 @@ exports.up = function(knex, Promise) {
       }),
         knex.schema.table("units", function (t) {
         t.text('phone');
+      }),
+        knex.schema.table("admins", function (t) {
+        t.text('phone');
       })
     ]);
 };
@@ -16,6 +19,9 @@ exports.down = function(knex, Promise) {
       t.dropColumn('phone');
     }),
     knex.schema.table("units", function (t) {
+      t.dropColumn('phone');
+    }),
+    knex.schema.table("admins", function (t) {
       t.dropColumn('phone');
     })
   ]);
