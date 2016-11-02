@@ -10,9 +10,11 @@ const POST = 'POST';
 const PUT = 'PUT';
 
 const CATEGORIES = '/categories';
+const IMAGES = '/images';
 const MENU_ITEMS = '/products';
 const OPTION_CATEGORIES = '/modifiers';
 const OPTION_ITEMS = '/variations';
+const ORDERS = '/orders';
 
 var bearerToken='';
 
@@ -358,6 +360,20 @@ exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
   debug('deleteOptionCategory')
   return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
 };
+
+exports.uploadImage = function(req) {
+  debug('uploadImage')
+}
+
+exports.deleteImage = function(imageId) {
+  debug('deleteImage')
+  return requestEntities(IMAGES, DELETE, '', imageId)
+}
+
+exports.getOrderDetail=function(orderSysOrderId) {
+  debug('getOrderDetail')
+  return requestEntities(ORDERS, GET, '', orderSysOrderId)
+}
 
 exports.getOrderById=function(url) {
   debug('getOrderById')

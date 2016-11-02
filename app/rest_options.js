@@ -3,20 +3,49 @@ var Queries = require('koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
+var msc = require('./controllers/moltin.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 
+
+function *beforeSaveOrderHistory() {
+  debug('beforeSaveOrderHistory')
+  debug(this.resteasy.object)
+  if (this.resteasy.operation == 'create') {
+    debug('...create')
+    if (this.resteasy.object.order_sys_order_id) {
+      var moltin_order_id = this.resteasy.object.order_sys_order_id
+      debug('order sys order id: '+ moltin_order_id)
+      try {
+        var order_details = yield msc.getOrderDetail(moltin_order_id)
+      } catch (err) {
+        console.error(err)
+        throw(err)
+      }
+      debug('order details ')
+      debug(order_details)
+      this.resteasy.object.order_sys_order_detail = order_details
+      this.resteasy.object.status = 'order_requested'
+    } else {  // order_sys_order_id is required
+      console.error('No order id for the ordering system')
+      throw new Error('order_sys_order_id is required');
+      return;
+    }
+  } else if (this.resteasy.operation == 'update') {
+    debug('...update')
+  }
+}
+
 function *beforeSaveReview() {
-  console.log('beforeSaveReview: user is ')
-  console.log(this.params.user)
+  debug('beforeSaveReview: user is ')
+  debug(this.params.user)
   var answers = this.resteasy.object.answers;
   if (answers && answers.length) {
     var total = 0.0;
     for (var i = 0; i < answers.length; i++) {
       total += answers[i].answer;
     }
-
     this.resteasy.object.rating = total / answers.length;
   }
 }
@@ -232,6 +261,9 @@ module.exports = {
       } else if (this.resteasy.table == 'companies') {
         debug('saving companies')
         yield beforeSaveCompanies.call(this);
+      } else if (this.resteasy.table == 'order_history') {
+        debug('saving order_history')
+        yield beforeSaveOrderHistory.call(this);
       }
     },
 
