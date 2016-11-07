@@ -3,11 +3,17 @@ var Queries = require('koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
+var OrderHistory = require('./models/orderhistory.server.model');
 var msc = require('./controllers/moltin.server.controller');
+var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 
+
+function timestamp() {
+  return new Date(Date.now()).toLocaleString()
+}
 
 function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory')
@@ -26,7 +32,10 @@ function *beforeSaveOrderHistory() {
       debug('order details ')
       debug(order_details)
       this.resteasy.object.order_sys_order_detail = order_details
-      this.resteasy.object.status = 'order_requested'
+      // Set the initial state
+      this.resteasy.object.status = {
+        order_requested : ''
+      }
     } else {  // order_sys_order_id is required
       console.error('No order id for the ordering system')
       throw new Error('order_sys_order_id is required');
@@ -34,6 +43,150 @@ function *beforeSaveOrderHistory() {
     }
   } else if (this.resteasy.operation == 'update') {
     debug('...update')
+    if (this.resteasy.object.status) {
+      try {
+        var savedStatus = (yield OrderHistory.getStatus(this.params.id))[0]
+      } catch (err) {
+        console.error(err)
+        throw(err)
+      }
+      var newStat = this.resteasy.object.status
+      debug (savedStatus)
+      debug('new status '+ newStat)
+      if (!savedStatus.status[newStat]) {
+        // add subsequent state
+        savedStatus.status[newStat] = ''
+      } // else previously set
+      debug(savedStatus)
+      this.resteasy.object.status = savedStatus.status
+    }
+  }
+}
+
+function *afterCreateOrderHistory(orderHistory) {
+  debug('afterCreateOrderHistory')
+
+  try {
+    unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
+  } catch (err) {
+    console.error('afterCreateOrderHistory: error retrieving unit');
+    throw err;
+  }
+  debug(unit)
+  var title = "Order Requested!"
+  var status = "order_requested"
+
+  if (!unit.device_id) {
+    console.error('afterCreateOrderHistory: No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+    throw new Error ('No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+  }
+  debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
+  push.notifyVendorOrderRequested(unit.device_id, orderHistory.id, title, status)
+  var hash = {
+    status : {
+      order_requested: timestamp()
+    }
+  }
+  this.resteasy.queries.push(
+    this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
+  );
+}
+
+function *afterUpdateOrderHistory(orderHistory) {
+  debug('afterUpdateOrderHistory')
+  /*
+  order_declined	Order Rejected	Vendor	Consumer
+  order_accepted	Order Accepted	Vendor	Consumer
+  order_paid	Order Paid	Consumer	Vendor
+  pay_fail	Payment Failed	Consumer	Vendor
+  order_in_queue	In Queue	Vendor	Consumer
+  order_cooking	Cooking	Vendor	Consumer
+  order_ready	Ready	Vendor	Consumer
+  order_picked_up	Picked Up	Vendor	Consumer
+  no_show	No Show	Vendor	Consumer
+  */
+  var device_id = ''
+  var title = ''
+  var orderHistoryStatus = orderHistory.status
+  debug(orderHistoryStatus)
+  var keys = Object.keys(orderHistoryStatus)
+  debug("...number of entries= "+ keys.length)
+  var updated = false
+  for (var i = 0; i < keys.length; i++) {
+    debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
+    if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
+      var status = keys[i]
+      debug('...status '+ status)
+      if (status == 'order_paid' || status == 'pay_fail') {
+        debug('...status update from customer. Notify unit')
+        // get unit device id
+        try {
+          var unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
+        } catch (err) {
+          console.error('afterUpdateOrderHistory: error retrieving unit '+ orderHistory.unit_id);
+          throw err;
+        }
+        device_id = unit.device_id
+      } else {
+        debug('...status update from unit. Notify customer')
+        // get customer devide id
+        try {
+          var customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
+        } catch (err) {
+          console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
+          throw err;
+        }
+        device_id = customer.device_id
+      }
+      if (!device_id){
+        console.error('afterUpdateOrderHistory: No device id!!')
+        throw new Error ('No device id!! Cannot notify')
+      }
+      switch(status) {
+          // From Consumer
+          case 'order_paid':
+              title = "Order Paid"
+              break;
+          case 'pay_fail':
+              title = "Payment Failed"
+              break;
+          // From Vendor
+          case 'order_declined':
+              title = "Order Declined"
+              break;
+          case 'order_accepted':
+              title = "Order Accepted"
+              break;
+          case 'order_in_queue':
+              title = "Order In Queue"
+              break;
+          case 'order_cooking':
+              title = "Order Cooking"
+              break;
+          case 'order_ready':
+              title = "Order Ready"
+              break;
+          case 'order_picked_up':
+              title = "Order Picked Up"
+              break;
+          case 'no_show':
+              title = "No Show"
+              break;
+          default:
+              throw new Error ('Unkown status '+ status +' for order '+ orderHistory.id)
+      }
+      debug('sending notification to device '+ device_id )
+      push.notifyVendorOrderRequested(device_id, orderHistory.id, title, status)
+      orderHistoryStatus[keys[i]] = timestamp()
+      debug(orderHistoryStatus)
+      updated = true
+    }
+  }
+  if (updated) {
+    debug(orderHistoryStatus)
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
+    );
   }
 }
 
@@ -271,11 +424,15 @@ module.exports = {
       if (this.resteasy.operation == 'create') {
         if (this.resteasy.table == 'reviews') {
           yield afterCreateReview.call(this, res[0]);
+        } else if (this.resteasy.table == 'order_history') {
+          yield afterCreateOrderHistory.call(this, res[0]);
         }
       } else if (this.resteasy.operation == 'update') {
         if (this.resteasy.table == 'review_approvals') {
           yield afterUpdateReviewApproval.call(this, res[0]);
-        }
+        } else if (this.resteasy.table == 'order_history') {
+            yield afterUpdateOrderHistory.call(this, res[0]);
+          }
       }
     },
   },

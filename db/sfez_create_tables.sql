@@ -225,7 +225,7 @@ CREATE TABLE order_history (
   actual_pickup_time timestamp,
   desired_pickup_time timestamp,
   prep_notice_time timestamp,
-  status text, -- json
+  status jsonb, -- json
   messages text, -- json
   qr_code text,
   manual_pickup boolean DEFAULT false,

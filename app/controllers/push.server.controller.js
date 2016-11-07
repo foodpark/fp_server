@@ -9,6 +9,9 @@ const ORDER = '/orders';
 const ORDER_CREATED = 'ORDER_CREATED';
 const ORDER_ACCEPTED_STATUS = 'ORDER_ACCEPTED_STATUS';
 
+
+const ORDER_REQUESTED = 'order_requested';
+
 var getMessage = function(deviceId){
 	return {
 		to:deviceId
@@ -33,7 +36,7 @@ var sendPushNotification = function(message){
 		var sender = new FCM.Sender(config.googleApiKey);
 		sender.send(message, function (err, response) {
 			if (err) {
-				console.log("Something has gone wrong!");
+				console.error("Something has gone wrong!");
 			} else {
 				console.log("Successfully sent with response: ", response);
 			}
@@ -69,6 +72,23 @@ exports.sendPush = function*(next){
 	this.body = {};
 }
 
+var setMessage = function(orderId, title, status) {
+	var note = {
+		"notification" : {
+			"body" : "Order "+ orderId +" requested at "+ Date.now(),
+			"title" : title
+		},
+		"data" : {
+			"status" : status
+		}
+	}
+}
+
+var notifyVendorOrderRequested = function(deviceId, orderId, title, status){
+	var msg = setMessage(orderId, title, status)
+	msg.to = deviceId
+	sendPushNotification(message);
+}
 
 var informVendorOrderCreated = function(deviceId, order){
 	var message = getMessage(deviceId);

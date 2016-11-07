@@ -20,8 +20,6 @@ exports.getSingleUnit = function(id) {
   return knex('units').select().where('id', id)
 };
 
-
-
 exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtime, callback) {
   var earth = 6371;  // earth radius in km
   var lat1 = latitude + 180/Math.PI * (distance/earth);
