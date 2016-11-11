@@ -132,6 +132,7 @@ CREATE TABLE customers (
     order_sys_id text,
     description text,
     device_id text,
+    device_type text,
     fcm_id text,
     phone text,
     facebook text,
@@ -160,6 +161,7 @@ CREATE TABLE units (
     phone text,
     fcm_id text,
     device_id text,
+    device_type text,
     unit_order_sys_id text,
     territory_id integer REFERENCES territories(id),
     company_id integer REFERENCES companies(id),
@@ -225,11 +227,11 @@ CREATE TABLE order_history (
   actual_pickup_time timestamp,
   desired_pickup_time timestamp,
   prep_notice_time timestamp,
-  status json, -- json
+  status json,
   messages text, -- json
   qr_code text,
   manual_pickup boolean DEFAULT false,
-  order_sys_order_detail json,
+  order_detail json, -- json
   checkin_id integer REFERENCES checkins(id),
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),

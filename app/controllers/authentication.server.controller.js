@@ -44,6 +44,8 @@ var setUserInfo = function (user) {
   }
   debug(user)
   if (user.company_id) info.company_id = user.company_id
+  else if (user.customer_id) info.customer_id = user.customer_id
+  else if (user.admin_id) info.admin_id = user.admin_id
   debug(info)
   return info
 };
@@ -62,6 +64,24 @@ exports.login = function *(next) {
       throw err;
     }
     userInfo.company_id = company.id
+  } else if (this.passport.user.role == 'CUSTOMER') {
+    try {
+      var customer = (yield Customer.getForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.customer_id = customer.id
+  } else if (this.passport.user.role == 'ADMIN') {
+    try {
+      var admin = (yield Admin.getForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.admin_id = admin.id
   }
   debug('done')
   debug('userInfo: '+ userInfo)
@@ -279,23 +299,26 @@ exports.register = function*(next) {
       debug('register: creating customer');
 
       try {
-        var customerId = yield Customer.createCustomer(userObject.id);
+        var customer = yield Customer.createCustomer(userObject.id);
       } catch (err) {
         console.error('register: error creating customer');
         console.error(err)
         throw err;
       }
+      userObject.customer_id = customer.id
 
     } else if (role == 'ADMIN') {
       debug('register: creating admin');
 
       try {
-        var adminId = yield Admin.createAdmin(userObject.id);
+        var admin = yield Admin.createAdmin(userObject.id);
       } catch (err) {
         console.error('register: error creating admin');
         console.error(err)
         throw err;
       }
+      userObject.admin_id = admin.id
+
     } else {
       console.error('register: unknown role '+ role)
       throw new Error('unknown role '+ role)

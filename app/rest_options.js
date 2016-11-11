@@ -331,6 +331,34 @@ function *afterUpdateReviewApproval(approval) {
   );
 }
 
+function *afterReadOrderHistory(orderHistory) {
+  debug('afterReadOrderHistory')
+  if (orderHistory.order_sys_order_id && !orderHistory.order_detail) {
+    try {
+      var moltin_order_items = yield msc.getOrderDetail(orderHistory.order_sys_order_id)
+    } catch (err) {
+      console.error(err)
+      throw(err)
+    }
+    debug('..moltin order')
+    debug(moltin_order_items)
+    moltin_order_items = JSON.stringify(moltin_order_items)
+    var order_detail = { order_detail: moltin_order_items};
+    debug(order_detail)
+    try {
+      var updatedOrder = yield OrderHistory.updateOrder(orderHistory.id, order_detail)
+    } catch (err) {
+      console.error(err)
+      throw(err)
+    }
+    debug('updatedOrder')
+    debug(updatedOrder)
+  }
+  /* this.resteasy.queries.push(
+    this.resteasy.transaction.table('order_history').where('order_history.id', order_history.id).update(order_detail)
+  );*/
+}
+
 module.exports = {
   hooks: {
     authorize: function *(operation, object) {
@@ -390,9 +418,9 @@ module.exports = {
               } // else continue
               console.log(valid)
             }
-            console.log("...authorized")
           }
         }
+        console.log("...authorized")
 
       } else if (operation == 'read') {
         console.log('got a read')
@@ -433,6 +461,10 @@ module.exports = {
         } else if (this.resteasy.table == 'order_history') {
             yield afterUpdateOrderHistory.call(this, res[0]);
           }
+      } else if (this.resteasy.operation == 'read') {
+        if (this.resteasy.table == 'order_history') {
+          yield afterReadOrderHistory.call(this, res[0]);
+        }
       }
     },
   },

@@ -1,4 +1,5 @@
 var debug = require('debug')('moltin');
+var fs = require('fs');
 var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('requestretry');
@@ -10,7 +11,7 @@ const POST = 'POST';
 const PUT = 'PUT';
 
 const CATEGORIES = '/categories';
-const IMAGES = '/images';
+const IMAGES = '/files';
 const MENU_ITEMS = '/products';
 const OPTION_CATEGORIES = '/modifiers';
 const OPTION_ITEMS = '/variations';
@@ -87,43 +88,6 @@ var getBearerToken = function *(next) {
   return bearerToken
 };
 
-exports.createCompany=function *(sfezCompany) {
-  debug('createCompany')
-  var flow = '/flows/companies/entries'
-  var data = {
-    'name': sfezCompany.name,
-    'email': sfezCompany.email
-  }
-  debug(data)
-  try {
-    var result = yield requestEntities(flow, POST, data)
-  } catch (err) {
-    console.error(err)
-    throw(err)
-  }
-  debug(result)
-  return result
-}
-
-exports.createDefaultCategory=function(moltincompany) {
-  debug('company name : '+ moltincompany.name)
-  debug('company email : '+ moltincompany.email)
-  var date = new Date().getTime()
-  debug('date '+ date)
-  var slug = moltincompany.name.replace(/\W+/g, '-').toLowerCase();
-  slug = slug + '-' + date;
-  debug('slug '+ slug)
-  var flow = "/categories"
-  var data = {
-    'slug': slug,
-    'status': 1,
-    'title': moltincompany.name + ' Menu',
-    'description': moltincompany.name + ' Menu',
-    'company': moltincompany.id
-  }
-  return requestEntities(flow, POST, data)
-};
-
 var sendRequest = function *(url, method, data) {
   debug('sendRequest')
   try {
@@ -198,6 +162,43 @@ var requestEntities = function *(flow, method, data, id, params) {
   debug(result)
   return result
 }
+
+exports.createCompany=function *(sfezCompany) {
+  debug('createCompany')
+  var flow = '/flows/companies/entries'
+  var data = {
+    'name': sfezCompany.name,
+    'email': sfezCompany.email
+  }
+  debug(data)
+  try {
+    var result = yield requestEntities(flow, POST, data)
+  } catch (err) {
+    console.error(err)
+    throw(err)
+  }
+  debug(result)
+  return result
+}
+
+exports.createDefaultCategory=function(moltincompany) {
+  debug('company name : '+ moltincompany.name)
+  debug('company email : '+ moltincompany.email)
+  var date = new Date().getTime()
+  debug('date '+ date)
+  var slug = moltincompany.name.replace(/\W+/g, '-').toLowerCase();
+  slug = slug + '-' + date;
+  debug('slug '+ slug)
+  var flow = "/categories"
+  var data = {
+    'slug': slug,
+    'status': 1,
+    'title': moltincompany.name + ' Menu',
+    'description': moltincompany.name + ' Menu',
+    'company': moltincompany.id
+  }
+  return requestEntities(flow, POST, data)
+};
 
 exports.createCategory=function (company, catTitle, catParent) {
   debug('createCategory')
@@ -361,18 +362,15 @@ exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
   return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
 };
 
-exports.uploadImage = function(req) {
-  debug('uploadImage')
-}
-
-exports.deleteImage = function(imageId) {
-  debug('deleteImage')
-  return requestEntities(IMAGES, DELETE, '', imageId)
+var orderDetailFlow = function (orderSysOrderId) {
+  debug('orderDetailFlow')
+  var flow = ORDERS + '/' + orderSysOrderId + '/items'
+  return flow
 }
 
 exports.getOrderDetail=function(orderSysOrderId) {
   debug('getOrderDetail')
-  return requestEntities(ORDERS, GET, '', orderSysOrderId)
+  return requestEntities(orderDetailFlow(orderSysOrderId), GET)
 }
 
 exports.getOrderById=function(url) {
@@ -383,4 +381,70 @@ exports.getOrderById=function(url) {
 exports.getOrder = function(url){
   debug('getOrder')
   return requestEntities(url, GET);
+}
+
+
+exports.deleteImage = function(imageId) {
+  debug('deleteImage')
+  return requestEntities(IMAGES, DELETE, '', imageId)
+}
+
+exports.uploadImage = function *(menuItemId, path) {
+  debug('uploadImage')
+  try {
+    var token = yield getBearerToken()
+    debug('...token '+ token)
+  } catch (err) {
+    console.error(err)
+    throw (err)
+  }
+
+  var url = config.moltinStoreUrl + IMAGES
+  debug('...url : '+ url)
+  try {
+    var imagefile = fs.createReadStream(path)
+  } catch (err) {
+    console.log('uploadImage: error')
+    console.log(err)
+  }
+
+  debug(imagefile)
+  var data = {
+    file: imagefile,
+    assign_to: menuItemId
+  }
+  debug(data)
+  debug('...uploading')
+  return new Promise(function(resolve, reject) {
+    request({
+      method: POST,
+      url: url,
+      formData: data,
+      headers: {
+        'Authorization': 'Bearer '+ token
+      },
+      maxAttempts: 3,
+      retryDelay: 150,  // wait for 150 ms before trying again
+    })
+    .then( function (res) {
+      debug('status code '+ res.statusCode)
+      debug('sendRequest: parsing...')
+      debug(res.body)
+      if (res.statusCode == 401 ) { // Unauthorized
+        debug('...Access token expired')
+        debug('...clear bearer token and throw error')
+        bearerToken = '';
+        reject({'statusCode': 401, 'error': 'Unauthorized'})
+      }
+      var result = JSON.parse(res.body).result
+      resolve (result)
+      return;
+
+    })
+    .catch( function (err) {
+      console.error("uploadImage: statusCode: " + err.statusCode);
+      console.error("uploadImage: statusText: " + err.statusText);
+      reject (err)
+    })
+  })
 }
