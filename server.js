@@ -4,6 +4,7 @@ var Helmet = require('koa-helmet');
 var Session = require('koa-session');
 var Views = require('koa-views');
 var Flash = require('koa-flash');
+var Router = require('koa-router');
 var serve = require('koa-static-folder');
 
 var Passport = require('./config/passport');
@@ -34,6 +35,10 @@ app.use(serve('./public/vendors'));
 // Enable Cross-Origin requestEntities
 // TODO: THIS IS NOT A PRODUCTION CONFIGURATION
 app.use(cors());
+var router = new Router();
+router.options('*', cors());
+app.use(router.routes())
+app.use(router.allowedMethods())
 
 require('./app/routes')(app);
 
