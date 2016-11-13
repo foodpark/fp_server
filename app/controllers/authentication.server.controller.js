@@ -212,9 +212,9 @@ exports.register = function*(next) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!role) {
+    if (!role || ['OWNER','CUSTOMER','ADMIN'].indexOf(role) < 0) {
       this.status = 422
-      this.body = {error: 'Missing role: Customer / Owner.'}
+      this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
       return;
     }
     if (role == 'OWNER') {
@@ -271,6 +271,7 @@ exports.register = function*(next) {
       console.error(err)
       throw err;
     }
+    debug('...user created with id '+ userObject.id)
 
     if (role == 'OWNER') {
       debug('register: creating company');
@@ -299,29 +300,28 @@ exports.register = function*(next) {
       debug('register: creating customer');
 
       try {
-        var customer = yield Customer.createCustomer(userObject.id);
+        var customer = (yield Customer.createCustomer(userObject.id))[0]
       } catch (err) {
         console.error('register: error creating customer');
         console.error(err)
         throw err;
       }
+      debug('...customer created with id '+ customer.id)
       userObject.customer_id = customer.id
 
     } else if (role == 'ADMIN') {
       debug('register: creating admin');
 
       try {
-        var admin = yield Admin.createAdmin(userObject.id);
+        var admin = (yield Admin.createAdmin(userObject.id))[0]
       } catch (err) {
         console.error('register: error creating admin');
         console.error(err)
         throw err;
       }
+      debug('...admin created with id '+ admin.id)
       userObject.admin_id = admin.id
 
-    } else {
-      console.error('register: unknown role '+ role)
-      throw new Error('unknown role '+ role)
     }
 
     debug('register: completed. Authenticating user...')
