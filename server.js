@@ -32,11 +32,21 @@ app.use(passport.session());
 //This is a temporary home for vendor UI. Uses koa-static-folder and koa-send to send assets
 app.use(serve('./public/vendors'));
 
-// Enable Cross-Origin requestEntities
-// TODO: THIS IS NOT A PRODUCTION CONFIGURATION
+// Enable Cross-Origin Resource Sharing
 app.use(cors());
 var router = new Router();
-router.options('*', cors());
+router.all('/*', function(req, res, next) {
+  // CORS headers
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  // Custom headers for CORS
+  res.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+  if (req.method == 'OPTIONS') {
+    res.status(200).end();
+  } else {
+    next();
+  }
+});
 app.use(router.routes())
 app.use(router.allowedMethods())
 

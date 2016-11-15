@@ -359,6 +359,15 @@ function *afterReadOrderHistory(orderHistory) {
   );*/
 }
 
+function *afterReadUnit(unit) {
+
+  if (this.this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+    debug(m[0])
+    debug(m[1])
+    return query.select('units.*').whereRaw('units.company_id = ?', m[1]);
+  }
+}
+
 module.exports = {
   hooks: {
     authorize: function *(operation, object) {
@@ -471,11 +480,18 @@ module.exports = {
 
   // the apply context option allows you to specify special
   // relationships between things, in our case, /companies/:id/units,
-  // for example.  Which does a search through the checkins table for
-  // active checkins.
+  // for example.
   applyContext: function(query) {
+    debug('applyContext')
     var context = this.params.context;
     var m;
+    debug(this.resteasy.operation)
+    debug(this.resteasy.table)
+    debug(context)
+    if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+      debug('company id '+ m[1])
+      return query.select('units.*').where('company_id', m[1]);
+    }
   /**  if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
       return query.select(['units.*', 'checkins.check_in AS unit_check_in', 'checkins.check_out AS unit_check_out']).join('checkins', 'checkins.unit_id', 'units.id')
         .whereRaw('checkins.company_id = ? AND checkins.check_in <= now() AND ( checkins.check_out IS NULL OR checkins.check_out >= now() )', [m[1]]);

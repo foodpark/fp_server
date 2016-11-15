@@ -398,4 +398,10 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
 REVOKE ALL ON TABLE users FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
 
+
+GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
+GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
+GRANT SELECT ON TABLE information_schema.table_constraints TO sfez_rw;
+GRANT SELECT ON TABLE pg_catalog.pg_constraint TO sfez_rw;
+
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to sfez_rw;
