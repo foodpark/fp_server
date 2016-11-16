@@ -35,7 +35,8 @@ app.use(serve('./public/vendors'));
 // Enable Cross-Origin Resource Sharing
 app.use(cors());
 var router = new Router();
-router.all('/*', function(req, res, next) {
+router.all('/*', cors());
+/* router.all('/*', function(req, res, next) {
   // CORS headers
   res.header("Access-Control-Allow-Origin", "*");
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -46,7 +47,7 @@ router.all('/*', function(req, res, next) {
   } else {
     next();
   }
-});
+}); */
 app.use(router.routes())
 app.use(router.allowedMethods())
 
