@@ -4,6 +4,7 @@ var Helmet = require('koa-helmet');
 var Session = require('koa-session');
 var Views = require('koa-views');
 var Flash = require('koa-flash');
+var Router = require('koa-router');
 var serve = require('koa-static-folder');
 
 var Passport = require('./config/passport');
@@ -31,9 +32,39 @@ app.use(passport.session());
 //This is a temporary home for vendor UI. Uses koa-static-folder and koa-send to send assets
 app.use(serve('./public/vendors'));
 
-// Enable Cross-Origin requestEntities
-// TODO: THIS IS NOT A PRODUCTION CONFIGURATION
+// Enable Cross-Origin Resource Sharing
 app.use(cors());
+var router = new Router();
+router.all('/*', cors(
+  {
+    origin: '*',
+    method: 'GET,PUT,POST,DELETE,OPTIONS',
+    headers: 'Content-type,Accept,X-Access-Token,X-Key,Authorization'
+  }
+));
+/* router.all('/*', function *(next) {
+  console.log("setting CORS headers")
+  console.log(this.response.headers)
+  // CORS headers
+  console.log("set allowed origin to *")
+  this.response.header("Access-Control-Allow-Origin", "*");
+  console.log("set allowed methods to GET,PUT,POST,DELETE,OPTIONS")
+  this.response.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  // Custom headers for CORS
+  console.log("set allowed headers to Content-type,Accept,X-Access-Token,X-Key")
+  this.response.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
+  console.log(this.response);
+  if (this.request.method == 'OPTIONS') {
+    console.log("Got preflight request")
+    this.response.status=200;
+    return;
+  } else {
+    console.log("No preflight")
+    next();
+  }
+}); */
+app.use(router.routes())
+app.use(router.allowedMethods())
 
 require('./app/routes')(app);
 

@@ -88,6 +88,7 @@ CREATE TABLE admins (
     id SERIAL PRIMARY KEY,
     description text,
     photo text,
+    phone text,
     super_admin boolean DEFAULT false,
     city text,
     state text,
@@ -101,9 +102,9 @@ CREATE TABLE admins (
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY,
     name text NOT NULL UNIQUE,
-    order_sys_id text NOT NULL,
-    base_slug text NOT NULL,
-    default_cat text NOT NULL,
+    order_sys_id text,
+    base_slug text,
+    default_cat text,
     description text,
     email text,
     phone text,
@@ -118,7 +119,7 @@ CREATE TABLE companies (
     state text,
     country text,
     taxband text,
-    tags json,
+    tags text,
     stub boolean,
     user_id integer REFERENCES users(id),
     created_at timestamp without time zone DEFAULT now(),
@@ -131,7 +132,9 @@ CREATE TABLE customers (
     order_sys_id text,
     description text,
     device_id text,
+    device_type text,
     fcm_id text,
+    phone text,
     facebook text,
     twitter text,
     photo text,
@@ -155,8 +158,10 @@ CREATE TABLE units (
     username text,
     password text,
     qr_code text,
+    phone text,
     fcm_id text,
     device_id text,
+    device_type text,
     unit_order_sys_id text,
     territory_id integer REFERENCES territories(id),
     company_id integer REFERENCES companies(id),
@@ -222,11 +227,11 @@ CREATE TABLE order_history (
   actual_pickup_time timestamp,
   desired_pickup_time timestamp,
   prep_notice_time timestamp,
-  status text, -- json
+  status json,
   messages text, -- json
   qr_code text,
-  manual_pickup boolean,
-  order_sys_order_detail json,
+  manual_pickup boolean DEFAULT false,
+  order_detail json, -- json
   checkin_id integer REFERENCES checkins(id),
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),
@@ -357,6 +362,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE locations TO sfez_rw;
 REVOKE ALL ON TABLE loyalty FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty TO sfez_rw;
 
+REVOKE ALL ON TABLE loyalty_rewards FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_rewards TO sfez_rw;
+
 REVOKE ALL ON TABLE loyalty_used FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_used TO sfez_rw;
 
@@ -381,10 +389,19 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE search_preferences TO sfez_rw;
 REVOKE ALL ON TABLE territories FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE territories TO sfez_rw;
 
+REVOKE ALL ON TABLE unit_types FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE unit_types TO sfez_rw;
+
 REVOKE ALL ON TABLE units FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
 
 REVOKE ALL ON TABLE users FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
+
+
+GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
+GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
+GRANT SELECT ON TABLE information_schema.table_constraints TO sfez_rw;
+GRANT SELECT ON TABLE pg_catalog.pg_constraint TO sfez_rw;
 
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to sfez_rw;

@@ -304,6 +304,7 @@ var internalGetMenuItem = function *(id) {
 
 exports.updateMenuItem=function *(next) {
   debug('updateMenuItem')
+  debug('id '+ this.menuItem.id)
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('updateMenuItem: Role authorized')
     var user = this.passport.user
@@ -364,6 +365,104 @@ exports.deleteMenuItem=function *(next) {
     }
   } else {
     console.error('deleteMenuItem: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
+exports.uploadMenuItemImage=function *(next) {
+  debug('uploadMenuItemImage')
+  debug('..files')
+  debug(this.body.files)
+  debug('..path')
+  debug(this.body.files.image.path)
+  debug('..check for files')
+  if (!this.body.files.image.path) {
+    debug('..No image found')
+    return;
+  }
+  debug('..Image found')
+  try {
+    var image = yield msc.uploadImage(this.menuItem.id, this.body.files.image.path)
+  } catch (err) {
+    console.error('uploadMenuItemImage: error uploading menu item image in ordering system ')
+    console.error(err)
+    throw(err)
+  }
+  this.body = image
+  return;
+}
+
+exports.uploadImage=function *(next) {
+  debug('uploadImage')
+  debug('id '+ this.menuItem.id)
+  if (!this.body.files) {
+    debug('uploadImage: No image found')
+    return;
+  }
+  debug('found image')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('uploadImage: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('uploadImage: error uploading menu item image: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.menuItem.company.data.id +'=='+ this.company.orderSysId)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      var data = this.body;
+      debug(data)
+      try {
+        var item = yield msc.uploadImage(this.menuItem.id, data)
+      } catch (err) {
+        console.error('uploadImage: error uploading menu item image in ordering system ')
+        throw(err)
+      }
+      this.body = item
+      return;
+    } else {
+      console.error('uploadImage: updateMenuItem: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('uploadImage: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
+exports.deleteImage=function *(next) {
+  debug('deleteImage')
+  debug('...id '+ this.params.imageId)
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('deleteImage: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('deleteImage: error deleting menu item iamge: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company.data.id == this.company.order_sys_id) {
+      try {
+        var message = yield msc.deleteImage(this.params.imageId)
+      } catch (err) {
+        console.error('deleteImage: error deleting menu item image in ordering system ')
+        throw(err)
+      }
+      this.body = message
+      return;
+    } else {
+      console.error('deleteImage: Menu item does not belong to company')
+      this.status=422
+      this.body = {error: 'Menu item does not belong to company'}
+      return;
+    }
+  } else {
+    console.error('deleteImage: User not authorized')
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -607,12 +706,6 @@ exports.createOptionCategory=function *(func, params, next) {
     debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
     if (this.menuItem.company.data.id == this.company.order_sys_id) {
       try {
-        var title = this.body.title
-        if (!title) {
-          this.status=422
-          this.body = { error: 'Title is required.'}
-          return;
-        }
 
         debug('...calling moltin create option category')
         var results = yield msc.createOptionCategory(this.menuItem.id, title, 'variant')

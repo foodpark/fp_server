@@ -42,6 +42,10 @@ var setUserInfo = function (user) {
     username: user.username,
     role: user.role
   }
+  debug(user)
+  if (user.company_id) info.company_id = user.company_id
+  else if (user.customer_id) info.customer_id = user.customer_id
+  else if (user.admin_id) info.admin_id = user.admin_id
   debug(info)
   return info
 };
@@ -51,6 +55,34 @@ exports.login = function *(next) {
   debug(this.passport.user)
   debug('calling')
   userInfo = setUserInfo(this.passport.user)
+  if (this.passport.user.role == 'OWNER') {
+    try {
+      var company = (yield Company.companyForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.company_id = company.id
+  } else if (this.passport.user.role == 'CUSTOMER') {
+    try {
+      var customer = (yield Customer.getForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.customer_id = customer.id
+  } else if (this.passport.user.role == 'ADMIN') {
+    try {
+      var admin = (yield Admin.getForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.admin_id = admin.id
+  }
   debug('done')
   debug('userInfo: '+ userInfo)
   this.status = 200;
@@ -180,9 +212,9 @@ exports.register = function*(next) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!role) {
+    if (!role || ['OWNER','CUSTOMER','ADMIN'].indexOf(role) < 0) {
       this.status = 422
-      this.body = {error: 'Missing role: Customer / Owner.'}
+      this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
       return;
     }
     if (role == 'OWNER') {
@@ -239,12 +271,13 @@ exports.register = function*(next) {
       console.error(err)
       throw err;
     }
+    debug('...user created with id '+ userObject.id)
 
     if (role == 'OWNER') {
       debug('register: creating company');
 
       try {
-        var company  = yield createCompany(company_name, email, userObject.id);
+        var company  = (yield createCompany(company_name, email, userObject.id))[0];
       } catch (err) {
         console.error('register: error creating company');
         console.error(err)
@@ -258,31 +291,37 @@ exports.register = function*(next) {
         }
         throw err;
       }
+      debug(company)
+      debug('...company created with id '+ company.id)
+      userObject.company_id = company.id
+      debug(userObject)
 
     } else if (role == 'CUSTOMER') {
       debug('register: creating customer');
 
       try {
-        var customerId = yield Customer.createCustomer(userObject.id);
+        var customer = (yield Customer.createCustomer(userObject.id))[0]
       } catch (err) {
         console.error('register: error creating customer');
         console.error(err)
         throw err;
       }
+      debug('...customer created with id '+ customer.id)
+      userObject.customer_id = customer.id
 
     } else if (role == 'ADMIN') {
       debug('register: creating admin');
 
       try {
-        var adminId = yield Admin.createAdmin(userObject.id);
+        var admin = (yield Admin.createAdmin(userObject.id))[0]
       } catch (err) {
         console.error('register: error creating admin');
         console.error(err)
         throw err;
       }
-    } else {
-      console.error('register: unknown role '+ role)
-      throw new Error('unknown role '+ role)
+      debug('...admin created with id '+ admin.id)
+      userObject.admin_id = admin.id
+
     }
 
     debug('register: completed. Authenticating user...')

@@ -1,115 +1,84 @@
+--
+-- PostgreSQL database dump
+--
 
-COPY food_parks (id, name, city, state, postal_code, country, latitude, longitude, created_at) FROM stdin;
-3001	The Picnic	Austin	TX	78704	US	30.2635748	-97.7627071	2016-08-21 23:31:43.131352
-3002	Alamo Drafthouse	Austin	TX	78704	US	30.2560786	-97.76350909999996	2016-08-21 23:01:03.622149
-3003	Austin Food Park	Austin	TX	78702	US	30.2544287	-97.7371197	2016-08-21 23:01:50.563872
-3004	Truck Garden Food Park - Av. Roberto Freire	Ponta Negra	RN	\N	BR	-5.874374	-35.178695	2016-08-21 23:03:07.177813
-3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	Ponta Negra	RN	\N	BR	-5.865769	-35.185878	2016-08-21 23:05:04.914807
-3006	Natal Shopping Food Park - Av. das Brancas Dunas	Natal	RN	\N	BR	-5.842563	-35.210624	2016-08-21 23:12:10.112015
-3007	Bar 54 Food Park - Rua Porto Mirim	Natal	RN	\N	BR	-5.874674	-35.183514	2016-08-29 20:54:42.540882
-3008	Bar Trove Food Park - Rua Presidente José Bento	Natal	RN	\N	BR	-5.805748	-35.214705	2016-08-30 21:12:08.717913
-3009	Food By Food West	Austin	TX	78723	US	30.298	-97.707	2016-08-21 23:31:43.131352
-3010	Growler Food Park	Pflugerville	TX	78660	US	30.449	-97.607	2016-08-21 23:01:03.622149
-3011	Food Park at La Frontera	Round Rock	TX	78681	US	30.481	-97.677	2016-08-21 23:01:50.563872
-3012	Las Palmas Food Bazaar	Miami	FL	33136	US	25.792	-80.196	2016-08-21 23:03:07.177813
-3013	Tropical Food Court	Fort Lauderdale	FL	33304	US	26.136	-80.137	2016-08-21 23:05:04.914807
-3014	Snappy Food Park	Coral Gables	FL	33146	US	25.729	-80.261	2016-08-21 23:12:10.112015
-3015	LoDo TrPk	Denver	CO	80202	US	39.751	-105.000	2016-08-29 20:54:42.540882
-3016	Del Mar	Aurora	CO	80042	US	39.728	-104.844	2016-08-30 21:12:08.717913
-3017	Foothills Food Court	Lakewood	CO	80226	US	39.711	-105.084	2016-08-30 21:12:08.717913
-\.
-SELECT pg_catalog.setval('food_parks_id_seq', 30018, true);
+-- Dumped from database version 9.5.4
+-- Dumped by pg_dump version 9.5.4
 
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
 
-COPY users (id, first_name, last_name, username, password, role, provider, provider_id, provider_data, created_at) FROM stdin;
-11001	Stacy	Tran	mp12	5a4636076012403dd394fa20f49fcd9c	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352
-11002	Jonathan	Jones	mp2	defc72a96803a619a6735cd7e7e69e1b	CUSTOMER	local	local	{}	2016-08-21 23:01:03.622149
-11003	Marco and Inez	Pena	mp3	28dafd4a8cb5f33065e93cbc83862563	CUSTOMER	local	local	{}	2016-08-21 23:01:50.563872
-11004	Julie	Grant	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	OWNER	local	local	{}	2016-08-21 23:03:07.177813
-11005	Bob	Smith	mp5@gmail.com	146eb1afa89654aca443976646460ef4	OWNER	local	local	{}	2016-08-21 23:05:04.914807
-11006	Cindy	Clark	mp6@gmail.com	5ce4c4a0a26e6df0fdbb380d78f4fab2	OWNER	local	local	{}	2016-08-21 23:12:10.112015
-11007	\N	\N	mptruck61	6cf9be93694189e06c66faa49a6cbc93	UNITMGR	local	local	{}	2016-08-29 20:54:42.540882
-11008	\N	\N	mptruck64	5db0aeb457f45ddb90c35b39569c1348	UNITMGR	local	local	{}	2016-08-30 21:12:08.717913
-11009	\N	\N	mptruck64five	dda2549944250c6c038797b463e7de99	UNITMGR	local	local	{}	2016-08-30 21:22:22.983667
-11010	\N	\N	trucker1	2c914a017cf7354e6c6319afe0b664b2	UNITMGR	local	local	{}	2016-09-06 23:57:26.291924
-11011	Dennis	Nichols	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	ADMIN	local	local	{}	2016-10-20 23:33:15.004572
-11012	Luiz	Cobello	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	ADMIN	local	local	{}	2016-10-22 18:42:04.179585
-11013	Marcos	Hirano	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	ADMIN	local	local	{}	2016-10-22 18:41:25.721489
-\.
-SELECT pg_catalog.setval('users_id_seq', 11014, true);
+SET search_path = public, pg_catalog;
 
+SET default_tablespace = '';
 
-COPY territories (id, territory, city, state, country, timezone, latitude, longitude, created_at) FROM stdin;
-1	 Natal-RN	Natal	RN	Brazil	Buenos Aires	-5.777182	-35.200323	2016-09-06 23:00:00.000000
-2	 Sao Paolo-SP	Sao Paolo	RN	Brazil	Brasilia	-23.55	-46.633333	2016-09-06 23:00:00.000000
-3	 Pipa-RN	Pipa	RN	Brazil	Buenos Aires	-6.228994	-35.048776	2016-09-06 23:00:00.000000
-4	 Austin-TX	Austin	TX	USA	Central Time (US & Canada)	30.264317	-97.738228	2016-09-06 23:00:00.000000
-5	 Pflugerville-TX	Pflugerville	TX	USA	Central Time (US & Canada)	30.440	-97.620	2016-09-06 23:00:00.000000
-6	 Round Rock-TX	Round Rock	TX	USA	Central Time (US & Canada)	30.508	-97.678	2016-09-06 23:00:00.000000
-7	 Fort Lauderdale-TX	Fort Lauderdale	FL	USA	Eastern Time (US & Canada)	26.122	-80.137	2016-09-06 23:00:00.000000
-8	 Miami-FL	Miami	FL	USA	Eastern Time (US & Canada)	25.762	-80.190	2016-09-06 23:00:00.000000
-9	 Coral Gables-FL	Coral Gables	FL	USA	Eastern Time (US & Canada)	25.722	-80.269	2016-09-06 23:00:00.000000
-10	 Denver-CO	Denver	CO	USA	Mountain Time (US & Canada)	39.746	-104.992	2016-09-06 23:00:00.000000
-11	 Aurora-CO	Aurora	CO	USA	Mountain Time (US & Canada)	39.725	-104.847	2016-09-06 23:00:00.000000
-12	 Lakewood-CO	Lakewood	CO	USA	Mountain Time (US & Canada)	39.711	-105.081	2016-09-06 23:00:00.000000
-\.
-SELECT pg_catalog.setval('territories_id_seq', 13, true);
+SET default_with_oids = false;
+
+--
+-- Name: order_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE order_history (
+    id integer NOT NULL,
+    order_sys_order_id text,
+    amount money,
+    initiation_time timestamp without time zone,
+    payment_time timestamp without time zone,
+    actual_pickup_time timestamp without time zone,
+    desired_pickup_time timestamp without time zone,
+    prep_notice_time timestamp without time zone,
+    status json,
+    messages text,
+    qr_code text,
+    manual_pickup boolean DEFAULT false,
+    order_detail json,
+    checkin_id integer,
+    customer_id integer,
+    unit_id integer,
+    company_id integer,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
 
 
-COPY admins (id, description, photo, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
-1	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
-2	\N	\N	f	\N	\N	\N	11012	2016-10-22 18:42:04.186193	2016-10-22 18:42:04.186193
-3	\N	\N	f	\N	\N	\N	11013	2016-10-22 18:41:25.893483	2016-10-22 18:41:25.893483
-\.
-SELECT pg_catalog.setval('admins_id_seq', 4, true);
+ALTER TABLE order_history OWNER TO postgres;
 
-COPY companies (id, name, order_sys_id, base_slug, default_cat, description, email, facebook, twitter, photo, featured_dish, hours, schedule, city, state, country, taxband, user_id, created_at) FROM stdin;
-1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	Fresh street food tacos	tacos@pacos.com	www.facebook.com/pacostacos	@pacostacos	\N	\N	11am-8pm	M-F	\N	\N	\N	\N	11004	2016-08-26 21:31:52.102331
-1002	Thaitanic	1293768990807556920	thaitanic-1471829851769	1322127087452029500	Authentic Thai	info@thaitanic.com	www.facebook.com/thaitanic	@thaitan	\N	\N	3pm-5pm	TWTF	\N	\N	\N	\N	11005	2016-08-21 21:37:32.594516
-1003	Grilla Cheese	1293768990807556920	grillacheese-1471829851769	1322127087452029500	Thick slabs of grilled cheese on Texas toast	cheez@grillacheese.com	wwww.facebook.com/grillacheese	@griller	\N	\N	11am-3pm	MTWTFSS	\N	\N	\N	\N	11006	2016-08-21 21:37:32.594516
-\.
-SELECT pg_catalog.setval('companies_id_seq', 1004, true);
+--
+-- Name: order_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
 
-COPY customers (id, order_sys_id, description, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at) FROM stdin;
-9001	\N	Taco expert. I love tacos.	www.facebook.com/stacytfakeaccount	\N	\N	f	\N	\N	\N	11001	2016-08-21 23:31:43.151356
-9002	\N	Serial food eater	www.facebook.com/jonjonesfakeaccount	\N	\N	f	\N	\N	\N	11002	2016-08-21 23:31:43.151356
-9003	\N	Food bloggers. Follow us on mifood.blog.com	www.facebook.com/mifoodfakeaccount	\N	\N	t	\N	\N	\N	11003	2016-08-21 23:31:43.151356
-\.
-SELECT pg_catalog.setval('customers_id_seq', 9004, true);
-
-COPY units (id, name, number, type, description, username, password, qr_code, unit_order_sys_id, company_id, unit_mgr_id, customer_order_window) FROM stdin;
-2001	Thaitanic Truck 1	1	TRUCK	\N	mptruck61	mptruck61	\N	\N	1002	11007	15
-2002	Thaitanic Cart 1	1	CART	\N	mptruck64	mptruck64	\N	\N	1002	11008	20
-2003	Pacos Tacos Truck 1	1	TRUCK	\N	mptruck64five	mptruck64five	\N	\N	1001	11009	10
-2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010	15
-\.
-SELECT pg_catalog.setval('units_id_seq', 2005, true);
-
-COPY checkins (id, check_in, check_out, latitude, longitude, display_address, food_park_name, note, food_park_id, unit_id, company_id, created_at, updated_at) FROM stdin;
-1	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.81163600000000002	-35.2090430000000012	\N	\N	\N	\N	2003	1003	2016-10-28 01:09:25.425267	2016-10-28 01:09:25.425267
-2	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.76750499999999988	-35.199499000000003	\N	\N	\N	\N	2004	1003	2016-10-28 01:09:28.154896	2016-10-28 01:09:28.154896
-3	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.78073999999999977	-35.2068099999999973	\N	\N	\N	\N	2002	1002	2016-10-28 01:09:30.953065	2016-10-28 01:09:30.953065
-4	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.7795399999999999	-35.1927609999999973	\N	\N	\N	\N	2001	1002	2016-10-28 01:09:33.199263	2016-10-28 01:09:33.199263
-5	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.78810399999999969	-35.1892759999999996	\N	\N	\N	\N	2003	1001	2016-10-28 01:09:36.319803	2016-10-28 01:09:36.319803
-\.
-SELECT pg_catalog.setval('checkins_id_seq', 6, true);
+CREATE SEQUENCE order_history_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
-COPY reviews (id, comment, rating, answers, customer_id, company_id, unit_id, status, created_at) FROM stdin;
-4	Very clean and the customer service is excellent.	4.8	{"answer": 4, "question": "Food good?"}	9002	1003	2004	\N	2016-09-07 19:33:13.598095
-5	Broad selection of quality food and creative menu.	4.9	{"answer": 4, "question": "Food good?"}	9003	1002	2001	\N	2016-09-07 19:36:06.711809
-6	Thaitanic has the best cart in the city.	4.7	{"answer": 4, "question": "Food good?"}	9003	1002	2002	\N	2016-09-07 19:37:07.687663
-7	BIG portions prepared exactly how you request and unreasonably low prices!!!  Love tacos!	4.6	{"answer": 4, "question": "Food good?"}	9001	1001	2003	\N	2016-09-07 19:38:49.741905
-\.
-SELECT pg_catalog.setval('reviews_id_seq', 8, true);
+ALTER TABLE order_history_id_seq OWNER TO postgres;
 
-COPY review_approvals (id, review_id, reviewer_id, status, created_at, updated_at) FROM stdin;
-1	4	\N	\N	2016-09-07 19:33:13.598095	2016-09-07 19:33:13.598095
-2	5	\N	\N	2016-09-07 19:36:06.711809	2016-09-07 19:36:06.711809
-3	6	\N	\N	2016-09-07 19:37:07.687663	2016-09-07 19:37:07.687663
-4	7	\N	\N	2016-09-07 19:38:49.741905	2016-09-07 19:38:49.741905
-\.
-SELECT pg_catalog.setval('review_approvals_id_seq', 5, true);
+--
+-- Name: order_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE order_history_id_seq OWNED BY order_history.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history ALTER COLUMN id SET DEFAULT nextval('order_history_id_seq'::regclass);
+
+
+--
+-- Data for Name: order_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
 
 COPY order_history (id, order_sys_order_id, amount, initiation_time, payment_time, actual_pickup_time, desired_pickup_time, prep_notice_time, status, messages, qr_code, manual_pickup, order_detail, checkin_id, customer_id, unit_id, company_id, created_at, updated_at) FROM stdin;
 699	1373627724484051551	$11.00	2016-10-09 16:55:13.892119	\N	\N	2016-10-09 17:15:13.892119	\N	{"order_accepted": "11/6/2016, 8:56:52 PM","order_requested": "11/6/2016, 8:54:12 PM"}	\N	a62b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022	f	[{"id":"1373627725994000992","created_at":"2016-11-01 03:00:07","updated_at":"2016-11-01 03:00:07","product":{"value":null,"data":null},"sku":"grillacheese-1471829851769-item2","title":"Item2","quantity":2,"tax_rate":1.6,"tax_band":{"value":"Brazil Service Charge","data":{"id":"1278235843793780901","title":"Brazil Service Charge","description":"Brazil Service Charge","rate":1.6,"created_at":null,"updated_at":null}},"options":"[]","cart_identifier":"da63e1b35211a2050f2882758d2b3bf5","price":{"value":"R$10.99","data":{"formatted":{"with_tax":"R$10.99","without_tax":"R$10.82","tax":"R$0.17"},"rounded":{"with_tax":10.99,"without_tax":10.82,"tax":0.17},"raw":{"with_tax":10.99312,"without_tax":10.82,"tax":0.17312}}},"totals":{"value":"R$21.99","data":{"formatted":{"with_tax":"R$21.99","without_tax":"R$21.64","tax":"R$0.35"},"rounded":{"with_tax":21.99,"without_tax":21.64,"tax":0.35},"raw":{"with_tax":21.98624,"without_tax":21.64,"tax":0.34624}}},"is_variation":false,"modifiers":[],"images":[]}]	\N	9002	2001	1002	2016-11-10 22:42:05.955656	2016-11-10 22:42:05.955656
@@ -118,4 +87,76 @@ COPY order_history (id, order_sys_order_id, amount, initiation_time, payment_tim
 700	1371101531029373235	$9.00	2016-10-09 17:00:05.837234	\N	\N	2016-10-09 17:20:05.837234	\N	{"order_requested": "11/6/2016, 9:04:12 PM"}	\N	\N	f	[{"id":"1371101532858089780","created_at":"2016-10-28 15:21:01","updated_at":"2016-10-28 15:21:01","product":{"value":"Panang Curry","data":{"id":"1294341403832222349","order":null,"created_at":"2016-07-14 17:32:20","updated_at":"2016-10-01 11:17:27","sku":"2222","title":"Panang Curry","slug":"thaitanic_panang_curry","sale_price":0,"status":{"value":"Live","data":{"key":"1","value":"Live"}},"category":{"value":"Curries","data":{"1293782567115293555":{"id":"1293782567115293555","order":1,"created_at":"2016-07-13 23:02:02","updated_at":"2016-10-28 13:11:23","parent":{"value":"Thaitanic Menu","data":{"id":"1293791001558647679","order":3,"created_at":"2016-07-13 23:18:47","updated_at":"2016-10-28 13:11:23","parent":null,"slug":"thaitanic","status":{"value":"Live","data":{"key":"1","value":"Live"}},"title":"Thaitanic Menu","description":"The Thaitanic Menu","company":{"value":"Thaitanic","data":{"id":"1293768990807556920","order":null,"created_at":"2016-07-13 22:35:03","updated_at":"2016-07-13 22:35:34","name":"Thaitanic","email":"Bobsmith@hotmail.com","facebook":"www.facebook.com/thaitanic","photo":null,"description":"Authentic Thai","favdish":null}}}},"slug":"thaitanic_curries","status":{"value":"Live","data":{"key":"1","value":"Live"}},"title":"Curries","description":"All the curries","company":{"value":"Thaitanic","data":{"id":"1293768990807556920","order":null,"created_at":"2016-07-13 22:35:03","updated_at":"2016-07-13 22:35:34","name":"Thaitanic","email":"Bobsmith@hotmail.com","facebook":"www.facebook.com/thaitanic","photo":null,"description":"Authentic Thai","favdish":null}}}}},"stock_level":99992,"stock_status":{"value":"In Stock","data":{"key":"1","value":"In Stock"}},"description":"Coconut milk, panang, peppes, and your choice of protein","requires_shipping":{"value":"No","data":{"key":"0","value":"No"}},"weight":0,"height":0,"width":0,"depth":0,"catalog_only":{"value":"No","data":{"key":"0","value":"No"}},"collection":null,"brand":null,"tax_band":{"value":"Brazil Service Charge","data":{"id":"1278235843793780901","title":"Brazil Service Charge","description":"Brazil Service Charge","rate":1.6,"created_at":null,"updated_at":null}},"company":{"value":"Thaitanic","data":{"id":"1293768990807556920","order":null,"created_at":"2016-07-13 22:35:03","updated_at":"2016-07-13 22:35:34","name":"Thaitanic","email":"Bobsmith@hotmail.com","facebook":"www.facebook.com/thaitanic","photo":null,"description":"Authentic Thai","favdish":null}},"price":{"value":"R$9.99","data":{"formatted":{"with_tax":"R$9.99","without_tax":"R$9.83","tax":"R$0.16"},"rounded":{"with_tax":9.99,"without_tax":9.83,"tax":0.16},"raw":{"with_tax":9.98728,"without_tax":9.83,"tax":0.15728}}},"is_variation":false,"modifiers":{"1371633899372806549":{"id":"1371633899372806549","order":null,"created_at":"2016-10-29 08:58:44","updated_at":"2016-10-29 08:58:44","type":{"value":"Single","data":{"key":"single","value":"Single"}},"title":"OptionItems","instructions":"","product":"1294341403832222349","variations":{"1371633902837301654":{"title":"New Curry","product":"","modifier":"1371633899372806549","mod_price":"10","id":"1371633902837301654","difference":"1R$0.00"},"1371634240738820503":{"title":"New Curry","product":"","modifier":"1371633899372806549","mod_price":"10","id":"1371634240738820503","difference":"1R$0.00"}}},"1371804145274585550":{"id":"1371804145274585550","order":null,"created_at":"2016-10-29 14:36:59","updated_at":"2016-10-29 14:36:59","type":{"value":"Variant","data":{"key":"variant","value":"Variant"}},"title":"Meat Selection","instructions":"","product":"1294341403832222349","variations":{"1371804164585161167":{"title":"beef","product":"","modifier":"1371804145274585550","mod_price":"+$2","id":"1371804164585161167","difference":"+R$0.00"},"1371804336224469457":{"title":"pork","product":"","modifier":"1371804145274585550","mod_price":"+1","id":"1371804336224469457","difference":"+R$1.00"}}}},"images":[]}},"sku":"2222","title":"Panang Curry","quantity":1,"tax_rate":1.6,"tax_band":{"value":"Brazil Service Charge","data":{"id":"1278235843793780901","title":"Brazil Service Charge","description":"Brazil Service Charge","rate":1.6,"created_at":null,"updated_at":null}},"options":"[]","cart_identifier":"0fd49de9ac5085c456bbba911e650f8c","price":{"value":"R$9.99","data":{"formatted":{"with_tax":"R$9.99","without_tax":"R$9.83","tax":"R$0.16"},"rounded":{"with_tax":9.99,"without_tax":9.83,"tax":0.16},"raw":{"with_tax":9.98728,"without_tax":9.83,"tax":0.15728}}},"totals":{"value":"R$9.99","data":{"formatted":{"with_tax":"R$9.99","without_tax":"R$9.83","tax":"R$0.16"},"rounded":{"with_tax":9.99,"without_tax":9.83,"tax":0.16},"raw":{"with_tax":9.98728,"without_tax":9.83,"tax":0.15728}}}}]	\N	9001	2001	1002	2016-11-10 22:42:05.955656	2016-11-10 22:44:35.037665
 698	1351409762318680784	$5.00	2016-10-09 16:50:45.184934	\N	\N	2016-10-09 17:10:45.184934	\N	{"order_paid": "11/6/2016, 8:31:56 PM","order_accepted": "11/6/2016, 8:26:52 PM","order_requested": "11/6/2016, 8:23:52 PM"}	\N	b32b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022	f	[{"id":"1351409763786687185","created_at":"2016-10-01 11:16:59","updated_at":"2016-10-01 11:16:59","product":{"value":"Panang Curry","data":{"id":"1294341403832222349","order":null,"created_at":"2016-07-14 17:32:20","updated_at":"2016-10-01 11:17:27","sku":"2222","title":"Panang Curry","slug":"thaitanic_panang_curry","sale_price":0,"status":{"value":"Live","data":{"key":"1","value":"Live"}},"category":{"value":"Curries","data":{"1293782567115293555":{"id":"1293782567115293555","order":1,"created_at":"2016-07-13 23:02:02","updated_at":"2016-10-28 13:11:23","parent":{"value":"Thaitanic Menu","data":{"id":"1293791001558647679","order":3,"created_at":"2016-07-13 23:18:47","updated_at":"2016-10-28 13:11:23","parent":null,"slug":"thaitanic","status":{"value":"Live","data":{"key":"1","value":"Live"}},"title":"Thaitanic Menu","description":"The Thaitanic Menu","company":{"value":"Thaitanic","data":{"id":"1293768990807556920","order":null,"created_at":"2016-07-13 22:35:03","updated_at":"2016-07-13 22:35:34","name":"Thaitanic","email":"Bobsmith@hotmail.com","facebook":"www.facebook.com/thaitanic","photo":null,"description":"Authentic Thai","favdish":null}}}},"slug":"thaitanic_curries","status":{"value":"Live","data":{"key":"1","value":"Live"}},"title":"Curries","description":"All the curries","company":{"value":"Thaitanic","data":{"id":"1293768990807556920","order":null,"created_at":"2016-07-13 22:35:03","updated_at":"2016-07-13 22:35:34","name":"Thaitanic","email":"Bobsmith@hotmail.com","facebook":"www.facebook.com/thaitanic","photo":null,"description":"Authentic Thai","favdish":null}}}}},"stock_level":99992,"stock_status":{"value":"In Stock","data":{"key":"1","value":"In Stock"}},"description":"Coconut milk, panang, peppes, and your choice of protein","requires_shipping":{"value":"No","data":{"key":"0","value":"No"}},"weight":0,"height":0,"width":0,"depth":0,"catalog_only":{"value":"No","data":{"key":"0","value":"No"}},"collection":null,"brand":null,"tax_band":{"value":"Brazil Service Charge","data":{"id":"1278235843793780901","title":"Brazil Service Charge","description":"Brazil Service Charge","rate":1.6,"created_at":null,"updated_at":null}},"company":{"value":"Thaitanic","data":{"id":"1293768990807556920","order":null,"created_at":"2016-07-13 22:35:03","updated_at":"2016-07-13 22:35:34","name":"Thaitanic","email":"Bobsmith@hotmail.com","facebook":"www.facebook.com/thaitanic","photo":null,"description":"Authentic Thai","favdish":null}},"price":{"value":"R$9.99","data":{"formatted":{"with_tax":"R$9.99","without_tax":"R$9.83","tax":"R$0.16"},"rounded":{"with_tax":9.99,"without_tax":9.83,"tax":0.16},"raw":{"with_tax":9.98728,"without_tax":9.83,"tax":0.15728}}},"is_variation":false,"modifiers":{"1371633899372806549":{"id":"1371633899372806549","order":null,"created_at":"2016-10-29 08:58:44","updated_at":"2016-10-29 08:58:44","type":{"value":"Single","data":{"key":"single","value":"Single"}},"title":"OptionItems","instructions":"","product":"1294341403832222349","variations":{"1371633902837301654":{"title":"New Curry","product":"","modifier":"1371633899372806549","mod_price":"10","id":"1371633902837301654","difference":"1R$0.00"},"1371634240738820503":{"title":"New Curry","product":"","modifier":"1371633899372806549","mod_price":"10","id":"1371634240738820503","difference":"1R$0.00"}}},"1371804145274585550":{"id":"1371804145274585550","order":null,"created_at":"2016-10-29 14:36:59","updated_at":"2016-10-29 14:36:59","type":{"value":"Variant","data":{"key":"variant","value":"Variant"}},"title":"Meat Selection","instructions":"","product":"1294341403832222349","variations":{"1371804164585161167":{"title":"beef","product":"","modifier":"1371804145274585550","mod_price":"+$2","id":"1371804164585161167","difference":"+R$0.00"},"1371804336224469457":{"title":"pork","product":"","modifier":"1371804145274585550","mod_price":"+1","id":"1371804336224469457","difference":"+R$1.00"}}}},"images":[]}},"sku":"2222","title":"Panang Curry","quantity":3,"tax_rate":1.6,"tax_band":{"value":"Brazil Service Charge","data":{"id":"1278235843793780901","title":"Brazil Service Charge","description":"Brazil Service Charge","rate":1.6,"created_at":null,"updated_at":null}},"options":"[]","cart_identifier":"0fd49de9ac5085c456bbba911e650f8c","price":{"value":"R$9.99","data":{"formatted":{"with_tax":"R$9.99","without_tax":"R$9.83","tax":"R$0.16"},"rounded":{"with_tax":9.99,"without_tax":9.83,"tax":0.16},"raw":{"with_tax":9.98728,"without_tax":9.83,"tax":0.15728}}},"totals":{"value":"R$29.99","data":{"formatted":{"with_tax":"R$29.99","without_tax":"R$29.52","tax":"R$0.47"},"rounded":{"with_tax":29.99,"without_tax":29.52,"tax":0.47},"raw":{"with_tax":29.96184,"without_tax":29.49,"tax":0.47184}}}}]	\N	9001	2001	1002	2016-11-10 22:42:05.955656	2016-11-10 22:42:05.955656
 \.
+
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
 SELECT pg_catalog.setval('order_history_id_seq', 701, true);
+
+
+--
+-- Name: order_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_history_checkin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_checkin_id_fkey FOREIGN KEY (checkin_id) REFERENCES checkins(id);
+
+
+--
+-- Name: order_history_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: order_history_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: order_history_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES units(id);
+
+
+--
+-- Name: order_history; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON TABLE order_history FROM PUBLIC;
+REVOKE ALL ON TABLE order_history FROM postgres;
+GRANT ALL ON TABLE order_history TO postgres;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_history TO sfez_rw;
+
+
+--
+-- Name: order_history_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+REVOKE ALL ON SEQUENCE order_history_id_seq FROM PUBLIC;
+REVOKE ALL ON SEQUENCE order_history_id_seq FROM postgres;
+GRANT ALL ON SEQUENCE order_history_id_seq TO postgres;
+GRANT SELECT,USAGE ON SEQUENCE order_history_id_seq TO sfez_rw;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

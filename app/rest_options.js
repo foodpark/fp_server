@@ -3,19 +3,202 @@ var Queries = require('koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
+var OrderHistory = require('./models/orderhistory.server.model');
+var msc = require('./controllers/moltin.server.controller');
+var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
-var Unit = require('./models/unit.server.model')
+var Unit = require('./models/unit.server.model');
+var debug = require('debug')('rest_options');
+
+
+function timestamp() {
+  return new Date(Date.now()).toLocaleString()
+}
+
+function *beforeSaveOrderHistory() {
+  debug('beforeSaveOrderHistory')
+  debug(this.resteasy.object)
+  if (this.resteasy.operation == 'create') {
+    debug('...create')
+    if (this.resteasy.object.order_sys_order_id) {
+      var moltin_order_id = this.resteasy.object.order_sys_order_id
+      debug('order sys order id: '+ moltin_order_id)
+      try {
+        var order_details = yield msc.getOrderDetail(moltin_order_id)
+      } catch (err) {
+        console.error(err)
+        throw(err)
+      }
+      debug('order details ')
+      debug(order_details)
+      this.resteasy.object.order_sys_order_detail = order_details
+      // Set the initial state
+      this.resteasy.object.status = {
+        order_requested : ''
+      }
+    } else {  // order_sys_order_id is required
+      console.error('No order id for the ordering system')
+      throw new Error('order_sys_order_id is required');
+      return;
+    }
+  } else if (this.resteasy.operation == 'update') {
+    debug('...update')
+    if (this.resteasy.object.status) {
+      try {
+        var savedStatus = (yield OrderHistory.getStatus(this.params.id))[0]
+      } catch (err) {
+        console.error(err)
+        throw(err)
+      }
+      var newStat = this.resteasy.object.status
+      debug (savedStatus)
+      debug('new status '+ newStat)
+      if (!savedStatus.status[newStat]) {
+        // add subsequent state
+        savedStatus.status[newStat] = ''
+      } // else previously set
+      debug(savedStatus)
+      this.resteasy.object.status = savedStatus.status
+    }
+  }
+}
+
+function *afterCreateOrderHistory(orderHistory) {
+  debug('afterCreateOrderHistory')
+
+  try {
+    unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
+  } catch (err) {
+    console.error('afterCreateOrderHistory: error retrieving unit');
+    throw err;
+  }
+  debug(unit)
+  var title = "Order Requested!"
+  var status = "order_requested"
+
+  if (!unit.device_id) {
+    console.error('afterCreateOrderHistory: No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+    throw new Error ('No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+  }
+  debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
+  push.notifyVendorOrderRequested(unit.device_id, orderHistory.id, title, status)
+  var hash = {
+    status : {
+      order_requested: timestamp()
+    }
+  }
+  this.resteasy.queries.push(
+    this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
+  );
+}
+
+function *afterUpdateOrderHistory(orderHistory) {
+  debug('afterUpdateOrderHistory')
+  /*
+  order_declined	Order Rejected	Vendor	Consumer
+  order_accepted	Order Accepted	Vendor	Consumer
+  order_paid	Order Paid	Consumer	Vendor
+  pay_fail	Payment Failed	Consumer	Vendor
+  order_in_queue	In Queue	Vendor	Consumer
+  order_cooking	Cooking	Vendor	Consumer
+  order_ready	Ready	Vendor	Consumer
+  order_picked_up	Picked Up	Vendor	Consumer
+  no_show	No Show	Vendor	Consumer
+  */
+  var device_id = ''
+  var title = ''
+  var orderHistoryStatus = orderHistory.status
+  debug(orderHistoryStatus)
+  var keys = Object.keys(orderHistoryStatus)
+  debug("...number of entries= "+ keys.length)
+  var updated = false
+  for (var i = 0; i < keys.length; i++) {
+    debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
+    if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
+      var status = keys[i]
+      debug('...status '+ status)
+      if (status == 'order_paid' || status == 'pay_fail') {
+        debug('...status update from customer. Notify unit')
+        // get unit device id
+        try {
+          var unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
+        } catch (err) {
+          console.error('afterUpdateOrderHistory: error retrieving unit '+ orderHistory.unit_id);
+          throw err;
+        }
+        device_id = unit.device_id
+      } else {
+        debug('...status update from unit. Notify customer')
+        // get customer devide id
+        try {
+          var customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
+        } catch (err) {
+          console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
+          throw err;
+        }
+        device_id = customer.device_id
+      }
+      if (!device_id){
+        console.error('afterUpdateOrderHistory: No device id!!')
+        throw new Error ('No device id!! Cannot notify')
+      }
+      switch(status) {
+          // From Consumer
+          case 'order_paid':
+              title = "Order Paid"
+              break;
+          case 'pay_fail':
+              title = "Payment Failed"
+              break;
+          // From Vendor
+          case 'order_declined':
+              title = "Order Declined"
+              break;
+          case 'order_accepted':
+              title = "Order Accepted"
+              break;
+          case 'order_in_queue':
+              title = "Order In Queue"
+              break;
+          case 'order_cooking':
+              title = "Order Cooking"
+              break;
+          case 'order_ready':
+              title = "Order Ready"
+              break;
+          case 'order_picked_up':
+              title = "Order Picked Up"
+              break;
+          case 'no_show':
+              title = "No Show"
+              break;
+          default:
+              throw new Error ('Unkown status '+ status +' for order '+ orderHistory.id)
+      }
+      debug('sending notification to device '+ device_id )
+      push.notifyVendorOrderRequested(device_id, orderHistory.id, title, status)
+      orderHistoryStatus[keys[i]] = timestamp()
+      debug(orderHistoryStatus)
+      updated = true
+    }
+  }
+  if (updated) {
+    debug(orderHistoryStatus)
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
+    );
+  }
+}
 
 function *beforeSaveReview() {
-  console.log('beforeSaveReview: user is ')
-  console.log(this.params.user)
+  debug('beforeSaveReview: user is ')
+  debug(this.params.user)
   var answers = this.resteasy.object.answers;
   if (answers && answers.length) {
     var total = 0.0;
     for (var i = 0; i < answers.length; i++) {
       total += answers[i].answer;
     }
-
     this.resteasy.object.rating = total / answers.length;
   }
 }
@@ -109,6 +292,11 @@ function *beforeSaveUnit() {
   }
 }
 
+function *beforeSaveCompanies() {
+  debug('beforeSaveCompanies')
+  debug(this.resteasy.object)
+}
+
 function *beforeSaveLoyaltyRewards() {
   if (this.resteasy.operation == 'create') {
     if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
@@ -143,6 +331,43 @@ function *afterUpdateReviewApproval(approval) {
   );
 }
 
+function *afterReadOrderHistory(orderHistory) {
+  debug('afterReadOrderHistory')
+  if (orderHistory.order_sys_order_id && !orderHistory.order_detail) {
+    try {
+      var moltin_order_items = yield msc.getOrderDetail(orderHistory.order_sys_order_id)
+    } catch (err) {
+      console.error(err)
+      throw(err)
+    }
+    debug('..moltin order')
+    debug(moltin_order_items)
+    moltin_order_items = JSON.stringify(moltin_order_items)
+    var order_detail = { order_detail: moltin_order_items};
+    debug(order_detail)
+    try {
+      var updatedOrder = yield OrderHistory.updateOrder(orderHistory.id, order_detail)
+    } catch (err) {
+      console.error(err)
+      throw(err)
+    }
+    debug('updatedOrder')
+    debug(updatedOrder)
+  }
+  /* this.resteasy.queries.push(
+    this.resteasy.transaction.table('order_history').where('order_history.id', order_history.id).update(order_detail)
+  );*/
+}
+
+function *afterReadUnit(unit) {
+
+  if (this.this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+    debug(m[0])
+    debug(m[1])
+    return query.select('units.*').whereRaw('units.company_id = ?', m[1]);
+  }
+}
+
 module.exports = {
   hooks: {
     authorize: function *(operation, object) {
@@ -162,41 +387,49 @@ module.exports = {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
         }
+        console.log("...authorized")
       } else if (operation == 'update' || operation == 'delete') {
         if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update Unauthorized - Owners/Admin only',401);
           } else {
-            // verify user is modifying the correct company
-            var coId = this.params.id
-            if (this.params.table != 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
-              coId = m[1]
+            if (this.passport.user.role == 'OWNER') {
+              // verify user is modifying the correct company
+              var coId = this.params.id
+              if (this.params.table != 'companies' && (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/)))) {
+                coId = m[1]
+              }
+              console.log('verifying owner')
+              var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
+              console.log(valid)
+              if (!valid) {
+                this.throw('Update Unauthorized - incorrect Owner',401);
+              } // else continue
+              console.log(valid)
             }
-            console.log('verifying owner')
-            var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
-            console.log(valid)
-            if (!valid) {
-              this.throw('Update Unauthorized - incorrect Owner',401);
-            } // else continue
+            console.log("...authorized")
           }
         } else if (this.params.table == 'customers' ||  this.params.table == 'favorites' || this.params.table == 'reviews') {
-          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update Unauthorized - Customers only',401);
           } else {
-            // verify user is modifying the correct review
-            var custId = this.params.id
-            if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
-              custId = m[1]
+            if (this.passport.user.role == 'CUSTOMER') {
+              // verify user is modifying the correct review
+              var custId = this.params.id
+              if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
+                custId = m[1]
+              }
+              console.log('verifying customer')
+              var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
+              console.log(valid)
+              if (!valid) {
+                this.throw('Update Unauthorized - User may not update this customer',401);
+              } // else continue
+              console.log(valid)
             }
-            console.log('verifying customer')
-            var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
-            console.log(valid)
-            if (!valid) {
-              this.throw('Update Unauthorized - User may not update this customer',401);
-            } // else continue
-            console.log(valid)
           }
         }
+        console.log("...authorized")
 
       } else if (operation == 'read') {
         console.log('got a read')
@@ -207,12 +440,20 @@ module.exports = {
     },
 
     beforeSave: function *() {
+      debug('this.resteasy.table')
       if (this.resteasy.table == 'reviews') {
         yield beforeSaveReview.call(this);
       } else if (this.resteasy.table == 'units') {
         yield beforeSaveUnit.call(this);
       } else if (this.resteasy.table == 'loyalty_rewards') {
+        debug('saving loyalty rewards')
         yield beforeSaveLoyaltyRewards.call(this);
+      } else if (this.resteasy.table == 'companies') {
+        debug('saving companies')
+        yield beforeSaveCompanies.call(this);
+      } else if (this.resteasy.table == 'order_history') {
+        debug('saving order_history')
+        yield beforeSaveOrderHistory.call(this);
       }
     },
 
@@ -220,10 +461,18 @@ module.exports = {
       if (this.resteasy.operation == 'create') {
         if (this.resteasy.table == 'reviews') {
           yield afterCreateReview.call(this, res[0]);
+        } else if (this.resteasy.table == 'order_history') {
+          yield afterCreateOrderHistory.call(this, res[0]);
         }
       } else if (this.resteasy.operation == 'update') {
         if (this.resteasy.table == 'review_approvals') {
           yield afterUpdateReviewApproval.call(this, res[0]);
+        } else if (this.resteasy.table == 'order_history') {
+            yield afterUpdateOrderHistory.call(this, res[0]);
+          }
+      } else if (this.resteasy.operation == 'read') {
+        if (this.resteasy.table == 'order_history') {
+          yield afterReadOrderHistory.call(this, res[0]);
         }
       }
     },
@@ -231,11 +480,18 @@ module.exports = {
 
   // the apply context option allows you to specify special
   // relationships between things, in our case, /companies/:id/units,
-  // for example.  Which does a search through the checkins table for
-  // active checkins.
+  // for example.
   applyContext: function(query) {
+    debug('applyContext')
     var context = this.params.context;
     var m;
+    debug(this.resteasy.operation)
+    debug(this.resteasy.table)
+    debug(context)
+    if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+      debug('company id '+ m[1])
+      return query.select('units.*').where('company_id', m[1]);
+    }
   /**  if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
       return query.select(['units.*', 'checkins.check_in AS unit_check_in', 'checkins.check_out AS unit_check_out']).join('checkins', 'checkins.unit_id', 'units.id')
         .whereRaw('checkins.company_id = ? AND checkins.check_in <= now() AND ( checkins.check_out IS NULL OR checkins.check_out >= now() )', [m[1]]);
