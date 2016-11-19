@@ -371,42 +371,25 @@ exports.deleteMenuItem=function *(next) {
   }
 }
 
+
 exports.uploadMenuItemImage=function *(next) {
   debug('uploadMenuItemImage')
+  debug('id '+ this.menuItem.id)
   debug('..files')
   debug(this.body.files)
   debug('..path')
-  debug(this.body.files.image.path)
+  debug(this.body.files.file.path)
   debug('..check for files')
-  if (!this.body.files.image.path) {
-    debug('..No image found')
-    return;
-  }
-  debug('..Image found')
-  try {
-    var image = yield msc.uploadImage(this.menuItem.id, this.body.files.image.path)
-  } catch (err) {
-    console.error('uploadMenuItemImage: error uploading menu item image in ordering system ')
-    console.error(err)
-    throw(err)
-  }
-  this.body = image
-  return;
-}
-
-exports.uploadImage=function *(next) {
-  debug('uploadImage')
-  debug('id '+ this.menuItem.id)
   if (!this.body.files) {
-    debug('uploadImage: No image found')
+    debug('uploadMenuItemImage: No image found')
     return;
   }
   debug('found image')
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
-    debug('uploadImage: Role authorized')
+    debug('uploadMenuItemImage: Role authorized')
     var user = this.passport.user
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('uploadImage: error uploading menu item image: Owner '+ user.id + 'not associated with '+ this.company.name)
+        console.error('uploadMenuItemImage: error uploading menu item image: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
     debug(this.menuItem.company.data.id +'=='+ this.company.orderSysId)
@@ -414,21 +397,21 @@ exports.uploadImage=function *(next) {
       var data = this.body;
       debug(data)
       try {
-        var item = yield msc.uploadImage(this.menuItem.id, data)
+        var item = yield msc.uploadImage(this.menuItem.id, this.body.files.file.path)
       } catch (err) {
-        console.error('uploadImage: error uploading menu item image in ordering system ')
+        console.error('uploadMenuItemImage: error uploading menu item image in ordering system ')
         throw(err)
       }
       this.body = item
       return;
     } else {
-      console.error('uploadImage: updateMenuItem: Menu item does not belong to company')
+      console.error('uploadMenuItemImage: updateMenuItem: Menu item does not belong to company')
       this.status=422
       this.body = {error: 'Menu item does not belong to company'}
       return;
     }
   } else {
-    console.error('uploadImage: User not authorized')
+    console.error('uploadMenuItemImage: User not authorized')
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
