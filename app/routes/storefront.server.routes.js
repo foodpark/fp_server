@@ -38,7 +38,7 @@ module.exports=function(app) {
 
   router.put(apiversion + '/companies/:companyId/categories/:categoryId', requireJWT, storefront.updateCategory);
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.updateMenuItem);
-  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/image',  requireJWT, storefront.uploadMenuItemImage)
+  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
 	router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
