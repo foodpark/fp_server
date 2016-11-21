@@ -233,6 +233,7 @@ CREATE TABLE order_history (
   manual_pickup boolean DEFAULT false,
   order_detail json, -- json
   checkin_id integer REFERENCES checkins(id),
+  customer_name text,
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),
   company_id integer REFERENCES companies(id),

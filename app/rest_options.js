@@ -4,6 +4,7 @@ var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
+var User = require('./models/user.server.model');
 var msc = require('./controllers/moltin.server.controller');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
@@ -21,6 +22,26 @@ function *beforeSaveOrderHistory() {
   if (this.resteasy.operation == 'create') {
     debug('...create')
     if (this.resteasy.object.order_sys_order_id) {
+      debug('..getting customer name')
+      try {
+        var customer = (yield Customer.getSingleCustomer(this.resteasy.object.customer_id))[0]
+        var user = (yield User.getSingleUser(customer.user_id))[0];
+      } catch (err) {
+        console.error('beforeSaveOrderHistory: error getting customer name');
+        throw err;
+      }
+      var customerName = user.first_name + " " + user.last_name.charAt(0)
+      debug("customer "+ customerName)
+      this.resteasy.object.customer_name = customerName
+
+      //set company
+      if (!this.resteasy.object.company_id) {
+        debug(this.params.context)
+        var coId = this.params.context.match(/companies\/(\d+)\//)
+        debug(coId)
+        this.resteasy.object.company_id = coId[1];
+      }
+
       var moltin_order_id = this.resteasy.object.order_sys_order_id
       debug('order sys order id: '+ moltin_order_id)
       try {
@@ -36,6 +57,8 @@ function *beforeSaveOrderHistory() {
       this.resteasy.object.status = {
         order_requested : ''
       }
+      debug(this.resteasy.object)
+      debug('...preprocessing complete. Ready to save')
     } else {  // order_sys_order_id is required
       console.error('No order id for the ordering system')
       throw new Error('order_sys_order_id is required');
@@ -117,6 +140,7 @@ function *afterUpdateOrderHistory(orderHistory) {
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
       debug('...status '+ status)
+      var note_target = 'customer'
       if (status == 'order_paid' || status == 'pay_fail') {
         debug('...status update from customer. Notify unit')
         // get unit device id
@@ -126,6 +150,7 @@ function *afterUpdateOrderHistory(orderHistory) {
           console.error('afterUpdateOrderHistory: error retrieving unit '+ orderHistory.unit_id);
           throw err;
         }
+        note_target = 'unit'
         device_id = unit.device_id
       } else {
         debug('...status update from unit. Notify customer')
@@ -139,8 +164,8 @@ function *afterUpdateOrderHistory(orderHistory) {
         device_id = customer.device_id
       }
       if (!device_id){
-        console.error('afterUpdateOrderHistory: No device id!!')
-        throw new Error ('No device id!! Cannot notify')
+        console.error('afterUpdateOrderHistory: Cannot notify! No device id for ' + note_target)
+        throw new Error ('Cannot notify! No device id for '+ note_target)
       }
       switch(status) {
           // From Consumer
@@ -490,7 +515,7 @@ module.exports = {
     debug(context)
     if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
       debug('company id '+ m[1])
-      return query.select('units.*').where('company_id', m[1]);
+      return query.select('*').where('company_id', m[1]);
     }
   /**  if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
       return query.select(['units.*', 'checkins.check_in AS unit_check_in', 'checkins.check_out AS unit_check_out']).join('checkins', 'checkins.unit_id', 'units.id')
