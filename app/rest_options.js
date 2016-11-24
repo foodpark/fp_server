@@ -16,6 +16,55 @@ function timestamp() {
   return new Date(Date.now()).toLocaleString()
 }
 
+function *simplifyDetails(orderDetail) {
+  var items = orderDetail
+  debug('array length '+ items.length)
+  var menuItems = {};
+  for (i = 0; i < items.length; i++ ) {
+    item = items[i];
+    debug('menu item ')
+    debug(item.product.value)
+    debug('quantity ')
+    debug(item.quantity)
+    var itemDetail = {
+      title : item.product.value,
+      quantity : item.quantity
+    }
+    if (item.product.data.modifiers) {
+      debug('modifiers')
+      var modifiers = item.product.data.modifiers
+      itemDetail.options = []
+      itemDetail.selections = {}
+      for (var j in modifiers) {
+        debug(modifiers[j].title)
+        var mod = modifiers[j]
+        debug(mod)
+        if (!mod.type && mod.data.type.value == 'Variant') { // price associated with Variant
+          debug(mod.data.title + ': '+ mod.var_title)
+          itemDetail.selections[mod.data.title] = mod.var_title
+        } else { // option items or single selections
+          var titles = []
+          for (var k in mod.variations) {
+            var variation = mod.variations[k]
+            debug('...'+ variation.title)
+            titles.push(variation.title)
+          }
+          debug(titles)
+          if (mod.type.value == 'Single') {
+            itemDetail.options = titles
+          } else if (mod.type.value == 'Variant') {
+            itemDetail.selections[mod.title]=titles
+          }
+        }
+      }
+    }
+    debug(itemDetail.selections)
+    menuItems[item.product.value] = itemDetail
+  }
+  debug(menuItems)
+  return menuItems
+}
+
 function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory')
   debug(this.resteasy.object)
@@ -46,13 +95,14 @@ function *beforeSaveOrderHistory() {
       debug('order sys order id: '+ moltin_order_id)
       try {
         var order_details = yield msc.getOrderDetail(moltin_order_id)
+        order_details = yield simplifyDetails(order_details)
       } catch (err) {
         console.error(err)
         throw(err)
       }
       debug('order details ')
       debug(order_details)
-      this.resteasy.object.order_sys_order_detail = order_details
+      this.resteasy.object.order_detail = order_details
       // Set the initial state
       this.resteasy.object.status = {
         order_requested : ''
@@ -82,6 +132,8 @@ function *beforeSaveOrderHistory() {
       } // else previously set
       debug(savedStatus)
       this.resteasy.object.status = savedStatus.status
+    } else {
+      debug('...not a status update')
     }
   }
 }
@@ -99,12 +151,13 @@ function *afterCreateOrderHistory(orderHistory) {
   var title = "Order Requested!"
   var status = "order_requested"
 
-  if (!unit.device_id) {
+  /* if (!unit.device_id) {
     console.error('afterCreateOrderHistory: No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
     throw new Error ('No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
   push.notifyVendorOrderRequested(unit.device_id, orderHistory.id, title, status)
+  */
   var hash = {
     status : {
       order_requested: timestamp()
@@ -361,17 +414,16 @@ function *afterReadOrderHistory(orderHistory) {
   if (orderHistory.order_sys_order_id && !orderHistory.order_detail) {
     try {
       var moltin_order_items = yield msc.getOrderDetail(orderHistory.order_sys_order_id)
+      var details = yield simplifyDetails(moltin_order_items)
     } catch (err) {
       console.error(err)
       throw(err)
     }
-    debug('..moltin order')
-    debug(moltin_order_items)
-    moltin_order_items = JSON.stringify(moltin_order_items)
-    var order_detail = { order_detail: moltin_order_items};
-    debug(order_detail)
+    debug('..order details')
+    debug(details)
+    var orderDetail = { order_detail: details};
     try {
-      var updatedOrder = yield OrderHistory.updateOrder(orderHistory.id, order_detail)
+      var updatedOrder = yield OrderHistory.updateOrder(orderHistory.id, orderDetail)
     } catch (err) {
       console.error(err)
       throw(err)
