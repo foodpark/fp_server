@@ -181,7 +181,7 @@ function *afterUpdateOrderHistory(orderHistory) {
   order_picked_up	Picked Up	Vendor	Consumer
   no_show	No Show	Vendor	Consumer
   */
-  var device_id = ''
+  var deviceId = ''
   var title = ''
   var orderHistoryStatus = orderHistory.status
   debug(orderHistoryStatus)
@@ -193,7 +193,7 @@ function *afterUpdateOrderHistory(orderHistory) {
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
       debug('...status '+ status)
-      var note_target = 'customer'
+      var msgTarget = 'customer'
       if (status == 'order_paid' || status == 'pay_fail') {
         debug('...status update from customer. Notify unit')
         // get unit device id
@@ -203,8 +203,8 @@ function *afterUpdateOrderHistory(orderHistory) {
           console.error('afterUpdateOrderHistory: error retrieving unit '+ orderHistory.unit_id);
           throw err;
         }
-        note_target = 'unit'
-        device_id = unit.device_id
+        msgTarget = 'unit'
+        deviceId = unit.device_id
       } else {
         debug('...status update from unit. Notify customer')
         // get customer devide id
@@ -214,11 +214,11 @@ function *afterUpdateOrderHistory(orderHistory) {
           console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
           throw err;
         }
-        device_id = customer.device_id
+        deviceId = customer.device_id
       }
-      if (!device_id){
-        console.error('afterUpdateOrderHistory: Cannot notify! No device id for ' + note_target)
-        throw new Error ('Cannot notify! No device id for '+ note_target)
+      if (!deviceId){
+        console.error('afterUpdateOrderHistory: Cannot notify! No device id for ' + msgTarget)
+        throw new Error ('Cannot notify! No device id for '+ msgTarget)
       }
       switch(status) {
           // From Consumer
@@ -250,11 +250,17 @@ function *afterUpdateOrderHistory(orderHistory) {
           case 'no_show':
               title = "No Show"
               break;
+          case 'order_dispatched':
+              title = "Order Dispatched"
+              break;
+          case 'order_delivered':
+              title = "Order Delivered"
+              break;
           default:
               throw new Error ('Unkown status '+ status +' for order '+ orderHistory.id)
       }
-      debug('sending notification to device '+ device_id )
-      push.notifyVendorOrderRequested(device_id, orderHistory.id, title, status)
+      debug('sending notification to device '+ deviceId )
+      push.notifyVendorOrderRequested(deviceId, orderHistory.id, title, status)
       orderHistoryStatus[keys[i]] = timestamp()
       debug(orderHistoryStatus)
       updated = true

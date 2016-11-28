@@ -389,7 +389,7 @@ exports.deleteImage = function(imageId) {
   return requestEntities(IMAGES, DELETE, '', imageId)
 }
 
-exports.uploadImage = function *(menuItemId, path) {
+exports.uploadImage = function *(itemId, path) {
   debug('uploadImage')
   try {
     var token = yield getBearerToken()
@@ -404,14 +404,14 @@ exports.uploadImage = function *(menuItemId, path) {
   try {
     var imagefile = fs.createReadStream(path)
   } catch (err) {
-    console.log('uploadImage: error')
-    console.log(err)
+    console.error('uploadImage: error')
+    console.error(err)
   }
 
   debug(imagefile)
   var data = {
     file: imagefile,
-    assign_to: menuItemId
+    assign_to: itemId
   }
   debug(data)
   debug('...uploading')

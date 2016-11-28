@@ -45,6 +45,11 @@ exports.getForUser = function(userId) {
   return knex('companies').select('*').where('user_id', userId)
 };
 
+exports.updateImage = function(companyId, cdnPath) {
+  var hash = { photo : cdnPath }
+  return knex('companies').update(hash).where('id', companyId)
+};
+
 exports.verifyOwner = function(companyId, userId) {
   return knex('companies').select('*').where({
     id: companyId,

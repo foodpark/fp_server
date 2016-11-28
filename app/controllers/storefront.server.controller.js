@@ -51,6 +51,59 @@ exports.listCompanies=function *(next) {
   return;
 }
 
+exports.uploadCompanyImage=function *(next) {
+  debug('uploadCompanyImage')
+  debug('id '+ this.company.id)
+  debug('..files')
+  debug(this.body.files)
+  debug('..path')
+  debug(this.body.files.file.path)
+  debug('..check for files')
+  if (!this.body.files) {
+    debug('uploadCompanyImage: No image found')
+    return;
+  }
+  debug('..found image')
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    debug('uploadCompanyImage: Role authorized')
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('uploadCompanyImage: error uploading company image: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw(401, 'Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    var data = this.body;
+    debug(data)
+    try {
+      var item = yield msc.uploadImage(this.company.id, this.body.files.file.path)
+    } catch (err) {
+      console.error('uploadCompanyImage: error uploading menu item image in ordering system ')
+      throw(err)
+    }
+    var domain = item.segments.domain
+    var suffix = item.segments.suffix
+    debug('..domain ' + domain)
+    debug('..suffix ' + suffix)
+    debug('..domain string length '+ domain.length)
+    var domainLen = domain.length - 1 // eliminate extra slash
+    debug('..len '+ domainLen)
+    var cdnPath = domain.substring(0,domainLen) + suffix
+    debug('..cdnPath '+ cdnPath)
+    try {
+      var co = yield Company.updateImage(this.company.id, cdnPath)
+    } catch (err) {
+      console.error('uploadCompanyImage: error assigning image to company')
+      throw(err)
+    }
+    this.body = item
+    return;
+  } else {
+    console.error('uploadCompanyImage: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
 exports.readCategory=function *(next) {
 	this.body=this.category;
   return;

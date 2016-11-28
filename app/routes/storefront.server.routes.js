@@ -29,7 +29,8 @@ module.exports=function(app) {
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
 	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
-
+  
+  router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyImage)
 	router.post(apiversion + '/companies/:companyId/categories', requireJWT, storefront.createCategory)
   router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', requireJWT, storefront.createMenuItem)
   router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
