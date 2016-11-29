@@ -51,7 +51,7 @@ exports.listCompanies=function *(next) {
   return;
 }
 
-exports.uploadCompanyImage=function *(next) {
+var uploadCompanyImage=function *(next) {
   debug('uploadCompanyImage')
   debug('id '+ this.company.id)
   debug('..files')
@@ -88,20 +88,39 @@ exports.uploadCompanyImage=function *(next) {
     debug('..len '+ domainLen)
     var cdnPath = domain.substring(0,domainLen) + suffix
     debug('..cdnPath '+ cdnPath)
-    try {
-      var co = yield Company.updateImage(this.company.id, cdnPath)
-    } catch (err) {
-      console.error('uploadCompanyImage: error assigning image to company')
-      throw(err)
-    }
-    this.body = item
-    return;
+    return cdnPath
   } else {
     console.error('uploadCompanyImage: User not authorized')
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
   }
+}
+
+exports.uploadCompanyPhoto= function *(next) {
+  debug('uploadCompanyPhoto')
+  var cdnPath = yield uploadCompanyImage.apply(this)
+  try {
+    var co = yield Company.updatePhoto(this.company.id, cdnPath)
+  } catch (err) {
+    console.error('uploadCompanyPhoto: error assigning image to company')
+    throw(err)
+  }
+  this.body = co
+  return;
+}
+
+exports.uploadCompanyFeaturedDish= function *(next) {
+  debug('uploadCompanyFeaturedDish')
+  var cdnPath = yield uploadCompanyImage.apply(this)
+  try {
+    var co = yield Company.updateFeaturedDish(this.company.id, cdnPath)
+  } catch (err) {
+    console.error('uploadCompanyFeaturedDish: error assigning image to company')
+    throw(err)
+  }
+  this.body = co
+  return;
 }
 
 exports.readCategory=function *(next) {

@@ -45,10 +45,16 @@ exports.getForUser = function(userId) {
   return knex('companies').select('*').where('user_id', userId)
 };
 
-exports.updateImage = function(companyId, cdnPath) {
-  var hash = { photo : cdnPath }
-  return knex('companies').update(hash).where('id', companyId)
+exports.updateFeaturedDish = function(companyId, cdnPath) {
+  var hash = { featured_dish : cdnPath }
+  return knex('companies').update(hash).where('id', companyId).returning('*')
 };
+
+exports.updatePhoto = function(companyId, cdnPath) {
+  var hash = { photo : cdnPath }
+  return knex('companies').update(hash).where('id', companyId).returning('*')
+};
+
 
 exports.verifyOwner = function(companyId, userId) {
   return knex('companies').select('*').where({
