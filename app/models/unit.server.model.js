@@ -95,3 +95,11 @@ exports.findUniqueUnitName = function(company, unitName, suffix, callback) {
         }
     );
 };
+
+exports.verifyUnitManager = function(companyId, unitId, unitMgrId) {
+  return knex('units').select('*').where({
+    id: unitId,
+    company_id: companyId,
+    unit_mgr_id: unitMgrId
+  })
+};

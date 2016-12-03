@@ -471,6 +471,19 @@ module.exports = {
           } // else continue          }
         }
         console.log("...authorized")
+      } else if (operation == 'update' && this.params.table == 'units' && this.isAuthenticated() && this.passport.user && this.passport.user.role == 'UNITMGR') {
+        debug('unit mgr update')
+        if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
+          var compId = m[1]
+        }
+        debug('.. for company '+ compId)
+        var valid = (yield Unit.verifyUnitManager(compId, this.params.id, this.passport.user.id))[0]
+        debug(valid)
+        if (!valid) {
+          this.throw('Update Unauthorized - incorrect Unit Manager',401);
+        } // else continue
+        console.log("...authorized")
+
       } else if (operation == 'update' || operation == 'delete') {
         if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
@@ -513,7 +526,6 @@ module.exports = {
           }
         }
         console.log("...authorized")
-
       } else if (operation == 'read') {
         console.log('got a read')
       } else {
