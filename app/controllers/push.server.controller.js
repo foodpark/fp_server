@@ -87,7 +87,7 @@ var setMessage = function(orderId, title, status) {
 var notifyVendorOrderRequested = function(deviceId, orderId, title, status){
 	var msg = setMessage(orderId, title, status)
 	msg.to = deviceId
-	sendPushNotification(message);
+	sendPushNotification(msg);
 }
 
 var informVendorOrderCreated = function(deviceId, order){

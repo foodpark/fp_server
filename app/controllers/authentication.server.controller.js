@@ -297,7 +297,7 @@ exports.register = function*(next) {
       debug(userObject)
 
     } else if (role == 'CUSTOMER') {
-      debug('register: creating customer');
+      debug('register: creating customer with user id '+ userObject.id);
 
       try {
         var customer = (yield Customer.createCustomer(userObject.id))[0]
@@ -307,6 +307,7 @@ exports.register = function*(next) {
         throw err;
       }
       debug('...customer created with id '+ customer.id)
+      debug(customer)
       userObject.customer_id = customer.id
 
     } else if (role == 'ADMIN') {

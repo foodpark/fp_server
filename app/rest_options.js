@@ -6,6 +6,7 @@ var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var User = require('./models/user.server.model');
 var msc = require('./controllers/moltin.server.controller');
+var payload = require('./util/payload');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
@@ -68,6 +69,7 @@ function *simplifyDetails(orderDetail) {
 function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory')
   debug(this.resteasy.object)
+  debug('..operation '+ this.resteasy.operation)
   if (this.resteasy.operation == 'create') {
     debug('...create')
     if (this.resteasy.object.order_sys_order_id) {
@@ -112,10 +114,11 @@ function *beforeSaveOrderHistory() {
     } else {  // order_sys_order_id is required
       console.error('No order id for the ordering system')
       throw new Error('order_sys_order_id is required');
-      return;
     }
   } else if (this.resteasy.operation == 'update') {
     debug('...update')
+    var pld = payload.hardenOrderHistPutPayload(resteasy.object)
+    debug(pld)
     if (this.resteasy.object.status) {
       try {
         var savedStatus = (yield OrderHistory.getStatus(this.params.id))[0]
@@ -135,6 +138,30 @@ function *beforeSaveOrderHistory() {
     } else {
       debug('...not a status update')
     }
+      // what can be updated?
+      /*
+  NO - id SERIAL PRIMARY KEY
+  NO - order_sys_order_id text
+  NO - amount money,
+  NO - initiation_time timestamp,
+  WHY DO WE NEED THIS, WE HAVE STATUS - payment_time timestamp,
+  actual_pickup_time timestamp,
+  desired_pickup_time timestamp,
+  prep_notice_time timestamp,
+  status json,
+  messages text, -- json
+  qr_code text,
+  manual_pickup boolean DEFAULT false,
+  order_detail json, -- json
+  NO - checkin_id integer REFERENCES checkins(id),
+  NO - customer_name text,
+  NO - customer_id integer REFERENCES customers(id),
+  NO - unit_id integer REFERENCES units(id),
+  NO - company_id integer REFERENCES companies(id),
+  NO - created_at timestamp without time zone DEFAULT now(),
+  NO - updated_at timestamp without time zone DEFAULT now()
+  */
+
   }
 }
 
@@ -351,7 +378,6 @@ function *beforeSaveUnit() {
   }
   if (existingUser) {
     throw new Error('That user name is already in use.');
-    return;
   }
   if (createOrUpdateUser) {
     var unitmgr = { role: 'UNITMGR', username: username, password: password}
