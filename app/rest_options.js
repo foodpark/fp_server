@@ -6,7 +6,7 @@ var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var User = require('./models/user.server.model');
 var msc = require('./controllers/moltin.server.controller');
-var payload = require('./util/payload');
+var payload = require('./utils/payload');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
@@ -117,8 +117,16 @@ function *beforeSaveOrderHistory() {
     }
   } else if (this.resteasy.operation == 'update') {
     debug('...update')
-    var pld = payload.hardenOrderHistPutPayload(resteasy.object)
-    debug(pld)
+    debug('...limit payload elements')
+    try {
+      // this will modify this.resteasy.object
+      yield payload.limitOrderHistPayloadForPut(this.resteasy.object)
+    } catch (err) {
+      console.error(err)
+      throw(err)
+    }
+    debug('..limited payload is..')
+    debug(this.resteasy.object)
     if (this.resteasy.object.status) {
       try {
         var savedStatus = (yield OrderHistory.getStatus(this.params.id))[0]
@@ -128,7 +136,7 @@ function *beforeSaveOrderHistory() {
       }
       var newStat = this.resteasy.object.status
       debug (savedStatus)
-      debug('new status '+ newStat)
+      debug('..status sent is '+ newStat)
       if (!savedStatus.status[newStat]) {
         // add subsequent state
         savedStatus.status[newStat] = ''
@@ -138,30 +146,6 @@ function *beforeSaveOrderHistory() {
     } else {
       debug('...not a status update')
     }
-      // what can be updated?
-      /*
-  NO - id SERIAL PRIMARY KEY
-  NO - order_sys_order_id text
-  NO - amount money,
-  NO - initiation_time timestamp,
-  WHY DO WE NEED THIS, WE HAVE STATUS - payment_time timestamp,
-  actual_pickup_time timestamp,
-  desired_pickup_time timestamp,
-  prep_notice_time timestamp,
-  status json,
-  messages text, -- json
-  qr_code text,
-  manual_pickup boolean DEFAULT false,
-  order_detail json, -- json
-  NO - checkin_id integer REFERENCES checkins(id),
-  NO - customer_name text,
-  NO - customer_id integer REFERENCES customers(id),
-  NO - unit_id integer REFERENCES units(id),
-  NO - company_id integer REFERENCES companies(id),
-  NO - created_at timestamp without time zone DEFAULT now(),
-  NO - updated_at timestamp without time zone DEFAULT now()
-  */
-
   }
 }
 
