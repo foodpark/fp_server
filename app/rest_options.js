@@ -75,14 +75,18 @@ function *beforeSaveOrderHistory() {
     if (this.resteasy.object.order_sys_order_id) {
       debug('..getting customer name')
       try {
-        var customer = (yield Customer.getSingleCustomer(this.resteasy.object.customer_id))[0]
-        var user = (yield User.getSingleUser(customer.user_id))[0];
+        debug('..user ')
+        debug(this.passport.user)
+        var user = this.passport.user
+        var customer = (yield Customer.getForUser(user.id))[0]
+        debug('..customer')
+        debug(customer)
       } catch (err) {
         console.error('beforeSaveOrderHistory: error getting customer name');
         throw err;
       }
       var customerName = user.first_name + " " + user.last_name.charAt(0)
-      debug("customer "+ customerName)
+      debug("..customer name is "+ customerName)
       this.resteasy.object.customer_name = customerName
 
       //set company
@@ -102,7 +106,7 @@ function *beforeSaveOrderHistory() {
         console.error(err)
         throw(err)
       }
-      debug('order details ')
+      debug('...order details ')
       debug(order_details)
       this.resteasy.object.order_detail = order_details
       // Set the initial state
@@ -162,13 +166,13 @@ function *afterCreateOrderHistory(orderHistory) {
   var title = "Order Requested!"
   var status = "order_requested"
 
-  /* if (!unit.device_id) {
+  if (!unit.device_id) {
     console.error('afterCreateOrderHistory: No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
     throw new Error ('No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
   push.notifyVendorOrderRequested(unit.device_id, orderHistory.id, title, status)
-  */
+
   var hash = {
     status : {
       order_requested: timestamp()
@@ -181,17 +185,7 @@ function *afterCreateOrderHistory(orderHistory) {
 
 function *afterUpdateOrderHistory(orderHistory) {
   debug('afterUpdateOrderHistory')
-  /*
-  order_declined	Order Rejected	Vendor	Consumer
-  order_accepted	Order Accepted	Vendor	Consumer
-  order_paid	Order Paid	Consumer	Vendor
-  pay_fail	Payment Failed	Consumer	Vendor
-  order_in_queue	In Queue	Vendor	Consumer
-  order_cooking	Cooking	Vendor	Consumer
-  order_ready	Ready	Vendor	Consumer
-  order_picked_up	Picked Up	Vendor	Consumer
-  no_show	No Show	Vendor	Consumer
-  */
+
   var deviceId = ''
   var title = ''
   var orderHistoryStatus = orderHistory.status
