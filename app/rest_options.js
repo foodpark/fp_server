@@ -166,13 +166,13 @@ function *afterCreateOrderHistory(orderHistory) {
   var title = "Order Requested!"
   var status = "order_requested"
 
-  if (!unit.device_id) {
+  /* if (!unit.device_id) {
     console.error('afterCreateOrderHistory: No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
     throw new Error ('No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
   push.notifyVendorOrderRequested(unit.device_id, orderHistory.id, title, status)
-
+  */
   var hash = {
     status : {
       order_requested: timestamp()
