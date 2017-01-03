@@ -1,119 +1,142 @@
-var config = require('../../config/config')
+var config = require('../../config/config');
+var FCM = require('fcm-node');
+var gcm = require('node-gcm');
 var moltin = require('./moltin.server.controller');
-
-var fcm = require('fcm-node');
+var OrderHistory = require('../models/orderhistory.server.model');
+var OrderStatusAudit = require('../models/orderstatusaudit.server.model');
+var timestamp = require('../utils/timestamp');
+var debug = require('debug')('push');
 
 var deviceInfo = {};
 
 const ORDER = '/orders';
 const ORDER_CREATED = 'ORDER_CREATED';
 const ORDER_ACCEPTED_STATUS = 'ORDER_ACCEPTED_STATUS';
-
-
 const ORDER_REQUESTED = 'order_requested';
 
-var getMessage = function(deviceId){
-	return {
-		to:deviceId
-	};
-}
+var displayString = {
+	order_requested	 : 'was requested',
+	order_declined   : 'was rejected',
+	order_accepted   : 'was accepted',
+	order_paid       : 'was paid',
+	pay_fail         : 'payment failed',
+	order_in_queue   : 'is in queue',
+	order_cooking    : 'is cooking',
+	order_ready	     : 'is ready',
+	order_picked_up  : 'was picked up',
+	no_show          : ': customer was no show',
+	order_dispatched : 'was dispatched',
+	order_delivered	 : 'was delivered'
+} 
 
-/*
-	Inform customer about order accept or decline
-*/
-var informCutomer = function(deviceId, orderId, orderStatus){
-	console.log("*********** Info Customer *****************");
-	console.log("Customer Device Info ", deviceId, orderId, orderStatus);
-	var orderStatusMessage = (orderStatus+'' == 'true')?'Your order accepted by vendor':'Your order decline by vendor';
-	var message = getMessage(deviceId);
-	message.data = {'order':orderId, type:ORDER_ACCEPTED_STATUS, order_status:orderStatus};
-	message.notification = {'title':"SFEZ Food",'message':orderStatusMessage};
-	sendPushNotification(message);
-}
 
-var sendPushNotification = function(message){
-	if(message){
-		var sender = new FCM.Sender(config.googleApiKey);
-		sender.send(message, function (err, response) {
-			if (err) {
-				console.error("Something has gone wrong!");
-			} else {
-				console.log("Successfully sent with response: ", response);
-			}
-		});
-	}
-}
-
-exports.orderAcceptDeclice = function*(next){
-	console.log("****************** Accept/Declice **********************");
-	console.log("Status ", this.body.order_status);
-	try{
-		var status = this.body.order_status;
-		var order = this.body.order;
-		var flow = ORDER + '/'+ order;
-		var orderObject = yield moltin.getOrderById(flow);
-		if(orderObject && orderObject.customer && orderObject.customer.data){
-			device_token = getDeviceToken(orderObject.customer.data.email);
-			informCutomer(device_token, order, status);
-		}
-	}catch(err){
-		throw(err);
-	}
-	this.body = orderObject;
-}
-
-exports.sendPush = function*(next){
-	var sender = new gcm.Sender(config.googleApiKey);
-	sender.send(getMessage(), { registrationTokens: tokens(this.query.deviceToken) }, function (err, response) {
-  		if(err) console.error(err);
-  		else    console.log(response);
-	});
-
-	this.body = {};
-}
-
-var setMessage = function(orderId, title, status) {
+var setOrderStatusMessage = function(orderId, title, display, status) {
 	var note = {
 		"notification" : {
-			"body" : "Order "+ orderId +" requested at "+ Date.now(),
+			"body" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
 			"title" : title
 		},
 		"data" : {
 			"status" : status
 		}
-	}
+	};
+	return note;
 }
 
-var notifyVendorOrderRequested = function(deviceId, orderId, title, status){
-	var msg = setMessage(orderId, title, status)
-	msg.to = deviceId
-	sendPushNotification(msg);
+var sendFCMNotification = function (message){
+	debug('sendFCMNotification');
+	return new Promise( function(resolve, reject) { 
+		if (message) {
+			var fcm = new FCM(config.fcmServerKey);
+			debug('fcm');
+			debug(fcm);
+			fcm.send(message, function (err, response) {
+				if(err) {
+					debug('..Error occurred');
+					console.error(err);
+					reject(err);
+				} else {
+					console.log('FCM notification sent');
+					console.log(response);
+					resolve(response);
+				}
+			})
+		} else {
+			console.error('..Empty message ');
+			console.error(message);
+			reject(new Error('Empty message. FCM notification not sent'));
+		}
+	})
 }
 
-var informVendorOrderCreated = function(deviceId, order){
-	var message = getMessage(deviceId);
-	message.data = {'order':order, type:ORDER_CREATED};
-	message.notification = {'title':"SFEZ Food",'message':'An order created. Do you want to accept?'};
-	sendPushNotification(message);
+var sendGCMNotification = function (message){
+	debug('sendGCMNotification');
+	return new Promise( function(resolve, reject) {
+		if (message) {
+			var  gcmMsg = new gcm.Message();
+			gcmMsg.addData(message.data);
+			gcmMsg.addNotification(message.notification)
+			debug(gcmMsg)
+			var regtokens = [message.to];
+			debug(regtokens)
+			var sender = new gcm.Sender(config.gcmServerKey);
+			debug(sender);
+			debug('..sending');
+			sender.send(gcmMsg, {registrationTokens : regtokens}, function (err, response) {
+				debug('..returned from call to Google')
+				if(err) {
+					reject(err);
+				} else {
+					console.log('GCM notification sent');
+					resolve(response);
+				}
+			})
+		} else {
+			reject(new Error('Empty message or sender. GCM notification not sent'));	
+		}
+	})
 }
 
-exports.eventTrack = function*(next){
-	console.log("*********************** response from webhook *******************")
-	console.log(this.body," Webhook ****************************8 ");
-	var order = this.body.order;
-	var vendor = this.body.vendor;
-	var deviceId = getDeviceToken(vendor);
-	informVendorOrderCreated(deviceId, order);
-	this.status = 200;
-}
-
-
-exports.setDeviceToken = function*(next){
-	deviceInfo[this.body.user_email] = this.body.device_token;
-	console.log("deviceToken ", deviceInfo)
-	this.body = {};
-}
-
-var getDeviceToken = function(userEmail){
-	return deviceInfo[userEmail];
+exports.notifyOrderUpdated = function *(orderId, msgTarget){
+	debug('notifyOrderUpdated');
+	var msg = setOrderStatusMessage(orderId, msgTarget.title, displayString[msgTarget.status], msgTarget.status);
+	debug(msg);
+	debug('..sending notification..');
+	var notified = {};
+	var fcmRes = '';
+	if (msgTarget.fcmId) {
+		debug('...to fcm id');
+		msg.to = msgTarget.fcmId;
+		try {
+			fcmRes = yield sendFCMNotification(msgTarget);
+		} catch (err) {
+			// failed notification is not a showstopper
+			console.error(err);
+			notified.fcm = false;
+		}
+		debug('...response')
+		debug(fcmRes)
+		if (fcmRes && fcmRes.success > 0 && fmcRes.failure == 0) {
+			notified.fcm = true;
+		}
+	} else console.log('No fcm id - no fcm notification sent to '+ msgTarget.to +' '+ msgTarget.toId)
+	if (msgTarget.gcmId) {
+		debug('...to gcm id');
+		msg.to = msgTarget.gcmId;
+		var gcmRes = '';
+		try {
+			gcmRes = yield sendGCMNotification(msg);
+		} catch (err) {
+			//failed notificaiton is not a showstopper
+			console.error(err);
+			notified.gcm = false;
+		}
+		debug('...response');
+		debug(gcmRes);
+		if (gcmRes && gcmRes.success > 0 && fcmRes.failure == 0) {
+			notified.gcm = true;
+		}
+		debug('...done with notifications attempts')
+	} else console.log('No gcm id - no gcm notification sent to '+ msgTarget.to +' '+ msgTarget.toId)
+	return notified;
 }
