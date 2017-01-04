@@ -47,7 +47,7 @@ var sendFCMNotification = function (message){
 	return new Promise( function(resolve, reject) { 
 		if (message) {
 			var fcm = new FCM(config.fcmServerKey);
-			debug('fcm');
+			debug('..fcm');
 			debug(fcm);
 			fcm.send(message, function (err, response) {
 				if(err) {
@@ -110,7 +110,6 @@ exports.notifyOrderUpdated = function *(orderId, msgTarget){
 			fcmRes = yield sendFCMNotification(msgTarget);
 		} catch (err) {
 			// failed notification is not a showstopper
-			console.error(err);
 			notified.fcm = false;
 		}
 		debug('...response')
@@ -127,7 +126,6 @@ exports.notifyOrderUpdated = function *(orderId, msgTarget){
 			gcmRes = yield sendGCMNotification(msg);
 		} catch (err) {
 			//failed notificaiton is not a showstopper
-			console.error(err);
 			notified.gcm = false;
 		}
 		debug('...response');
