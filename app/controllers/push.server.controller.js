@@ -89,6 +89,7 @@ var sendGCMNotification = function (message){
 					reject(err);
 				} else {
 					console.log('GCM notification sent');
+					console.log(response);
 					resolve(response);
 				}
 			})

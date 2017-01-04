@@ -222,7 +222,7 @@ function *afterUpdateOrderHistory(orderHistory) {
         debug('..Unit gcm id is '+ unit.gcm_id)
         msgTarget.to = 'unit'
         msgTarget.toId = unit.id
-        msgTarget.gcmId = unit.device_id
+        msgTarget.gcmId = unit.gcm_id
         msgTarget.fcmId = unit.fcm_id
       } else {
         debug('...status update from unit. Notify customer '+ orderHistory.customer_id)
@@ -236,7 +236,7 @@ function *afterUpdateOrderHistory(orderHistory) {
         debug('..Customer gcm id is '+ customer.gcm_id)
         msgTarget.to = 'customer' 
         msgTarget.toId = customer.id
-        msgTarget.gcmId = customer.device_id
+        msgTarget.gcmId = customer.gcm_id
         msgTarget.fcmId = customer.fcm_id
       }
       if (!msgTarget.gcmId && !msgTarget.fcmId){
