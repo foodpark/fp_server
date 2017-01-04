@@ -70,18 +70,18 @@ COPY companies (id, name, order_sys_id, base_slug, default_cat, description, ema
 \.
 SELECT pg_catalog.setval('companies_id_seq', 1004, true);
 
-COPY customers (id, order_sys_id, description, device_id, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at) FROM stdin;
+COPY customers (id, order_sys_id, description, gcm_id, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at) FROM stdin;
 9001	\N	Taco expert. I love tacos.	APA91bECFEhmamkhENoB_sn2N20T0KX8HqF5XxzBG1PseAuJJ9VdoRkkl0sZXtsLosSHCi2oSo01t63XOzRHxTEOLqYtwOF0mF2m0GaCCyE-Op1uVkMuvC-rgoqh1A0rA80OIMgVxkeE	www.facebook.com/stacytfakeaccount	\N	\N	f	\N	\N	\N	11001	2016-08-21 23:31:43.151356
 9002	\N	Serial food eater	\N	www.facebook.com/jonjonesfakeaccount	\N	\N	f	\N	\N	\N	11002	2016-08-21 23:31:43.151356
 9003	\N	Food bloggers. Follow us on mifood.blog.com	\N	www.facebook.com/mifoodfakeaccount	\N	\N	t	\N	\N	\N	11003	2016-08-21 23:31:43.151356
 \.
 SELECT pg_catalog.setval('customers_id_seq', 9004, true);
 
-COPY units (id, name, number, type, description, username, password, qr_code, unit_order_sys_id, company_id, unit_mgr_id, customer_order_window) FROM stdin;
-2001	Thaitanic Truck 1	1	TRUCK	\N	mptruck61	mptruck61	\N	\N	1002	11007	15
-2002	Thaitanic Cart 1	1	CART	\N	mptruck64	mptruck64	\N	\N	1002	11008	20
-2003	Pacos Tacos Truck 1	1	TRUCK	\N	mptruck64five	mptruck64five	\N	\N	1001	11009	10
-2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010	15
+COPY units (id, name, number, type, description, username, password, qr_code, unit_order_sys_id, company_id, unit_mgr_id, customer_order_window, fcm_id, gcm_id) FROM stdin;
+2001	Thaitanic Truck 1	1	TRUCK	\N	mptruck61	mptruck61	\N	\N	1002	11007	15	APA91bGyR9ZsR74serH6pLKNGxHBM5EkDMR20dEbIJ7-PS-uiApWaIwczWffiofgkmow_u3s-f2IcFTYlPGfSafCGQ6rAS-z1GJUjsd1juSzmuM4ibl5rxbASpWoPMCkZpUpY8EFe-_Q	c9k1cdeqqlc:APA91bE3N9DPEPRVrylvqniUc0YkeqiDcL0bLF7wEpm0BUFDspsRMjJGenLnF07ssEmBZe90pG983xq9cQLzLzu6uWXYyhv1OZpDrUeCirxjBSzmIX-TJlO5T58PxakjRLd8LIghjnuy
+2002	Thaitanic Cart 1	1	CART	\N	mptruck64	mptruck64	\N	\N	1002	11008	20	\N	APA91bGLPDm96TAg6C77VrwxlP1Nk11Md-hSRZGLOjS8CoECWfEFjp1Ise1_GRolqix4jydowaJ9d8OKxJMoiH3_qc0VEGNdqKiQ66Jbb_mneP-0T5qm4IK3RPZMKQlu9j2T7gOJGg0B
+2003	Pacos Tacos Truck 1	1	TRUCK	\N	mptruck64five	mptruck64five	\N	\N	1001	11009	10	\N	\N
+2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010	15	fSXaK3t8Tvc:APA91bGyt1VUybSq0JE5DX5eCalr2xl_SRuRF-QrzIGLrAJSmvDwDNLEJVd2qiOM_2spZwvGdop6KRaZqFjgNdVM47nJjIbglkC7QkGqNex0guUe8V77-qm4LZpIANBHV6bDeBflAD3I	\N
 \.
 SELECT pg_catalog.setval('units_id_seq', 2005, true);
 
