@@ -81,9 +81,11 @@ var sendGCMNotification = function (message){
 			var sender = new gcm.Sender(config.gcmServerKey);
 			debug(sender);
 			debug('..sending');
+			console.log('Sending GCM notification...');
 			sender.send(gcmMsg, {registrationTokens : regtokens}, function (err, response) {
 				debug('..returned from call to Google')
 				if(err) {
+					console.error(err);
 					reject(err);
 				} else {
 					console.log('GCM notification sent');
@@ -105,6 +107,7 @@ exports.notifyOrderUpdated = function *(orderId, msgTarget){
 	var fcmRes = '';
 	if (msgTarget.fcmId) {
 		debug('...to fcm id');
+		console.log('Sending FCM notification...');
 		msg.to = msgTarget.fcmId;
 		try {
 			fcmRes = yield sendFCMNotification(msgTarget);
