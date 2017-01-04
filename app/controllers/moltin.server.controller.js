@@ -362,6 +362,12 @@ exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
   return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
 };
 
+
+exports.findOrder=function(orderSysOrderId) {
+  debug('findOrder')
+  return requestEntities(ORDERS, GET, '', orderSysOrderId)
+};
+
 var orderDetailFlow = function (orderSysOrderId) {
   debug('orderDetailFlow')
   var flow = ORDERS + '/' + orderSysOrderId + '/items'
