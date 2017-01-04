@@ -3,7 +3,6 @@ var FCM = require('fcm-node');
 var gcm = require('node-gcm');
 var moltin = require('./moltin.server.controller');
 var OrderHistory = require('../models/orderhistory.server.model');
-var OrderStatusAudit = require('../models/orderstatusaudit.server.model');
 var timestamp = require('../utils/timestamp');
 var debug = require('debug')('push');
 

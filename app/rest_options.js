@@ -7,15 +7,12 @@ var OrderHistory = require('./models/orderhistory.server.model');
 var User = require('./models/user.server.model');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
+var timestamp = require('./utils/timestamp');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 
-
-function timestamp() {
-  return new Date(Date.now()).toLocaleString()
-}
 
 function *simplifyDetails(orderDetail) {
   var items = orderDetail
@@ -27,9 +24,11 @@ function *simplifyDetails(orderDetail) {
     debug(item.product.value)
     debug('quantity ')
     debug(item.quantity)
+    debug('amount')
     var itemDetail = {
       title : item.product.value,
-      quantity : item.quantity
+      quantity : item.quantity,
+
     }
     if (item.product.data.modifiers) {
       debug('modifiers')
@@ -67,8 +66,8 @@ function *simplifyDetails(orderDetail) {
 }
 
 function *beforeSaveOrderHistory() {
-  debug('beforeSaveOrderHistory')
-  debug(this.resteasy.object)
+  debug('beforeSaveOrderHistory');
+  debug(this.resteasy.object);
   debug('..operation '+ this.resteasy.operation)
   if (this.resteasy.operation == 'create') {
     debug('...create')
@@ -86,8 +85,9 @@ function *beforeSaveOrderHistory() {
         throw err;
       }
       var customerName = user.first_name + " " + user.last_name.charAt(0)
-      debug("..customer name is "+ customerName)
-      this.resteasy.object.customer_name = customerName
+      debug("..customer name is "+ customerName);
+      this.resteasy.object.customer_name = customerName;
+      this.resteasy.object.customer_id = customer.id;
 
       //set company
       if (!this.resteasy.object.company_id) {
@@ -100,12 +100,15 @@ function *beforeSaveOrderHistory() {
       var moltin_order_id = this.resteasy.object.order_sys_order_id
       debug('order sys order id: '+ moltin_order_id)
       try {
+        var order = yield msc.findOrder(moltin_order_id)
         var order_details = yield msc.getOrderDetail(moltin_order_id)
         order_details = yield simplifyDetails(order_details)
       } catch (err) {
         console.error(err)
         throw(err)
       }
+      debug('...total amount '+ order.totals.formatted.total)
+      this.resteasy.object.amount = order.totals.formatted.total
       debug('...order details ')
       debug(order_details)
       this.resteasy.object.order_detail = order_details
@@ -153,6 +156,7 @@ function *beforeSaveOrderHistory() {
   }
 }
 
+
 function *afterCreateOrderHistory(orderHistory) {
   debug('afterCreateOrderHistory')
 
@@ -163,19 +167,26 @@ function *afterCreateOrderHistory(orderHistory) {
     throw err;
   }
   debug(unit)
-  var title = "Order Requested!"
-  var status = "order_requested"
 
-  /* if (!unit.device_id) {
-    console.error('afterCreateOrderHistory: No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
-    throw new Error ('No device id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+  if (!unit.gcm_id && !unit.fcm_id) {
+    console.error('afterCreateOrderHistory: No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+    throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+  }
+  var msgTarget = {
+    to     : 'unit',
+    toId   : unit.id,
+    gcmId  : unit.gcm_id,
+    fcmId  : unit.fcm_id,
+    title  : "Order Requested!",
+    status : "order_requested"
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
-  push.notifyVendorOrderRequested(unit.device_id, orderHistory.id, title, status)
-  */
+  yield push.notifyOrderUpdated(orderHistory.id, msgTarget)
+  debug('..returned from notifying')
+
   var hash = {
     status : {
-      order_requested: timestamp()
+      order_requested: timestamp.now()
     }
   }
   this.resteasy.queries.push(
@@ -198,86 +209,101 @@ function *afterUpdateOrderHistory(orderHistory) {
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
       debug('...status '+ status)
-      var msgTarget = 'customer'
+      var msgTarget = { order_id : orderHistory.id }
       if (status == 'order_paid' || status == 'pay_fail') {
         debug('...status update from customer. Notify unit')
-        // get unit device id
+        // get unit 
         try {
           var unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
         } catch (err) {
           console.error('afterUpdateOrderHistory: error retrieving unit '+ orderHistory.unit_id);
           throw err;
         }
-        msgTarget = 'unit'
-        deviceId = unit.device_id
+        debug('..Unit gcm id is '+ unit.gcm_id)
+        msgTarget.to = 'unit'
+        msgTarget.toId = unit.id
+        msgTarget.gcmId = unit.gcm_id
+        msgTarget.fcmId = unit.fcm_id
       } else {
-        debug('...status update from unit. Notify customer')
-        // get customer devide id
+        debug('...status update from unit. Notify customer '+ orderHistory.customer_id)
+        // get customer device id
         try {
           var customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
         } catch (err) {
           console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
           throw err;
         }
-        deviceId = customer.device_id
+        debug('..Customer gcm id is '+ customer.gcm_id)
+        msgTarget.to = 'customer' 
+        msgTarget.toId = customer.id
+        msgTarget.gcmId = customer.gcm_id
+        msgTarget.fcmId = customer.fcm_id
       }
-      if (!deviceId){
-        console.error('afterUpdateOrderHistory: Cannot notify! No device id for ' + msgTarget)
-        throw new Error ('Cannot notify! No device id for '+ msgTarget)
+      if (!msgTarget.gcmId && !msgTarget.fcmId){
+        console.error('afterUpdateOrderHistory: Cannot notify! No fcm/gcm id for ' + msgTarget.to +' '+ msgTarget.toId)
+        throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to)
       }
       switch(status) {
           // From Consumer
           case 'order_paid':
-              title = "Order Paid"
+              msgTarget.title = "Order Paid"
               break;
           case 'pay_fail':
-              title = "Payment Failed"
+              msgTarget.title = "Payment Failed"
               break;
           // From Vendor
           case 'order_declined':
-              title = "Order Declined"
+              msgTarget.title = "Order Declined"
               break;
           case 'order_accepted':
-              title = "Order Accepted"
+              msgTarget.title = "Order Accepted"
               break;
           case 'order_in_queue':
-              title = "Order In Queue"
+              msgTarget.title = "Order In Queue"
               break;
           case 'order_cooking':
-              title = "Order Cooking"
+              msgTarget.title = "Order Cooking"
               break;
           case 'order_ready':
-              title = "Order Ready"
+              msgTarget.title = "Order Ready"
               break;
           case 'order_picked_up':
-              title = "Order Picked Up"
+              msgTarget.title = "Order Picked Up"
               break;
           case 'no_show':
-              title = "No Show"
+              msgTarget.title = "No Show"
               break;
           case 'order_dispatched':
-              title = "Order Dispatched"
+              msgTarget.title = "Order Dispatched"
               break;
           case 'order_delivered':
-              title = "Order Delivered"
+              msgTarget.title = "Order Delivered"
               break;
           default:
               throw new Error ('Unkown status '+ status +' for order '+ orderHistory.id)
       }
-      debug('sending notification to device '+ deviceId )
-      push.notifyVendorOrderRequested(deviceId, orderHistory.id, title, status)
-      orderHistoryStatus[keys[i]] = timestamp()
-      debug(orderHistoryStatus)
-      updated = true
+      msgTarget.status = status
+      
+      debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')')
+      yield push.notifyOrderUpdated(orderHistory.id, msgTarget)
+      debug('..returned from notifying')
+    } else {
+      debug('..notification for '+ keys[i] + ' previously sent');
     }
   }
-  if (updated) {
-    debug(orderHistoryStatus)
-    this.resteasy.queries.push(
-      this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
-    );
-  }
 }
+
+/*
+fcm: https://fcm.googleapis.com/fcm/send
+gcm: https://gcm-http.googleapis.com/gcm/send
+curl --header "Authorization: key=AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI" \
+       --header Content-Type:"application/json" \
+       https://gcm-http.googleapis.com/gcm/send \
+       -d "{\"registration_ids\":[\"cFjGDbV8s5o:APA91bHk_FrAcpIkX8ATzv5lisTtgU4Qdz7mhO_lV4sDzvpXXO075K4qRligKMieeAedqYOmRFSOqGc8w-w5uGkehdavuUjZZ77Q1vOrO3WDq5jnwVvY2LaP7aW02DCQJVx0E79g1jX9\"]}"
+       */
+// \"registration_ids\":[\"cFjGDbV8s5o:APA91bHk_FrAcpIkX8ATzv5lisTtgU4Qdz7mhO_lV4sDzvpXXO075K4qRligKMieeAedqYOmRFSOqGc8w-w5uGkehdavuUjZZ77Q1vOrO3WDq5jnwVvY2LaP7aW02DCQJVx0E79g1jX9\"
+//   "dSEAkJd05m0:APA91bGkJgqyfvkGjpL4MuBi419c-S9VZhRQ7U5aAJUoxffBwVqs3zEkaBu452emgWS-dbufPmw9u0KyHg2__CLd0mkALrWQULCqCe8OtMUbRaDPDDE9AP_1TUzfQ2e5P5392ufYtS4f",
+
 
 function *beforeSaveReview() {
   debug('beforeSaveReview: user is ')
@@ -461,7 +487,8 @@ module.exports = {
       console.log('checking authorization of ' + operation + ' on ')
       console.log(this.params)
       if (operation == 'create') {
-        if (this.params.table == 'companies' || this.params.table == 'food_parks' || this.params.table == 'roles' ) {
+        if (this.params.table == 'companies' || this.params.table == 'food_parks' || this.params.table == 'roles' ||
+            this.params.table == 'order_status_audit' || this.params.table == 'territories') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Create Unauthorized - Admin only',401);
           } // else continue
@@ -469,7 +496,9 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
-        } else if (this.params.table == 'customers' || this.params.table == 'favorites' || this.params.table == 'reviews') {
+        } else if (this.params.table == 'customers' || this.params.table == 'favorites' || this.params.table == 'reviews' ||
+                   this.params.table == 'order_history') {
+          debug('checking POST order_history '+ this.params.table)
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
@@ -489,9 +518,14 @@ module.exports = {
         console.log("...authorized")
 
       } else if (operation == 'update' || operation == 'delete') {
-        if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
+        if (this.params.table == 'territories' || this.params.table == 'food_parks' || this.params.table == 'roles' ||
+            this.params.table == 'order_status_audit' || this.params.table == 'users') {
+          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
+            this.throw('Update/Delete Unauthorized - Admin only',401);
+          } // else continue
+        } else if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
-            this.throw('Update Unauthorized - Owners/Admin only',401);
+            this.throw('Update/Delete Unauthorized - Owners/Admin only',401);
           } else {
             if (this.passport.user.role == 'OWNER') {
               // verify user is modifying the correct company
@@ -503,15 +537,14 @@ module.exports = {
               var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
               console.log(valid)
               if (!valid) {
-                this.throw('Update Unauthorized - incorrect Owner',401);
+                this.throw('Update/Delete Unauthorized - incorrect Owner',401);
               } // else continue
               console.log(valid)
             }
-            console.log("...authorized")
           }
         } else if (this.params.table == 'customers' ||  this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
-            this.throw('Update Unauthorized - Customers only',401);
+            this.throw('Update/Delete Unauthorized - Customers only',401);
           } else {
             if (this.passport.user.role == 'CUSTOMER') {
               // verify user is modifying the correct review
@@ -523,12 +556,12 @@ module.exports = {
               var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
               console.log(valid)
               if (!valid) {
-                this.throw('Update Unauthorized - User may not update this customer',401);
+                this.throw('Update/Delete Unauthorized - User may not update this customer',401);
               } // else continue
               console.log(valid)
             }
           }
-        }
+        } 
         console.log("...authorized")
       } else if (operation == 'read') {
         console.log('got a read')
@@ -539,7 +572,6 @@ module.exports = {
     },
 
     beforeSave: function *() {
-      debug('this.resteasy.table')
       if (this.resteasy.table == 'reviews') {
         yield beforeSaveReview.call(this);
       } else if (this.resteasy.table == 'units') {
@@ -591,13 +623,5 @@ module.exports = {
       debug('company id '+ m[1])
       return query.select('*').where('company_id', m[1]);
     }
-  /**  if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
-      return query.select(['units.*', 'checkins.check_in AS unit_check_in', 'checkins.check_out AS unit_check_out']).join('checkins', 'checkins.unit_id', 'units.id')
-        .whereRaw('checkins.company_id = ? AND checkins.check_in <= now() AND ( checkins.check_out IS NULL OR checkins.check_out >= now() )', [m[1]]);
-      /*        .where('checkins.company_id', '=', m[1])
-              .where('checkins.check_in', '<=', this.resteasy.knex.fn.now())
-              .where('checkins.check_out', 'IS', null); */
-  //  }
-
   },
 };
