@@ -36,6 +36,8 @@ var setOrderStatusMessage = function(orderId, title, display, status) {
 			"title" : title
 		},
 		"data" : {
+			"message" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+			"title" : title,
 			"status" : status
 		}
 	};
