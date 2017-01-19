@@ -287,18 +287,18 @@ function *afterUpdateOrderHistory(orderHistory) {
       debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')')
       yield push.notifyOrderUpdated(orderHistory.id, msgTarget)
       debug('..returned from notifying');
-      var hashStatus = {};
-      hashStatus[status] = timestamp.now();
-      debug(hashStatus)
-      var hash = {
-        status : hashStatus
-      }
-      this.resteasy.queries.push(
-        this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
-      );
-    } else {
-      debug('..notification for '+ keys[i] + ' previously sent');
+
+      // record notification time
+      orderHistoryStatus[keys[i]] = timestamp.now();
+      debug(orderHistoryStatus)
+      updated = true;
     }
+  }
+  if (updated) {
+    debug(orderHistoryStatus)
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
+    );
   }
 }
 
