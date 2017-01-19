@@ -244,14 +244,14 @@ function *afterUpdateOrderHistory(orderHistory) {
         throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to)
       }
       switch(status) {
-          // From Consumer
+          // From Customer
           case 'order_paid':
               msgTarget.title = "Order Paid"
               break;
           case 'pay_fail':
               msgTarget.title = "Payment Failed"
               break;
-          // From Vendor
+          // From Unit
           case 'order_declined':
               msgTarget.title = "Order Declined"
               break;
@@ -286,7 +286,16 @@ function *afterUpdateOrderHistory(orderHistory) {
       
       debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')')
       yield push.notifyOrderUpdated(orderHistory.id, msgTarget)
-      debug('..returned from notifying')
+      debug('..returned from notifying');
+      var hashStatus = {};
+      hashStatus[status] = timestamp.now();
+      debug(hashStatus)
+      var hash = {
+        status : hashStatus
+      }
+      this.resteasy.queries.push(
+        this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
+      );
     } else {
       debug('..notification for '+ keys[i] + ' previously sent');
     }
