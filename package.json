@@ -44,7 +44,6 @@
     "passport-jwt": "^2.1.0",
     "passport-local": "^1.0.0",
     "pg": "^6.1.0",
-    "pg-native": "^1.10.0",
     "pg-promise": "^5.3.1",
     "querystring": "^0.2.0",
     "request": "^2.75.0",
@@ -52,7 +51,7 @@
     "uuid": "^2.0.3",
     "watch": "^0.19.2"
   },
-  "description": "The SFEZ server is a MEAN-based implementation that serves the relationship services for StreetFood EZ. Basic services include reviews, favorites, checkins, loyalty, social media.",
+  "description": "The SFEZ server is a Node-based implementation that provides the relationship services for StreetFood EZ. Basic services include reviews, favorites, checkins, loyalty, social media.",
   "main": "server.js",
   "devDependencies": {
     "chai": "^3.5.0",
