@@ -73,22 +73,23 @@ var uploadCompanyImage=function *(next) {
     }
     var data = this.body;
     debug(data)
+    var item = '';
     try {
-      var item = yield msc.uploadImage(this.company.id, this.body.files.file.path)
+      item = yield msc.uploadImage(this.company.id, this.body.files.file.path)
     } catch (err) {
       console.error('uploadCompanyImage: error uploading menu item image in ordering system ')
       throw(err)
     }
-    var domain = item.segments.domain
-    var suffix = item.segments.suffix
-    debug('..domain ' + domain)
-    debug('..suffix ' + suffix)
+    var domain = item.segments.domain;
+    var suffix = item.segments.suffix;
+    debug('..domain ' + domain);
+    debug('..suffix ' + suffix);
     debug('..domain string length '+ domain.length)
     var domainLen = domain.length - 1 // eliminate extra slash
-    debug('..len '+ domainLen)
-    var cdnPath = domain.substring(0,domainLen) + suffix
-    debug('..cdnPath '+ cdnPath)
-    return cdnPath
+    debug('..len '+ domainLen);
+    var cdnPath = domain.substring(0,domainLen) + suffix;
+    debug('..cdnPath '+ cdnPath);
+    return cdnPath;
   } else {
     console.error('uploadCompanyImage: User not authorized')
     this.status=401
@@ -99,9 +100,9 @@ var uploadCompanyImage=function *(next) {
 
 exports.uploadCompanyPhoto= function *(next) {
   debug('uploadCompanyPhoto')
-  var cdnPath = yield uploadCompanyImage.apply(this)
+  var cdnPath = yield uploadCompanyImage.apply(this);
   try {
-    var co = yield Company.updatePhoto(this.company.id, cdnPath)
+    var co = yield Company.updatePhoto(this.company.id, cdnPath);
   } catch (err) {
     console.error('uploadCompanyPhoto: error assigning image to company')
     throw(err)
@@ -112,9 +113,9 @@ exports.uploadCompanyPhoto= function *(next) {
 
 exports.uploadCompanyFeaturedDish= function *(next) {
   debug('uploadCompanyFeaturedDish')
-  var cdnPath = yield uploadCompanyImage.apply(this)
+  var cdnPath = yield uploadCompanyImage.apply(this);
   try {
-    var co = yield Company.updateFeaturedDish(this.company.id, cdnPath)
+    var co = yield Company.updateFeaturedDish(this.company.id, cdnPath);
   } catch (err) {
     console.error('uploadCompanyFeaturedDish: error assigning image to company')
     throw(err)
@@ -122,6 +123,47 @@ exports.uploadCompanyFeaturedDish= function *(next) {
   this.body = co
   return;
 }
+
+exports.deleteCompany=function *(next) {
+  debug('deleteCompany')
+  debug('id '+ this.company.id)
+  debug('order sys order id '+ this.company.order_sys_id)
+  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+    var user = this.passport.user
+    if (user.role == auth.OWNER && user.id != this.company.user_id) {
+        console.error('error deleting company: Owner '+ user.id + 'not associated with '+ this.company.name)
+        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+    }
+    var results
+    try {
+      results = yield msc.deleteCompany(this.company.order_sys_id)
+    } catch (err) {
+      console.error('error deleting company ('+ this.company.id +') in ordering system')
+      throw(err)
+    }
+    debug(results)
+    try {
+      results = yield Company.deleteCompany(this.company.id)
+    }catch (err) {
+      console.error('error deleting company ('+ this.company.id +') in SFEZ')
+      throw(err)
+    }
+
+    debug(results)
+
+    this.body = {
+	    "status":true,
+    	"message":"Company removed successfully"
+    };
+    return;
+  } else {
+    console.error('deleteCompany: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
 
 exports.readCategory=function *(next) {
 	this.body=this.category;

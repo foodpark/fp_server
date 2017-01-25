@@ -10,6 +10,7 @@ module.exports = {
   client_secret: "K5M1sc3PZuBVU3gn5iMzymWGecDk1HT90ZrjWVra6P",
   grant_type: "client_credentials",
   defaultTaxBand: "1278235843793780901", // Brazil ICMS
+  deliveryCharge: "1.6",
   sumup:{
     clientId:"com.sumup.apisampleapp",
     client_secret:"6332ad54-eb47-4b41-8390-074f062da085",

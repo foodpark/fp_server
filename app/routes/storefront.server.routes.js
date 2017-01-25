@@ -45,6 +45,8 @@ module.exports=function(app) {
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
 
+
+	router.delete(apiversion + '/companies/:companyId',requireJWT, storefront.deleteCompany);
 	router.delete(apiversion + '/companies/:companyId/categories/:categoryId',requireJWT, storefront.deleteCategory);
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.deleteMenuItem);
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/images/:imageId', requireJWT, storefront.deleteImage)

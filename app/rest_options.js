@@ -416,8 +416,26 @@ function *beforeSaveUnit() {
 }
 
 function *beforeSaveCompanies() {
-  debug('beforeSaveCompanies')
-  debug(this.resteasy.object)
+  debug('beforeSaveCompanies');
+  debug(this.resteasy.object);
+  debug(this.params);
+  var company = (yield Company.getSingleCompany(this.params.id))[0];
+  debug('company '+ company.id);
+  if (company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
+
+    var amount = this.resteasy.object.delivery_chg_amount;
+    debug('..delivery charge amount has changed to '+ amount +'. Updating..')
+    // Update moltin
+    var item = '';
+    var data = { price: amount};
+    try {
+        item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
+    } catch (err) {
+      console.error(err);
+      throw new Error ('Error trynig to update delivery charge in ordering system');
+    }
+    debug('..delivery charge updated')
+  }
 }
 
 function *beforeSaveLoyaltyRewards() {

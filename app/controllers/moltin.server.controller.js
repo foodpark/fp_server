@@ -10,12 +10,13 @@ const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
 
-const CATEGORIES = '/categories';
-const IMAGES = '/files';
-const MENU_ITEMS = '/products';
+const CATEGORIES        = '/categories';
+const COMPANIES         = '/flows/companies/entries'
+const IMAGES            = '/files';
+const MENU_ITEMS        = '/products';
 const OPTION_CATEGORIES = '/modifiers';
-const OPTION_ITEMS = '/variations';
-const ORDERS = '/orders';
+const OPTION_ITEMS      = '/variations';
+const ORDERS            = '/orders';
 
 var bearerToken='';
 
@@ -165,14 +166,13 @@ var requestEntities = function *(flow, method, data, id, params) {
 
 exports.createCompany=function *(sfezCompany) {
   debug('createCompany')
-  var flow = '/flows/companies/entries'
   var data = {
     'name': sfezCompany.name,
     'email': sfezCompany.email
   }
   debug(data)
   try {
-    var result = yield requestEntities(flow, POST, data)
+    var result = yield requestEntities(COMPANIES, POST, data)
   } catch (err) {
     console.error(err)
     throw(err)
@@ -180,6 +180,11 @@ exports.createCompany=function *(sfezCompany) {
   debug(result)
   return result
 }
+
+exports.deleteCompany=function(companyId) {
+  debug('deleteCompany')
+  return requestEntities(COMPANIES, DELETE, '', companyId)
+};
 
 exports.createDefaultCategory=function(moltincompany) {
   debug('company name : '+ moltincompany.name)
@@ -202,6 +207,7 @@ exports.createDefaultCategory=function(moltincompany) {
 
 exports.createCategory=function (company, catTitle, catParent) {
   debug('createCategory')
+  debug(company)
   var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
   if (!catParent) catParent = company.default_cat;
   var data = {

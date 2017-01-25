@@ -1,28 +1,5 @@
 var knex = require('../../config/knex');
 
-/**
-CREATE TABLE companies (
-  ID SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  order_sys_id TEXT NOT NULL,
-  base_slug TEXT NOT NULL,
-  default_cat TEXT NOT NULL,
-  description TEXT,
-  email TEXT,
-  facebook TEXT,
-  twitter TEXT,
-  photo TEXT,
-  featured_dish TEXT,
-  hours TEXT,
-  schedule TEXT,
-  city TEXT,
-  state TEXT,
-  country TEXT,
-  taxband TEXT,
-  user_id INTEGER REFERENCES users (id),
-  created TIMESTAMP DEFAULT current_timestamp
-)
-**/
 
 exports.companyForCompanyName = function(companyName) {
   return knex('companies').select('*').where('name', 'ILIKE', companyName)
@@ -63,7 +40,8 @@ exports.verifyOwner = function(companyId, userId) {
   })
 };
 
-exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug, callback) {
+exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug, 
+  deliveryCat, deliveryItem, deliveryChgAmount, callback) {
   return knex('companies').insert(
     {
       name: name,
@@ -71,6 +49,14 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
       user_id: parseInt(userId),
       order_sys_id: moltCoId,
       default_cat: moltDefCat,
+      delivery_chg_cat_id: deliveryCat,
+      delivery_chg_item_id: deliveryItem,
+      delivery_chg_amount: deliveryChgAmount,
       base_slug: moltSlug
     }).returning('*').asCallback(callback);
+};
+
+
+exports.deleteCompany = function(companyId) {
+  return knex('companies').where('id', companyId).del();
 };

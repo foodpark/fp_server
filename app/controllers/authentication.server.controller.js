@@ -63,7 +63,7 @@ exports.login = function *(next) {
       console.error(err)
       throw err;
     }
-    userInfo.company_id = company.id
+    userInfo.company_id = company.id;
   } else if (this.passport.user.role == 'CUSTOMER') {
     try {
       var customer = (yield Customer.getForUser(this.passport.user.id))[0];
@@ -141,6 +141,36 @@ var createMoltinDefaultCategory = function *(company) {
   return results;
 };
 
+var createMoltinDeliveryChargeCategory = function *(company, defaultCat) {
+  debug('createMoltinDeliveryChargeCategory');
+  debug(company);
+  debug('default cat '+ defaultCat);
+  var category = '';
+  try {
+    category = yield msc.createCategory(company, "Delivery Charge Category", defaultCat);
+  } catch (err) {
+      console.error('error creating delivery charge category in ordering system ');
+      throw(err);
+  }
+  return category;
+};
+
+var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
+  debug('createMoltinDeliveryChargeItem');
+  var chargeItem = '';
+  var title = "Delivery Charge";
+  var status = 1; // live
+  var description = "Delivery Charge";
+  try {
+    chargeItem = yield msc.createMenuItem(company, title, status, config.deliveryCharge, deliveryCat, description);
+  } catch (err) {
+    console.error(err)
+    console.error('error creating delivery charge item in ordering system ')
+    throw(err)
+  }
+  return chargeItem;
+};
+
 var createCompany = function *(company_name, email, userId) {
   debug('createCompany');
   debug('user id is '+ userId);
@@ -149,28 +179,57 @@ var createCompany = function *(company_name, email, userId) {
     email: email,
     userId: userId,
   };
+  var moltinCompany = '';
   try {
-    var moltinCompany = yield createMoltinCompany(company)
+    moltinCompany = yield createMoltinCompany(company)
   } catch (err) {
     console.error('createCompany: error during Moltin company creation');
     console.error(err);
     throw (err);
-    return;
   }
-  debug('moltin company successfully created : ' + moltinCompany.id);
-  company.orderSysId = moltinCompany.id;
+  debug('..moltin company successfully created : ' + moltinCompany.id);
+  debug(moltinCompany);
+  company.order_sys_id = moltinCompany.id;
+
+  debug('..create default category');
+  var moltinCat = '';
   try {
-    var moltinCat = yield createMoltinDefaultCategory(moltinCompany)
+    moltinCat = yield createMoltinDefaultCategory(moltinCompany);
   } catch (err) {
     console.error('createCompany: error during Moltin default category creation');
     console.error(err);
     // TODO: Either delete Moltin company and SFEZ user, or queue for category creation
     throw (err);
   }
-
   debug('moltin category successfully created : ' + moltinCat.id);
+  company.default_cat = moltinCat.id;
+  company.base_slug = moltinCat.slug;
+
+  debug('..create delivery charge category');
+  var deliveryChgCat = '';
   try {
-    var sfezCompany = yield Company.createCompany(company_name, email, userId, moltinCompany.id, moltinCat.id, moltinCat.slug)
+    var co = 
+    deliveryChgCat = yield createMoltinDeliveryChargeCategory(company, moltinCat.id);
+  } catch (err) {
+    console.error('createCompany: error during Moltin delivery charge category creation');
+    console.error(err);
+    throw (err);
+  }
+
+  debug('..create delivery charge item');
+  var deliveryChgItem = '';
+  try {
+    deliveryChgItem = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
+  } catch (err) {
+    console.error('createCompany: error during Moltin delivery charge item creation');
+    console.error(err);
+    throw (err);
+  }
+
+ var sfezCompany = '';
+  try {
+    sfezCompany = yield Company.createCompany(company_name, email, userId, moltinCompany.id, 
+      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge);
   } catch (err) {
     console.error('createCompany: error creating company');
     console.error(err);
@@ -178,7 +237,8 @@ var createCompany = function *(company_name, email, userId) {
     // TODO: add compensating transactions
     throw (err);
   }
-  debug(sfezCompany)
+  debug('..SFEZ company');
+  debug(sfezCompany);
   return sfezCompany;
 };
 
