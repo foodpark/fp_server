@@ -413,12 +413,16 @@ function *beforeSaveUnit() {
     }
     debug(user);
     if (!unit) {
+      debug('..adding unit mgr '+ user.id +' to new unit')
       this.resteasy.object.unit_mgr_id = user.id; // a new Unit
       // get the company
+      debug('..getting company')
       if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
+        debug('..adding company '+ m[1] +' to new unit')
         this.resteasy.object.company_id = m[1]
       } else {
         // no company context is an error
+        console.err('No company context for unit: '+ this.params.context);
         throw new Error ('No company context for unit')
       }
     }
