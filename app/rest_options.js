@@ -422,6 +422,8 @@ function *beforeSaveUnit() {
         throw new Error ('No company context for unit')
       }
     }
+    debug('..unit');
+    debug(this.resteasy.object);
   }
 }
 
