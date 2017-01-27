@@ -328,6 +328,7 @@ function *beforeSaveReview() {
 }
 
 function *beforeSaveUnit() {
+  debug('beforeSaveUnit')
   /** A Unit is associated with a User-UnitMgr
     * Owners create/update/delete Units and by association
     * create/update/delete the User-UnitMgr.
@@ -357,7 +358,9 @@ function *beforeSaveUnit() {
       console.error('create unit: error during creation');
       throw err;
     }
+    debug(existingUser);
   }
+  debug(this.resteasy.operation);
   if (this.resteasy.operation == 'update') {
     // Update an existing unit. We need to retrieve the Unit and also
     // check for username uniqueness in case the username is being changed.
@@ -376,9 +379,11 @@ function *beforeSaveUnit() {
       console.error('update unit: error retrieving unit during update');
       throw err;
     }
+    debug('unit');
+    debug(unit);
     if (existingUser && (existingUser.id == unit.unit_mgr_id)) {
       // No other unit/user is using (potentially new) username
-      existingUser = ''
+      existingUser = '';
       // check if username/password changed. Must use unit to check password,
       // as password in Users is encrypted
       if (username==unit.username && password == unit.password) {
@@ -389,19 +394,24 @@ function *beforeSaveUnit() {
     } // else no existingUser and this is an update to username
       // Or existingUser doesn't belong to this unit so throw error below
   }
+  debug(existingUser);
   if (existingUser) {
+    console.err('User name '+ existingUser.username +' already in use')
     throw new Error('That user name is already in use.');
   }
+  debug('..create or update user ');
+  debug(createOrUpdateUser);
   if (createOrUpdateUser) {
     var unitmgr = { role: 'UNITMGR', username: username, password: password}
     if (unit) unitmgr.id = unit.unit_mgr_id // update the right one
-    console.log(unitmgr)
+    debug(unitmgr);
     try {
       var user = (yield User.createOrUpdateUser(unitmgr))[0]
     } catch (err) {
       console.error('create/update unit: error creating/updating User-UnitMgr');
       throw err;
     }
+    debug(user);
     if (!unit) {
       this.resteasy.object.unit_mgr_id = user.id; // a new Unit
       // get the company

@@ -9,7 +9,7 @@ module.exports = {
   clientId: "",
   client_secret: "",
   grant_type: "client_credentials",
-  defaultTaxBand: "1314876088337301664", // Brazil ICMS
+  defaultTaxBand: "1278235843793780901", // Brazil ICMS
   deliveryCharge: "",
   sumup:{
       clientId:"",
