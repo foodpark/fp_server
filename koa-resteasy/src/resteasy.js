@@ -2,6 +2,7 @@ var queries = require('./queries');
 var Schema = require('./schema');
 var co = require('co');
 var _ = require('lodash');
+var debug = require('debug')('resteasy');
 
 // get and sanitize table:
 function table(context) {
@@ -59,6 +60,7 @@ function *prepare(next) {
   yield resteasy.knex.transaction(function(trx) {
     resteasy.transaction = trx;
     resteasy.query = trx(resteasy.table);
+    debug('resteasy.table'+ resteasy.table);
     resteasy.queries = [];
 
     return co(function *() {
@@ -84,7 +86,7 @@ function *prepare(next) {
       // only execute the query if the behavior is default:
       if (resteasy.query) {
         var sql = yield resteasy.query.toSQL();
-
+        debug(sql);
         var res = yield resteasy.query;
 
         yield hook(ctx, 'afterQuery', res);
@@ -161,6 +163,7 @@ function *index(next) {
 }
 
 function *create(next) {
+  debug('resteasy: create');
   // add values implied by the route (e.g. api/users/3/playlists)
   var implied = impliedHash(this);
 

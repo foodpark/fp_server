@@ -71,57 +71,65 @@ function *beforeSaveOrderHistory() {
   debug('..operation '+ this.resteasy.operation)
   if (this.resteasy.operation == 'create') {
     debug('...create')
-    if (this.resteasy.object.order_sys_order_id) {
-      debug('..getting customer name')
-      try {
-        debug('..user ')
-        debug(this.passport.user)
-        var user = this.passport.user
-        var customer = (yield Customer.getForUser(user.id))[0]
-        debug('..customer')
-        debug(customer)
-      } catch (err) {
-        console.error('beforeSaveOrderHistory: error getting customer name');
-        throw err;
-      }
-      var customerName = user.first_name + " " + user.last_name.charAt(0)
-      debug("..customer name is "+ customerName);
-      this.resteasy.object.customer_name = customerName;
-      this.resteasy.object.customer_id = customer.id;
-
-      //set company
-      if (!this.resteasy.object.company_id) {
-        debug(this.params.context)
-        var coId = this.params.context.match(/companies\/(\d+)\//)
-        debug(coId)
-        this.resteasy.object.company_id = coId[1];
-      }
-
-      var moltin_order_id = this.resteasy.object.order_sys_order_id
-      debug('order sys order id: '+ moltin_order_id)
-      try {
-        var order = yield msc.findOrder(moltin_order_id)
-        var order_details = yield msc.getOrderDetail(moltin_order_id)
-        order_details = yield simplifyDetails(order_details)
-      } catch (err) {
-        console.error(err)
-        throw(err)
-      }
-      debug('...total amount '+ order.totals.formatted.total)
-      this.resteasy.object.amount = order.totals.formatted.total
-      debug('...order details ')
-      debug(order_details)
-      this.resteasy.object.order_detail = order_details
-      // Set the initial state
-      this.resteasy.object.status = {
-        order_requested : ''
-      }
-      debug(this.resteasy.object)
-      debug('...preprocessing complete. Ready to save')
-    } else {  // order_sys_order_id is required
+    if (! this.resteasy.object.order_sys_order_id) { // is required
       console.error('No order id for the ordering system')
-      throw new Error('order_sys_order_id is required');
+      throw new Error('order_sys_order_id is required', 422);
     }
+    debug('..getting customer name')
+    try {
+      debug('..user ')
+      debug(this.passport.user)
+      var user = this.passport.user
+      var customer = (yield Customer.getForUser(user.id))[0]
+      debug('..customer')
+      debug(customer)
+    } catch (err) {
+      console.error('beforeSaveOrderHistory: error getting customer name');
+      throw err;
+    }
+    var customerName = user.first_name + " " + user.last_name.charAt(0)
+    debug("..customer name is "+ customerName);
+    this.resteasy.object.customer_name = customerName;
+    this.resteasy.object.customer_id = customer.id;
+
+    //set company
+    debug('..get company id');
+    if (!this.resteasy.object.company_id) {
+      debug(this.params.context)
+      var coId = this.params.context.match(/companies\/(\d+)\//)
+      debug(coId)
+      this.resteasy.object.company_id = coId[1];
+    }
+    //set unit
+    debug('..get unit id');
+    if (!this.resteasy.object.unit_id) {
+      debug(this.params.context)
+      var unId = this.params.context.match(/units\/(\d+)/)
+      debug(unId)
+      this.resteasy.object.unit_id = unId[1];
+    }
+
+    var moltin_order_id = this.resteasy.object.order_sys_order_id
+    debug('order sys order id: '+ moltin_order_id)
+    try {
+      var order = yield msc.findOrder(moltin_order_id)
+      var order_details = yield msc.getOrderDetail(moltin_order_id)
+      order_details = yield simplifyDetails(order_details)
+    } catch (err) {
+      console.error(err)
+      throw(err)
+    }
+    debug('...total amount '+ order.totals.formatted.total)
+    this.resteasy.object.amount = order.totals.formatted.total
+    debug('...order details ')
+    debug(order_details)
+    this.resteasy.object.order_detail = order_details
+    // Set the initial state
+    this.resteasy.object.status = {
+      order_requested : ''
+    }
+    debug(this.resteasy.object)
+    debug('...preprocessing complete. Ready to save')
   } else if (this.resteasy.operation == 'update') {
     debug('...update')
     debug('...limit payload elements')
@@ -154,12 +162,13 @@ function *beforeSaveOrderHistory() {
       debug('...not a status update')
     }
   }
+  debug('returning from beforeSaveOrderHistory');
 }
 
 
 function *afterCreateOrderHistory(orderHistory) {
   debug('afterCreateOrderHistory')
-
+  debug(orderHistory);
   try {
     unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
   } catch (err) {
@@ -541,12 +550,12 @@ module.exports = {
           } // else continue          }
         } else if (this.params.table == 'customers' || this.params.table == 'favorites' || this.params.table == 'reviews' ||
                    this.params.table == 'order_history') {
-          debug('checking POST order_history '+ this.params.table)
+          debug('checking POST '+ this.params.table)
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue          }
         }
-        console.log("...authorized")
+        console.log("... create is authorized")
       } else if (operation == 'update' && this.params.table == 'units' && this.isAuthenticated() && this.passport.user && this.passport.user.role == 'UNITMGR') {
         debug('unit mgr update')
         if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
@@ -628,10 +637,12 @@ module.exports = {
       } else if (this.resteasy.table == 'order_history') {
         debug('saving order_history')
         yield beforeSaveOrderHistory.call(this);
+        debug('saving order_history to repository')
       }
     },
 
     afterQuery: function *(res) {
+      debug('afterQuery')
       if (this.resteasy.operation == 'create') {
         if (this.resteasy.table == 'reviews') {
           yield afterCreateReview.call(this, res[0]);

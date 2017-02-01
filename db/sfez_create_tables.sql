@@ -224,7 +224,7 @@ CREATE TABLE favorites (
 CREATE TABLE order_history (
   id SERIAL PRIMARY KEY,
   order_sys_order_id text,
-  amount money,
+  amount text,
   initiation_time timestamp,
   payment_time timestamp,
   actual_pickup_time timestamp,
