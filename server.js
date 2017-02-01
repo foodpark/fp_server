@@ -77,8 +77,6 @@ function formatError(err) {
     }
 }
 
-app.use(error(formatError));
-
 var server = app.listen(config.port);
 module.exports = app;
 module.exports = server; // support unit test

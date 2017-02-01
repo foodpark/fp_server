@@ -1,5 +1,5 @@
 var _ = require('lodash');
-var Queries = require('koa-resteasy').Queries;
+var Queries = require('../koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
