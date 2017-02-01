@@ -253,9 +253,10 @@ exports.register = function*(next) {
     const role = this.body.role.toUpperCase();
 
     if (!email) {
-      this.status = 422
-      this.body = {error: 'Please enter an email address.'}
-      return;
+      this.throw(422, 'Please enter an email address.');
+      //this.status = 422
+      //this.body = {error: 'Please enter an email address.'}
+      //return;
     }
     if (!first_name) {
       this.status = 422

@@ -1,5 +1,6 @@
 var Koa = require('koa');
 var Body = require('koa-better-body');
+var error = require('koa-json-error');
 var Helmet = require('koa-helmet');
 var Session = require('koa-session');
 var Views = require('koa-views');
@@ -12,7 +13,7 @@ var passport = Passport();
 
 var config = require('./config/config');
 var dbConfig = require('./config/knex');
-var firebase = require('firebase');
+var admin = require("firebase-admin");
 var cors = require('kcors');
 
 var app = Koa();
@@ -63,17 +64,30 @@ router.all('/*', cors(
     next();
   }
 }); */
-app.use(router.routes())
-app.use(router.allowedMethods())
+app.use(router.routes());
+app.use(router.allowedMethods());
 
 require('./app/routes')(app);
+
+function formatError(err) {
+    return {
+        success: false,
+        message: err.message,
+        status: err.status
+    }
+}
+
+app.use(error(formatError));
 
 var server = app.listen(config.port);
 module.exports = app;
 module.exports = server; // support unit test
 
-firebase.initializeApp({
-  serviceAccount: "./config/SFEZ-10ff25a209ed.json",
+
+var serviceAccount = require("./config/SFEZ-10ff25a209ed.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://sfez-17981.firebaseio.com/"
 });
 
