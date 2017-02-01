@@ -1,6 +1,5 @@
 var Koa = require('koa');
 var Body = require('koa-better-body');
-var error = require('koa-json-error');
 var Helmet = require('koa-helmet');
 var Session = require('koa-session');
 var Views = require('koa-views');
@@ -68,14 +67,6 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 require('./app/routes')(app);
-
-function formatError(err) {
-    return {
-        success: false,
-        message: err.message,
-        status: err.status
-    }
-}
 
 var server = app.listen(config.port);
 module.exports = app;
