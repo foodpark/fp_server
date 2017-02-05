@@ -30,19 +30,65 @@ var displayString = {
 
 
 var setOrderStatusMessage = function(orderId, title, display, status) {
-	var note = {
-		"notification" : {
-			"body" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
-			"title" : title
-		},
-		"data" : {
-			"message" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
-			"title" : title,
-			"status" : status
+	var note = '';
+	if (status == 'order_requested') {
+		note = {
+			"notification" : {
+				"body" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"title" : title
+			},
+			"data" : {
+				"message" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"title" : title,
+				"status" : status
+			}
+		};
+	} else {
+		note = {
+			"notification" : {
+				"body" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"title" : title
+			},
+			"data" : {
+				"message" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"title" : title,
+				"status" : status
+			}
 		}
 	};
 	return note;
 }
+
+/*Title:  Takeout Order Accept/Decline
+
+Pickup Time:  desired_pickup_time
+Customer:  Customer_Name
+Order Details:  
+
+"Accept Box"        "Decline Box"
+
+
+2a)  Vendor Accepts  {status: 'order_accepted'}
+
+Notification sent to customer:
+
+Title:  Order Accepted
+
+ Your payment was processed!  
+
+Pickup Time:  desired_pickup_time
+Customer:  Customer_Name
+Order:  order_sys_order_id (last 4 numbers)
+
+2b)  Vendor Declines {status: 'order_declined'}
+
+Notification sent to customer:
+
+Title:  Order Declined
+
+<Vendor Name> did not accept your order at this time. Please try again some other time. 
+*/
+
 
 var sendFCMNotification = function (message){
 	debug('sendFCMNotification');

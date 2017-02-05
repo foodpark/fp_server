@@ -60,7 +60,7 @@ function *prepare(next) {
   yield resteasy.knex.transaction(function(trx) {
     resteasy.transaction = trx;
     resteasy.query = trx(resteasy.table);
-    debug('resteasy.table'+ resteasy.table);
+    debug('resteasy.table '+ resteasy.table);
     resteasy.queries = [];
 
     return co(function *() {

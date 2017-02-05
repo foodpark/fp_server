@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Queries = require('../koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
+var Favorites = require('./models/favorites.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var User = require('./models/user.server.model');
@@ -524,14 +525,6 @@ function *afterReadOrderHistory(orderHistory) {
   );*/
 }
 
-function *afterReadUnit(unit) {
-
-  if (this.this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
-    debug(m[0])
-    debug(m[1])
-    return query.select('units.*').whereRaw('units.company_id = ?', m[1]);
-  }
-}
 
 module.exports = {
   hooks: {
@@ -548,12 +541,19 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
-        } else if (this.params.table == 'customers' || this.params.table == 'favorites' || this.params.table == 'reviews' ||
-                   this.params.table == 'order_history') {
-          debug('checking POST '+ this.params.table)
+        } else if (this.params.table == 'favorites' || this.params.table == 'reviews' || this.params.table == 'order_history') {
+          debug('..checking POST '+ this.params.table)
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
-          } // else continue          }
+          } // else continue
+          debug('..get customer id for user')
+          var customer = (yield Customer.getForUser(this.passport.user.id))[0]
+          debug(customer)
+          if (!customer) {
+            this.throw('Unauthorized - no such customer',401);
+          } // else continue
+          this.resteasy.object.customer_id = customer.id;
+          console.log('..authorized')  
         }
         console.log("... create is authorized")
       } else if (operation == 'update' && this.params.table == 'units' && this.isAuthenticated() && this.passport.user && this.passport.user.role == 'UNITMGR') {
@@ -568,7 +568,10 @@ module.exports = {
           this.throw('Update Unauthorized - incorrect Unit Manager',401);
         } // else continue
         console.log("...authorized")
-
+      } else if (operation == 'update' && this.params.table == 'users' && this.isAuthenticated() &&
+                 this.passport.user && this.passport.user.role != 'UNITMGR') {
+        debug('..authorized '+ this.passport.user.role +' to update user info');
+        
       } else if (operation == 'update' || operation == 'delete') {
         if (this.params.table == 'territories' || this.params.table == 'food_parks' || this.params.table == 'roles' ||
             this.params.table == 'order_status_audit' || this.params.table == 'users') {
@@ -596,21 +599,17 @@ module.exports = {
           }
         } else if (this.params.table == 'customers' ||  this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
-            this.throw('Update/Delete Unauthorized - Customers only',401);
+            this.throw('Update/Delete Unauthorized - Customers/Admins only',401);
           } else {
             if (this.passport.user.role == 'CUSTOMER') {
-              // verify user is modifying the correct review
-              var custId = this.params.id
-              if (!this.params.table == 'customers' && (this.params.context && (m = this.params.context.match(/customers\/(\d+)$/)))) {
-                custId = m[1]
-              }
-              console.log('verifying customer')
-              var valid = (yield Customer.verifyUser(custId, this.passport.user.id))[0]
-              console.log(valid)
-              if (!valid) {
-                this.throw('Update/Delete Unauthorized - User may not update this customer',401);
+              debug('..get customer id for user')
+              var customer = (yield Customer.getForUser(this.passport.user.id))[0]
+              debug(customer)
+              if (!customer) {
+                this.throw('Unauthorized - not customer',401);
               } // else continue
-              console.log(valid)
+              this.resteasy.object.customer_id = customer.id;
+              console.log('..authorized')
             }
           }
         } 
@@ -642,7 +641,8 @@ module.exports = {
     },
 
     afterQuery: function *(res) {
-      debug('afterQuery')
+      debug('afterQuery');
+      debug(this.resteasy.operation)
       if (this.resteasy.operation == 'create') {
         if (this.resteasy.table == 'reviews') {
           yield afterCreateReview.call(this, res[0]);
@@ -654,8 +654,9 @@ module.exports = {
           yield afterUpdateReviewApproval.call(this, res[0]);
         } else if (this.resteasy.table == 'order_history') {
             yield afterUpdateOrderHistory.call(this, res[0]);
-          }
-      } else if (this.resteasy.operation == 'read') {
+        }
+      } else if (this.resteasy.operation == 'index') {
+        debug('..read');
         if (this.resteasy.table == 'order_history') {
           yield afterReadOrderHistory.call(this, res[0]);
         }
@@ -666,16 +667,38 @@ module.exports = {
   // the apply context option allows you to specify special
   // relationships between things, in our case, /companies/:id/units,
   // for example.
-  applyContext: function(query) {
+  applyContext: function (query) {
     debug('applyContext')
     var context = this.params.context;
     var m;
-    debug(this.resteasy.operation)
-    debug(this.resteasy.table)
-    debug(context)
-    if (this.resteasy.operation == 'read' && this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
-      debug('company id '+ m[1])
-      return query.select('*').where('company_id', m[1]);
+    debug('..operation '+ this.resteasy.operation);
+    debug('..table '+ this.resteasy.table);
+    debug('context');
+    if (!context) debug('..no context')
+    else debug(context);
+    if (this.resteasy.operation == 'index') {
+      if (this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
+        debug('..company id '+ m[1])
+        return query.select('*').where('company_id', m[1]);
+      } else if (this.resteasy.table == 'favorites') {
+        debug('..read favorites');
+        debug(this.resteasy.object);
+        var custId = this.resteasy.object.customer_id;
+        var coId   = this.resteasy.object.company_id;
+        var unitId = this.resteasy.object.unit_id;
+        // doing this the hard way
+        debug('..modify query');
+        if (custId) {
+          debug('..customer id '+ custId);
+          return query.select('*').where('customer_id', custId);
+        } else if (unitId) {
+          debug('..unit id '+ unitId);
+          return query.select('*').where('unit_id', unitId);
+        } else if (coId) {
+          debug('..company id '+ coId);
+          return query.select('*').where('company_id', coId);
+        }
+      }
     }
   },
 };
