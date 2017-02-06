@@ -170,24 +170,42 @@ function *beforeSaveOrderHistory() {
 function *afterCreateOrderHistory(orderHistory) {
   debug('afterCreateOrderHistory')
   debug(orderHistory);
+  var unit = '';
   try {
     unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
   } catch (err) {
     console.error('afterCreateOrderHistory: error retrieving unit');
     throw err;
   }
-  debug(unit)
-
+  debug(unit);
   if (!unit.gcm_id && !unit.fcm_id) {
     console.error('afterCreateOrderHistory: No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
     throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
+
+  var customer = '';
+  try {
+    customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
+  } catch (err) {
+    console.error('afterCreateOrderHistory: error retrieving customer');
+    throw err;
+  }
+  debug(customer);
+  
+  var orderDetail = JSON.stringify(orderHistory.order_detail, null, 2);
+  debug(orderDetail);
+  var msg = 'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'+
+            'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+
+            'Order Details: ' + orderDetail +'\n';
+  debug('msg');
+  debug(msg);
   var msgTarget = {
     to     : 'unit',
     toId   : unit.id,
     gcmId  : unit.gcm_id,
     fcmId  : unit.fcm_id,
-    title  : "Order Requested!",
+    title  : "Order Accept/Decline",
+    message : msg,
     status : "order_requested"
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
@@ -203,6 +221,20 @@ function *afterCreateOrderHistory(orderHistory) {
     this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
   );
 }
+
+var display = {
+	order_requested	 : 'was requested',
+	order_declined   : 'was rejected',
+	order_accepted   : 'was accepted',
+	pay_fail         : 'payment failed',
+	order_in_queue   : 'is in queue',
+	order_cooking    : 'is cooking',
+	order_ready	     : 'is ready',
+	order_picked_up  : 'was picked up',
+	no_show          : ': customer was no show',
+	order_dispatched : 'was dispatched',
+	order_delivered	 : 'was delivered'
+} 
 
 function *afterUpdateOrderHistory(orderHistory) {
   debug('afterUpdateOrderHistory')
@@ -237,13 +269,22 @@ function *afterUpdateOrderHistory(orderHistory) {
       } else {
         debug('...status update from unit. Notify customer '+ orderHistory.customer_id)
         // get customer device id
+        var customer ='';
         try {
-          var customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
+          customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
         } catch (err) {
           console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
           throw err;
         }
         debug('..Customer gcm id is '+ customer.gcm_id)
+        var company = '';
+        try {
+          company = (yield Company.getSingleCompany(orderHistory.company_id))[0];
+        } catch (err) {
+          console.error('afterUpdateOrderHistory: error retrieving company '+ orderHistory.company_id);
+          throw err;
+        }
+        debug('..Company name is '+ company.name);
         msgTarget.to = 'customer' 
         msgTarget.toId = customer.id
         msgTarget.gcmId = customer.gcm_id
@@ -253,49 +294,80 @@ function *afterUpdateOrderHistory(orderHistory) {
         console.error('afterUpdateOrderHistory: Cannot notify! No fcm/gcm id for ' + msgTarget.to +' '+ msgTarget.toId)
         throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to)
       }
+      var orderNum = orderHistory.order_sys_order_id;
+      orderNum = orderNum.substring(orderNum.length-4);
+      debug(orderNum);
+      var custName = this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0);
+      debug(custName);
+      debug(status);
       switch(status) {
           // From Customer
           case 'order_paid':
-              msgTarget.title = "Order Paid"
+              msgTarget.title = "Payment Processed";
+              msgTarget.message = custName +"'s payment was processed at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           case 'pay_fail':
-              msgTarget.title = "Payment Failed"
+              msgTarget.title = "Payment Failed";
+              msgTarget.message = custName +" payment failed at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           // From Unit
           case 'order_declined':
-              msgTarget.title = "Order Declined"
+              msgTarget.title = "Order Declined";
+              msgTarget.message = company.name +" did not accept your order at this time. Please try again some other time.";
+              msgTarget.body = msgTarget.message;
               break;
           case 'order_accepted':
-              msgTarget.title = "Order Accepted"
+              msgTarget.title = "Order Accepted";
+              msgTarget.message =  'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'  +
+                                   'Customer: '+ custName +'\n'+
+                                   'Order: '+ orderNum;
+              msgTarget.body = "Order accepted at "+ timestamp.now();
               break;
           case 'order_in_queue':
-              msgTarget.title = "Order In Queue"
+              msgTarget.title = "Order In Queue";
+              msgTarget.message = "Your order "+ orderNum +" put in queue at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           case 'order_cooking':
-              msgTarget.title = "Order Cooking"
+              msgTarget.title = "Order Cooking";
+              msgTarget.message = "Your order "+ orderNum +" started cooking at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           case 'order_ready':
-              msgTarget.title = "Order Ready"
+              msgTarget.title = "Order Ready";
+              msgTarget.message = "Your order "+ orderNum +" is ready! Good to go at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           case 'order_picked_up':
-              msgTarget.title = "Order Picked Up"
+              msgTarget.title = "Order Picked Up";
+              msgTarget.message = "Your order "+ orderNum +" was picked up at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           case 'no_show':
-              msgTarget.title = "No Show"
+              msgTarget.title = "No Show";
+              msgTarget.message = "Your order "+ orderNum +" was not picked up! Did you forget?";
+              msgTarget.body = msgTarget.message;
               break;
           case 'order_dispatched':
-              msgTarget.title = "Order Dispatched"
+              msgTarget.title = "Order Dispatched";
+              msgTarget.message = "Your order "+ orderNum +" was dispatched at "+ timestamp.now();
+              msgTarget.body = msgTarget.message;
               break;
           case 'order_delivered':
-              msgTarget.title = "Order Delivered"
+              msgTarget.title = "Order Delivered";
+              msgTarget.message = "Your order "+ orderNum +" was delivered at "+ timestamp.now() +". Thanks again!";
+              msgTarget.body = msgTarget.message;
               break;
           default:
               throw new Error ('Unkown status '+ status +' for order '+ orderHistory.id)
       }
       msgTarget.status = status
       
-      debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')')
-      yield push.notifyOrderUpdated(orderHistory.id, msgTarget)
+      debug(msgTarget);
+      debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
+      yield push.notifyOrderUpdated(orderNum, msgTarget);
       debug('..returned from notifying');
 
       // record notification time

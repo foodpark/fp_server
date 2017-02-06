@@ -13,32 +13,17 @@ const ORDER_CREATED = 'ORDER_CREATED';
 const ORDER_ACCEPTED_STATUS = 'ORDER_ACCEPTED_STATUS';
 const ORDER_REQUESTED = 'order_requested';
 
-var displayString = {
-	order_requested	 : 'was requested',
-	order_declined   : 'was rejected',
-	order_accepted   : 'was accepted',
-	order_paid       : 'was paid',
-	pay_fail         : 'payment failed',
-	order_in_queue   : 'is in queue',
-	order_cooking    : 'is cooking',
-	order_ready	     : 'is ready',
-	order_picked_up  : 'was picked up',
-	no_show          : ': customer was no show',
-	order_dispatched : 'was dispatched',
-	order_delivered	 : 'was delivered'
-} 
 
-
-var setOrderStatusMessage = function(orderId, title, display, status) {
+var setOrderStatusMessage = function(orderId, title, status, message, body) {
 	var note = '';
 	if (status == 'order_requested') {
 		note = {
 			"notification" : {
-				"body" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"body" : body,
 				"title" : title
 			},
 			"data" : {
-				"message" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"message" : message,
 				"title" : title,
 				"status" : status
 			}
@@ -46,11 +31,11 @@ var setOrderStatusMessage = function(orderId, title, display, status) {
 	} else {
 		note = {
 			"notification" : {
-				"body" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"body" : body,
 				"title" : title
 			},
 			"data" : {
-				"message" : "Order "+ orderId +" "+ display +" at "+ timestamp.now(),
+				"message" : message,
 				"title" : title,
 				"status" : status
 			}
@@ -149,7 +134,8 @@ var sendGCMNotification = function (message){
 
 exports.notifyOrderUpdated = function *(orderId, msgTarget){
 	debug('notifyOrderUpdated');
-	var msg = setOrderStatusMessage(orderId, msgTarget.title, displayString[msgTarget.status], msgTarget.status);
+	var msg = setOrderStatusMessage(orderId, msgTarget.title, 
+	          msgTarget.status, msgTarget.message, msgTarget.body);
 	debug(msg);
 	debug('..sending notification..');
 	var notified = {};
