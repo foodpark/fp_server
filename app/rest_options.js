@@ -672,7 +672,7 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update/Delete Unauthorized - Customers/Admins only',401);
           } else {
-            if (this.passport.user.role == 'CUSTOMER') {
+            /* if (this.passport.user.role == 'CUSTOMER') {
               debug('..get customer id for user')
               var customer = (yield Customer.getForUser(this.passport.user.id))[0]
               debug(customer)
@@ -680,8 +680,8 @@ module.exports = {
                 this.throw('Unauthorized - not customer',401);
               } // else continue
               this.resteasy.object.customer_id = customer.id;
-              console.log('..authorized')
-            }
+            } */
+            console.log('..authorized')
           }
         } 
         console.log("...authorized")
