@@ -145,7 +145,7 @@ exports.notifyOrderUpdated = function *(orderId, msgTarget){
 		console.log('Sending FCM notification...');
 		msg.to = msgTarget.fcmId;
 		try {
-			fcmRes = yield sendFCMNotification(msgTarget);
+			fcmRes = yield sendFCMNotification(msg);
 		} catch (err) {
 			// failed notification is not a showstopper
 			notified.fcm = false;
