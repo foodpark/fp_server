@@ -410,108 +410,107 @@ function *beforeSaveReview() {
 }
 
 function *beforeSaveUnit() {
-  debug('beforeSaveUnit')
-  /** A Unit is associated with a User-UnitMgr
-    * Owners create/update/delete Units and by association
-    * create/update/delete the User-UnitMgr.
-    * User-UnitMgr username/password are replicated in Unit so that they can be
-    * displayed to the Owner, specifically that the password can be shown/updated
-    * 1. Creating a unit - make sure the unit name is unique in Units,
-    *    as well as the username in users
-    * 2. Update a unit - if the username/password is changed, it also needs
-    *    to be changed in Users
-    *    a. A changed username must be checked for uniqueness in Users
-    *    b. A unit being updated has to be retrieved first, because the uniqueness
-    *       check will return at least this unit if the username hasn't changed,
-    *       and we need the unit_mgr_id in order to update the right User record
-    *       if the username has changed
-    */
+  debug('beforeSaveUnit');
+  // If username or password is changed, we need to update the Users table
   var username = this.resteasy.object.username;
   var password = this.resteasy.object.password;
-  var existingUser = '';
-  var unit = '';
-  var createOrUpdateUser = false; // assume no create/update of user
-  if (username) {
-    // username present, possible create or update
-    createOrUpdateUser = true;
+  if (this.resteasy.operation == 'create') {
+    debug('..starting create of new Unit');
+    // get the company context
+    debug('..getting company')
+    var companyId = '';
+    if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
+      debug('..company '+ m[1]);
+      companyId = m[1];
+    } else {
+      // no company context is an error
+      console.error('beforeSaveUnit: No company context for unit: '+ this.params.context);
+      throw new Error ('No company context for unit')
+    }
+    if (!username || !password) {
+      // need both to create new User and Unit
+      console.error('beforeSaveUnit: Username/password are required');
+      throw new Error ('Username/password are required');
+    } 
+    // make sure it's a unique username
+    var existingUser = '';
     try {
       existingUser = (yield User.userForUsername(username))[0];
     } catch (err) {
-      console.error('create unit: error during creation');
+      console.error('beforeSaveUnit: error during User creation');
       throw err;
     }
-    debug(existingUser);
-  }
-  debug(this.resteasy.operation);
-  if (this.resteasy.operation == 'update') {
-    // Update an existing unit. We need to retrieve the Unit and also
-    // check for username uniqueness in case the username is being changed.
-    // Name isn't being changed if the Unit username and User username are the
-    // the same for unit.unit_mgr_id == user.id. If the unit and user aren't
-    // associated, then any existing user found is a failure of uniqueness.
-    // No existing user found means a new username is being entered for the Unit
-    // and User-UnitMgr
-    var unitId = this.params.id
-    if (!unitId) { // must have unit id for update
-      throw new Error('update operation requires unit id')
+    debug('..user exists for username '+ username +'? Yes: user details; No: undefined');
+    debug(existingUser)
+    if (existingUser) {
+      console.error('beforeSaveUnit: Tried to create unit with duplicate name of '+ username );
+      console.error('beforeSaveUnit: Name must be unique within Unit/User tables');
+      throw new Error('That name already exists. Try another name');
     }
+
+    var unitmgr = { role: 'UNITMGR', username: username, password: password };
+    var user = '';
     try {
-      unit = (yield Unit.getSingleUnit(unitId))[0];
+      user = (yield User.createOrUpdateUser(unitmgr))[0];
     } catch (err) {
-      console.error('update unit: error retrieving unit during update');
+      console.error('beforeSaveUnit: Error creating User-UnitMgr');
       throw err;
     }
-    debug('unit');
-    debug(unit);
-    if (existingUser && (existingUser.id == unit.unit_mgr_id)) {
-      // No other unit/user is using (potentially new) username
-      existingUser = '';
-      // check if username/password changed. Must use unit to check password,
-      // as password in Users is encrypted
-      if (username==unit.username && password == unit.password) {
-        // No changes to User record
-        createOrUpdateUser = false;
-      } // else there's a new username or password and we'll need to use the
-        // unit.unit_mgr_id for the update
-    } // else no existingUser and this is an update to username
-      // Or existingUser doesn't belong to this unit so throw error below
-  }
-  debug(existingUser);
-  if (existingUser) {
-    console.err('User name '+ existingUser.username +' already in use')
-    throw new Error('That user name is already in use.');
-  }
-  debug('..create or update user ');
-  debug(createOrUpdateUser);
-  if (createOrUpdateUser) {
-    var unitmgr = { role: 'UNITMGR', username: username, password: password}
-    if (unit) unitmgr.id = unit.unit_mgr_id // update the right one
-    debug(unitmgr);
-    try {
-      var user = (yield User.createOrUpdateUser(unitmgr))[0]
-    } catch (err) {
-      console.error('create/update unit: error creating/updating User-UnitMgr');
-      throw err;
-    }
+    debug('..user created');
     debug(user);
-    if (!unit) {
-      debug('..adding unit mgr '+ user.id +' to new unit')
-      this.resteasy.object.unit_mgr_id = user.id; // a new Unit
-      // get the company
-      debug('..getting company')
-      if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
-        debug('..adding company '+ m[1] +' to new unit')
-        this.resteasy.object.company_id = m[1]
-      } else {
-        // no company context is an error
-        console.err('No company context for unit: '+ this.params.context);
-        throw new Error ('No company context for unit')
-      }
+    this.resteasy.object.unit_mgr_id = user.id; 
+    this.resteasy.object.company_id = parseInt(companyId);
+    debug('..ready to create unit');
+    debug(this.resteasy.object);
+  } else if (this.resteasy.operation == 'update') {
+    debug('..starting update of existing Unit');
+    // This block of code checks to see if username/password, if provided,
+    // was/were changed. If so, update User.
+    if (!username && !password) {
+      debug('..no update to user data');
+      return;
+    }
+    var unitId = this.params.id;
+    if (!unitId) {
+      console.error('beforeSaveUnit: No unit id provided');
+      throw new Error('No unit id provided. Update operation requires unit id')
+    }
+    var unit = '';
+    try {
+      unit = (yield Unit.getSingleUnit(this.params.id))[0];
+    } catch (err) {
+      console.error('beforeSaveUnit: Error getting existing unit');
+      throw err;
     }
     debug('..unit');
-    debug(this.resteasy.object);
+    debug(unit);
+    if (username && username != unit.username || password && password != unit.password) {
+      // username or password was changed
+      var user = '';
+      try {
+        user = (yield User.getSingleUser(unit.unit_mgr_id))[0];
+      } catch (err) {
+        console.error('beforeSaveUnit: Error getting existing user');
+        throw err;
+      }
+      debug('..user');
+      debug(user);
+      var userHash = {};
+      if (username) userHash.username = username;
+      if (password) userHash.password = password;
+      debug('..updating user');
+      try {
+        user = (yield User.updateUser(user.id, userHash))[0];
+      } catch (err) {
+        console.error('beforeSaveUnit: Error updating user');
+        throw err;
+      }
+      debug('..user after update');
+      debug(user);
+    } 
   }
 }
+
 
 function *beforeSaveCompanies() {
   debug('beforeSaveCompanies');

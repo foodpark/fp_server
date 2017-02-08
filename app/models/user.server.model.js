@@ -54,15 +54,21 @@ exports.createUser = function(hash) {
 };
 
 exports.updateUser = function(id, hash) {
-  hash.password = encryptPassword(hash.password);
+  debug('updateUser');
+  if (hash.password) hash.password = encryptPassword(hash.password);
+  debug(hash);
   return knex('users').update(hash).where('id',id).returning('*');
 };
 
 exports.createOrUpdateUser = function(hash) {
-  var userId = hash.id
+  debug('createOrUpdateUser');
+  var userId = hash.id;
+  debug(hash);
   if (userId) {
+    debug('..update user');
     return this.updateUser(userId, hash)
   }
+  debug('..create user');
   return this.createUser(hash)
 }
 

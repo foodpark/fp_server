@@ -15,7 +15,7 @@
     "ejs": "^2.4.2",
     "fcm-node": "^1.0.15",
     "firebase": "^3.4.1",
-    "firebase-admin": "^4.0.6",
+    "firebase-admin": "^4.1.0",
     "form-data": "^2.1.2",
     "gmaps": "0.4.24",
     "jsonwebtoken": "^7.1.6",

@@ -153,7 +153,7 @@ CREATE TABLE customers (
 CREATE TABLE units (
     id SERIAL PRIMARY KEY,
     name text NOT NULL UNIQUE,
-    number integer NOT NULL,
+    number integer,
     type text REFERENCES unit_types(type),
     customer_order_window integer,
     prep_notice integer,
