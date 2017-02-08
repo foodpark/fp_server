@@ -21,22 +21,37 @@ COPY food_parks (id, name, city, state, postal_code, country, latitude, longitud
 SELECT pg_catalog.setval('food_parks_id_seq', 30018, true);
 
 
-COPY users (id, first_name, last_name, username, password, role, provider, provider_id, provider_data, created_at) FROM stdin;
-11001	Stacy	Tran	mp12	5a4636076012403dd394fa20f49fcd9c	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352
-11002	Jonathan	Jones	mp2	defc72a96803a619a6735cd7e7e69e1b	CUSTOMER	local	local	{}	2016-08-21 23:01:03.622149
-11003	Marco and Inez	Pena	mp3	28dafd4a8cb5f33065e93cbc83862563	CUSTOMER	local	local	{}	2016-08-21 23:01:50.563872
-11004	Julie	Grant	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	OWNER	local	local	{}	2016-08-21 23:03:07.177813
-11005	Bob	Smith	mp5@gmail.com	146eb1afa89654aca443976646460ef4	OWNER	local	local	{}	2016-08-21 23:05:04.914807
-11006	Cindy	Clark	mp6@gmail.com	5ce4c4a0a26e6df0fdbb380d78f4fab2	OWNER	local	local	{}	2016-08-21 23:12:10.112015
-11007	\N	\N	mptruck61	6cf9be93694189e06c66faa49a6cbc93	UNITMGR	local	local	{}	2016-08-29 20:54:42.540882
-11008	\N	\N	mptruck64	5db0aeb457f45ddb90c35b39569c1348	UNITMGR	local	local	{}	2016-08-30 21:12:08.717913
-11009	\N	\N	mptruck64five	dda2549944250c6c038797b463e7de99	UNITMGR	local	local	{}	2016-08-30 21:22:22.983667
-11010	\N	\N	trucker1	2c914a017cf7354e6c6319afe0b664b2	UNITMGR	local	local	{}	2016-09-06 23:57:26.291924
-11011	Dennis	Nichols	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	ADMIN	local	local	{}	2016-10-20 23:33:15.004572
-11012	Luiz	Cobello	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	ADMIN	local	local	{}	2016-10-22 18:42:04.179585
-11013	Marcos	Hirano	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	ADMIN	local	local	{}	2016-10-22 18:41:25.721489
+COPY users (id, username, password, first_name, last_name, role, provider, provider_id, provider_data, created_at, updated_at) FROM stdin;
+11001	mp10	mp15	Stacy	Tran	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352	2017-02-03 09:25:30.279083
+11002	mp27	defc72a96803a619a6735cd7e7e69e1b	Jonathan	Jones	CUSTOMER	local	local	{}	2016-08-21 23:01:03.622149	2017-02-03 09:54:22.527595
+11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	local	local	{}	2016-08-21 23:03:07.177813	2017-01-31 23:32:49.172208
+11005	mp5@gmail.com	146eb1afa89654aca443976646460ef4	Bob	Smith	OWNER	local	local	{}	2016-08-21 23:05:04.914807	2017-01-31 23:32:49.172208
+11006	mp6@gmail.com	5ce4c4a0a26e6df0fdbb380d78f4fab2	Cindy	Clark	OWNER	local	local	{}	2016-08-21 23:12:10.112015	2017-01-31 23:32:49.172208
+11007	mptruck61	6cf9be93694189e06c66faa49a6cbc93	\N	\N	UNITMGR	local	local	{}	2016-08-29 20:54:42.540882	2017-01-31 23:32:49.172208
+11008	mptruck64	5db0aeb457f45ddb90c35b39569c1348	\N	\N	UNITMGR	local	local	{}	2016-08-30 21:12:08.717913	2017-01-31 23:32:49.172208
+11009	mptruck64five	dda2549944250c6c038797b463e7de99	\N	\N	UNITMGR	local	local	{}	2016-08-30 21:22:22.983667	2017-01-31 23:32:49.172208
+11010	trucker1	2c914a017cf7354e6c6319afe0b664b2	\N	\N	UNITMGR	local	local	{}	2016-09-06 23:57:26.291924	2017-01-31 23:32:49.172208
+11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	local	local	{}	2016-10-20 23:33:15.004572	2017-01-31 23:32:49.172208
+11012	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	Luiz	Cobello	ADMIN	local	local	{}	2016-10-22 18:42:04.179585	2017-01-31 23:32:49.172208
+11013	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	Marcos	Hirano	ADMIN	local	local	{}	2016-10-22 18:41:25.721489	2017-01-31 23:32:49.172208
+11017	jack@crazysubs.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Jack	Crazy	OWNER	local	local	{}	2017-02-01 11:21:51.951081	2017-02-01 11:21:51.951081
+11018	crazy56	33b0a180f307ca68ba2c2dfa55f6ff4c	\N	\N	UNITMGR	\N	\N	\N	2017-02-01 11:46:50.778073	2017-02-01 11:46:50.778073
+11020	Mo@totino.com	27c9d5187cd283f8d160ec1ed2b5ac89	Mo	Totino	OWNER	local	local	{}	2017-02-02 07:04:17.433015	2017-02-02 07:04:17.433015
+11021	moe56	276fbf86abd87a184df2b737328b6973	\N	\N	UNITMGR	\N	\N	\N	2017-02-02 07:47:24.105698	2017-02-02 07:47:24.105698
+11024	Bangkok@cafe.com	bangkok	Bangkok	Cafe	OWNER	local	local	{}	2017-02-02 08:43:47.94126	2017-02-02 09:09:32.202801
+11003	mp4	28dafd4a8cb5f33065e93cbc83862563	Marco and Inez	Pena	CUSTOMER	local	local	{}	2016-08-21 23:01:50.563872	2017-02-02 09:35:54.217743
+11025	Grilla@grillacheez.com	82edd3141a6270a3ac5e93323c07a7e1	Grilla	Cheez	OWNER	local	local	{}	2017-02-02 21:14:48.007795	2017-02-02 21:14:48.007795
+11026	grilla56	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	2017-02-02 21:25:02.499941	2017-02-02 21:25:02.499941
+11068	mg26@gmail.com	22c7b568334f78f0a122ee388557660e	mg2	spy	CUSTOMER	local	local	{}	2017-02-03 19:07:56.71264	2017-02-03 19:07:56.71264
+11165	suren@aryvart.com	b6c231fc212b1a67d4965d0b1527358c	Surendiran	Parasuraman	CUSTOMER	local	local	{}	2017-02-06 05:44:09.338925	2017-02-06 05:44:09.338925
+11168	grilla56@gmail.com	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	2017-02-06 07:01:15.7952	2017-02-06 07:01:15.7952
+11169	Jack	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	2017-02-06 07:11:55.254344	2017-02-06 07:11:55.254344
+11174	grilla26	3ee0410d3f0f9cf2d1b2f07c2d74604d	\N	\N	UNITMGR	\N	\N	\N	2017-02-06 09:51:07.21648	2017-02-06 09:51:07.21648
+11190	testetcus@gmail.com	e10adc3949ba59abbe56e057f20f883e	Tester	Customer	CUSTOMER	local	local	{}	2017-02-08 01:37:49.206449	2017-02-08 01:37:49.206449
+11192	chunky@monkey.com	90ead2a2940e7f354c310900a950043a	Chunky	Monkey	OWNER	local	local	{}	2017-02-08 07:22:17.334042	2017-02-08 07:22:17.334042
+11193	chunkytruck1	90ead2a2940e7f354c310900a950043a	\N	\N	UNITMGR	\N	\N	\N	2017-02-08 07:22:22.781745	2017-02-08 07:22:22.781745
 \.
-SELECT pg_catalog.setval('users_id_seq', 11014, true);
+SELECT pg_catalog.setval('users_id_seq', 11193, true);
 
 
 COPY territories (id, territory, city, state, country, timezone, latitude, longitude, created_at) FROM stdin;
@@ -63,59 +78,75 @@ COPY admins (id, description, photo, super_admin, city, state, country, user_id,
 \.
 SELECT pg_catalog.setval('admins_id_seq', 4, true);
 
-COPY companies (id, name, order_sys_id, base_slug, default_cat, description, email, facebook, twitter, photo, featured_dish, hours, schedule, city, state, country, taxband, user_id, created_at) FROM stdin;
-1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	Fresh street food tacos	tacos@pacos.com	www.facebook.com/pacostacos	@pacostacos	\N	\N	11am-8pm	M-F	\N	\N	\N	\N	11004	2016-08-26 21:31:52.102331
-1002	Thaitanic	1293768990807556920	thaitanic-1471829851769	1322127087452029500	Authentic Thai	info@thaitanic.com	www.facebook.com/thaitanic	@thaitan	\N	\N	3pm-5pm	TWTF	\N	\N	\N	\N	11005	2016-08-21 21:37:32.594516
-1003	Grilla Cheese	1293768990807556920	grillacheese-1471829851769	1322127087452029500	Thick slabs of grilled cheese on Texas toast	cheez@grillacheese.com	wwww.facebook.com/grillacheese	@griller	\N	\N	11am-3pm	MTWTFSS	\N	\N	\N	\N	11006	2016-08-21 21:37:32.594516
+COPY companies (id, name, order_sys_id, base_slug, default_cat, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, photo, featured_dish, hours, schedule, business_address, city, state, country, taxband, tags, stub, user_id, created_at, updated_at) FROM stdin;
+1006	Moes Pizza	1441305766198772495	moes-pizza-1486037058170	1441305773295534864	1441305780476183313	1441305790123082514	1.6	Pan pizza, buffalo wings, garlic chicken specials	Mo@totino.com	\N	www.facebook.com/Moespizza	\N	https://commercecdn.com/1278235777548943678/2f70d68d-01c6-4522-bac7-6113f4627035.jpeg	https://commercecdn.com/1278235777548943678/703961d4-b2a2-4885-91bd-0b55a6785f38.jpeg	10 am - 8 pm		\N	\N	\N	\N	\N	pizza, lasagna, pasta	\N	11020	2017-02-02 17:04:21.21	2017-02-06 09:28:38.766628
+1008	Grilla Cheez	1441733842225332401	grilla-cheez-1486088088823	1441733850261618866	1441733858146910387	1441733867391156404	1.6	Get your taste buds ready for a cheese avalanche	streetfoodez@gmail.com	\N	www.facebook.com/grillacheez	\N	https://commercecdn.com/1278235777548943678/b10b1939-f66f-4b49-837d-9c40a66d1ed0.jpeg	https://commercecdn.com/1278235777548943678/1d035d77-a55d-43fd-8654-e8f03de61220.jpeg	12 pm - 8 pm		\N	\N	\N	\N	\N	grilled cheese, panini	\N	11025	2017-02-03 07:14:52.001	2017-02-07 10:56:07.867738
+1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	\N	\N	\N	Fresh street food tacos	tacos@pacos.com	\N	www.facebook.com/pacostacos	@pacostacos	commercecdn.com/1278235777548943678/ad2c0f25-4f8c-43db-96dc-89660c7063e5.jpeg	commercecdn.com/1278235777548943678/73203d73-e4cd-4723-804f-14ae8ffe6d9e.jpeg	11am-8pm		\N	\N	\N	\N	\N	tacos, enchiladas	\N	11004	2016-08-27 01:31:52.102	2017-02-02 15:57:44.927103
+1088	Chunky Monkey	1445663478260957711	chunky-monkey-1486556537929	1445663485726818832	1445663493511447057	1445663503426781714	1.6	Best hot fudge sundaes in town	chunky@monkey.com	\N	www.facebook.com/chunkymonkey	\N	https://commercecdn.com/1278235777548943678/462a01bc-583c-4892-9144-a117ca406783.png	https://commercecdn.com/1278235777548943678/0ad8cddc-28c8-4ca5-b70c-77296672ccd6.jpeg	10 am - 8 pm	\N	\N	\N	\N	\N	\N	\N	\N	11192	2017-02-08 12:22:21.119	2017-02-08 07:25:32.694987
+1005	Crazy Jacks	1440710633996681868	crazy-jacks-1485966112929	1440710643157041805	1440710650237026958	1440710659665822351	1.6	Homemade subs "Crazy Jack" style	Streetfoodez@hotmail.com	\N	www.facebook.com/crazyjacks	\N	https://commercecdn.com/1278235777548943678/8c75231e-33eb-4823-93e0-42093f79d98f.jpeg	https://commercecdn.com/1278235777548943678/ddcc397f-c3eb-4de2-babc-9a544ac5da9b.jpeg	10 am - 5 pm		\N	\N	\N	\N	\N	subs, burgers, bbq	\N	11017	2017-02-01 21:21:56.123	2017-02-08 06:58:17.105764
 \.
-SELECT pg_catalog.setval('companies_id_seq', 1004, true);
+SELECT pg_catalog.setval('companies_id_seq', 1088, true);
 
-COPY customers (id, order_sys_id, description, gcm_id, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at) FROM stdin;
-9001	\N	Taco expert. I love tacos.	APA91bECFEhmamkhENoB_sn2N20T0KX8HqF5XxzBG1PseAuJJ9VdoRkkl0sZXtsLosSHCi2oSo01t63XOzRHxTEOLqYtwOF0mF2m0GaCCyE-Op1uVkMuvC-rgoqh1A0rA80OIMgVxkeE	www.facebook.com/stacytfakeaccount	\N	\N	f	\N	\N	\N	11001	2016-08-21 23:31:43.151356
-9002	\N	Serial food eater	\N	www.facebook.com/jonjonesfakeaccount	\N	\N	f	\N	\N	\N	11002	2016-08-21 23:31:43.151356
-9003	\N	Food bloggers. Follow us on mifood.blog.com	\N	www.facebook.com/mifoodfakeaccount	\N	\N	t	\N	\N	\N	11003	2016-08-21 23:31:43.151356
-\.
-SELECT pg_catalog.setval('customers_id_seq', 9004, true);
 
-COPY units (id, name, number, type, description, username, password, qr_code, unit_order_sys_id, company_id, unit_mgr_id, customer_order_window, fcm_id, gcm_id) FROM stdin;
-2001	Thaitanic Truck 1	1	TRUCK	\N	mptruck61	mptruck61	\N	\N	1002	11007	15	APA91bGyR9ZsR74serH6pLKNGxHBM5EkDMR20dEbIJ7-PS-uiApWaIwczWffiofgkmow_u3s-f2IcFTYlPGfSafCGQ6rAS-z1GJUjsd1juSzmuM4ibl5rxbASpWoPMCkZpUpY8EFe-_Q	c9k1cdeqqlc:APA91bE3N9DPEPRVrylvqniUc0YkeqiDcL0bLF7wEpm0BUFDspsRMjJGenLnF07ssEmBZe90pG983xq9cQLzLzu6uWXYyhv1OZpDrUeCirxjBSzmIX-TJlO5T58PxakjRLd8LIghjnuy
-2002	Thaitanic Cart 1	1	CART	\N	mptruck64	mptruck64	\N	\N	1002	11008	20	\N	APA91bGLPDm96TAg6C77VrwxlP1Nk11Md-hSRZGLOjS8CoECWfEFjp1Ise1_GRolqix4jydowaJ9d8OKxJMoiH3_qc0VEGNdqKiQ66Jbb_mneP-0T5qm4IK3RPZMKQlu9j2T7gOJGg0B
-2003	Pacos Tacos Truck 1	1	TRUCK	\N	mptruck64five	mptruck64five	\N	\N	1001	11009	10	\N	\N
-2004	Grilla Cheese Truck 1	1	TRUCK	\N	trucker	trucker	\N	\N	1003	11010	15	fSXaK3t8Tvc:APA91bGyt1VUybSq0JE5DX5eCalr2xl_SRuRF-QrzIGLrAJSmvDwDNLEJVd2qiOM_2spZwvGdop6KRaZqFjgNdVM47nJjIbglkC7QkGqNex0guUe8V77-qm4LZpIANBHV6bDeBflAD3I	\N
+COPY customers (id, order_sys_id, description, gcm_id, device_type, fcm_id, phone, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at, updated_at) FROM stdin;
+9001	\N	Taco expert. I love tacos.	APA91bECFEhmamkhENoB_sn2N20T0KX8HqF5XxzBG1PseAuJJ9VdoRkkl0sZXtsLosSHCi2oSo01t63XOzRHxTEOLqYtwOF0mF2m0GaCCyE-Op1uVkMuvC-rgoqh1A0rA80OIMgVxkeE	\N	\N	\N	www.facebook.com/stacytfakeaccount	\N	\N	f	\N	\N	\N	11001	2016-08-21 23:31:43.151356	2017-01-31 23:32:49.180085
+9003	\N	Food bloggers. Follow us on mifood.blog.com	APA91bEYSDTsHDYPmL0cGRi6xJfj0hAqyvVJTzsJbp8ZTydmcBhkebSyq32CW_6gcNRNelck-wv0ffA2lUcSLo9yw6iUvCaXSfaGasP_MjbeFnzLJDJRLJ8VKtOiX9lUyqVr6lyg8OC-	\N	\N	\N	www.facebook.com/mifoodfakeaccount	\N	\N	t	\N	\N	\N	11003	2016-08-21 23:31:43.151356	2017-02-02 09:27:57.482063
+9002	\N	Serial food eater	APA91bEYSDTsHDYPmL0cGRi6xJfj0hAqyvVJTzsJbp8ZTydmcBhkebSyq32CW_6gcNRNelck-wv0ffA2lUcSLo9yw6iUvCaXSfaGasP_MjbeFnzLJDJRLJ8VKtOiX9lUyqVr6lyg8OC-	\N	\N	\N	www.facebook.com/jonjonesfakeaccount	\N	\N	f	\N	\N	\N	11002	2016-08-21 23:31:43.151356	2017-02-03 09:34:40.840539
+9006	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11165	2017-02-06 05:44:09.344202	2017-02-06 05:44:09.344202
+9005	\N	described	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11068	2017-02-03 19:07:56.716851	2017-02-07 10:27:20.11839
+9007	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11190	2017-02-08 01:37:49.214166	2017-02-08 01:37:49.214166
 \.
-SELECT pg_catalog.setval('units_id_seq', 2005, true);
+SELECT pg_catalog.setval('customers_id_seq', 9007, true);
+
+COPY units (id, name, number, type, customer_order_window, prep_notice, description, username, password, qr_code, phone, fcm_id, gcm_id, device_type, unit_order_sys_id, territory_id, company_id, unit_mgr_id, created_at, updated_at) FROM stdin;
+2001	Thaitanic Truck 1	1	TRUCK	15	\N	\N	mptruck61	mptruck61	\N	\N	\N	c9k1cdeqqlc:APA91bE3N9DPEPRVrylvqniUc0YkeqiDcL0bLF7wEpm0BUFDspsRMjJGenLnF07ssEmBZe90pG983xq9cQLzLzu6uWXYyhv1OZpDrUeCirxjBSzmIX-TJlO5T58PxakjRLd8LIghjnuy	\N	\N	\N	1005	11007	2017-01-31 23:32:49.181663	2017-02-08 00:20:56.367215
+2002	Thaitanic Cart 1	1	CART	20	\N	\N	mptruck64	mptruck64	\N	\N	\N	APA91bGLPDm96TAg6C77VrwxlP1Nk11Md-hSRZGLOjS8CoECWfEFjp1Ise1_GRolqix4jydowaJ9d8OKxJMoiH3_qc0VEGNdqKiQ66Jbb_mneP-0T5qm4IK3RPZMKQlu9j2T7gOJGg0B	\N	\N	\N	1001	11008	2017-01-31 23:32:49.181663	2017-02-03 16:46:37.423503
+2003	Pacos Tacos Truck 12	1	TRUCK	10	\N	\N	mptruck64five	mptruck64five	\N	\N	\N	\N	\N	\N	\N	1006	11009	2017-01-31 23:32:49.181663	2017-02-06 09:29:12.298814
+2006	jack	5	TRUCK	20	15	\N	crazy56	crazy56	\N	\N	\N	APA91bHFjI8S9LO62I1TV2fDz5RZh9OoBgHl0tfe6kxjeFS4GLSNZX38iq4bEZgifFWUwAUn43FrrJPT6WtlnBlwhb98wqk1xaKPQp7J_fpGWaAuWnMBzRbnJW8d1MIm0no58e_r8A3f	\N	\N	2	1005	11018	2017-02-01 11:46:50.747716	2017-02-07 11:48:43.213625
+2007	Moe Truck #1	4	TRUCK	20	15	\N	moe56	moe56	\N	\N	\N	\N	\N	\N	2	1005	11021	2017-02-02 07:47:24.083754	2017-02-07 12:13:27.800781
+2008	Grilla Truck 1	1	TRUCK	20	15	\N	grilla56	grilla56	\N	\N	\N	APA91bHFjI8S9LO62I1TV2fDz5RZh9OoBgHl0tfe6kxjeFS4GLSNZX38iq4bEZgifFWUwAUn43FrrJPT6WtlnBlwhb98wqk1xaKPQp7J_fpGWaAuWnMBzRbnJW8d1MIm0no58e_r8A3f	\N	\N	\N	1005	11026	2017-02-02 21:25:02.490854	2017-02-08 10:01:35.212283
+2070	Crazy Truck 5	5	TRUCK	20	15	\N	Jack	jack	\N	\N	\N	\N	\N	\N	1	1005	11169	2017-02-06 07:11:55.248113	2017-02-06 07:11:55.248113
+2075	Grilla Truck #1	1	TRUCK	20	15	\N	grilla26	grilla26	\N	\N	\N	\N	\N	\N	1	1008	11174	2017-02-06 09:51:07.210394	2017-02-07 11:46:49.507075
+2089	Chunky Truck #1	1	TRUCK	30	20	\N	chunkytruck1	chunkymonkey	\N	\N	\N	\N	\N	\N	1	1088	11193	2017-02-08 07:22:22.776055	2017-02-08 08:51:31.239426
+\.
+SELECT pg_catalog.setval('units_id_seq', 2090, true);
+
 
 COPY checkins (id, check_in, check_out, latitude, longitude, display_address, food_park_name, note, food_park_id, unit_id, company_id, created_at, updated_at) FROM stdin;
-1	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.81163600000000002	-35.2090430000000012	\N	\N	\N	\N	2003	1003	2016-10-28 01:09:25.425267	2016-10-28 01:09:25.425267
-2	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.76750499999999988	-35.199499000000003	\N	\N	\N	\N	2004	1003	2016-10-28 01:09:28.154896	2016-10-28 01:09:28.154896
-3	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.78073999999999977	-35.2068099999999973	\N	\N	\N	\N	2002	1002	2016-10-28 01:09:30.953065	2016-10-28 01:09:30.953065
-4	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.7795399999999999	-35.1927609999999973	\N	\N	\N	\N	2001	1002	2016-10-28 01:09:33.199263	2016-10-28 01:09:33.199263
 5	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.78810399999999969	-35.1892759999999996	\N	\N	\N	\N	2003	1001	2016-10-28 01:09:36.319803	2016-10-28 01:09:36.319803
+10	2017-02-02 16:42:47.58	2017-02-07 04:40:47.579	30.2560785999999986	-97.7635090999999932	\N	Alamo Drafthouse	\N	\N	2002	1005	2017-02-02 11:42:45.25003	2017-02-02 11:42:45.25003
+9	2016-09-07 00:00:00	2017-02-02 22:30:23.37	-5.88751699999999989	-35.1734379999999973	\N	\N	\N	\N	2007	1006	2017-02-02 12:50:42.83	2017-02-06 09:18:10.97724
+12	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.87337400000000009	-35.1766950000000023	\N	\N	\N	\N	2003	1001	2017-02-06 09:23:36.192133	2017-02-06 09:25:52.227031
+11	2016-09-06 20:20:00	2018-01-06 01:54:09.437	-5.88741700000000012	-35.1734379999999973	\N	\N	\N	\N	2075	1008	2017-02-02 21:35:31.116338	2017-02-06 09:53:26.084743
+13	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.88741700000000012	-35.1734379999999973	\N	\N	\N	\N	2070	1005	2017-02-06 09:55:18.766355	2017-02-06 09:55:18.766355
+18	2017-02-07 21:55:47.541	2017-02-07 12:51:41.99	-5.88766820000000024	-35.1715465999999992	Praia Shopping	\N	\N	\N	2006	1005	2017-02-07 16:55:48.037	2017-02-07 12:51:43.188544
+20	2017-02-08 08:25:51.148	2017-02-08 16:30:55.402	-5.78410400000000013	-35.1892759999999996	\N	Bar 54 Food Park - Rua Porto Mirim	\N	3007	2001	\N	2017-02-08 03:26:51.333344	2017-02-08 03:26:51.333344
+21	2017-02-08 08:41:22.967	2017-02-08 16:10:14.668	-5.78410400000000013	-35.1892759999999996	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2001	\N	2017-02-08 03:43:16.979797	2017-02-08 03:43:16.979797
+22	2017-02-08 11:07:11.68	2017-02-08 12:55:21.608	-5.86576900000000023	\N	\N	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3005	2001	\N	2017-02-08 06:07:23.383044	2017-02-08 06:07:23.383044
+23	2017-02-08 11:26:06.759	2017-02-08 12:30:09.256	-5.80574800000000035	\N	\N	Bar Trove Food Park - Rua Presidente José Bento	\N	3008	2001	\N	2017-02-08 06:26:12.150683	2017-02-08 06:26:12.150683
+19	2017-02-07 23:31:49.792	2017-02-08 08:01:59.452	-5.88765149999999959	-35.1716704999999976	Ponta Negra	\N	\N	\N	2006	1005	2017-02-07 18:31:50.094	2017-02-08 08:02:00.427033
+24	2017-02-08 18:02:11.986	2017-02-08 08:02:29.192	30.7313316999999984	76.7278691000000066	\N	\N	\N	\N	2006	1005	2017-02-08 13:02:12.872	2017-02-08 08:02:30.124958
+25	2016-09-06 12:00:00	2018-10-06 15:00:00	-5.88641699999999979	-35.171438000000002	\N	\N	\N	\N	2089	1088	2017-02-08 08:03:25.320423	2017-02-08 08:03:25.320423
+26	2017-02-08 13:06:14.163	2017-02-08 16:00:23.012	-5.84256300000000017	\N	\N	Natal Shopping Food Park - Av. das Brancas Dunas	\N	3006	2001	\N	2017-02-08 08:06:24.771952	2017-02-08 08:06:24.771952
 \.
-SELECT pg_catalog.setval('checkins_id_seq', 6, true);
+SELECT pg_catalog.setval('checkins_id_seq', 26, true);
+
 
 
 COPY reviews (id, comment, rating, answers, customer_id, company_id, unit_id, status, created_at) FROM stdin;
-4	Very clean and the customer service is excellent.	4.8	{"answer": 4, "question": "Food good?"}	9002	1003	2004	\N	2016-09-07 19:33:13.598095
-5	Broad selection of quality food and creative menu.	4.9	{"answer": 4, "question": "Food good?"}	9003	1002	2001	\N	2016-09-07 19:36:06.711809
-6	Thaitanic has the best cart in the city.	4.7	{"answer": 4, "question": "Food good?"}	9003	1002	2002	\N	2016-09-07 19:37:07.687663
-7	BIG portions prepared exactly how you request and unreasonably low prices!!!  Love tacos!	4.6	{"answer": 4, "question": "Food good?"}	9001	1001	2003	\N	2016-09-07 19:38:49.741905
 \.
-SELECT pg_catalog.setval('reviews_id_seq', 8, true);
+SELECT pg_catalog.setval('reviews_id_seq', 1, true);
 
 COPY review_approvals (id, review_id, reviewer_id, status, created_at, updated_at) FROM stdin;
-1	4	\N	\N	2016-09-07 19:33:13.598095	2016-09-07 19:33:13.598095
-2	5	\N	\N	2016-09-07 19:36:06.711809	2016-09-07 19:36:06.711809
-3	6	\N	\N	2016-09-07 19:37:07.687663	2016-09-07 19:37:07.687663
-4	7	\N	\N	2016-09-07 19:38:49.741905	2016-09-07 19:38:49.741905
 \.
-SELECT pg_catalog.setval('review_approvals_id_seq', 5, true);
+SELECT pg_catalog.setval('review_approvals_id_seq', 1, true);
 
 
 COPY order_history (id, order_sys_order_id, amount, initiation_time, payment_time, actual_pickup_time, desired_pickup_time, prep_notice_time, status, messages, qr_code, manual_pickup, order_detail, checkin_id, customer_name, customer_id, unit_id, company_id, created_at, updated_at) FROM stdin;
-697	1363783221757608842	$7.00	2016-10-09 16:45:22.362132	\N	\N	2016-10-09 17:05:22.362132	\N	{"order_requested": "11/6/2016, 8:13:52 PM"}	\N	d12b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022	f	{"Coffee":{"title":"Coffee","quantity":1,"selections":[]}}	\N	Marco and Inez P.	9003	2001	1002	2016-11-10 22:42:05.955656	2016-11-10 22:42:05.955656
-696	1364458146390605831	$10.00	2016-10-09 16:40:58.210291	\N	2016-10-09 16:59:30.001837	2016-10-09 17:00:58.210291	\N	{"order_paid": "11/6/2016, 8:11:56 PM","order_accepted": "11/6/2016, 8:06:52 PM","order_requested": "11/6/2016, 8:03:52 PM"}	\N	a92b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022	f	{"The Independent Make it Clean Corn":{"title":"The Independent Make it Clean Corn","quantity":1,"options":["No Cheese","Butter","Butter","Butter","No Beans","No Ancho Aioli","l","l2","l3","l4"],"selections":{"Extras":"Make it Clean","Shell":"Corn"}},"Coffee":{"title":"Coffee","quantity":1,"options":[],"selections":{}}}	\N	Marco and Inez P.	9003	2001	1002	2016-11-10 22:42:05.955656	2016-11-10 22:42:05.955656
-700	1371101531029373235	$9.00	2016-10-09 17:00:05.837234	\N	\N	2016-10-09 22:20:05.837	\N	{"order_requested": "11/6/2016, 9:04:12 PM"}	\N	\N	f	{"Panang Curry":{"title":"Panang Curry","quantity":1,"options":["New Curry"],"selections":{"Meat Selection":["beef","pork"]}}}	\N	Stacy T.	9001	2001	1002	2016-11-10 22:42:05.955656	2016-11-23 19:10:50.728281
-698	1351409762318680784	$5.00	2016-10-09 16:50:45.184934	\N	\N	2016-10-09 21:10:45.184	\N	{"order_paid":"11/6/2016, 8:31:56 PM","order_accepted":"11/6/2016, 8:26:52 PM","order_requested":"11/6/2016, 8:23:52 PM"}	\N	b32b0402b2d239c829f421d8913ab1e39247dcbb84b913dbb9719b5e5c915022	f	{"Panang Curry":{"title":"Panang Curry","quantity":3,"options":["New Curry"],"selections":{"Meat Selection":["beef","pork"]}}}	\N	Stacy T.	9001	2001	1002	2016-11-10 22:42:05.955656	2016-11-20 20:47:01.453944
+716	1441827869947855089	R$11.60	\N	\N	\N	2017-02-06 20:11:56	\N	{"order_requested":"2/4/2017, 2:13:37 PM"}	\N	\N	f	{"Submariner Gargonzola":{"title":"Submariner Gargonzola","quantity":1,"options":[],"selections":{"Cheese":"Gargonzola"}}}	\N	Marco and Inez P	9003	2006	1005	2017-02-04 14:13:35.376951	2017-02-04 14:13:35.376951
+717	1442308288698909145	R$25.58	\N	\N	\N	2017-02-06 20:11:56	\N	{"order_requested":"2/4/2017, 2:15:50 PM"}	\N	\N	f	{"Thai Noodles":{"title":"Thai Noodles","quantity":2,"options":["extra beef","extra curry pork","Extra bbq"],"selections":{}}}	\N	Marco and Inez P	9003	2006	1005	2017-02-04 14:15:48.542129	2017-02-04 14:15:48.542129
+718	1441814057349808367	R$25.60	\N	\N	\N	2017-02-06 20:11:56	\N	{"order_requested":"2/4/2017, 2:16:20 PM"}	\N	\N	f	{"Turkey Sub":{"title":"Turkey Sub","quantity":3,"options":["Potato Salad","Potato Chips"],"selections":{}}}	\N	Marco and Inez P	9003	2006	1005	2017-02-04 14:16:18.178361	2017-02-04 14:16:18.178361
+719	1441813386487660781	R$9.60	\N	\N	\N	2016-02-28 20:11:56	\N	{"order_requested":"2/4/2017, 2:31:49 PM"}	\N	\N	f	{"Turkey Sub":{"title":"Turkey Sub","quantity":1,"options":["Potato Salad","Potato Chips"],"selections":{}}}	\N	mg2 s	9005	2008	1008	2017-02-04 14:31:46.803123	2017-02-04 14:31:46.803123
+720	1441813321006186731	R$9.60	\N	\N	\N	2016-02-28 20:11:56	2016-02-28 19:56:56	{"order_requested":"2/6/2017, 4:02:49 PM"}	\N	\N	f	{"Turkey Sub":{"title":"Turkey Sub","quantity":1,"options":["Potato Salad","Potato Chips"],"selections":{}}}	\N	mg2 s	9005	2006	1005	2017-02-06 16:02:47.579754	2017-02-06 16:02:47.579754
 \.
-SELECT pg_catalog.setval('order_history_id_seq', 701, true);
+SELECT pg_catalog.setval('order_history_id_seq', 720, true);
