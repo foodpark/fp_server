@@ -9,7 +9,7 @@
 t=$(date "+%Y.%m.%d-%H.%M.%S")
 
 echo "Backing up db with timestamp $t..."
-pg_dump -U postgres sfezdb -f backup_$t.sql
+pg_dump -U postgres sfezdb -f logs/backup_$t.sql
 echo "...done"
 echo
 
