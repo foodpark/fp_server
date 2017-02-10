@@ -611,11 +611,10 @@ function *beforeSaveLoyaltyRewards() {
 
 function *beforeSaveUser() {
   debug('beforeSaveUser');
-  debug(this.params);
-  // safety check -- use id of logged in user
-  debug(this.params.id);
-  //this.params.id = this.passport.user.id;
-  debug(this.params.id);
+  if (this.passport.user.role!='ADMIN' && this.passport.user.id != this.params.id) {
+    console.error('beforeSaveUser: Logged-in user id does not match param user id');
+    throw new Error('Param id does not match logged-in user credentials'); 
+  }
   var password = this.resteasy.object.password;
   debug(password);
   if (password) {
