@@ -1,33 +1,17 @@
 var crypto = require('crypto');
 var knex = require('../../config/knex');
 var debug = require('debug')('user.model');
-/**
 
-CREATE TABLE users (
-  ID SERIAL PRIMARY KEY,
-  username TEXT NOT NULL,
-  password TEXT NOT NULL,
-  role TEXT REFERENCES roles (type),
-  provider TEXT,
-  provider_id TEXT,
-  provider_data TEXT,
-  created TIMESTAMP DEFAULT current_timestamp
-)
-CREATE TABLE roles (
-  ID SERIAL PRIMARY KEY,
-  type TEXT NOT NULL UNIQUE
-)
-INSERT INTO ROLES (type) values ('CUSTOMER');
-INSERT INTO ROLES (type) values ('OWNER');
-INSERT INTO ROLES (type) values ('UNITMGR');
-INSERT INTO ROLES (type) values ('ADMIN');
-**/
 
-var encryptPassword = function (password) {
+function encrypt(password) {
   var md5 = crypto.createHash('md5');
   md5 = md5.update(password).digest('hex');
 
   return md5;
+}
+
+exports.encryptPassword = function (password) {
+  return encrypt(password);
 }
 
 exports.userForUsername = function(username) {
@@ -49,13 +33,13 @@ exports.getSingleUser = function(id) {
 };
 
 exports.createUser = function(hash) {
-  hash.password = encryptPassword(hash.password);
+  hash.password = encrypt(hash.password);
   return knex('users').insert(hash).returning('*');
 };
 
 exports.updateUser = function(id, hash) {
   debug('updateUser');
-  if (hash.password) hash.password = encryptPassword(hash.password);
+  if (hash.password) hash.password = encrypt(hash.password);
   debug(hash);
   return knex('users').update(hash).where('id',id).returning('*');
 };
@@ -77,7 +61,7 @@ exports.deleteUser = function(id) {
 }
 
 exports.authenticate = function(md5password, password) {
-  var md5 = encryptPassword(password)
+  var md5 = encrypt(password)
 
   return md5password === md5;
 };

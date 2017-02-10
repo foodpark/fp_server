@@ -409,6 +409,63 @@ function *beforeSaveReview() {
   }
 }
 
+function *beforeSaveCustomer(){
+  debug('beforeSaveCustomer');  
+  // If username or password is changed, we need to update the Users table
+  var username = this.resteasy.object.username;
+  var password = this.resteasy.object.password;
+  if (this.resteasy.operation == 'update') {
+    debug('..starting update of existing Customer'); 
+    // This block of code checks to see if username/password, if provided,
+    // was/were changed. If so, update User.
+    if (!username && !password) {
+      debug('..no update to user data');
+      return;
+    }
+    // Otherwise username and/or password was changed
+    if (!this.params.id) {
+      console.error('beforeSaveCustomer: No customer id provided');
+      throw new Error('No customer id provided. Update operation requires customer id')
+    }
+    var customer = '';
+    try {
+      customer = (yield Customer.getSingleCustomer(this.params.id))[0];
+    } catch (err) {
+      console.error('beforeSaveCustomer: Error getting existing Customer');
+      throw err;
+    }
+    debug('..customer');
+    debug(customer);
+    var user = '';
+    try {
+      user = (yield User.getSingleUser(customer.user_id))[0];
+    } catch (err) {
+      console.error('beforeSaveCustomer: Error getting existing user');
+      throw err;
+    }
+    debug('..user');
+    debug(user);
+    var userHash = {};
+    if (username) {
+      userHash.username = username;
+      delete this.resteasy.object.username;
+    }
+    if (password) {
+      userHash.password = password;
+      delete this.resteasy.object.password;
+    }
+    debug('..updating user');
+    try {
+      user = (yield User.updateUser(user.id, userHash))[0];
+    } catch (err) {
+      console.error('beforeSaveCustomer: Error updating user');
+      throw err;
+    }
+    debug('..user after update');
+    debug(user);
+  }
+}
+
 function *beforeSaveUnit() {
   debug('beforeSaveUnit');
   // If username or password is changed, we need to update the Users table
@@ -550,6 +607,21 @@ function *beforeSaveLoyaltyRewards() {
       throw new Error ('No company context found for loyalty rewards');
     }
   }
+}
+
+function *beforeSaveUser() {
+  debug('beforeSaveUser');
+  debug(this.params);
+  // safety check -- use id of logged in user
+  debug(this.params.id);
+  //this.params.id = this.passport.user.id;
+  debug(this.params.id);
+  var password = this.resteasy.object.password;
+  debug(password);
+  if (password) {
+    this.resteasy.object.password = User.encryptPassword(password);
+  }
+  debug(this.resteasy.object);
 }
 
 function *afterCreateReview(review) {
@@ -708,6 +780,8 @@ module.exports = {
         debug('saving order_history')
         yield beforeSaveOrderHistory.call(this);
         debug('saving order_history to repository')
+      } else if (this.resteasy.table == 'users') {
+        yield beforeSaveUser.call(this);
       }
     },
 
