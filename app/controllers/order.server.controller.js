@@ -1,5 +1,10 @@
-var config = require('../../config/config')
-var moltin = require('./moltin.server.controller');
+var config  = require('../../config/config');
+var auth = require('./authentication.server.controller');
+var Company = require ('../models/company.server.model');
+var moltin  = require('./moltin.server.controller');
+var orderhistory  = require('../models/orderhistory.server.model');
+var Unit    = require ('../models/unit.server.model');
+var debug   = require('debug')('orders');
 
 const ORDER = '/orders';
 
@@ -18,4 +23,96 @@ exports.getOrders = function*(next){
   }
   console.log(orders.length)
   this.body = orders;
+}
+
+exports.getActiveOrders = function * (next) {
+  debug('getActiveOrders');
+  if (!this.company || !this.unit) {
+    console.error('getActiveOrders: Company/unit id missing');
+    throw new Error('Company/unit id missing');
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  if (user.role == 'OWNER' && user.id == this.company.user_id || 
+      user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try { 
+      var orders = yield orderhistory.getActiveOrders(this.company.id, this.unit.id);
+    } catch (err) {
+      console.error('getActiveOrders: error getting active orders');
+      console.error(err)
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    return;
+  } else {
+    console.error('get active orders: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
+exports.getClosedOrders = function * (next) {
+  debug('getClosedOrders');
+  if (!this.company || !this.unit) {
+    console.error('getClosedOrders: Company/unit id missing');
+    throw new Error('Company/unit id missing');
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  if (user.role == 'OWNER' && user.id == this.company.user_id || 
+      user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try { 
+      var orders = yield orderhistory.getClosedOrders(this.company.id, this.unit.id);
+    } catch (err) {
+      console.error('getClosedOrders: error getting closed orders');
+      console.error(err)
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    return;
+  } else {
+    console.error('get closed orders: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
+exports.getCompany=function *(id, next) {
+  debug('getCompany');
+  debug('id ' + id);
+  var company = '';
+  try {
+    company = (yield Company.getSingleCompany(id))[0];
+  } catch (err) {
+    console.error('error getting company');
+    throw(err);
+  }
+  debug(company);
+  this.company = company;
+  yield next;
+}
+
+exports.getUnit=function *(id, next) {
+  debug('getUnit');
+  debug('id ' + id);
+  var unit = '';
+  try {
+    unit = (yield Unit.getSingleUnit(id))[0];
+  } catch (err) {
+    console.error('error getting unit');
+    throw(err);
+  }
+  debug(unit);
+  this.unit = unit;
+  yield next;
 }

@@ -425,18 +425,11 @@ exports.roleAuthorization = function *(role, role2) {
 }
 
 exports.isAuthorized = function *(role, role2) {
-  debug('isAuthorized')
+  debug('isAuthorized');
   debug(this.passport.user);
   if (this.passport.user) {
-    try {
-     var user = (yield User.getSingleUser(this.passport.user.id))[0]
-     debug(user)
-    } catch (err) {
-      debug(err);
-      throw new Error('No user was found for id '+ this.passport.user.id)
-    }
-    if (user.role == role || user.role == role2) {
-      debug('found '+ user.role)
+    if (this.passport.user.role == role || this.passport.user.role == role2) {
+      debug('found '+ this.passport.user.role)
       return true;
     }
     return false

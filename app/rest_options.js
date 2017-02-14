@@ -296,7 +296,10 @@ function *afterUpdateOrderHistory(orderHistory) {
       }
       var orderNum = orderHistory.order_sys_order_id;
       orderNum = orderNum.substring(orderNum.length-4);
-      debug(orderNum);
+      debug('..order number '+ orderNum);
+      debug(this.passport.user);
+      debug(this.passport.user.first_name);
+      debug(this.passport.user.last_name);
       var custName = this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0);
       debug(custName);
       debug(status);
@@ -822,8 +825,15 @@ module.exports = {
     else debug(context);
     if (this.resteasy.operation == 'index') {
       if (this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
-        debug('..company id '+ m[1])
+        debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
+      } else if (this.resteasy.table == 'order_history' && context 
+                && (m = context.match(/companies\/(\d+)/)) 
+                && (n = context.match(/units\/(\d+)/))) {
+        debug('..query order history');
+        debug('..company id '+ m[1]);
+        debug('..unit id '+ n[1]);
+        return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
       } else if (this.resteasy.table == 'favorites') {
         debug('..read favorites');
         debug(this.resteasy.object);
