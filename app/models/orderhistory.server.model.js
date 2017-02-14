@@ -17,7 +17,7 @@ exports.getActiveOrders = function(companyId, unitId) {
   return knex('order_history').select('*').
     whereRaw("status \\? ? and not (status \\?| ?) "+
     " and company_id = ? and unit_id = ?",
-    ['order_paid', ['order_picked_up', 'order_delivered'], companyId, unitId]).returning('*');
+    ['order_paid', ['order_picked_up', 'order_delivered', 'no_show'], companyId, unitId]).returning('*');
 };
 
 exports.getClosedOrders = function(companyId, unitId) {
@@ -27,5 +27,5 @@ exports.getClosedOrders = function(companyId, unitId) {
   }
   return knex('order_history').select('*').
     whereRaw("company_id = ? and unit_id = ? and status \\?| ?",
-    [companyId, unitId,['order_picked_up', 'order_delivered']]).returning('*');
+    [companyId, unitId,['order_picked_up', 'order_delivered', 'no_show']]).returning('*');
 };

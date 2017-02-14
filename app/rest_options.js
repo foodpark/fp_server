@@ -251,6 +251,30 @@ function *afterUpdateOrderHistory(orderHistory) {
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
       debug('...status '+ status)
+      var customer ='';
+      try {
+        customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
+      } catch (err) {
+        console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
+        throw err;
+      }
+      debug(customer);
+      var user ='';
+      try {
+        user = (yield User.getSingleUser(customer.user_id))[0];
+      } catch (err) {
+        console.error('afterUpdateOrderHistory: error retrieving user '+ customer.user_id);
+        throw err;
+      }
+      debug(user);
+      var company = '';
+      try {
+        company = (yield Company.getSingleCompany(orderHistory.company_id))[0];
+      } catch (err) {
+        console.error('afterUpdateOrderHistory: error retrieving company '+ orderHistory.company_id);
+        throw err;
+      }
+      debug(company);
       var msgTarget = { order_id : orderHistory.id }
       if (status == 'order_paid' || status == 'pay_fail') {
         debug('...status update from customer. Notify unit')
@@ -269,22 +293,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       } else {
         debug('...status update from unit. Notify customer '+ orderHistory.customer_id)
         // get customer device id
-        var customer ='';
-        try {
-          customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
-        } catch (err) {
-          console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
-          throw err;
-        }
         debug('..Customer gcm id is '+ customer.gcm_id)
-        var company = '';
-        try {
-          company = (yield Company.getSingleCompany(orderHistory.company_id))[0];
-        } catch (err) {
-          console.error('afterUpdateOrderHistory: error retrieving company '+ orderHistory.company_id);
-          throw err;
-        }
-        debug('..Company name is '+ company.name);
         msgTarget.to = 'customer' 
         msgTarget.toId = customer.id
         msgTarget.gcmId = customer.gcm_id
@@ -297,10 +306,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       var orderNum = orderHistory.order_sys_order_id;
       orderNum = orderNum.substring(orderNum.length-4);
       debug('..order number '+ orderNum);
-      debug(this.passport.user);
-      debug(this.passport.user.first_name);
-      debug(this.passport.user.last_name);
-      var custName = this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0);
+      var custName = user.first_name +' '+ user.last_name.charAt(0);
       debug(custName);
       debug(status);
       switch(status) {
