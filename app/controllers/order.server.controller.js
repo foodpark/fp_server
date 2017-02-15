@@ -1,6 +1,7 @@
 var config  = require('../../config/config');
 var auth = require('./authentication.server.controller');
 var Company = require ('../models/company.server.model');
+var Customer = require ('../models/customer.server.model');
 var moltin  = require('./moltin.server.controller');
 var orderhistory  = require('../models/orderhistory.server.model');
 var Unit    = require ('../models/unit.server.model');
@@ -87,6 +88,70 @@ exports.getClosedOrders = function * (next) {
   }
 }
 
+exports.getCustomerActiveOrders = function * (next) {
+  debug('getCustomerActiveOrders');
+  if (!this.customer) {
+    console.error('getCustomerActiveOrders: Customer id missing');
+    this.status= 422;
+    this.body = {error: 'Customer id missing'};
+    return;
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id || 
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try { 
+      var orders = yield orderhistory.getCustomerActiveOrders(this.customer.id);
+    } catch (err) {
+      console.error('getCustomerActiveOrders: error getting customer active orders');
+      console.error(err)
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    return;
+  } else {
+    console.error('get customer active orders: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
+exports.getCustomerClosedOrders = function * (next) {
+  debug('getCustomerClosedOrders');
+  if (!this.customer) {
+    console.error('getCustomerClosedOrders: Customer id missing');
+    this.status= 422;
+    this.body = {error: 'Customer id missing'};
+    return;
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id || 
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try { 
+      var orders = yield orderhistory.getCustomerClosedOrders(this.customer.id);
+    } catch (err) {
+      console.error('getCustomerClosedOrders: error getting customer closed orders');
+      console.error(err)
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    return;
+  } else {
+    console.error('get customer closed orders: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
 exports.getCompany=function *(id, next) {
   debug('getCompany');
   debug('id ' + id);
@@ -99,6 +164,21 @@ exports.getCompany=function *(id, next) {
   }
   debug(company);
   this.company = company;
+  yield next;
+}
+
+exports.getCustomer=function *(id, next) {
+  debug('getCustomer');
+  debug('id ' + id);
+  var customer = '';
+  try {
+    customer = (yield Customer.getSingleCustomer(id))[0];
+  } catch (err) {
+    console.error('error getting customer');
+    throw(err);
+  }
+  debug(customer);
+  this.customer = customer;
   yield next;
 }
 

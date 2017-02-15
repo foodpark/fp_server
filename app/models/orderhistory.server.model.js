@@ -29,3 +29,23 @@ exports.getClosedOrders = function(companyId, unitId) {
     whereRaw("company_id = ? and unit_id = ? and status \\?| ?",
     [companyId, unitId,['order_picked_up', 'order_delivered', 'no_show']]).returning('*');
 };
+
+exports.getCustomerActiveOrders = function(customerId) {
+  if (!customerId) {
+    console.error('Missing customer id ('+ customerId+')');
+    throw new Error('Missing customer id ('+ customerId+')');
+  }
+  return knex('order_history').select('*').
+    whereRaw("status \\? ? and not (status \\?| ?) and customer_id = ?",
+    ['order_paid', ['order_picked_up', 'order_delivered', 'no_show'], customerId]).returning('*');
+};
+
+exports.getCustomerClosedOrders = function(customerId) {
+  if (!customerId) {
+    console.error('Missing customer id ('+ customerId+')');
+    throw new Error('Missing customer id ('+ customerId+')');
+  }
+  return knex('order_history').select('*').
+    whereRaw("customer_id = ? and status \\?| ?",
+    [customerId,['order_picked_up', 'order_delivered', 'no_show']]).returning('*');
+};
