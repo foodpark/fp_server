@@ -247,7 +247,7 @@ CREATE TABLE order_history (
 
 CREATE TABLE loyalty (
   id SERIAL PRIMARY KEY,
-  amount money,
+  amount text,
   customer_id integer REFERENCES customers(id),
   company_id integer REFERENCES companies(id),
   created_at timestamp without time zone DEFAULT now(),

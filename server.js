@@ -12,7 +12,6 @@ var passport = Passport();
 
 var config = require('./config/config');
 var dbConfig = require('./config/knex');
-var admin = require("firebase-admin");
 var cors = require('kcors');
 
 var app = Koa();
@@ -71,13 +70,5 @@ require('./app/routes')(app);
 var server = app.listen(config.port);
 module.exports = app;
 module.exports = server; // support unit test
-
-
-var serviceAccount = require("./config/SFEZ-10ff25a209ed.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://sfez-17981.firebaseio.com/"
-});
 
 console.log(process.env.NODE_ENV + ' server running at http://localhost:' + config.port);

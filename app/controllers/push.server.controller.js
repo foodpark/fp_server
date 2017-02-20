@@ -1,4 +1,5 @@
 var config = require('../../config/config');
+var admin = require("firebase-admin");
 var FCM = require('fcm-node');
 var gcm = require('node-gcm');
 var moltin = require('./moltin.server.controller');
@@ -13,6 +14,13 @@ const ORDER_CREATED = 'ORDER_CREATED';
 const ORDER_ACCEPTED_STATUS = 'ORDER_ACCEPTED_STATUS';
 const ORDER_REQUESTED = 'order_requested';
 
+
+var serviceAccount = require("../../config/SFEZ-113af0fa7076.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://sfez-17981.firebaseio.com/"
+});
 
 var setOrderStatusMessage = function(orderId, title, status, message, body) {
 	var note = '';
@@ -44,38 +52,34 @@ var setOrderStatusMessage = function(orderId, title, status, message, body) {
 	return note;
 }
 
-/*Title:  Takeout Order Accept/Decline
+var sendFCMNotification = function (message) {
+	// Send a message to the device corresponding to the provided
+	// registration token.
+	var payload = { notification: message.notification, data: message.data};
+	debug(payload);
+	return new Promise( function(resolve, reject) {
+		admin.messaging().sendToDevice(message.to, payload)
+		.then(function(response) {
+			// See the MessagingDevicesResponse reference documentation for
+			// the contents of response.
+			debug('..sent message');
+			console.log(response);
+			var error = response.results[0].error;
+			if (error) {
+				console.error(error.errorInfo);
+				reject(error.errorInfo.message);
+			}
+			resolve(response);
+		})
+		.catch(function(error) {
+			console.error("Error sending message:");
+			console.log(error);
+			reject(error);
+		});
+	});
+}
 
-Pickup Time:  desired_pickup_time
-Customer:  Customer_Name
-Order Details:  
-
-"Accept Box"        "Decline Box"
-
-
-2a)  Vendor Accepts  {status: 'order_accepted'}
-
-Notification sent to customer:
-
-Title:  Order Accepted
-
- Your payment was processed!  
-
-Pickup Time:  desired_pickup_time
-Customer:  Customer_Name
-Order:  order_sys_order_id (last 4 numbers)
-
-2b)  Vendor Declines {status: 'order_declined'}
-
-Notification sent to customer:
-
-Title:  Order Declined
-
-<Vendor Name> did not accept your order at this time. Please try again some other time. 
-*/
-
-
-var sendFCMNotification = function (message){
+var oldSendFCMNotification = function (message){
 	debug('sendFCMNotification');
 	return new Promise( function(resolve, reject) { 
 		if (message) {
@@ -149,6 +153,7 @@ exports.notifyOrderUpdated = function *(orderId, msgTarget){
 		} catch (err) {
 			// failed notification is not a showstopper
 			notified.fcm = false;
+			console.error(err);
 		}
 		debug('...response')
 		debug(fcmRes)
@@ -165,6 +170,7 @@ exports.notifyOrderUpdated = function *(orderId, msgTarget){
 		} catch (err) {
 			//failed notificaiton is not a showstopper
 			notified.gcm = false;
+			console.error(err);
 		}
 		debug('...response');
 		debug(gcmRes);
