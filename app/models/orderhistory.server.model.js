@@ -30,6 +30,17 @@ exports.getClosedOrders = function(companyId, unitId) {
     [companyId, unitId,['order_picked_up', 'order_delivered', 'no_show']]).returning('*');
 };
 
+exports.getRequestedOrders = function(companyId, unitId) {
+  if (!companyId || !unitId) {
+    console.error('Missing company id ('+ companyId+') or unit id ('+ unitId +')');
+    throw new Error('Missing company id ('+ companyId+') or unit id ('+ unitId +')');
+  }
+  return knex('order_history').select('*').
+    whereRaw("status \\? ? and not (status \\?| ?) "+
+    " and company_id = ? and unit_id = ?",
+    ['order_requested', ['order_accepted', 'order_declined'], companyId, unitId]).returning('*');
+};
+
 exports.getCustomerActiveOrders = function(customerId) {
   if (!customerId) {
     console.error('Missing customer id ('+ customerId+')');

@@ -88,6 +88,37 @@ exports.getClosedOrders = function * (next) {
   }
 }
 
+exports.getRequestedOrders = function * (next) {
+  debug('getRequestedOrders');
+  if (!this.company || !this.unit) {
+    console.error('getRequestedOrders: Company/unit id missing');
+    throw new Error('Company/unit id missing');
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  if (user.role == 'OWNER' && user.id == this.company.user_id || 
+      user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try { 
+      var orders = yield orderhistory.getRequestedOrders(this.company.id, this.unit.id);
+    } catch (err) {
+      console.error('getRequestedOrders: error getting requested orders');
+      console.error(err)
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    return;
+  } else {
+    console.error('getRequestedOrders: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
 exports.getCustomerActiveOrders = function * (next) {
   debug('getCustomerActiveOrders');
   if (!this.customer) {

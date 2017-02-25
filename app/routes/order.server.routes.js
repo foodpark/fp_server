@@ -12,6 +12,7 @@ module.exports=function(app) {
 
 	router.get(apiversion + '/companies/:companyId/units/:unitId/active_orders', requireJWT, orders.getActiveOrders);
 	router.get(apiversion + '/companies/:companyId/units/:unitId/closed_orders', requireJWT, orders.getClosedOrders);
+	router.get(apiversion + '/companies/:companyId/units/:unitId/requested_orders', requireJWT, orders.getRequestedOrders);
 	
   router.param('companyId', orders.getCompany);
   router.param('unitId', orders.getUnit);
