@@ -22,7 +22,7 @@ SELECT pg_catalog.setval('food_parks_id_seq', 30018, true);
 
 
 COPY users (id, username, password, first_name, last_name, role, provider, provider_id, provider_data, created_at, updated_at) FROM stdin;
-11001	mp10	mp15	Stacy	Tran	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352	2017-02-03 09:25:30.279083
+11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352	2017-02-03 09:25:30.279083
 11002	mp27	defc72a96803a619a6735cd7e7e69e1b	Jonathan	Jones	CUSTOMER	local	local	{}	2016-08-21 23:01:03.622149	2017-02-03 09:54:22.527595
 11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	local	local	{}	2016-08-21 23:03:07.177813	2017-01-31 23:32:49.172208
 11005	mp5@gmail.com	146eb1afa89654aca443976646460ef4	Bob	Smith	OWNER	local	local	{}	2016-08-21 23:05:04.914807	2017-01-31 23:32:49.172208

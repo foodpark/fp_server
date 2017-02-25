@@ -234,7 +234,7 @@ CREATE TABLE order_history (
   messages text, -- json
   qr_code text,
   manual_pickup boolean DEFAULT false,
-  order_detail json, -- json
+  order_detail jsonb, 
   checkin_id integer REFERENCES checkins(id),
   customer_name text,
   customer_id integer REFERENCES customers(id),

@@ -44,26 +44,39 @@ function *simplifyDetails(orderDetail) {
           debug(mod.data.title + ': '+ mod.var_title)
           itemDetail.selections[mod.data.title] = mod.var_title
         } else { // option items or single selections
-          var titles = []
-          for (var k in mod.variations) {
-            var variation = mod.variations[k]
-            debug('...'+ variation.title)
-            titles.push(variation.title)
-          }
-          debug(titles)
-          if (mod.type.value == 'Single') {
-            itemDetail.options = titles
-          } else if (mod.type.value == 'Variant') {
+          var titles = [];
+          if (mod.type.value == 'Variant') {
+            for (var k in mod.variations) {
+              var variation = mod.variations[k]
+              debug('... variant '+ variation.title);
+              debug('...'+ variation.id);
+              titles.push(variation.title);
+            }
             itemDetail.selections[mod.title]=titles
+          } else if (mod.type.value =='Single') {
+            for (var k in mod.variations) {
+              var variation = mod.variations[k]
+              debug('... option '+ variation.title);
+              debug('... id '+ variation.id);
+              debug('... parent '+ variation.modifier);
+              var options = item.options[variation.modifier];
+              if (options && options[variation.id] ) {
+                debug('... option '+ variation.title +' was selected');
+                titles.push(variation.title);
+              }
+            }
+            itemDetail.options = titles;
           }
         }
       }
     }
-    debug(itemDetail.selections)
-    menuItems[item.product.value] = itemDetail
+    debug('... add item detail to list ');
+    debug(itemDetail);
+    menuItems[item.id] = itemDetail;
+    debug(menuItems);
   }
-  debug(menuItems)
-  return menuItems
+  debug(menuItems);
+  return menuItems;
 }
 
 function *beforeSaveOrderHistory() {
