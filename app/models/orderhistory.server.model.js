@@ -60,3 +60,14 @@ exports.getCustomerClosedOrders = function(customerId) {
     whereRaw("customer_id = ? and status \\?| ?",
     [customerId,['order_picked_up', 'order_delivered', 'no_show']]).returning('*');
 };
+
+exports.getCustomerRequestedOrders = function(customerId) {
+  if (!customerId) {
+    console.error('Missing customer id ('+ customerId+')');
+    throw new Error('Missing customer id ('+ customerId+')');
+  }
+  return knex('order_history').select('*').
+    whereRaw("status \\? ? and not (status \\?| ?) "+
+    " and customer_id = ? ",
+    ['order_requested', ['order_paid', 'pay_fail'], customerId]).returning('*');
+};

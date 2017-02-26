@@ -183,6 +183,38 @@ exports.getCustomerClosedOrders = function * (next) {
   }
 }
 
+exports.getCustomerRequestedOrders = function * (next) {
+  debug('getCustomerRequestedOrders');
+  if (!this.customer) {
+    console.error('getCustomerRequestedOrders: Customer id missing');
+    this.status= 422;
+    this.body = {error: 'Customer id missing'};
+    return;
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id || 
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try { 
+      var orders = yield orderhistory.getCustomerRequestedOrders(this.customer.id);
+    } catch (err) {
+      console.error('getCustomerRequestedOrders: error getting customer requested orders');
+      console.error(err)
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    return;
+  } else {
+    console.error('getCustomerRequestedOrders: User not authorized')
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
+}
+
 exports.getCompany=function *(id, next) {
   debug('getCompany');
   debug('id ' + id);

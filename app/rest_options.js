@@ -207,7 +207,8 @@ function *afterCreateOrderHistory(orderHistory) {
   
   var orderDetail = JSON.stringify(orderHistory.order_detail, null, 2);
   debug(orderDetail);
-  var msg = 'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'+
+  var pickuptime = orderHistory.desired_pickup_time.toISOString();
+  var msg = 'Pickup Time: '+ pickuptime +'\n'+
             'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+
             'Order Details: ' + orderDetail +'\n';
   debug('msg');
@@ -219,10 +220,13 @@ function *afterCreateOrderHistory(orderHistory) {
     fcmId  : unit.fcm_id,
     title  : "Order Accept/Decline",
     message : msg,
+    body : msg,
     status : "order_requested"
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
-  yield push.notifyOrderUpdated(orderHistory.id, msgTarget)
+  var orderNum = orderHistory.order_sys_order_id;
+  orderNum = orderNum.substring(orderNum.length-4);
+  yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
   var hash = {

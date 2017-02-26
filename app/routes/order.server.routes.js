@@ -19,6 +19,7 @@ module.exports=function(app) {
 
 	router.get(apiversion + '/customers/:customerId/active_orders', requireJWT, orders.getCustomerActiveOrders);
 	router.get(apiversion + '/customers/:customerId/closed_orders', requireJWT, orders.getCustomerClosedOrders);
+	router.get(apiversion + '/customers/:customerId/requested_orders', requireJWT, orders.getCustomerRequestedOrders);
 	
 	router.param('customerId', orders.getCustomer);
 
