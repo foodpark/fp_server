@@ -171,11 +171,13 @@ function *create(next) {
 
   var columns = (yield this.resteasy.schema.columns(this.resteasy.table));
   if (_.find(columns, { column_name: 'updated_at' })) {
-    hash['updated_at'] = this.resteasy.knex.fn.now();
+    //hash['updated_at'] = this.resteasy.knex.fn.now();
+    hash['updated_at'] = this.resteasy.knex.raw("now() at time zone 'utc'");
   }
 
   if (_.find(columns, { column_name: 'created_at' })) {
-    hash['created_at'] = this.resteasy.knex.fn.now();
+    //hash['created_at'] = this.resteasy.knex.fn.now(); 
+    hash['created_at'] = this.resteasy.knex.raw("now() at time zone 'utc'");
   }
 
   yield hook(this, 'beforeSave');
