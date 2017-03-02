@@ -36,8 +36,8 @@ CREATE TABLE territories (
     timezone text,
     latitude float8,
     longitude float8,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE food_parks (
@@ -51,8 +51,8 @@ CREATE TABLE food_parks (
     country text,
     latitude float8,
     longitude float8,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE locations (
@@ -66,8 +66,8 @@ CREATE TABLE locations (
   territory_id integer REFERENCES territories(id),
   latitude float8,
   longitude float8,
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE users (
@@ -80,8 +80,8 @@ CREATE TABLE users (
     provider text,
     provider_id text,
     provider_data text,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE admins (
@@ -94,8 +94,8 @@ CREATE TABLE admins (
     state text,
     country text,
     user_id integer REFERENCES users(id),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -125,8 +125,8 @@ CREATE TABLE companies (
     tags text,
     stub boolean,
     user_id integer REFERENCES users(id),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -146,8 +146,8 @@ CREATE TABLE customers (
     state text,
     country text,
     user_id integer REFERENCES users(id),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE units (
@@ -169,8 +169,8 @@ CREATE TABLE units (
     territory_id integer REFERENCES territories(id),
     company_id integer REFERENCES companies(id),
     unit_mgr_id integer REFERENCES users(id),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -186,8 +186,8 @@ CREATE TABLE checkins (
   food_park_id integer REFERENCES food_parks(id),
   unit_id integer REFERENCES units(id),
   company_id integer REFERENCES companies(id),
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -207,8 +207,8 @@ CREATE TABLE checkin_history (
   food_park_id integer REFERENCES food_parks(id),
   note text,
   display_address text,
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -216,7 +216,7 @@ CREATE TABLE favorites (
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),
   company_id integer REFERENCES companies(id),
-  created_at timestamp without time zone DEFAULT now(),
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   PRIMARY KEY (customer_id, unit_id, company_id)
 );
 
@@ -240,8 +240,8 @@ CREATE TABLE order_history (
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),
   company_id integer REFERENCES companies(id),
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -250,8 +250,8 @@ CREATE TABLE loyalty (
   amount text,
   customer_id integer REFERENCES customers(id),
   company_id integer REFERENCES companies(id),
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE loyalty_rewards (
@@ -260,8 +260,8 @@ CREATE TABLE loyalty_rewards (
   gold_reward_item text,
   silver_reward_item text,
   bronze_reward_item text,
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -269,8 +269,8 @@ CREATE TABLE loyalty_used (
   id SERIAL PRIMARY KEY,
   amount integer,
   order_history_id integer REFERENCES order_history(id),
-  created_at timestamp without time zone DEFAULT now(),
-  updated_at timestamp without time zone DEFAULT now()
+  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE review_states (
@@ -284,8 +284,8 @@ CREATE TABLE review_approvals (
     review_id integer,
     reviewer_id integer REFERENCES admins(id),
     status text,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE reviews (
@@ -297,8 +297,8 @@ CREATE TABLE reviews (
     company_id integer REFERENCES companies(id),
     unit_id integer REFERENCES units(id),
     status text REFERENCES review_states(name),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
@@ -307,8 +307,8 @@ CREATE TABLE search_preferences (
     customer_id integer REFERENCES customers(id),
     territory_id integer REFERENCES territories(id),
     distance float8,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 
