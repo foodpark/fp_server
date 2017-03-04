@@ -601,7 +601,7 @@ function *beforeSaveCompanies() {
   debug(this.params);
   var company = (yield Company.getSingleCompany(this.params.id))[0];
   debug('company '+ company.id);
-  if (company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
+  if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
 
     var amount = this.resteasy.object.delivery_chg_amount;
     debug('..delivery charge amount has changed to '+ amount +'. Updating..')
@@ -612,25 +612,28 @@ function *beforeSaveCompanies() {
         item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
     } catch (err) {
       console.error(err);
-      throw new Error ('Error trynig to update delivery charge in ordering system');
+      throw new Error ('Error updating delivery charge in ordering system');
     }
     debug('..delivery charge updated')
   }
 }
 
 function *beforeSaveLoyaltyRewards() {
+  debug('beforeSaveLoyaltyRewards');
   if (this.resteasy.operation == 'create') {
     if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
       var coId = m[1];
+      debug('..company id '+ coId);
       var exists = (yield LoyaltyRewards.isCompanyFound(coId))[0];
-      console.log('LoyaltyRewards.isCompanyFound:')
-      console.log(exists);
+      debug('..LoyaltyRewards.isCompanyFound: ')
+      debug(exists);
       // if vendor already has loyalty rewards defined for their company ID, do not allow a second set to be saved.
       if (exists) {
         this.throw('Company has existing rewards defined. Use PUT/PATCH to modify.',405);
       }
+      this.resteasy.object.company_id = coId;
     } else {
-      throw new Error ('No company context found for loyalty rewards');
+      this.throw('No company context found for loyalty rewards',422);
     }
   }
 }
@@ -875,7 +878,13 @@ module.exports = {
           debug('..company id '+ coId);
           return query.select('*').where('company_id', coId);
         }
-      }
+      } else if (this.resteasy.table == 'food_parks' && context && (m = context.match(/territories\/(\d+)$/))) {
+        debug('..territory id '+ m[1]);
+        return query.select('*').where('territory_id', m[1]);
+      } else if (this.resteasy.table == 'loyalty_rewards' && context && (m = context.match(/companies\/(\d+)$/))) {
+        debug('..company id '+ m[1]);
+        return query.select('*').where('company_id', m[1]);
+      } 
     }
   },
 };

@@ -1,0 +1,2247 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.6.2
+-- Dumped by pg_dump version 9.6.1
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: admins; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE admins (
+    id integer NOT NULL,
+    description text,
+    photo text,
+    phone text,
+    super_admin boolean DEFAULT false,
+    city text,
+    state text,
+    country text,
+    user_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE admins OWNER TO postgres;
+
+--
+-- Name: admins_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE admins_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE admins_id_seq OWNER TO postgres;
+
+--
+-- Name: admins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE admins_id_seq OWNED BY admins.id;
+
+
+--
+-- Name: checkin_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE checkin_history (
+    id integer NOT NULL,
+    unit_name text,
+    unit_id integer,
+    company_name text,
+    company_id integer,
+    user_id integer,
+    service_cancellation_time timestamp with time zone,
+    check_in timestamp with time zone,
+    check_out timestamp with time zone,
+    latitude double precision,
+    longitude double precision,
+    food_park_name text,
+    food_park_id integer,
+    note text,
+    display_address text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE checkin_history OWNER TO postgres;
+
+--
+-- Name: checkin_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE checkin_history_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE checkin_history_id_seq OWNER TO postgres;
+
+--
+-- Name: checkin_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE checkin_history_id_seq OWNED BY checkin_history.id;
+
+
+--
+-- Name: checkins; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE checkins (
+    id integer NOT NULL,
+    check_in timestamp with time zone,
+    check_out timestamp with time zone,
+    latitude double precision,
+    longitude double precision,
+    display_address text,
+    food_park_name text,
+    note text,
+    food_park_id integer,
+    unit_id integer,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE checkins OWNER TO postgres;
+
+--
+-- Name: checkins_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE checkins_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE checkins_id_seq OWNER TO postgres;
+
+--
+-- Name: checkins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE checkins_id_seq OWNED BY checkins.id;
+
+
+--
+-- Name: companies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE companies (
+    id integer NOT NULL,
+    name text NOT NULL,
+    order_sys_id text,
+    base_slug text,
+    default_cat text,
+    daily_special_cat_id text,
+    delivery_chg_cat_id text,
+    delivery_chg_item_id text,
+    delivery_chg_amount text,
+    description text,
+    email text,
+    phone text,
+    facebook text,
+    twitter text,
+    photo text,
+    featured_dish text,
+    hours text,
+    schedule text,
+    business_address text,
+    city text,
+    state text,
+    country text,
+    taxband text,
+    tags text,
+    stub boolean,
+    user_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE companies OWNER TO postgres;
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE companies_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE companies_id_seq OWNER TO postgres;
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE companies_id_seq OWNED BY companies.id;
+
+
+--
+-- Name: customers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE customers (
+    id integer NOT NULL,
+    order_sys_id text,
+    description text,
+    gcm_id text,
+    device_type text,
+    fcm_id text,
+    phone text,
+    facebook text,
+    twitter text,
+    photo text,
+    power_reviewer boolean DEFAULT false,
+    city text,
+    state text,
+    country text,
+    user_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE customers OWNER TO postgres;
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE customers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE customers_id_seq OWNER TO postgres;
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE customers_id_seq OWNED BY customers.id;
+
+
+--
+-- Name: favorites; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE favorites (
+    customer_id integer NOT NULL,
+    unit_id integer NOT NULL,
+    company_id integer NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE favorites OWNER TO postgres;
+
+--
+-- Name: food_parks; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE food_parks (
+    id integer NOT NULL,
+    name text NOT NULL,
+    photo text,
+    territory_id integer,
+    city text,
+    state text,
+    postal_code text,
+    country text,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE food_parks OWNER TO postgres;
+
+--
+-- Name: food_parks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE food_parks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE food_parks_id_seq OWNER TO postgres;
+
+--
+-- Name: food_parks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE food_parks_id_seq OWNED BY food_parks.id;
+
+
+--
+-- Name: locations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE locations (
+    id integer NOT NULL,
+    name text NOT NULL,
+    type text,
+    main_loc_text text,
+    secondary_loc_text text,
+    regex_seed text,
+    hitcount integer,
+    territory_id integer,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE locations OWNER TO postgres;
+
+--
+-- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE locations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE locations_id_seq OWNER TO postgres;
+
+--
+-- Name: locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
+
+
+--
+-- Name: loyalty; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE loyalty (
+    id integer NOT NULL,
+    amount text,
+    customer_id integer,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE loyalty OWNER TO postgres;
+
+--
+-- Name: loyalty_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE loyalty_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE loyalty_id_seq OWNER TO postgres;
+
+--
+-- Name: loyalty_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE loyalty_id_seq OWNED BY loyalty.id;
+
+
+--
+-- Name: loyalty_rewards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE loyalty_rewards (
+    id integer NOT NULL,
+    company_id integer,
+    gold_reward_item text,
+    silver_reward_item text,
+    bronze_reward_item text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE loyalty_rewards OWNER TO postgres;
+
+--
+-- Name: loyalty_rewards_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE loyalty_rewards_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE loyalty_rewards_id_seq OWNER TO postgres;
+
+--
+-- Name: loyalty_rewards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE loyalty_rewards_id_seq OWNED BY loyalty_rewards.id;
+
+
+--
+-- Name: loyalty_used; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE loyalty_used (
+    id integer NOT NULL,
+    amount integer,
+    order_history_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE loyalty_used OWNER TO postgres;
+
+--
+-- Name: loyalty_used_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE loyalty_used_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE loyalty_used_id_seq OWNER TO postgres;
+
+--
+-- Name: loyalty_used_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE loyalty_used_id_seq OWNED BY loyalty_used.id;
+
+
+--
+-- Name: order_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE order_history (
+    id integer NOT NULL,
+    order_sys_order_id text,
+    amount text,
+    initiation_time timestamp with time zone,
+    payment_time timestamp with time zone,
+    actual_pickup_time timestamp with time zone,
+    desired_pickup_time timestamp with time zone,
+    prep_notice_time timestamp with time zone,
+    status jsonb,
+    messages text,
+    qr_code text,
+    manual_pickup boolean DEFAULT false,
+    order_detail jsonb,
+    checkin_id integer,
+    customer_name text,
+    customer_id integer,
+    unit_id integer,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE order_history OWNER TO postgres;
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE order_history_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE order_history_id_seq OWNER TO postgres;
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE order_history_id_seq OWNED BY order_history.id;
+
+
+--
+-- Name: review_approvals; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE review_approvals (
+    id integer NOT NULL,
+    review_id integer,
+    reviewer_id integer,
+    status text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE review_approvals OWNER TO postgres;
+
+--
+-- Name: review_approvals_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE review_approvals_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE review_approvals_id_seq OWNER TO postgres;
+
+--
+-- Name: review_approvals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE review_approvals_id_seq OWNED BY review_approvals.id;
+
+
+--
+-- Name: review_states; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE review_states (
+    id integer NOT NULL,
+    name text NOT NULL,
+    allowed_transitions integer[]
+);
+
+
+ALTER TABLE review_states OWNER TO postgres;
+
+--
+-- Name: review_states_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE review_states_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE review_states_id_seq OWNER TO postgres;
+
+--
+-- Name: review_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE review_states_id_seq OWNED BY review_states.id;
+
+
+--
+-- Name: reviews; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE reviews (
+    id integer NOT NULL,
+    comment text,
+    rating numeric,
+    answers json,
+    customer_id integer,
+    company_id integer,
+    unit_id integer,
+    status text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE reviews OWNER TO postgres;
+
+--
+-- Name: reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE reviews_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE reviews_id_seq OWNER TO postgres;
+
+--
+-- Name: reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE reviews_id_seq OWNED BY reviews.id;
+
+
+--
+-- Name: roles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE roles (
+    id integer NOT NULL,
+    type text NOT NULL
+);
+
+
+ALTER TABLE roles OWNER TO postgres;
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE roles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE roles_id_seq OWNER TO postgres;
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE roles_id_seq OWNED BY roles.id;
+
+
+--
+-- Name: search_preferences; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE search_preferences (
+    id integer NOT NULL,
+    customer_id integer,
+    territory_id integer,
+    distance double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE search_preferences OWNER TO postgres;
+
+--
+-- Name: search_preferences_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE search_preferences_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE search_preferences_id_seq OWNER TO postgres;
+
+--
+-- Name: search_preferences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE search_preferences_id_seq OWNED BY search_preferences.id;
+
+
+--
+-- Name: territories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE territories (
+    id integer NOT NULL,
+    city text,
+    territory text,
+    state text,
+    country text,
+    timezone text,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE territories OWNER TO postgres;
+
+--
+-- Name: territories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE territories_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE territories_id_seq OWNER TO postgres;
+
+--
+-- Name: territories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE territories_id_seq OWNED BY territories.id;
+
+
+--
+-- Name: unit_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE unit_types (
+    id integer NOT NULL,
+    type text NOT NULL
+);
+
+
+ALTER TABLE unit_types OWNER TO postgres;
+
+--
+-- Name: unit_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE unit_types_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE unit_types_id_seq OWNER TO postgres;
+
+--
+-- Name: unit_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE unit_types_id_seq OWNED BY unit_types.id;
+
+
+--
+-- Name: units; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE units (
+    id integer NOT NULL,
+    name text NOT NULL,
+    number integer,
+    type text,
+    customer_order_window integer,
+    prep_notice integer,
+    description text,
+    username text,
+    password text,
+    qr_code text,
+    phone text,
+    fcm_id text,
+    gcm_id text,
+    device_type text,
+    unit_order_sys_id text,
+    territory_id integer,
+    company_id integer,
+    unit_mgr_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE units OWNER TO postgres;
+
+--
+-- Name: units_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE units_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE units_id_seq OWNER TO postgres;
+
+--
+-- Name: units_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE units_id_seq OWNED BY units.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE users (
+    id integer NOT NULL,
+    username text NOT NULL,
+    password text NOT NULL,
+    first_name text,
+    last_name text,
+    role text,
+    provider text,
+    provider_id text,
+    provider_data text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE users_id_seq OWNED BY users.id;
+
+
+--
+-- Name: admins id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY admins ALTER COLUMN id SET DEFAULT nextval('admins_id_seq'::regclass);
+
+
+--
+-- Name: checkin_history id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkin_history ALTER COLUMN id SET DEFAULT nextval('checkin_history_id_seq'::regclass);
+
+
+--
+-- Name: checkins id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkins ALTER COLUMN id SET DEFAULT nextval('checkins_id_seq'::regclass);
+
+
+--
+-- Name: companies id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY companies ALTER COLUMN id SET DEFAULT nextval('companies_id_seq'::regclass);
+
+
+--
+-- Name: customers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY customers ALTER COLUMN id SET DEFAULT nextval('customers_id_seq'::regclass);
+
+
+--
+-- Name: food_parks id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY food_parks ALTER COLUMN id SET DEFAULT nextval('food_parks_id_seq'::regclass);
+
+
+--
+-- Name: locations id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
+
+
+--
+-- Name: loyalty id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty ALTER COLUMN id SET DEFAULT nextval('loyalty_id_seq'::regclass);
+
+
+--
+-- Name: loyalty_rewards id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty_rewards ALTER COLUMN id SET DEFAULT nextval('loyalty_rewards_id_seq'::regclass);
+
+
+--
+-- Name: loyalty_used id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty_used ALTER COLUMN id SET DEFAULT nextval('loyalty_used_id_seq'::regclass);
+
+
+--
+-- Name: order_history id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history ALTER COLUMN id SET DEFAULT nextval('order_history_id_seq'::regclass);
+
+
+--
+-- Name: review_approvals id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY review_approvals ALTER COLUMN id SET DEFAULT nextval('review_approvals_id_seq'::regclass);
+
+
+--
+-- Name: review_states id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY review_states ALTER COLUMN id SET DEFAULT nextval('review_states_id_seq'::regclass);
+
+
+--
+-- Name: reviews id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY reviews ALTER COLUMN id SET DEFAULT nextval('reviews_id_seq'::regclass);
+
+
+--
+-- Name: roles id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY roles ALTER COLUMN id SET DEFAULT nextval('roles_id_seq'::regclass);
+
+
+--
+-- Name: search_preferences id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY search_preferences ALTER COLUMN id SET DEFAULT nextval('search_preferences_id_seq'::regclass);
+
+
+--
+-- Name: territories id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY territories ALTER COLUMN id SET DEFAULT nextval('territories_id_seq'::regclass);
+
+
+--
+-- Name: unit_types id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY unit_types ALTER COLUMN id SET DEFAULT nextval('unit_types_id_seq'::regclass);
+
+
+--
+-- Name: units id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units ALTER COLUMN id SET DEFAULT nextval('units_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- Data for Name: admins; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY admins (id, description, photo, phone, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
+1	\N	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515+00	2016-10-20 23:33:15.198515+00
+2	\N	\N	\N	f	\N	\N	\N	11012	2016-10-22 18:42:04.186193+00	2016-10-22 18:42:04.186193+00
+3	\N	\N	\N	f	\N	\N	\N	11013	2016-10-22 18:41:25.893483+00	2016-10-22 18:41:25.893483+00
+\.
+
+
+--
+-- Name: admins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('admins_id_seq', 4, true);
+
+
+--
+-- Data for Name: checkin_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY checkin_history (id, unit_name, unit_id, company_name, company_id, user_id, service_cancellation_time, check_in, check_out, latitude, longitude, food_park_name, food_park_id, note, display_address, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: checkin_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('checkin_history_id_seq', 1, false);
+
+
+--
+-- Data for Name: checkins; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY checkins (id, check_in, check_out, latitude, longitude, display_address, food_park_name, note, food_park_id, unit_id, company_id, created_at, updated_at) FROM stdin;
+5	2016-09-06 12:00:00+00	2018-10-06 15:00:00+00	-5.78810399999999969	-35.1892759999999996	\N	\N	\N	\N	2003	1001	2016-10-28 01:09:36.319803+00	2016-10-28 01:09:36.319803+00
+10	2017-02-02 16:42:47.58+00	2017-02-07 04:40:47.579+00	30.2560785999999986	-97.7635090999999932	\N	Alamo Drafthouse	\N	\N	2002	1005	2017-02-02 11:42:45.25003+00	2017-02-02 11:42:45.25003+00
+9	2016-09-07 00:00:00+00	2017-02-02 22:30:23.37+00	-5.88751699999999989	-35.1734379999999973	\N	\N	\N	\N	2007	1006	2017-02-02 12:50:42.83+00	2017-02-06 09:18:10.97724+00
+12	2016-09-06 12:00:00+00	2018-10-06 15:00:00+00	-5.87337400000000009	-35.1766950000000023	\N	\N	\N	\N	2003	1001	2017-02-06 09:23:36.192133+00	2017-02-06 09:25:52.227031+00
+11	2016-09-06 20:20:00+00	2018-01-06 01:54:09.437+00	-5.88741700000000012	-35.1734379999999973	\N	\N	\N	\N	2075	1008	2017-02-02 21:35:31.116338+00	2017-02-06 09:53:26.084743+00
+13	2016-09-06 12:00:00+00	2018-10-06 15:00:00+00	-5.88741700000000012	-35.1734379999999973	\N	\N	\N	\N	2070	1005	2017-02-06 09:55:18.766355+00	2017-02-06 09:55:18.766355+00
+18	2017-02-07 21:55:47.541+00	2017-02-07 12:51:41.99+00	-5.88766820000000024	-35.1715465999999992	Praia Shopping	\N	\N	\N	2006	1005	2017-02-07 16:55:48.037+00	2017-02-07 12:51:43.188544+00
+20	2017-02-08 08:25:51.148+00	2017-02-08 16:30:55.402+00	-5.78410400000000013	-35.1892759999999996	\N	Bar 54 Food Park - Rua Porto Mirim	\N	3007	2001	\N	2017-02-08 03:26:51.333344+00	2017-02-08 03:26:51.333344+00
+21	2017-02-08 08:41:22.967+00	2017-02-08 16:10:14.668+00	-5.78410400000000013	-35.1892759999999996	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2001	\N	2017-02-08 03:43:16.979797+00	2017-02-08 03:43:16.979797+00
+22	2017-02-08 11:07:11.68+00	2017-02-08 12:55:21.608+00	-5.86576900000000023	\N	\N	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3005	2001	\N	2017-02-08 06:07:23.383044+00	2017-02-08 06:07:23.383044+00
+23	2017-02-08 11:26:06.759+00	2017-02-08 12:30:09.256+00	-5.80574800000000035	\N	\N	Bar Trove Food Park - Rua Presidente José Bento	\N	3008	2001	\N	2017-02-08 06:26:12.150683+00	2017-02-08 06:26:12.150683+00
+19	2017-02-07 23:31:49.792+00	2017-02-08 08:01:59.452+00	-5.88765149999999959	-35.1716704999999976	Ponta Negra	\N	\N	\N	2006	1005	2017-02-07 18:31:50.094+00	2017-02-08 08:02:00.427033+00
+24	2017-02-08 18:02:11.986+00	2017-02-08 08:02:29.192+00	30.7313316999999984	76.7278691000000066	\N	\N	\N	\N	2006	1005	2017-02-08 13:02:12.872+00	2017-02-08 08:02:30.124958+00
+25	2016-09-06 12:00:00+00	2018-10-06 15:00:00+00	-5.88641699999999979	-35.171438000000002	\N	\N	\N	\N	2089	1088	2017-02-08 08:03:25.320423+00	2017-02-08 08:03:25.320423+00
+26	2017-02-08 13:06:14.163+00	2017-02-08 16:00:23.012+00	-5.84256300000000017	\N	\N	Natal Shopping Food Park - Av. das Brancas Dunas	\N	3006	2001	\N	2017-02-08 08:06:24.771952+00	2017-02-08 08:06:24.771952+00
+\.
+
+
+--
+-- Name: checkins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('checkins_id_seq', 26, true);
+
+
+--
+-- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, photo, featured_dish, hours, schedule, business_address, city, state, country, taxband, tags, stub, user_id, created_at, updated_at) FROM stdin;
+1089	Twenty-Two 20	1463287256591631047	twenty-two-20-1488657457755	1463287279064711880	1463287288409621193	1463287298845049546	1463287329899676363	1.6	\N	mp2220@gmail.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	11195	2017-03-04 19:57:49.025001+00	2017-03-04 19:57:49.025001+00
+1008	Grilla Cheez	1441733842225332401	grilla-cheez-1486088088823	1441733850261618866	1463313172281688785	1441733858146910387	1441733867391156404	1.6	Get your taste buds ready for a cheese avalanche	streetfoodez@gmail.com	\N	www.facebook.com/grillacheez	\N	https://commercecdn.com/1278235777548943678/b10b1939-f66f-4b49-837d-9c40a66d1ed0.jpeg	https://commercecdn.com/1278235777548943678/1d035d77-a55d-43fd-8654-e8f03de61220.jpeg	12 pm - 8 pm		\N	\N	\N	\N	\N	grilled cheese, panini	\N	11025	2017-02-03 07:14:52.001+00	2017-03-04 20:58:19.357435+00
+1005	Crazy Jacks	1440710633996681868	crazy-jacks-1485966112929	1440710643157041805	1463319152025404122	1440710650237026958	1440710659665822351	1.6	Homemade subs "Crazy Jack" style	Streetfoodez@hotmail.com	\N	www.facebook.com/crazyjacks	\N	https://commercecdn.com/1278235777548943678/8c75231e-33eb-4823-93e0-42093f79d98f.jpeg	https://commercecdn.com/1278235777548943678/ddcc397f-c3eb-4de2-babc-9a544ac5da9b.jpeg	10 am - 5 pm		\N	\N	\N	\N	\N	subs, burgers, bbq	\N	11017	2017-02-01 21:21:56.123+00	2017-03-04 21:01:14.476317+00
+1088	Chunky Monkey	1445663478260957711	chunky-monkey-1486556537929	1445663485726818832	1463319636031308507	1445663493511447057	1445663503426781714	1.6	Best hot fudge sundaes in town	chunky@monkey.com	\N	www.facebook.com/chunkymonkey	\N	https://commercecdn.com/1278235777548943678/462a01bc-583c-4892-9144-a117ca406783.png	https://commercecdn.com/1278235777548943678/0ad8cddc-28c8-4ca5-b70c-77296672ccd6.jpeg	10 am - 8 pm	\N	\N	\N	\N	\N	\N	\N	\N	11192	2017-02-08 12:22:21.119+00	2017-03-04 21:02:08.923872+00
+1006	Moes Pizza	1441305766198772495	moes-pizza-1486037058170	1441305773295534864	1463320397347816156	1441305780476183313	1441305790123082514	1.6	Pan pizza, buffalo wings, garlic chicken specials	Mo@totino.com	\N	www.facebook.com/Moespizza	\N	https://commercecdn.com/1278235777548943678/2f70d68d-01c6-4522-bac7-6113f4627035.jpeg	https://commercecdn.com/1278235777548943678/703961d4-b2a2-4885-91bd-0b55a6785f38.jpeg	10 am - 8 pm		\N	\N	\N	\N	\N	pizza, lasagna, pasta	\N	11020	2017-02-02 17:04:21.21+00	2017-03-04 21:03:45.558819+00
+1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	1463318392957043417	1463321163915592413	1463324599998481122	1.6	Fresh street food tacos	tacos@pacos.com	\N	www.facebook.com/pacostacos	@pacostacos	commercecdn.com/1278235777548943678/ad2c0f25-4f8c-43db-96dc-89660c7063e5.jpeg	commercecdn.com/1278235777548943678/73203d73-e4cd-4723-804f-14ae8ffe6d9e.jpeg	11am-8pm		\N	\N	\N	\N	\N	tacos, enchiladas	\N	11004	2016-08-27 01:31:52.102+00	2017-03-04 21:12:32.307442+00
+\.
+
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('companies_id_seq', 1089, true);
+
+
+--
+-- Data for Name: customers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY customers (id, order_sys_id, description, gcm_id, device_type, fcm_id, phone, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at, updated_at) FROM stdin;
+9001	\N	Taco expert. I love tacos.	APA91bECFEhmamkhENoB_sn2N20T0KX8HqF5XxzBG1PseAuJJ9VdoRkkl0sZXtsLosSHCi2oSo01t63XOzRHxTEOLqYtwOF0mF2m0GaCCyE-Op1uVkMuvC-rgoqh1A0rA80OIMgVxkeE	\N	\N	\N	www.facebook.com/stacytfakeaccount	\N	\N	f	\N	\N	\N	11001	2016-08-21 23:31:43.151356+00	2017-01-31 23:32:49.180085+00
+9003	\N	Food bloggers. Follow us on mifood.blog.com	APA91bEYSDTsHDYPmL0cGRi6xJfj0hAqyvVJTzsJbp8ZTydmcBhkebSyq32CW_6gcNRNelck-wv0ffA2lUcSLo9yw6iUvCaXSfaGasP_MjbeFnzLJDJRLJ8VKtOiX9lUyqVr6lyg8OC-	\N	\N	\N	www.facebook.com/mifoodfakeaccount	\N	\N	t	\N	\N	\N	11003	2016-08-21 23:31:43.151356+00	2017-02-02 09:27:57.482063+00
+9002	\N	Serial food eater	APA91bEYSDTsHDYPmL0cGRi6xJfj0hAqyvVJTzsJbp8ZTydmcBhkebSyq32CW_6gcNRNelck-wv0ffA2lUcSLo9yw6iUvCaXSfaGasP_MjbeFnzLJDJRLJ8VKtOiX9lUyqVr6lyg8OC-	\N	\N	\N	www.facebook.com/jonjonesfakeaccount	\N	\N	f	\N	\N	\N	11002	2016-08-21 23:31:43.151356+00	2017-02-03 09:34:40.840539+00
+9006	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11165	2017-02-06 05:44:09.344202+00	2017-02-06 05:44:09.344202+00
+9005	\N	described	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11068	2017-02-03 19:07:56.716851+00	2017-02-07 10:27:20.11839+00
+9007	\N	\N	\N	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11190	2017-02-08 01:37:49.214166+00	2017-02-08 01:37:49.214166+00
+\.
+
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('customers_id_seq', 9007, true);
+
+
+--
+-- Data for Name: favorites; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY favorites (customer_id, unit_id, company_id, created_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: food_parks; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY food_parks (id, name, photo, territory_id, city, state, postal_code, country, latitude, longitude, created_at, updated_at) FROM stdin;
+3001	The Picnic	\N	\N	Austin	TX	78704	US	30.2635748000000007	-97.7627071000000001	2016-08-21 23:31:43.131352+00	2017-03-04 19:56:28.327348+00
+3002	Alamo Drafthouse	\N	\N	Austin	TX	78704	US	30.2560785999999986	-97.7635090999999647	2016-08-21 23:01:03.622149+00	2017-03-04 19:56:28.327348+00
+3003	Austin Food Park	\N	\N	Austin	TX	78702	US	30.2544286999999983	-97.7371196999999938	2016-08-21 23:01:50.563872+00	2017-03-04 19:56:28.327348+00
+3004	Truck Garden Food Park - Av. Roberto Freire	\N	\N	Ponta Negra	RN	\N	BR	-5.87437400000000043	-35.1786949999999976	2016-08-21 23:03:07.177813+00	2017-03-04 19:56:28.327348+00
+3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	\N	Ponta Negra	RN	\N	BR	-5.86576900000000023	-35.1858780000000024	2016-08-21 23:05:04.914807+00	2017-03-04 19:56:28.327348+00
+3006	Natal Shopping Food Park - Av. das Brancas Dunas	\N	\N	Natal	RN	\N	BR	-5.84256300000000017	-35.2106240000000028	2016-08-21 23:12:10.112015+00	2017-03-04 19:56:28.327348+00
+3007	Bar 54 Food Park - Rua Porto Mirim	\N	\N	Natal	RN	\N	BR	-5.87467399999999973	-35.1835140000000024	2016-08-29 20:54:42.540882+00	2017-03-04 19:56:28.327348+00
+3008	Bar Trove Food Park - Rua Presidente José Bento	\N	\N	Natal	RN	\N	BR	-5.80574800000000035	-35.2147050000000021	2016-08-30 21:12:08.717913+00	2017-03-04 19:56:28.327348+00
+3009	Food By Food West	\N	\N	Austin	TX	78723	US	30.2979999999999983	-97.7069999999999936	2016-08-21 23:31:43.131352+00	2017-03-04 19:56:28.327348+00
+3010	Growler Food Park	\N	\N	Pflugerville	TX	78660	US	30.4490000000000016	-97.6069999999999993	2016-08-21 23:01:03.622149+00	2017-03-04 19:56:28.327348+00
+3011	Food Park at La Frontera	\N	\N	Round Rock	TX	78681	US	30.4810000000000016	-97.6770000000000067	2016-08-21 23:01:50.563872+00	2017-03-04 19:56:28.327348+00
+3012	Las Palmas Food Bazaar	\N	\N	Miami	FL	33136	US	25.7920000000000016	-80.195999999999998	2016-08-21 23:03:07.177813+00	2017-03-04 19:56:28.327348+00
+3013	Tropical Food Court	\N	\N	Fort Lauderdale	FL	33304	US	26.1359999999999992	-80.1370000000000005	2016-08-21 23:05:04.914807+00	2017-03-04 19:56:28.327348+00
+3014	Snappy Food Park	\N	\N	Coral Gables	FL	33146	US	25.7289999999999992	-80.2609999999999957	2016-08-21 23:12:10.112015+00	2017-03-04 19:56:28.327348+00
+3015	LoDo TrPk	\N	\N	Denver	CO	80202	US	39.7509999999999977	-105	2016-08-29 20:54:42.540882+00	2017-03-04 19:56:28.327348+00
+3016	Del Mar	\N	\N	Aurora	CO	80042	US	39.7280000000000015	-104.843999999999994	2016-08-30 21:12:08.717913+00	2017-03-04 19:56:28.327348+00
+3017	Foothills Food Court	\N	\N	Lakewood	CO	80226	US	39.7109999999999985	-105.084000000000003	2016-08-30 21:12:08.717913+00	2017-03-04 19:56:28.327348+00
+\.
+
+
+--
+-- Name: food_parks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('food_parks_id_seq', 30018, true);
+
+
+--
+-- Data for Name: locations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY locations (id, name, type, main_loc_text, secondary_loc_text, regex_seed, hitcount, territory_id, latitude, longitude, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: locations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('locations_id_seq', 1, false);
+
+
+--
+-- Data for Name: loyalty; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY loyalty (id, amount, customer_id, company_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: loyalty_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('loyalty_id_seq', 1, false);
+
+
+--
+-- Data for Name: loyalty_rewards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY loyalty_rewards (id, company_id, gold_reward_item, silver_reward_item, bronze_reward_item, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: loyalty_rewards_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('loyalty_rewards_id_seq', 1, false);
+
+
+--
+-- Data for Name: loyalty_used; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY loyalty_used (id, amount, order_history_id, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: loyalty_used_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('loyalty_used_id_seq', 1, false);
+
+
+--
+-- Data for Name: order_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY order_history (id, order_sys_order_id, amount, initiation_time, payment_time, actual_pickup_time, desired_pickup_time, prep_notice_time, status, messages, qr_code, manual_pickup, order_detail, checkin_id, customer_name, customer_id, unit_id, company_id, created_at, updated_at) FROM stdin;
+716	1441827869947855089	R$11.60	\N	\N	\N	2017-02-06 20:11:56+00	\N	{"order_requested": "2/4/2017, 2:13:37 PM"}	\N	\N	f	{"Submariner Gargonzola": {"title": "Submariner Gargonzola", "options": [], "quantity": 1, "selections": {"Cheese": "Gargonzola"}}}	\N	Marco and Inez P	9003	2006	1005	2017-02-04 14:13:35.376951+00	2017-02-04 14:13:35.376951+00
+717	1442308288698909145	R$25.58	\N	\N	\N	2017-02-06 20:11:56+00	\N	{"order_requested": "2/4/2017, 2:15:50 PM"}	\N	\N	f	{"Thai Noodles": {"title": "Thai Noodles", "options": ["extra beef", "extra curry pork", "Extra bbq"], "quantity": 2, "selections": {}}}	\N	Marco and Inez P	9003	2006	1005	2017-02-04 14:15:48.542129+00	2017-02-04 14:15:48.542129+00
+718	1441814057349808367	R$25.60	\N	\N	\N	2017-02-06 20:11:56+00	\N	{"order_requested": "2/4/2017, 2:16:20 PM"}	\N	\N	f	{"Turkey Sub": {"title": "Turkey Sub", "options": ["Potato Salad", "Potato Chips"], "quantity": 3, "selections": {}}}	\N	Marco and Inez P	9003	2006	1005	2017-02-04 14:16:18.178361+00	2017-02-04 14:16:18.178361+00
+719	1441813386487660781	R$9.60	\N	\N	\N	2016-02-28 20:11:56+00	\N	{"order_requested": "2/4/2017, 2:31:49 PM"}	\N	\N	f	{"Turkey Sub": {"title": "Turkey Sub", "options": ["Potato Salad", "Potato Chips"], "quantity": 1, "selections": {}}}	\N	mg2 s	9005	2008	1008	2017-02-04 14:31:46.803123+00	2017-02-04 14:31:46.803123+00
+720	1441813321006186731	R$9.60	\N	\N	\N	2016-02-28 20:11:56+00	2016-02-28 19:56:56+00	{"order_requested": "2/6/2017, 4:02:49 PM"}	\N	\N	f	{"Turkey Sub": {"title": "Turkey Sub", "options": ["Potato Salad", "Potato Chips"], "quantity": 1, "selections": {}}}	\N	mg2 s	9005	2006	1005	2017-02-06 16:02:47.579754+00	2017-02-06 16:02:47.579754+00
+\.
+
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('order_history_id_seq', 720, true);
+
+
+--
+-- Data for Name: review_approvals; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY review_approvals (id, review_id, reviewer_id, status, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: review_approvals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('review_approvals_id_seq', 1, true);
+
+
+--
+-- Data for Name: review_states; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY review_states (id, name, allowed_transitions) FROM stdin;
+1	New	{2,3,4}
+2	Approved	{3}
+3	Updated	{2,4}
+4	Disapproved	{3}
+\.
+
+
+--
+-- Name: review_states_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('review_states_id_seq', 5, true);
+
+
+--
+-- Data for Name: reviews; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY reviews (id, comment, rating, answers, customer_id, company_id, unit_id, status, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: reviews_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('reviews_id_seq', 1, true);
+
+
+--
+-- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY roles (id, type) FROM stdin;
+1	CUSTOMER
+2	OWNER
+3	UNITMGR
+4	ADMIN
+\.
+
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('roles_id_seq', 5, true);
+
+
+--
+-- Data for Name: search_preferences; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY search_preferences (id, customer_id, territory_id, distance, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: search_preferences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('search_preferences_id_seq', 1, false);
+
+
+--
+-- Data for Name: territories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY territories (id, city, territory, state, country, timezone, latitude, longitude, created_at, updated_at) FROM stdin;
+1	Natal	 Natal-RN	RN	Brazil	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+3	Pipa	 Pipa-RN	RN	Brazil	Buenos Aires	-6.22899400000000014	-35.0487759999999966	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+4	Austin	 Austin-TX	TX	USA	Central Time (US & Canada)	30.2643169999999984	-97.7382280000000065	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+5	Pflugerville	 Pflugerville-TX	TX	USA	Central Time (US & Canada)	30.4400000000000013	-97.6200000000000045	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+6	Round Rock	 Round Rock-TX	TX	USA	Central Time (US & Canada)	30.5079999999999991	-97.6779999999999973	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+7	Fort Lauderdale	 Fort Lauderdale-TX	FL	USA	Eastern Time (US & Canada)	26.1219999999999999	-80.1370000000000005	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+8	Miami	 Miami-FL	FL	USA	Eastern Time (US & Canada)	25.7620000000000005	-80.1899999999999977	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+9	Coral Gables	 Coral Gables-FL	FL	USA	Eastern Time (US & Canada)	25.7220000000000013	-80.2690000000000055	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+10	Denver	 Denver-CO	CO	USA	Mountain Time (US & Canada)	39.7460000000000022	-104.992000000000004	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+11	Aurora	 Aurora-CO	CO	USA	Mountain Time (US & Canada)	39.7250000000000014	-104.846999999999994	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+12	Lakewood	 Lakewood-CO	CO	USA	Mountain Time (US & Canada)	39.7109999999999985	-105.081000000000003	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
+\.
+
+
+--
+-- Name: territories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('territories_id_seq', 13, true);
+
+
+--
+-- Data for Name: unit_types; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY unit_types (id, type) FROM stdin;
+1	TRUCK
+2	CART
+3	RESTAURANT
+\.
+
+
+--
+-- Name: unit_types_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('unit_types_id_seq', 4, true);
+
+
+--
+-- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY units (id, name, number, type, customer_order_window, prep_notice, description, username, password, qr_code, phone, fcm_id, gcm_id, device_type, unit_order_sys_id, territory_id, company_id, unit_mgr_id, created_at, updated_at) FROM stdin;
+2001	Thaitanic Truck 1	1	TRUCK	15	\N	\N	mptruck61	mptruck61	\N	\N	\N	c9k1cdeqqlc:APA91bE3N9DPEPRVrylvqniUc0YkeqiDcL0bLF7wEpm0BUFDspsRMjJGenLnF07ssEmBZe90pG983xq9cQLzLzu6uWXYyhv1OZpDrUeCirxjBSzmIX-TJlO5T58PxakjRLd8LIghjnuy	\N	\N	\N	1005	11007	2017-01-31 23:32:49.181663+00	2017-02-08 00:20:56.367215+00
+2002	Thaitanic Cart 1	1	CART	20	\N	\N	mptruck64	mptruck64	\N	\N	\N	APA91bGLPDm96TAg6C77VrwxlP1Nk11Md-hSRZGLOjS8CoECWfEFjp1Ise1_GRolqix4jydowaJ9d8OKxJMoiH3_qc0VEGNdqKiQ66Jbb_mneP-0T5qm4IK3RPZMKQlu9j2T7gOJGg0B	\N	\N	\N	1001	11008	2017-01-31 23:32:49.181663+00	2017-02-03 16:46:37.423503+00
+2003	Pacos Tacos Truck 12	1	TRUCK	10	\N	\N	mptruck64five	mptruck64five	\N	\N	\N	\N	\N	\N	\N	1006	11009	2017-01-31 23:32:49.181663+00	2017-02-06 09:29:12.298814+00
+2006	jack	5	TRUCK	20	15	\N	crazy56	crazy56	\N	\N	\N	APA91bHFjI8S9LO62I1TV2fDz5RZh9OoBgHl0tfe6kxjeFS4GLSNZX38iq4bEZgifFWUwAUn43FrrJPT6WtlnBlwhb98wqk1xaKPQp7J_fpGWaAuWnMBzRbnJW8d1MIm0no58e_r8A3f	\N	\N	2	1005	11018	2017-02-01 11:46:50.747716+00	2017-02-07 11:48:43.213625+00
+2007	Moe Truck #1	4	TRUCK	20	15	\N	moe56	moe56	\N	\N	\N	\N	\N	\N	2	1005	11021	2017-02-02 07:47:24.083754+00	2017-02-07 12:13:27.800781+00
+2008	Grilla Truck 1	1	TRUCK	20	15	\N	grilla56	grilla56	\N	\N	\N	APA91bHFjI8S9LO62I1TV2fDz5RZh9OoBgHl0tfe6kxjeFS4GLSNZX38iq4bEZgifFWUwAUn43FrrJPT6WtlnBlwhb98wqk1xaKPQp7J_fpGWaAuWnMBzRbnJW8d1MIm0no58e_r8A3f	\N	\N	\N	1005	11026	2017-02-02 21:25:02.490854+00	2017-02-08 10:01:35.212283+00
+2070	Crazy Truck 5	5	TRUCK	20	15	\N	Jack	jack	\N	\N	\N	\N	\N	\N	1	1005	11169	2017-02-06 07:11:55.248113+00	2017-02-06 07:11:55.248113+00
+2075	Grilla Truck #1	1	TRUCK	20	15	\N	grilla26	grilla26	\N	\N	\N	\N	\N	\N	1	1008	11174	2017-02-06 09:51:07.210394+00	2017-02-07 11:46:49.507075+00
+2089	Chunky Truck #1	1	TRUCK	30	20	\N	chunkytruck1	chunkymonkey	\N	\N	\N	\N	\N	\N	1	1088	11193	2017-02-08 07:22:22.776055+00	2017-02-08 08:51:31.239426+00
+\.
+
+
+--
+-- Name: units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('units_id_seq', 2090, true);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY users (id, username, password, first_name, last_name, role, provider, provider_id, provider_data, created_at, updated_at) FROM stdin;
+11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352+00	2017-02-03 09:25:30.279083+00
+11002	mp27	defc72a96803a619a6735cd7e7e69e1b	Jonathan	Jones	CUSTOMER	local	local	{}	2016-08-21 23:01:03.622149+00	2017-02-03 09:54:22.527595+00
+11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	local	local	{}	2016-08-21 23:03:07.177813+00	2017-01-31 23:32:49.172208+00
+11005	mp5@gmail.com	146eb1afa89654aca443976646460ef4	Bob	Smith	OWNER	local	local	{}	2016-08-21 23:05:04.914807+00	2017-01-31 23:32:49.172208+00
+11006	mp6@gmail.com	5ce4c4a0a26e6df0fdbb380d78f4fab2	Cindy	Clark	OWNER	local	local	{}	2016-08-21 23:12:10.112015+00	2017-01-31 23:32:49.172208+00
+11007	mptruck61	6cf9be93694189e06c66faa49a6cbc93	\N	\N	UNITMGR	local	local	{}	2016-08-29 20:54:42.540882+00	2017-01-31 23:32:49.172208+00
+11008	mptruck64	5db0aeb457f45ddb90c35b39569c1348	\N	\N	UNITMGR	local	local	{}	2016-08-30 21:12:08.717913+00	2017-01-31 23:32:49.172208+00
+11009	mptruck64five	dda2549944250c6c038797b463e7de99	\N	\N	UNITMGR	local	local	{}	2016-08-30 21:22:22.983667+00	2017-01-31 23:32:49.172208+00
+11010	trucker1	2c914a017cf7354e6c6319afe0b664b2	\N	\N	UNITMGR	local	local	{}	2016-09-06 23:57:26.291924+00	2017-01-31 23:32:49.172208+00
+11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	local	local	{}	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
+11012	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	Luiz	Cobello	ADMIN	local	local	{}	2016-10-22 18:42:04.179585+00	2017-01-31 23:32:49.172208+00
+11013	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	Marcos	Hirano	ADMIN	local	local	{}	2016-10-22 18:41:25.721489+00	2017-01-31 23:32:49.172208+00
+11017	jack@crazysubs.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Jack	Crazy	OWNER	local	local	{}	2017-02-01 11:21:51.951081+00	2017-02-01 11:21:51.951081+00
+11018	crazy56	33b0a180f307ca68ba2c2dfa55f6ff4c	\N	\N	UNITMGR	\N	\N	\N	2017-02-01 11:46:50.778073+00	2017-02-01 11:46:50.778073+00
+11020	Mo@totino.com	27c9d5187cd283f8d160ec1ed2b5ac89	Mo	Totino	OWNER	local	local	{}	2017-02-02 07:04:17.433015+00	2017-02-02 07:04:17.433015+00
+11021	moe56	276fbf86abd87a184df2b737328b6973	\N	\N	UNITMGR	\N	\N	\N	2017-02-02 07:47:24.105698+00	2017-02-02 07:47:24.105698+00
+11024	Bangkok@cafe.com	bangkok	Bangkok	Cafe	OWNER	local	local	{}	2017-02-02 08:43:47.94126+00	2017-02-02 09:09:32.202801+00
+11003	mp4	28dafd4a8cb5f33065e93cbc83862563	Marco and Inez	Pena	CUSTOMER	local	local	{}	2016-08-21 23:01:50.563872+00	2017-02-02 09:35:54.217743+00
+11025	Grilla@grillacheez.com	82edd3141a6270a3ac5e93323c07a7e1	Grilla	Cheez	OWNER	local	local	{}	2017-02-02 21:14:48.007795+00	2017-02-02 21:14:48.007795+00
+11026	grilla56	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	2017-02-02 21:25:02.499941+00	2017-02-02 21:25:02.499941+00
+11068	mg26@gmail.com	22c7b568334f78f0a122ee388557660e	mg2	spy	CUSTOMER	local	local	{}	2017-02-03 19:07:56.71264+00	2017-02-03 19:07:56.71264+00
+11165	suren@aryvart.com	b6c231fc212b1a67d4965d0b1527358c	Surendiran	Parasuraman	CUSTOMER	local	local	{}	2017-02-06 05:44:09.338925+00	2017-02-06 05:44:09.338925+00
+11168	grilla56@gmail.com	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	2017-02-06 07:01:15.7952+00	2017-02-06 07:01:15.7952+00
+11169	Jack	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	2017-02-06 07:11:55.254344+00	2017-02-06 07:11:55.254344+00
+11174	grilla26	3ee0410d3f0f9cf2d1b2f07c2d74604d	\N	\N	UNITMGR	\N	\N	\N	2017-02-06 09:51:07.21648+00	2017-02-06 09:51:07.21648+00
+11190	testetcus@gmail.com	e10adc3949ba59abbe56e057f20f883e	Tester	Customer	CUSTOMER	local	local	{}	2017-02-08 01:37:49.206449+00	2017-02-08 01:37:49.206449+00
+11192	chunky@monkey.com	90ead2a2940e7f354c310900a950043a	Chunky	Monkey	OWNER	local	local	{}	2017-02-08 07:22:17.334042+00	2017-02-08 07:22:17.334042+00
+11193	chunkytruck1	90ead2a2940e7f354c310900a950043a	\N	\N	UNITMGR	\N	\N	\N	2017-02-08 07:22:22.781745+00	2017-02-08 07:22:22.781745+00
+11195	mp2220@gmail.com	e55eca7648f4fea0b5865c90131c27a6	Em	Twenty-Two	OWNER	local	local	{}	2017-03-04 19:57:34.324846+00	2017-03-04 19:57:34.324846+00
+\.
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_id_seq', 11195, true);
+
+
+--
+-- Name: admins admins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY admins
+    ADD CONSTRAINT admins_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: checkin_history checkin_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkin_history
+    ADD CONSTRAINT checkin_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: checkins checkins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkins
+    ADD CONSTRAINT checkins_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: companies companies_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY companies
+    ADD CONSTRAINT companies_name_key UNIQUE (name);
+
+
+--
+-- Name: companies companies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY companies
+    ADD CONSTRAINT companies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customers customers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY customers
+    ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favorites favorites_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY favorites
+    ADD CONSTRAINT favorites_pkey PRIMARY KEY (customer_id, unit_id, company_id);
+
+
+--
+-- Name: food_parks food_parks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY food_parks
+    ADD CONSTRAINT food_parks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY locations
+    ADD CONSTRAINT locations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: loyalty loyalty_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty
+    ADD CONSTRAINT loyalty_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: loyalty_rewards loyalty_rewards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty_rewards
+    ADD CONSTRAINT loyalty_rewards_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: loyalty_used loyalty_used_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty_used
+    ADD CONSTRAINT loyalty_used_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_history order_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: review_approvals review_approvals_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY review_approvals
+    ADD CONSTRAINT review_approvals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: review_states review_states_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY review_states
+    ADD CONSTRAINT review_states_name_key UNIQUE (name);
+
+
+--
+-- Name: review_states review_states_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY review_states
+    ADD CONSTRAINT review_states_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reviews reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY reviews
+    ADD CONSTRAINT reviews_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY roles
+    ADD CONSTRAINT roles_type_key UNIQUE (type);
+
+
+--
+-- Name: search_preferences search_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY search_preferences
+    ADD CONSTRAINT search_preferences_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: territories territories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY territories
+    ADD CONSTRAINT territories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unit_types unit_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY unit_types
+    ADD CONSTRAINT unit_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unit_types unit_types_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY unit_types
+    ADD CONSTRAINT unit_types_type_key UNIQUE (type);
+
+
+--
+-- Name: units units_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units
+    ADD CONSTRAINT units_name_key UNIQUE (name);
+
+
+--
+-- Name: units units_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units
+    ADD CONSTRAINT units_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: admins admins_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY admins
+    ADD CONSTRAINT admins_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: checkin_history checkin_history_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkin_history
+    ADD CONSTRAINT checkin_history_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: checkin_history checkin_history_food_park_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkin_history
+    ADD CONSTRAINT checkin_history_food_park_id_fkey FOREIGN KEY (food_park_id) REFERENCES food_parks(id);
+
+
+--
+-- Name: checkin_history checkin_history_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkin_history
+    ADD CONSTRAINT checkin_history_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES units(id);
+
+
+--
+-- Name: checkin_history checkin_history_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkin_history
+    ADD CONSTRAINT checkin_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: checkins checkins_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkins
+    ADD CONSTRAINT checkins_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: checkins checkins_food_park_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkins
+    ADD CONSTRAINT checkins_food_park_id_fkey FOREIGN KEY (food_park_id) REFERENCES food_parks(id);
+
+
+--
+-- Name: checkins checkins_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY checkins
+    ADD CONSTRAINT checkins_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES units(id);
+
+
+--
+-- Name: companies companies_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY companies
+    ADD CONSTRAINT companies_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: customers customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY customers
+    ADD CONSTRAINT customers_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: favorites favorites_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY favorites
+    ADD CONSTRAINT favorites_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: favorites favorites_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY favorites
+    ADD CONSTRAINT favorites_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: favorites favorites_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY favorites
+    ADD CONSTRAINT favorites_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES units(id);
+
+
+--
+-- Name: food_parks food_parks_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY food_parks
+    ADD CONSTRAINT food_parks_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES territories(id);
+
+
+--
+-- Name: locations locations_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY locations
+    ADD CONSTRAINT locations_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES territories(id);
+
+
+--
+-- Name: loyalty loyalty_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty
+    ADD CONSTRAINT loyalty_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: loyalty loyalty_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty
+    ADD CONSTRAINT loyalty_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: loyalty_rewards loyalty_rewards_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty_rewards
+    ADD CONSTRAINT loyalty_rewards_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: loyalty_used loyalty_used_order_history_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY loyalty_used
+    ADD CONSTRAINT loyalty_used_order_history_id_fkey FOREIGN KEY (order_history_id) REFERENCES order_history(id);
+
+
+--
+-- Name: order_history order_history_checkin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_checkin_id_fkey FOREIGN KEY (checkin_id) REFERENCES checkins(id);
+
+
+--
+-- Name: order_history order_history_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: order_history order_history_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: order_history order_history_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY order_history
+    ADD CONSTRAINT order_history_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES units(id);
+
+
+--
+-- Name: review_approvals review_approvals_reviewer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY review_approvals
+    ADD CONSTRAINT review_approvals_reviewer_id_fkey FOREIGN KEY (reviewer_id) REFERENCES admins(id);
+
+
+--
+-- Name: reviews reviews_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY reviews
+    ADD CONSTRAINT reviews_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: reviews reviews_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY reviews
+    ADD CONSTRAINT reviews_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: reviews reviews_status_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY reviews
+    ADD CONSTRAINT reviews_status_fkey FOREIGN KEY (status) REFERENCES review_states(name);
+
+
+--
+-- Name: reviews reviews_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY reviews
+    ADD CONSTRAINT reviews_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES units(id);
+
+
+--
+-- Name: search_preferences search_preferences_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY search_preferences
+    ADD CONSTRAINT search_preferences_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+
+--
+-- Name: search_preferences search_preferences_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY search_preferences
+    ADD CONSTRAINT search_preferences_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES territories(id);
+
+
+--
+-- Name: units units_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units
+    ADD CONSTRAINT units_company_id_fkey FOREIGN KEY (company_id) REFERENCES companies(id);
+
+
+--
+-- Name: units units_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units
+    ADD CONSTRAINT units_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES territories(id);
+
+
+--
+-- Name: units units_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units
+    ADD CONSTRAINT units_type_fkey FOREIGN KEY (type) REFERENCES unit_types(type);
+
+
+--
+-- Name: units units_unit_mgr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY units
+    ADD CONSTRAINT units_unit_mgr_id_fkey FOREIGN KEY (unit_mgr_id) REFERENCES users(id);
+
+
+--
+-- Name: users users_role_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_role_fkey FOREIGN KEY (role) REFERENCES roles(type);
+
+
+SET search_path = pg_catalog;
+
+--
+-- Name: pg_constraint; Type: ACL; Schema: pg_catalog; Owner: postgres
+--
+
+GRANT SELECT ON TABLE pg_constraint TO sfez_rw;
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: admins; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE admins TO sfez_rw;
+
+
+--
+-- Name: admins_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE admins_id_seq TO sfez_rw;
+
+
+--
+-- Name: checkin_history; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE checkin_history TO sfez_rw;
+
+
+--
+-- Name: checkin_history_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE checkin_history_id_seq TO sfez_rw;
+
+
+--
+-- Name: checkins; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE checkins TO sfez_rw;
+
+
+--
+-- Name: checkins_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE checkins_id_seq TO sfez_rw;
+
+
+--
+-- Name: companies; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE companies TO sfez_rw;
+
+
+--
+-- Name: companies_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE companies_id_seq TO sfez_rw;
+
+
+--
+-- Name: customers; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE customers TO sfez_rw;
+
+
+--
+-- Name: customers_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE customers_id_seq TO sfez_rw;
+
+
+--
+-- Name: favorites; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE favorites TO sfez_rw;
+
+
+--
+-- Name: food_parks; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_parks TO sfez_rw;
+
+
+--
+-- Name: food_parks_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE food_parks_id_seq TO sfez_rw;
+
+
+--
+-- Name: locations; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE locations TO sfez_rw;
+
+
+--
+-- Name: locations_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE locations_id_seq TO sfez_rw;
+
+
+--
+-- Name: loyalty; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty TO sfez_rw;
+
+
+--
+-- Name: loyalty_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE loyalty_id_seq TO sfez_rw;
+
+
+--
+-- Name: loyalty_rewards; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_rewards TO sfez_rw;
+
+
+--
+-- Name: loyalty_rewards_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE loyalty_rewards_id_seq TO sfez_rw;
+
+
+--
+-- Name: loyalty_used; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_used TO sfez_rw;
+
+
+--
+-- Name: loyalty_used_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE loyalty_used_id_seq TO sfez_rw;
+
+
+--
+-- Name: order_history; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_history TO sfez_rw;
+
+
+--
+-- Name: order_history_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE order_history_id_seq TO sfez_rw;
+
+
+--
+-- Name: review_approvals; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE review_approvals TO sfez_rw;
+
+
+--
+-- Name: review_approvals_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE review_approvals_id_seq TO sfez_rw;
+
+
+--
+-- Name: review_states; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE review_states TO sfez_rw;
+
+
+--
+-- Name: review_states_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE review_states_id_seq TO sfez_rw;
+
+
+--
+-- Name: reviews; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE reviews TO sfez_rw;
+
+
+--
+-- Name: reviews_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE reviews_id_seq TO sfez_rw;
+
+
+--
+-- Name: roles; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE roles TO sfez_rw;
+
+
+--
+-- Name: roles_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE roles_id_seq TO sfez_rw;
+
+
+--
+-- Name: search_preferences; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE search_preferences TO sfez_rw;
+
+
+--
+-- Name: search_preferences_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE search_preferences_id_seq TO sfez_rw;
+
+
+--
+-- Name: territories; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE territories TO sfez_rw;
+
+
+--
+-- Name: territories_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE territories_id_seq TO sfez_rw;
+
+
+--
+-- Name: unit_types; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE unit_types TO sfez_rw;
+
+
+--
+-- Name: unit_types_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE unit_types_id_seq TO sfez_rw;
+
+
+--
+-- Name: units; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
+
+
+--
+-- Name: units_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE units_id_seq TO sfez_rw;
+
+
+--
+-- Name: users; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
+
+
+--
+-- Name: users_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE users_id_seq TO sfez_rw;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

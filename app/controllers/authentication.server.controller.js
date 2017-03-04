@@ -141,6 +141,20 @@ var createMoltinDefaultCategory = function *(company) {
   return results;
 };
 
+var createMoltinDailySpecialCategory = function *(company, defaultCat) {
+  debug('createMoltinDailySpecialCategory');
+  debug(company);
+  debug('..default cat '+ defaultCat);
+  var category = '';
+  try {
+    category = yield msc.createCategory(company, "Daily Special Category", defaultCat);
+  } catch (err) {
+      console.error('error creating delivery charge category in ordering system ');
+      throw(err);
+  }
+  return category;
+};
+
 var createMoltinDeliveryChargeCategory = function *(company, defaultCat) {
   debug('createMoltinDeliveryChargeCategory');
   debug(company);
@@ -205,6 +219,17 @@ var createCompany = function *(company_name, email, userId) {
   company.default_cat = moltinCat.id;
   company.base_slug = moltinCat.slug;
 
+  debug('..create daily special category');
+  var dailySpecialCat = '';
+  try {
+    var co = 
+    dailySpecialCat = yield createMoltinDailySpecialCategory(company, moltinCat.id);
+  } catch (err) {
+    console.error('createCompany: error during Moltin daily special category creation');
+    console.error(err);
+    throw (err);
+  }
+
   debug('..create delivery charge category');
   var deliveryChgCat = '';
   try {
@@ -229,7 +254,8 @@ var createCompany = function *(company_name, email, userId) {
  var sfezCompany = '';
   try {
     sfezCompany = yield Company.createCompany(company_name, email, userId, moltinCompany.id, 
-      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge);
+      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
+      dailySpecialCat.id);
   } catch (err) {
     console.error('createCompany: error creating company');
     console.error(err);
