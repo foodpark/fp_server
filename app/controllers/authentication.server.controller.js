@@ -147,7 +147,7 @@ var createMoltinDailySpecialCategory = function *(company, defaultCat) {
   debug('..default cat '+ defaultCat);
   var category = '';
   try {
-    category = yield msc.createCategory(company, "Daily Special Category", defaultCat);
+    category = yield msc.createCategory(company, "Daily Specials", defaultCat);
   } catch (err) {
       console.error('error creating delivery charge category in ordering system ');
       throw(err);
