@@ -410,18 +410,6 @@ function *afterUpdateOrderHistory(orderHistory) {
   }
 }
 
-/*
-fcm: https://fcm.googleapis.com/fcm/send
-gcm: https://gcm-http.googleapis.com/gcm/send
-curl --header "Authorization: key=AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI" \
-       --header Content-Type:"application/json" \
-       https://gcm-http.googleapis.com/gcm/send \
-       -d "{\"registration_ids\":[\"cFjGDbV8s5o:APA91bHk_FrAcpIkX8ATzv5lisTtgU4Qdz7mhO_lV4sDzvpXXO075K4qRligKMieeAedqYOmRFSOqGc8w-w5uGkehdavuUjZZ77Q1vOrO3WDq5jnwVvY2LaP7aW02DCQJVx0E79g1jX9\"]}"
-       */
-// \"registration_ids\":[\"cFjGDbV8s5o:APA91bHk_FrAcpIkX8ATzv5lisTtgU4Qdz7mhO_lV4sDzvpXXO075K4qRligKMieeAedqYOmRFSOqGc8w-w5uGkehdavuUjZZ77Q1vOrO3WDq5jnwVvY2LaP7aW02DCQJVx0E79g1jX9\"
-//   "dSEAkJd05m0:APA91bGkJgqyfvkGjpL4MuBi419c-S9VZhRQ7U5aAJUoxffBwVqs3zEkaBu452emgWS-dbufPmw9u0KyHg2__CLd0mkALrWQULCqCe8OtMUbRaDPDDE9AP_1TUzfQ2e5P5392ufYtS4f",
-
-
 function *beforeSaveReview() {
   debug('beforeSaveReview: user is ')
   debug(this.params.user)
@@ -599,22 +587,33 @@ function *beforeSaveCompanies() {
   debug('beforeSaveCompanies');
   debug(this.resteasy.object);
   debug(this.params);
-  var company = (yield Company.getSingleCompany(this.params.id))[0];
-  debug('company '+ company.id);
-  if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
-
-    var amount = this.resteasy.object.delivery_chg_amount;
-    debug('..delivery charge amount has changed to '+ amount +'. Updating..')
-    // Update moltin
-    var item = '';
-    var data = { price: amount};
+  if (this.resteasy.operation == 'update') {
+    debug('...update');
+    debug('...limit payload elements');
     try {
-        item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
+      // this will modify this.resteasy.object
+      yield payload.limitCompanyPayloadForPut(this.resteasy.object)
     } catch (err) {
-      console.error(err);
-      throw new Error ('Error updating delivery charge in ordering system');
+      console.error(err)
+      throw(err)
     }
-    debug('..delivery charge updated')
+    var company = (yield Company.getSingleCompany(this.params.id))[0];
+    debug('company '+ company.id);
+    if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
+
+      var amount = this.resteasy.object.delivery_chg_amount;
+      debug('..delivery charge amount has changed to '+ amount +'. Updating..')
+      // Update moltin
+      var item = '';
+      var data = { price: amount};
+      try {
+          item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
+      } catch (err) {
+        console.error(err);
+        throw new Error ('Error updating delivery charge in ordering system');
+      }
+      debug('..delivery charge updated')
+    }
   }
 }
 

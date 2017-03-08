@@ -106,6 +106,7 @@ CREATE TABLE companies (
     base_slug text,
     default_cat text,
     daily_special_cat_id text,
+    daily_special_item_id text,
     delivery_chg_cat_id text,
     delivery_chg_item_id text,
     delivery_chg_amount text,
