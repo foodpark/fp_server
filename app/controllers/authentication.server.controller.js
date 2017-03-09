@@ -5,6 +5,7 @@ var sts = require('./security.server.controller'),
     Company = require('../models/company.server.model'),
     Customer = require('../models/customer.server.model'),
     Admin = require('../models/admin.server.model'),
+    Unit = require('../models/unit.server.model'),
     debug = require('debug')('auth');
 
 var _ = require('lodash');
@@ -43,9 +44,10 @@ var setUserInfo = function (user) {
     role: user.role
   }
   debug(user)
-  if (user.company_id) info.company_id = user.company_id
-  else if (user.customer_id) info.customer_id = user.customer_id
-  else if (user.admin_id) info.admin_id = user.admin_id
+  if (user.company_id) info.company_id = user.company_id;
+  else if (user.customer_id) info.customer_id = user.customer_id;
+  else if (user.admin_id) info.admin_id = user.admin_id;
+  else if (user.unit_id) info.unit_id = user.unit_id;
   debug(info)
   return info
 };
@@ -56,32 +58,45 @@ exports.login = function *(next) {
   debug('calling')
   userInfo = setUserInfo(this.passport.user)
   if (this.passport.user.role == 'OWNER') {
+    var company = '';
     try {
-      var company = (yield Company.companyForUser(this.passport.user.id))[0];
+      company = (yield Company.companyForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error('login: error retrieving company for owner '+this.passport.user.id);
       console.error(err)
       throw err;
     }
     userInfo.company_id = company.id;
   } else if (this.passport.user.role == 'CUSTOMER') {
+    var customer = '';
     try {
-      var customer = (yield Customer.getForUser(this.passport.user.id))[0];
+      customer = (yield Customer.getForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error('login: error retrieving customer role for user '+this.passport.user.id);
       console.error(err)
       throw err;
     }
     userInfo.customer_id = customer.id
   } else if (this.passport.user.role == 'ADMIN') {
+    var admin = '';
     try {
-      var admin = (yield Admin.getForUser(this.passport.user.id))[0];
+      admin = (yield Admin.getForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving company for Owner '+this.passport.user.id);
+      console.error('login: error retrieving admin role for user '+this.passport.user.id);
       console.error(err)
       throw err;
     }
     userInfo.admin_id = admin.id
+  } else if (this.passport.user.role == 'UNITMGR') {
+    var unit = '';
+    try {
+      unit = (yield Unit.getForUser(this.passport.user.id))[0];
+    } catch (err) {
+      console.error('login: error retrieving unit for unit manager '+this.passport.user.id);
+      console.error(err)
+      throw err;
+    }
+    userInfo.unit_id = unit.id
   }
   debug('done')
   debug('userInfo: '+ userInfo)

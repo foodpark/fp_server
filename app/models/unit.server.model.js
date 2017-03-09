@@ -103,3 +103,7 @@ exports.verifyUnitManager = function(companyId, unitId, unitMgrId) {
     unit_mgr_id: unitMgrId
   })
 };
+
+exports.getForUser = function(userId) {
+  return knex('units').select().where('unit_mgr_id', userId);
+};
