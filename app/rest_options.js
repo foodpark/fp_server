@@ -98,7 +98,7 @@ function *beforeSaveOrderHistory() {
       debug('..customer')
       debug(customer)
     } catch (err) {
-      console.error('beforeSaveOrderHistory: error getting customer name');
+      console.error('beforeSaveOrderHistory: error getting customer');
       throw err;
     }
     var customerName = user.first_name + " " + user.last_name.charAt(0)
@@ -114,6 +114,21 @@ function *beforeSaveOrderHistory() {
       debug(coId)
       this.resteasy.object.company_id = coId[1];
     }
+    debug('..getting company name')
+    var company = '';
+    try {
+      debug('..company id ');
+      debug(this.resteasy.object.company_id);
+      company = (yield Company.getSingleCompany(this.resteasy.object.company_id))[0];
+      debug('..company');
+      debug(company);
+    } catch (err) {
+      console.error('beforeSaveOrderHistory: error getting company');
+      throw err;
+    }
+    debug("..company name is "+ company.name);
+    this.resteasy.object.company_name = company.name;
+
     //set unit
     debug('..get unit id');
     if (!this.resteasy.object.unit_id) {
