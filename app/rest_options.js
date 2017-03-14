@@ -244,6 +244,7 @@ function *afterCreateOrderHistory(orderHistory) {
   yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
+  debug(timestamp.now()); 
   var hash = {
     status : {
       order_requested: timestamp.now()

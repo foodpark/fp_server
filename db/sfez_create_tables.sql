@@ -236,12 +236,13 @@ CREATE TABLE order_history (
   messages text, -- json
   qr_code text,
   manual_pickup boolean DEFAULT false,
+  for_delivery boolean DEFAULT false,
   order_detail jsonb, 
   checkin_id integer REFERENCES checkins(id),
-  company_name text,
   customer_name text,
   customer_id integer REFERENCES customers(id),
   unit_id integer REFERENCES units(id),
+  company_name text,
   company_id integer REFERENCES companies(id),
   created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
