@@ -152,6 +152,19 @@ CREATE TABLE customers (
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
+CREATE TABLE delivery_addresses (
+    id SERIAL PRIMARY KEY,
+    nickname text, 
+    address1 text,
+    address2 text,
+    city text,
+    state text,
+    phone text,
+    customer_id integer REFERENCES customers(id),
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+);
+
 CREATE TABLE units (
     id SERIAL PRIMARY KEY,
     name text NOT NULL UNIQUE,
@@ -159,6 +172,8 @@ CREATE TABLE units (
     type text REFERENCES unit_types(type),
     customer_order_window integer,
     prep_notice integer,
+    delivery_time_offset integer,
+    delivery_radius integer,
     description text,
     username text,
     password text,
@@ -175,6 +190,14 @@ CREATE TABLE units (
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
+CREATE TABLE drivers (
+    id SERIAL PRIMARY KEY,
+    name text,
+    phone text,
+    unit_id integer REFERENCES units(id),
+    created_at timestamptz DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz DEFAULT (now() at time zone 'utc')
+);
 
 CREATE TABLE checkins (
   id SERIAL PRIMARY KEY,
@@ -191,7 +214,6 @@ CREATE TABLE checkins (
   created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
-
 
 CREATE TABLE checkin_history (
   id SERIAL PRIMARY KEY,
@@ -237,6 +259,10 @@ CREATE TABLE order_history (
   qr_code text,
   manual_pickup boolean DEFAULT false,
   for_delivery boolean DEFAULT false,
+  delivery_address_id integer REFERENCES delivery_addresses(id),
+  delivery_address_details jsonb,
+  driver_id integer REFERENCES drivers(id),
+  contact text,
   order_detail jsonb, 
   checkin_id integer REFERENCES checkins(id),
   customer_name text,
@@ -247,7 +273,6 @@ CREATE TABLE order_history (
   created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
-
 
 CREATE TABLE loyalty (
   id SERIAL PRIMARY KEY,
@@ -357,6 +382,12 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE companies TO sfez_rw;
 
 REVOKE ALL ON TABLE customers FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE customers TO sfez_rw;
+
+REVOKE ALL ON TABLE delivery_addresses FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE delivery_addresses TO sfez_rw;
+
+REVOKE ALL ON TABLE drivers FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE drivers TO sfez_rw;
 
 REVOKE ALL ON TABLE favorites FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE favorites TO sfez_rw;
