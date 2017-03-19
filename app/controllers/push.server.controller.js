@@ -79,32 +79,6 @@ var sendFCMNotification = function (message) {
 	});
 }
 
-var oldSendFCMNotification = function (message){
-	debug('sendFCMNotification');
-	return new Promise( function(resolve, reject) { 
-		if (message) {
-			var fcm = new FCM(config.fcmServerKey);
-			debug('..fcm');
-			debug(fcm);
-			fcm.send(message, function (err, response) {
-				if(err) {
-					debug('..Error occurred');
-					console.error(err);
-					reject(err);
-				} else {
-					console.log('FCM notification sent');
-					console.log(response);
-					resolve(response);
-				}
-			})
-		} else {
-			console.error('..Empty message ');
-			console.error(message);
-			reject(new Error('Empty message. FCM notification not sent'));
-		}
-	})
-}
-
 var sendGCMNotification = function (message){
 	debug('sendGCMNotification');
 	return new Promise( function(resolve, reject) {

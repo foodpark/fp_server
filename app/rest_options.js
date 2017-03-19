@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Queries = require('../koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
+var DeliveryAddress = require('./models/deliveryaddress.server.model');
 var Favorites = require('./models/favorites.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
@@ -158,6 +159,31 @@ function *beforeSaveOrderHistory() {
       order_requested : ''
     }
     debug(this.resteasy.object)
+    if (this.resteasy.object.for_delivery) {
+      debug('..delivery order')
+      if (!this.resteasy.object.delivery_address_id) {
+        console.error('No delivery address specified')
+        throw new Error('No delivery address specified', 422);
+      }
+      var addrDetails = '';
+      try {
+        addrDetails = (yield DeliveryAddress.getSingleAddress(this.resteasy.object.delivery_address_id))[0];
+      } catch (err) {
+        console.error(err)
+        throw(err)
+      }
+      debug(addrDetails);
+      var details = {
+        address1 : addrDetails.address1,
+        address2 : addrDetails.address2,
+        city     : addrDetails.city,
+        state    : addrDetails.state,
+        phone    : addrDetails.phone
+      };
+      debug(details);
+      this.resteasy.object.delivery_address_details = details;
+    }
+    debug(this.resteasy.object)
     debug('...preprocessing complete. Ready to save')
   } else if (this.resteasy.operation == 'update') {
     debug('...update')
@@ -244,6 +270,7 @@ function *afterCreateOrderHistory(orderHistory) {
   yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
+  debug(timestamp.now()); 
   var hash = {
     status : {
       order_requested: timestamp.now()
@@ -726,7 +753,8 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
-        } else if (this.params.table == 'favorites' || this.params.table == 'reviews' || this.params.table == 'order_history') {
+        } else if (this.params.table == 'delivery_addresses' || this.params.table == 'favorites' || 
+                   this.params.table == 'reviews' || this.params.table == 'order_history') {
           debug('..checking POST '+ this.params.table)
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
@@ -782,19 +810,11 @@ module.exports = {
               console.log(valid)
             }
           }
-        } else if (this.params.table == 'customers' ||  this.params.table == 'favorites' || this.params.table == 'reviews') {
+        } else if (this.params.table == 'customers' ||  this.params.table == 'delivery_addresses' || 
+                   this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update/Delete Unauthorized - Customers/Admins only',401);
           } else {
-            /* if (this.passport.user.role == 'CUSTOMER') {
-              debug('..get customer id for user')
-              var customer = (yield Customer.getForUser(this.passport.user.id))[0]
-              debug(customer)
-              if (!customer) {
-                this.throw('Unauthorized - not customer',401);
-              } // else continue
-              this.resteasy.object.customer_id = customer.id;
-            } */
             console.log('..authorized')
           }
         } 
@@ -876,10 +896,12 @@ module.exports = {
         return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
       } else if (this.resteasy.table == 'favorites') {
         debug('..read favorites');
-        debug(this.resteasy.object);
-        var custId = this.resteasy.object.customer_id;
-        var coId   = this.resteasy.object.company_id;
-        var unitId = this.resteasy.object.unit_id;
+        var coId = '';
+        var custId = '';
+        var unitId = '';
+        if (context && (m = context.match(/companies\/(\d+)$/))) coId = m[1];
+        if (context && (m = context.match(/customers\/(\d+)$/))) custId = m[1];
+        if (context && (m = context.match(/units\/(\d+)$/))) unitId = m[1];
         // doing this the hard way
         debug('..modify query');
         if (custId) {
@@ -898,7 +920,10 @@ module.exports = {
       } else if (this.resteasy.table == 'loyalty_rewards' && context && (m = context.match(/companies\/(\d+)$/))) {
         debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
-      } 
+      } else if (this.resteasy.table == 'delivery_addresses' && context && (m = context.match(/customers\/(\d+)$/))) {
+        debug('..customer id '+ m[1]);
+        return query.select('*').where('customer_id', m[1]);
+      }  
     }
   },
 };
