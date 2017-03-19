@@ -172,6 +172,7 @@ CREATE TABLE units (
     type text REFERENCES unit_types(type),
     customer_order_window integer,
     prep_notice integer,
+    delivery boolean DEFAULT false,
     delivery_time_offset integer,
     delivery_radius integer,
     description text,
