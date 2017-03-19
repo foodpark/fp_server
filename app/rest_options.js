@@ -344,12 +344,12 @@ function *afterUpdateOrderHistory(orderHistory) {
       switch(status) {
           // From Customer
           case 'order_paid':
-              msgTarget.title = "Payment Processed";
+              msgTarget.title = "Payment Processed - Order #"+ orderNum;
               msgTarget.message = custName +"'s payment was processed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
           case 'pay_fail':
-              msgTarget.title = "Payment Failed";
+              msgTarget.title = "Payment Failed - Order #"+ orderNum;
               msgTarget.message = custName +" payment failed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
@@ -368,41 +368,41 @@ function *afterUpdateOrderHistory(orderHistory) {
               break;
           case 'order_in_queue':
               msgTarget.title = "Order In Queue";
-              msgTarget.message = "Your order "+ orderNum +" put in queue at "+ timestamp.now();
+              msgTarget.message = "Your order #"+ orderNum +" is queued for preparation";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_cooking':
               msgTarget.title = "Order Cooking";
-              msgTarget.message = "Your order "+ orderNum +" started cooking at "+ timestamp.now();
+              msgTarget.message = "Your order #"+ orderNum +" started cooking";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_ready':
               msgTarget.title = "Order Ready";
-              msgTarget.message = "Your order "+ orderNum +" is ready! Good to go at "+ timestamp.now();
+              msgTarget.message = "Your order #"+ orderNum +" is ready!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_picked_up':
               msgTarget.title = "Order Picked Up";
-              msgTarget.message = "Your order "+ orderNum +" was picked up at "+ timestamp.now();
+              msgTarget.message = "Your order #"+ orderNum +" was picked up!";
               msgTarget.body = msgTarget.message;
               break;
           case 'no_show':
               msgTarget.title = "No Show";
-              msgTarget.message = "Your order "+ orderNum +" was not picked up! Did you forget?";
+              msgTarget.message = "Your order #"+ orderNum +" was not picked up! Did you forget?";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_dispatched':
               msgTarget.title = "Order Dispatched";
-              msgTarget.message = "Your order "+ orderNum +" was dispatched at "+ timestamp.now();
+              msgTarget.message = "Your order #"+ orderNum +" is on its way!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_delivered':
               msgTarget.title = "Order Delivered";
-              msgTarget.message = "Your order "+ orderNum +" was delivered at "+ timestamp.now() +". Thanks again!";
+              msgTarget.message = "Your order #"+ orderNum +" was delivered. Thanks again!";
               msgTarget.body = msgTarget.message;
               break;
           default:
-              throw new Error ('Unkown status '+ status +' for order '+ orderHistory.id)
+              throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
       }
       msgTarget.status = status
       
