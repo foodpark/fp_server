@@ -259,7 +259,7 @@ function *afterCreateOrderHistory(orderHistory) {
     toId   : unit.id,
     gcmId  : unit.gcm_id,
     fcmId  : unit.fcm_id,
-    title  : "Order Accept/Decline",
+    title  : "Order Requested",
     message : msg,
     body : msg,
     status : "order_requested"
