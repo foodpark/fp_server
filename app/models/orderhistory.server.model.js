@@ -1,4 +1,4 @@
-var knex = require('../../config/knex');
+var knex  = require('../../config/knex');
 var debug = require('debug')('orders.model');
 
 exports.getStatus = function(id) {

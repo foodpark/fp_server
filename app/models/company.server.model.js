@@ -1,4 +1,5 @@
-var knex = require('../../config/knex');
+var knex  = require('../../config/knex');
+var debug = require('debug')('company.model');
 
 
 exports.companyForCompanyName = function(companyName) {
@@ -32,7 +33,6 @@ exports.updatePhoto = function(companyId, cdnPath) {
   return knex('companies').update(hash).where('id', companyId).returning('*')
 };
 
-
 exports.verifyOwner = function(companyId, userId) {
   return knex('companies').select('*').where({
     id: companyId,
@@ -56,7 +56,6 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
       base_slug: moltSlug
     }).returning('*').asCallback(callback);
 };
-
 
 exports.deleteCompany = function(companyId) {
   return knex('companies').where('id', companyId).del();

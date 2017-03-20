@@ -1,4 +1,5 @@
-var knex = require('../../config/knex');
+var knex  = require('../../config/knex');
+var debug = require('debug')('favorites.model');
 
 var createFavorite = function(companyId, customerId, unitId) {
   return knex('favorites').insert(

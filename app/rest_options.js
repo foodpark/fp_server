@@ -624,7 +624,6 @@ function *beforeSaveUnit() {
   }
 }
 
-
 function *beforeSaveCompanies() {
   debug('beforeSaveCompanies');
   debug(this.resteasy.object);
@@ -656,6 +655,37 @@ function *beforeSaveCompanies() {
       }
       debug('..delivery charge updated')
     }
+  }
+}
+
+function *beforeSaveDriver() {
+  debug('beforeSaveDriver');
+  debug(this.resteasy.object);
+  debug(this.params);
+  if (this.resteasy.operation == 'create') {
+    debug('...create');
+    debug('..getting company')
+    var companyId = '';
+    if (this.params.context && (m = this.params.context.match(/companies\/(\d+)/))) {
+      debug('..company '+ m[1]);
+      companyId = m[1];
+    } else {
+      // no company context is an error
+      console.error('beforeSaveDrivers: No company context for driver: '+ this.params.context);
+      throw new Error ('No company context for driver')
+    }
+    var unitId = '';
+    if (this.params.context && (n = this.params.context.match(/units\/(\d+)$/))) {
+      debug('..unit '+ n[1]);
+      unitId = n[1];
+    } else {
+      // no unit context is an error
+      console.error('beforeSaveDrivers: No unit context for driver: '+ this.params.context);
+      throw new Error ('No unit context for driver')
+    }
+
+    this.resteasy.object.company_id = companyId;
+    this.resteasy.object.unit_id = unitId;
   }
 }
 
@@ -737,6 +767,22 @@ function *afterReadOrderHistory(orderHistory) {
   );*/
 }
 
+function *validUnitMgr(params, user) {
+  debug('validUnitMgr');
+  var compId = '';
+  var unitId = '';
+  if (params.context && (m = params.context.match(/companies\/(\d+)/))) compId = m[1];
+  if (params.context && (n = params.context.match(/units\/(\d+)/))) unitId = n[1];
+ 
+  debug('.. for company '+ compId);
+  debug('.. for unit '+ unitId);
+  var valid = (yield Unit.verifyUnitManager(compId, unitId, user.id))[0]
+  debug('..unit manager is '+ valid);
+  if (!valid) {
+    return false;
+  } // else continue
+  return true;
+}
 
 module.exports = {
   hooks: {
@@ -753,6 +799,16 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
+        } else if (this.params.table == 'drivers') {
+          if(!this.isAuthenticated() || !this.passport.user || 
+              (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN'  && this.passport.user.role != 'UNITMGR')) {
+            this.throw('Create Unauthorized - Unit Manager/Owners/Admin only',401);
+          } 
+          var valid = yield validUnitMgr(this.params, this.passport.user);
+          if (!valid) {
+            this.throw('Update Unauthorized - incorrect Unit Manager',401);
+          } // else continue
+          console.log("...authorized")
         } else if (this.params.table == 'delivery_addresses' || this.params.table == 'favorites' || 
                    this.params.table == 'reviews' || this.params.table == 'order_history') {
           debug('..checking POST '+ this.params.table)
@@ -770,13 +826,8 @@ module.exports = {
         }
         console.log("... create is authorized")
       } else if (operation == 'update' && this.params.table == 'units' && this.isAuthenticated() && this.passport.user && this.passport.user.role == 'UNITMGR') {
-        debug('unit mgr update')
-        if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
-          var compId = m[1]
-        }
-        debug('.. for company '+ compId)
-        var valid = (yield Unit.verifyUnitManager(compId, this.params.id, this.passport.user.id))[0]
-        debug(valid)
+        debug('unit mgr update');
+        var valid = yield validUnitMgr(this.params, this.passport.user);
         if (!valid) {
           this.throw('Update Unauthorized - incorrect Unit Manager',401);
         } // else continue
@@ -810,6 +861,17 @@ module.exports = {
               console.log(valid)
             }
           }
+        }  else if (this.params.table == 'drivers') {
+          if(!this.isAuthenticated() || !this.passport.user || 
+             (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'UNITMGR')) {
+            this.throw('Update/Delete Unauthorized - Unit Managers/Owners/Admin only',401);
+          } else {
+            var valid = yield validUnitMgr(this.params, this.passport.user);
+            if (!valid) {
+              this.throw('Update Unauthorized - incorrect Unit Manager',401);
+            } // else continue
+            console.log("...authorized");
+          }
         } else if (this.params.table == 'customers' ||  this.params.table == 'delivery_addresses' || 
                    this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
@@ -829,8 +891,13 @@ module.exports = {
 
     beforeSave: function *() {
       if (this.resteasy.table == 'reviews') {
+        debug('saving reviews')
         yield beforeSaveReview.call(this);
+      } else if (this.resteasy.table == 'drivers') {
+        debug('saving drivers')
+        yield beforeSaveDriver.call(this);
       } else if (this.resteasy.table == 'units') {
+        debug('saving units')
         yield beforeSaveUnit.call(this);
       } else if (this.resteasy.table == 'loyalty_rewards') {
         debug('saving loyalty rewards')
@@ -843,6 +910,7 @@ module.exports = {
         yield beforeSaveOrderHistory.call(this);
         debug('saving order_history to repository')
       } else if (this.resteasy.table == 'users') {
+        debug('saving users')
         yield beforeSaveUser.call(this);
       }
     },
@@ -891,6 +959,13 @@ module.exports = {
                 && (m = context.match(/companies\/(\d+)/)) 
                 && (n = context.match(/units\/(\d+)/))) {
         debug('..query order history');
+        debug('..company id '+ m[1]);
+        debug('..unit id '+ n[1]);
+        return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
+      } else if (this.resteasy.table == 'drivers' && context 
+                && (m = context.match(/companies\/(\d+)/)) 
+                && (n = context.match(/units\/(\d+)/))) {
+        debug('..query drivers');
         debug('..company id '+ m[1]);
         debug('..unit id '+ n[1]);
         return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);

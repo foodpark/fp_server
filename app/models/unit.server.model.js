@@ -1,20 +1,7 @@
-var knex = require('../../config/knex');
+var knex    = require('../../config/knex');
 var Checkin = require ('../models/checkin.server.model');
+var debug   = require('debug')('unit.model');
 
-/**
-CREATE TABLE units (
-  ID SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
-  number SERIAL NOT NULL,
-  description TEXT,
-  username TEXT,
-  password TEXT,
-  qrCode TEXT,
-  unit_order_sys_id INTEGER,
-  company_id INTEGER REFERENCES companies (id),
-  unit_mgr_id INTEGER REFERENCES users (id)
-)
-**/
 
 exports.getSingleUnit = function(id) {
   return knex('units').select().where('id', id)

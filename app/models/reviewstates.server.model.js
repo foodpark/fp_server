@@ -1,4 +1,5 @@
-var knex = require('../../config/knex');
+var knex  = require('../../config/knex');
+var debug = require('debug')('reviewstates.model');
 
 exports.getAllowedTransitionsForCurrentState = function(currStateName) {
   return knex('review_states').select('allowed_transitions').where('name', currStateName);

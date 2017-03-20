@@ -196,6 +196,7 @@ CREATE TABLE drivers (
     name text,
     phone text,
     unit_id integer REFERENCES units(id),
+    company_id integer REFERENCES companies(id),
     created_at timestamptz DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz DEFAULT (now() at time zone 'utc')
 );
@@ -244,7 +245,6 @@ CREATE TABLE favorites (
   created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   PRIMARY KEY (customer_id, unit_id, company_id)
 );
-
 
 CREATE TABLE order_history (
   id SERIAL PRIMARY KEY,

@@ -1,6 +1,6 @@
 var crypto = require('crypto');
-var knex = require('../../config/knex');
-var debug = require('debug')('user.model');
+var knex   = require('../../config/knex');
+var debug  = require('debug')('user.model');
 
 
 function encrypt(password) {

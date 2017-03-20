@@ -1,5 +1,5 @@
 var knex = require('../../config/knex');
-
+var debug = require('debug')('checkin.model');
 
 /**CREATE TABLE checkins (
   ID SERIAL PRIMARY KEY,

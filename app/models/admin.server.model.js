@@ -1,21 +1,5 @@
 var knex = require('../../config/knex');
-
-/**
-CREATE TABLE admins (
-  ID SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  description TEXT,
-  photo TEXT,
-  super_admin BOOLEAN DEFAULT false,
-  city TEXT,
-  state TEXT,
-  country TEXT,
-  user_id INTEGER REFERENCES users (id),
-  created TIMESTAMP DEFAULT current_timestamp
-)
-
-
-**/
+var debug = require('debug')('admin.model');
 
 /* exports.getAllAdmins = function() {
   knex('admins').select().asCallback(callback);
