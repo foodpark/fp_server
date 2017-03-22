@@ -772,8 +772,20 @@ function *validUnitMgr(params, user) {
   var compId = '';
   var unitId = '';
   if (params.context && (m = params.context.match(/companies\/(\d+)/))) compId = m[1];
-  if (params.context && (n = params.context.match(/units\/(\d+)/))) unitId = n[1];
- 
+
+  if (params.table=="units") {
+    unitId = params.id;
+  } else { // some other table with unit in the context
+    if (params.context && (n = params.context.match(/units\/(\d+)$/))) unitId = n[1];
+  }
+  if (!compId) {
+    console.error('No company id provided for unit');
+    throw new Error('No company id provided for unit',422);
+  }
+  if (!unitId) {
+    console.error('No unit id provided');
+    throw new Error('No unit ide provided', 422);
+  }
   debug('.. for company '+ compId);
   debug('.. for unit '+ unitId);
   var valid = (yield Unit.verifyUnitManager(compId, unitId, user.id))[0]
