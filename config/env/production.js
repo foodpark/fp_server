@@ -11,6 +11,7 @@ module.exports = {
   grant_type: "client_credentials",
   defaultTaxBand: "1427064502431515521", // Brazil ICMS
   deliveryCharge: "",
+  deliveryOffset: 20,
   sumup:{
       clientId:"",
       client_secret:"",

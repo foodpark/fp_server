@@ -7,6 +7,7 @@ var Favorites = require('./models/favorites.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var User = require('./models/user.server.model');
+var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
 var timestamp = require('./utils/timestamp');
@@ -80,6 +81,33 @@ function *simplifyDetails(orderDetail) {
   return menuItems;
 }
 
+function * calculateDeliveryPickup(unitId, deliveryTime) {
+  debug('calculateDeliveryPickup');
+  debug('..unit id '+ unitId);
+  debug('..desired delivery '+ deliveryTime);
+  var pickup = '';
+  if (deliveryTime) { 
+    var delivery = new Date(deliveryTime);
+    var unit = '';
+    try {
+      unit = (yield Unit.getSingleUnit(unitId))[0];
+      debug('..unit');
+      debug(unit);
+    } catch (err) {
+      console.error('calculateDeliveryPickup: Error getting unit');
+      console.error(err);
+      throw err;
+    }
+    if (unit.delivery_time_offset) {
+      pickup = new Date( delivery.getTime() - unit.delivery_time_offset * 60000); 
+    } else {
+      pickup = new Date(delivery.getTime() - config.deliveryOffset * 60000);
+    }
+    debug('..delivery pickup time is '+ pickup.toISOString());
+  }
+  return pickup;
+}
+
 function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory');
   debug(this.resteasy.object);
@@ -87,7 +115,7 @@ function *beforeSaveOrderHistory() {
   if (this.resteasy.operation == 'create') {
     debug('...create')
     if (! this.resteasy.object.order_sys_order_id) { // is required
-      console.error('No order id for the ordering system')
+      console.error('beforeSaveOrderHistory: No order id for the ordering system')
       throw new Error('order_sys_order_id is required', 422);
     }
     debug('..getting customer name')
@@ -100,6 +128,7 @@ function *beforeSaveOrderHistory() {
       debug(customer)
     } catch (err) {
       console.error('beforeSaveOrderHistory: error getting customer');
+      console.error(err);
       throw err;
     }
     var customerName = user.first_name + " " + user.last_name.charAt(0)
@@ -125,6 +154,7 @@ function *beforeSaveOrderHistory() {
       debug(company);
     } catch (err) {
       console.error('beforeSaveOrderHistory: error getting company');
+      console.error(err);
       throw err;
     }
     debug("..company name is "+ company.name);
@@ -139,13 +169,15 @@ function *beforeSaveOrderHistory() {
       this.resteasy.object.unit_id = unId[1];
     }
 
+    // get order details and streamline for display
     var moltin_order_id = this.resteasy.object.order_sys_order_id
-    debug('order sys order id: '+ moltin_order_id)
+    debug('..order sys order id: '+ moltin_order_id)
     try {
       var order = yield msc.findOrder(moltin_order_id)
       var order_details = yield msc.getOrderDetail(moltin_order_id)
       order_details = yield simplifyDetails(order_details)
     } catch (err) {
+      console.error('beforeSaveOrderHistory: Error retreiving order items from ecommerce system');
       console.error(err)
       throw(err)
     }
@@ -159,16 +191,20 @@ function *beforeSaveOrderHistory() {
       order_requested : ''
     }
     debug(this.resteasy.object)
+
+    // Handle delivery details
     if (this.resteasy.object.for_delivery) {
       debug('..delivery order')
       if (!this.resteasy.object.delivery_address_id) {
         console.error('No delivery address specified')
         throw new Error('No delivery address specified', 422);
       }
+      // Get and streamline address for display
       var addrDetails = '';
       try {
         addrDetails = (yield DeliveryAddress.getSingleAddress(this.resteasy.object.delivery_address_id))[0];
       } catch (err) {
+        console.error('beforeSaveOrderHistory: Error getting delivery address');
         console.error(err)
         throw(err)
       }
@@ -182,7 +218,24 @@ function *beforeSaveOrderHistory() {
       };
       debug(details);
       this.resteasy.object.delivery_address_details = details;
+
+      // Set time to pickup up by delivery driver
+      var deliveryTime = this.resteasy.object.desired_delivery_time;
+      if (deliveryTime) {
+        var pickup = '';
+        try {
+          pickup = yield calculateDeliveryPickup(this.resteasy.object.unit_id, 
+                                                 this.resteasy.object.desired_delivery_time);
+        } catch (err) {
+          console.error('beforeSaveOrderHistory: Error calculating delivery pickup time');
+          console.error(err);
+          throw (err);
+        }
+        this.resteasy.object.desired_pickup_time = pickup;
+      }
     }
+
+    // Ready to save
     debug(this.resteasy.object)
     debug('...preprocessing complete. Ready to save')
   } else if (this.resteasy.operation == 'update') {

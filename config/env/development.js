@@ -12,6 +12,7 @@ module.exports = {
   olddefaultTaxBand: "1278235843793780901", // Brazil ICMS
   defaultTaxBand: "1427064502431515521",
   deliveryCharge: "1.6",
+  deliveryOffset: 20,
   sumup:{
     clientId:"com.sumup.apisampleapp",
     client_secret:"6332ad54-eb47-4b41-8390-074f062da085",
