@@ -210,6 +210,7 @@ function *beforeSaveOrderHistory() {
       }
       debug(addrDetails);
       var details = {
+        nickname : addrDetails.nickname,
         address1 : addrDetails.address1,
         address2 : addrDetails.address2,
         city     : addrDetails.city,
