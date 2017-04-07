@@ -49,3 +49,71 @@ var debug = require('debug')('payload');
         }
      }
  }
+
+
+exports.simplifySpecial = function * (special) {
+    debug('simplifySpecial');
+    debug(special.title);
+    var detail = {
+        title : special.title,
+        description : special.description,
+        price : special.price.value
+    }
+    if (special.images) detail.image = special.images[0].url.http;
+    debug(detail);
+    return detail;
+}
+
+
+exports.simplifyItem = function * (item) {
+    debug('simplifyItem');
+    debug('..menu item ');
+    debug(item.product.value);
+    debug('..quantity ');
+    debug(item.quantity);
+    debug('..amount');
+    var itemDetail = {
+        title : item.product.value,
+        quantity : item.quantity
+    }
+    if (item.product.data.modifiers) { 
+        debug('..modifiers');
+        var modifiers = item.product.data.modifiers;
+        itemDetail.options = [];
+        itemDetail.selections = {};
+        for (var j in modifiers) {
+            debug(modifiers[j].title);
+            var mod = modifiers[j];
+            debug(mod);
+            if (!mod.type && mod.data.type.value == 'Variant') { // price associated with Variant
+                debug(mod.data.title + ': '+ mod.var_title);
+                itemDetail.selections[mod.data.title] = mod.var_title;
+            } else { // option items or single selections
+                var titles = [];
+                if (mod.type.value == 'Variant') {
+                    for (var k in mod.variations) {
+                        var variation = mod.variations[k]
+                        debug('... variant '+ variation.title);
+                        debug('...'+ variation.id);
+                        titles.push(variation.title);
+                    }
+                    itemDetail.selections[mod.title]=titles
+                } else if (mod.type.value =='Single') {
+                    for (var k in mod.variations) {
+                        var variation = mod.variations[k]
+                        debug('... option '+ variation.title);
+                        debug('... id '+ variation.id);
+                        debug('... parent '+ variation.modifier);
+                        var options = item.options[variation.modifier];
+                        if (options && options[variation.id] ) {
+                            debug('... option '+ variation.title +' was selected');
+                            titles.push(variation.title);
+                        }
+                    }
+                    itemDetail.options = titles;
+                }
+            }
+        }
+    }
+    return itemDetail;
+}

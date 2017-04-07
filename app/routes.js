@@ -9,6 +9,7 @@ module.exports = function(app) {
   require('./routes/webhook.server.routes')(app);
   require('./routes/payment.server.routes')(app);
   require('./routes/order.server.routes')(app);
+  require('./routes/specials.server.routes')(app);
 
 
   var apiversion = '/api/'+ config.apiVersion + '/rel';

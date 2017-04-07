@@ -1,5 +1,5 @@
-var Unit = require ('../models/unit.server.model'),
-		debug = require('debug')('geo.server.controller');
+var Unit = require ('../models/unit.server.model');
+var debug = require('debug')('geo.server.controller');
 
 exports.searchUnits=function *(next) {
 	var date = new Date();

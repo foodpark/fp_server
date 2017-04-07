@@ -1,0 +1,87 @@
+var config  = require('../../config/config');
+var auth = require('./authentication.server.controller');
+var msc  = require('./moltin.server.controller');
+var Company = require ('../models/company.server.model');
+var Unit    = require ('../models/unit.server.model');
+var payload  = require('../utils/payload');
+var debug   = require('debug')('specials');
+
+
+exports.getSpecials = function * (next) {
+  debug('getSpecials');
+  debug(this.body);
+  var date  = new Date();
+  var units = '';
+  var lat = this.body.latitude;
+  var lon = this.body.longitude;
+  var dis = this.body.distance;
+  if (!lat) {
+    this.status = 422
+    this.body = {error: 'Please enter latitude'}
+    return;
+  }
+  if (!lon) {
+    this.status = 422
+    this.body = {error: 'Please enter longitude'}
+    return;
+  }
+  if (!dis) {
+    this.status = 422
+    this.body = {error: 'Please enter distance'}
+    return;
+  }
+
+  try { 
+	  units = yield Unit.findByCheckinTimebox(parseFloat(lat), parseFloat(lon), parseFloat(dis), date);
+  } catch (err) {
+    console.error('getSpecials: Error getting units');
+    console.error(err);
+  }
+  debug('..units');
+  debug(units);
+  var specials = [];
+  for (i=0;i<units.length;i++) {
+    var unit = units[i];
+    debug('..unit');
+    debug(unit);
+    var company = '';
+    try {
+      company = (yield Company.getSingleCompany(unit.company_id))[0];
+    } catch (err) {
+      console.error('getSpecials: Error getting company');
+      console.error(err);
+    }
+    if (company) { 
+      debug('..company '+ company.name + ' ' +company.id);
+      if (!company.daily_special_item_id) {
+        debug('..no daily special defined');
+        continue;
+      }
+      debug('..special '+ company.daily_special_item_id);
+      var special = '';
+      try {
+        special = (yield msc.findMenuItem(company.daily_special_item_id))[0];
+      } catch (err) {
+        console.error('getSpecials: Error getting special');
+        console.error(err);
+      }
+      debug('..from moltin');
+      debug(special);
+      try {
+        special = yield payload.simplifySpecial(special);
+      } catch (err) {
+        console.error('getSpecials: Error getting special');
+        console.error(err);
+      }
+      debug('..simplified');
+      debug(special);
+      if (special) {
+        special.company_id = company.id;
+        special.company_name = company.name;
+        specials.push(special);
+      }
+    }
+  }
+  this.body = specials;
+  return;
+}

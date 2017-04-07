@@ -30,8 +30,7 @@ function *simplifyDetails(orderDetail) {
     debug('amount')
     var itemDetail = {
       title : item.product.value,
-      quantity : item.quantity,
-
+      quantity : item.quantity
     }
     if (item.product.data.modifiers) {
       debug('modifiers')
