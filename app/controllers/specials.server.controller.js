@@ -60,21 +60,21 @@ exports.getSpecials = function * (next) {
       debug('..special '+ company.daily_special_item_id);
       var special = '';
       try {
-        special = (yield msc.findMenuItem(company.daily_special_item_id))[0];
+        special = yield msc.findMenuItem(company.daily_special_item_id);
+        debug('..from moltin');
+        debug(special);
       } catch (err) {
         console.error('getSpecials: Error getting special');
         console.error(err);
       }
-      debug('..from moltin');
-      debug(special);
       try {
         special = yield payload.simplifySpecial(special);
+        debug('..simplified');
+        debug(special);
       } catch (err) {
         console.error('getSpecials: Error getting special');
         console.error(err);
       }
-      debug('..simplified');
-      debug(special);
       if (special) {
         special.company_id = company.id;
         special.company_name = company.name;

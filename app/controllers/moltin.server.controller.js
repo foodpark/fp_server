@@ -160,8 +160,8 @@ var requestEntities = function *(flow, method, data, id, params) {
       }
   }
   debug('requestEntities: ...returning')
-  debug(result)
-  return result
+  debug(result);
+  return result;
 }
 
 exports.createCompany=function *(sfezCompany) {

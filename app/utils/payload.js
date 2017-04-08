@@ -50,20 +50,19 @@ var debug = require('debug')('payload');
      }
  }
 
-
 exports.simplifySpecial = function * (special) {
     debug('simplifySpecial');
     debug(special.title);
     var detail = {
+        id : special.id,
         title : special.title,
         description : special.description,
         price : special.price.value
     }
-    if (special.images) detail.image = special.images[0].url.http;
+    if (special.images && special.images[0]) detail.image = special.images[0].url.http;
     debug(detail);
     return detail;
 }
-
 
 exports.simplifyItem = function * (item) {
     debug('simplifyItem');
