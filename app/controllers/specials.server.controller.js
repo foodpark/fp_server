@@ -47,7 +47,7 @@ exports.getSpecials = function * (next) {
     debug(unit);
     debug('..check company '+ unit.company_id +' needs to be processed');
     debug(companies);
-    if (companies.includes(unit.company_id)) {
+    if (companies.indexOf(unit.company_id) !== -1) {
       debug('..already processed. Skipping');
       continue;
     }
