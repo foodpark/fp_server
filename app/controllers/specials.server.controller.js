@@ -40,10 +40,20 @@ exports.getSpecials = function * (next) {
   debug('..units');
   debug(units);
   var specials = [];
+  var companies = [];
   for (i=0;i<units.length;i++) {
     var unit = units[i];
     debug('..unit');
     debug(unit);
+    debug('..check company '+ unit.company_id +' needs to be processed');
+    debug(companies);
+    if (companies.includes(unit.company_id)) {
+      debug('..already processed. Skipping');
+      continue;
+    }
+    debug('..company '+ unit.company_id +' not processed. Adding...');
+    companies.push(unit.company_id);
+    debug(companies);
     var company = '';
     try {
       company = (yield Company.getSingleCompany(unit.company_id))[0];
