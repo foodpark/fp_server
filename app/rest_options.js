@@ -445,6 +445,7 @@ function *afterUpdateOrderHistory(orderHistory) {
                                    'Customer: '+ custName +'\n'+
                                    'Order: '+ orderNum;
               msgTarget.body = "Order accepted at "+ timestamp.now();
+	      msgTarget.data = "Order ID: " + orderHistory.order_sys_order_id + "\nCompany ID: " + company_id + "\nUnit ID: " + unit_id;
               break;
           case 'order_in_queue':
               msgTarget.title = "Order In Queue";
