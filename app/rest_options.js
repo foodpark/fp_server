@@ -448,7 +448,7 @@ function *afterUpdateOrderHistory(orderHistory) {
 	      var data = {
                          "unit_id": unit_id,  "company_id": company_id, "order_sys_order_id": orderHistory.order_sys_order_id
                          };
-	      msgTarget.data = "Order ID: " + orderHistory.order_sys_order_id + "\nCompany ID: " + company_id + "\nUnit ID: " + unit_id;
+	      msgTarget.data = data;
               break;
           case 'order_in_queue':
               msgTarget.title = "Order In Queue";
