@@ -445,10 +445,6 @@ function *afterUpdateOrderHistory(orderHistory) {
                                    'Customer: '+ custName +'\n'+
                                    'Order: '+ orderNum;
               msgTarget.body = "Order accepted at "+ timestamp.now();
-	      var data = {
-                         "unit_id": unit_id,  "company_id": company_id, "order_sys_order_id": orderHistory.order_sys_order_id
-                         };
-	      msgTarget.data = data;
               break;
           case 'order_in_queue':
               msgTarget.title = "Order In Queue";
@@ -488,6 +484,12 @@ function *afterUpdateOrderHistory(orderHistory) {
           default:
               throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
       }
+      debug(msgTarget);
+      var supplemental = {};
+      supplemental.unit_id = orderHistory.unit_id;
+      supplemental.company_id = orderHistory.company_id;
+      supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
+      msgTarget.data = supplemental;
       msgTarget.status = status
       
       debug(msgTarget);
