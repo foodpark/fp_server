@@ -1,11 +1,14 @@
 var User = require ('../models/user.server.model'),
-    Company = require ('../models/company.server.model'),
-    Customer = require ('../models/customer.server.model'),
-    auth = require('./authentication.server.controller'),
-    msc = require('./moltin.server.controller'),
-    config = require('../../config/config'),
-    debug = require('debug')('storefront');
+var Company = require ('../models/company.server.model'),
+var Customer = require ('../models/customer.server.model'),
+var auth = require('./authentication.server.controller'),
+var msc = require('./moltin.server.controller'),
+var config = require('../../config/config'),
+var debug = require('debug')('storefront');
 var _ = require('lodash');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 var getErrorMessage = function(err) {
     var message = '';

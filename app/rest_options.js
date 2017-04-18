@@ -489,6 +489,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       supplemental.unit_id = orderHistory.unit_id;
       supplemental.company_id = orderHistory.company_id;
       supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
+      supplemental.order_id = orderHistory.id;
       msgTarget.data = supplemental;
       msgTarget.status = status
       

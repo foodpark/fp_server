@@ -5,6 +5,9 @@ var Company = require ('../models/company.server.model');
 var Unit    = require ('../models/unit.server.model');
 var payload  = require('../utils/payload');
 var debug   = require('debug')('specials');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 
 exports.getSpecials = function * (next) {

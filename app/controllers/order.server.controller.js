@@ -6,8 +6,11 @@ var moltin  = require('./moltin.server.controller');
 var orderhistory  = require('../models/orderhistory.server.model');
 var Unit    = require ('../models/unit.server.model');
 var debug   = require('debug')('orders');
+var winston = require('winston');
 
-const ORDER = '/orders';
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
+
+var ORDER = '/orders';
 
 exports.getOrders = function*(next){
   var search = this.query;

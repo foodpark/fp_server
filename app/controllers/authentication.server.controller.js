@@ -1,14 +1,16 @@
-var sts = require('./security.server.controller'),
-    msc = require('./moltin.server.controller'),
-    config = require('../../config/config'),
-    User = require('../models/user.server.model'),
-    Company = require('../models/company.server.model'),
-    Customer = require('../models/customer.server.model'),
-    Admin = require('../models/admin.server.model'),
-    Unit = require('../models/unit.server.model'),
-    debug = require('debug')('auth');
-
+var sts = require('./security.server.controller');
+var msc = require('./moltin.server.controller');
+var config = require('../../config/config');
+var User = require('../models/user.server.model');
+var Company = require('../models/company.server.model');
+var Customer = require('../models/customer.server.model');
+var Admin = require('../models/admin.server.model');
+var Unit = require('../models/unit.server.model');
+var debug = require('debug')('auth');
 var _ = require('lodash');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 exports.CUSTOMER = 'CUSTOMER';
 exports.OWNER    = 'OWNER';
