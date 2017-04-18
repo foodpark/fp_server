@@ -1,9 +1,9 @@
-var User = require ('../models/user.server.model'),
-var Company = require ('../models/company.server.model'),
-var Customer = require ('../models/customer.server.model'),
-var auth = require('./authentication.server.controller'),
-var msc = require('./moltin.server.controller'),
-var config = require('../../config/config'),
+var User = require ('../models/user.server.model');
+var Company = require ('../models/company.server.model');
+var Customer = require ('../models/customer.server.model');
+var auth = require('./authentication.server.controller');
+var msc = require('./moltin.server.controller');
+var config = require('../../config/config');
 var debug = require('debug')('storefront');
 var _ = require('lodash');
 var winston = require('winston');

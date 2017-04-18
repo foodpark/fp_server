@@ -52,7 +52,8 @@
     "request": "^2.75.0",
     "requestretry": "^1.12.0",
     "uuid": "^2.0.3",
-    "watch": "^0.19.2"
+    "watch": "^0.19.2",
+    "winston": "^2.3.1"
   },
   "description": "The SFEZ server is a Node-based implementation that provides the relationship services for StreetFood EZ. Basic services include reviews, favorites, checkins, loyalty, social media.",
   "main": "server.js",
