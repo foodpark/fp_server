@@ -64,8 +64,8 @@ exports.login = function *(next) {
     try {
       company = (yield Company.companyForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving company for owner '+this.passport.user.id);
-      console.error(err)
+      logger.error('Error retrieving company for owner', 
+        {fn: 'login', user_id: this.passport.user.id, error: err});
       throw err;
     }
     userInfo.company_id = company.id;
@@ -74,8 +74,8 @@ exports.login = function *(next) {
     try {
       customer = (yield Customer.getForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving customer role for user '+this.passport.user.id);
-      console.error(err)
+      logger.error('Error retrieving customer role for user', 
+        {fn: 'login', user_id: this.passport.user.id, error: err});
       throw err;
     }
     userInfo.customer_id = customer.id
@@ -84,8 +84,8 @@ exports.login = function *(next) {
     try {
       admin = (yield Admin.getForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving admin role for user '+this.passport.user.id);
-      console.error(err)
+      logger.error('Error retrieving admin role for user', 
+        {fn: 'login', user_id: this.passport.user.id, error: err});
       throw err;
     }
     userInfo.admin_id = admin.id
@@ -94,8 +94,8 @@ exports.login = function *(next) {
     try {
       unit = (yield Unit.getForUser(this.passport.user.id))[0];
     } catch (err) {
-      console.error('login: error retrieving unit for unit manager '+this.passport.user.id);
-      console.error(err)
+      logger.error('Error retrieving unit for unit manager', 
+        {fn: 'login', user_id: this.passport.user.id, error: err});
       throw err;
     }
     userInfo.unit_id = unit.id
@@ -107,7 +107,8 @@ exports.login = function *(next) {
     token: 'JWT ' + sts.generateToken(userInfo),
     user: userInfo
   };
-  debug(this.body)
+  debug(this.body);
+  logger.info('login completed for user ', {user_id: this.passport.user.id});
   return;
 };
 
@@ -136,39 +137,54 @@ exports.renderRegister = function*(next) {
 };
 
 var createMoltinCompany = function *(company) {
-  debug('createMoltinCompany');
+  logger.info('create moltin company', {fn: 'createMoltinCompany', user_id: this.passport.user.id,
+    role : this.passport.user.role, company_id:company_id});
   try {
     var results = yield msc.createCompany(company)
   } catch (err) {
     console.error(err);
     throw (err);
+      logger.error('Error creating company for owner', 
+        {fn: 'login', user_id: this.passport.user.id, role: this.passport.user.role,
+        target_company: company, error: err});
   }
-  debug('createMoltinCompany: moltin company created');
+  logger.info('moltin company created', {fn: 'createMoltinCompany', user_id: this.passport.user.id,
+    role : this.passport.user.role, company_id: company.id, order_sys_id: results.id});
   return results
 };
 
 var createMoltinDefaultCategory = function *(company) {
-  debug('createMoltinDefaultCategory');
+  logger.info('create moltin default category', {fn: 'createMoltinDefaultCategory', user_id: this.passport.user.id,
+    role : this.passport.user.role, company_id:company_id});
   try {
     var results = yield msc.createDefaultCategory(company)
   } catch (err) {
-    console.error(err);
+    logger.error('Error creating moltin default category', 
+      {fn: 'createMoltinDefaultCategory', user_id: this.passport.user.id, role: this.passport.user.role,
+      company_id: company.id, error: err});
     throw (err);
   }
+  logger.info('default category created', {fn: 'createMoltinDefaultCategory', user_id: this.passport.user.id,
+    role : this.passport.user.role, company_id:company_id});
   return results;
 };
 
 var createMoltinDailySpecialCategory = function *(company, defaultCat) {
-  debug('createMoltinDailySpecialCategory');
+  debug('createMoltinDailySpecialCategory',, {fn: 'createMoltinDailySpecialCategory', 
+    user_id: this.passport.user.id, role : this.passport.user.role, company_id:company_id});
   debug(company);
   debug('..default cat '+ defaultCat);
   var category = '';
   try {
     category = yield msc.createCategory(company, "Daily Specials", defaultCat);
   } catch (err) {
-      console.error('error creating delivery charge category in ordering system ');
+      logger.error('Error creating delivery charge category', 
+        {fn: 'createMoltinDailySpecialCategory', user_id: this.passport.user.id, role: this.passport.user.role,
+        company_id: company.id, error: err});
       throw(err);
   }
+  logger.info('daily specials category created', {fn: 'createMoltinDailySpecialsCategory', 
+    user_id: this.passport.user.id, role : this.passport.user.role, company_id:company_id});
   return category;
 };
 
