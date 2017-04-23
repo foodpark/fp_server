@@ -6,6 +6,7 @@ var DeliveryAddress = require('./models/deliveryaddress.server.model');
 var Favorites = require('./models/favorites.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
+var Reviews = require('./models/reviews.server.model');
 var User = require('./models/user.server.model');
 var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
@@ -509,13 +510,23 @@ function *afterUpdateOrderHistory(orderHistory) {
 function *beforeSaveReview() {
   debug('beforeSaveReview: user is ')
   debug(this.params.user)
-  var answers = this.resteasy.object.answers;
-  if (answers && answers.length) {
-    var total = 0.0;
-    for (var i = 0; i < answers.length; i++) {
-      total += answers[i].answer;
+  var answersField = this.resteasy.object.answers;
+  if (answersField) {
+    var answers = answersField.answers;
+
+    if (answers && answers.length) {
+      debug('answers length: ' + answers.length);
+      var total = 0.0;
+      for (var i = 0; i < answers.length; i++) {
+        total += answers[i].answer;
+      }
+      this.resteasy.object.rating = total / answers.length;
+      debug('Review rating calculated as: ' + total);
+    } else {
+      console.log('Review rating not calculated - unexpected answers value: ' + answers);
     }
-    this.resteasy.object.rating = total / answers.length;
+  } else {
+    console.log('Review rating not calculated - answersField is null');
   }
 }
 
@@ -778,7 +789,7 @@ function *beforeSaveUser() {
 }
 
 function *afterCreateReview(review) {
-  var reviewApproval = { review_id: review.id, updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
+  var reviewApproval = { review_id: review.id, status: 'New', updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
 
   this.resteasy.queries.push(
     this.resteasy.transaction.table('review_approvals')
@@ -787,11 +798,30 @@ function *afterCreateReview(review) {
 }
 
 function *afterUpdateReviewApproval(approval) {
+  debug('begin afterUpdateReviewApproval function');
   var hash = { status: approval.status };
 
   this.resteasy.queries.push(
-    this.resteasy.transaction.table('reviews').where('reviews.id', approval.review_id).update(hash)
+    this.resteasy.transaction.table('reviews').where('id', approval.review_id).update(hash)
   );
+
+  // Recalculate company rating
+  if (approval.status == "Approved") {
+    var companyId = (yield Reviews.getCompanyId(approval.review_id))[0];
+    if (companyId) {
+      var averageRating = (yield Reviews.getAverageRating(companyId.company_id, approval.review_id))[0];
+      if (averageRating) {
+        debug('average rating is now ' + averageRating.avg_rating + ' for company ID ' + companyId.company_id);
+        var updateCompanyRating = { calculated_rating: averageRating.avg_rating };
+
+        this.resteasy.queries.push(
+          this.resteasy.transaction.table('companies').where('id', companyId.company_id).update(updateCompanyRating)
+        );
+      } else {
+        console.log('Unable to get avg rating for company '+ companyId.company_id);
+      }
+    }
+  }
 }
 
 function *afterReadOrderHistory(orderHistory) {

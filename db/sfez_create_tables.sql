@@ -126,6 +126,7 @@ CREATE TABLE companies (
     taxband text,
     tags text,
     stub boolean,
+    calculated_rating numeric DEFAULT 0.0,
     user_id integer REFERENCES users(id),
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
@@ -329,6 +330,8 @@ CREATE TABLE reviews (
     company_id integer REFERENCES companies(id),
     unit_id integer REFERENCES units(id),
     status text REFERENCES review_states(name),
+    power_reviewer boolean DEFAULT false,
+    power_title text,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
