@@ -5,7 +5,9 @@ var Customer = require ('../models/customer.server.model');
 var Favorite = require ('../models/favorites.server.model');
 var Unit    = require ('../models/unit.server.model');
 var debug   = require('debug')('favorites');
+var winston = require('winston');
 
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 exports.getCompanyFavorites = function * (next) {
   debug('getCompanyFavorites');

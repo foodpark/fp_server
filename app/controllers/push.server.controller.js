@@ -6,6 +6,9 @@ var moltin = require('./moltin.server.controller');
 var OrderHistory = require('../models/orderhistory.server.model');
 var timestamp = require('../utils/timestamp');
 var debug = require('debug')('push');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 var deviceInfo = {};
 
@@ -22,19 +25,21 @@ admin.initializeApp({
   databaseURL: "https://sfez-17981.firebaseio.com/"
 });
 
-var setOrderStatusMessage = function(orderId, title, status, message, body) {
+var setOrderStatusMessage = function(orderId, title, status, message, body, data) {
 	var note = '';
+
+	if (!data) data = {};
+	data.message = message;
+	data.title = title;
+	data.status = status;
+
 	if (status == 'order_requested') {
 		note = {
 			"notification" : {
 				"body" : body,
 				"title" : title
 			},
-			"data" : {
-				"message" : message,
-				"title" : title,
-				"status" : status
-			}
+			"data" : data
 		};
 	} else {
 		note = {
@@ -42,11 +47,7 @@ var setOrderStatusMessage = function(orderId, title, status, message, body) {
 				"body" : body,
 				"title" : title
 			},
-			"data" : {
-				"message" : message,
-				"title" : title,
-				"status" : status
-			}
+			"data" : data
 		}
 	};
 	return note;
@@ -113,7 +114,7 @@ var sendGCMNotification = function (message){
 exports.notifyOrderUpdated = function *(orderId, msgTarget){
 	debug('notifyOrderUpdated');
 	var msg = setOrderStatusMessage(orderId, msgTarget.title, 
-	          msgTarget.status, msgTarget.message, msgTarget.body);
+	          msgTarget.status, msgTarget.message, msgTarget.body, msgTarget.data);
 	debug(msg);
 	debug('..sending notification..');
 	var notified = {};

@@ -3,6 +3,9 @@ var fs = require('fs');
 var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('requestretry');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 
 const DELETE = 'DELETE';
@@ -160,8 +163,8 @@ var requestEntities = function *(flow, method, data, id, params) {
       }
   }
   debug('requestEntities: ...returning')
-  debug(result)
-  return result
+  debug(result);
+  return result;
 }
 
 exports.createCompany=function *(sfezCompany) {

@@ -1,9 +1,11 @@
-//var debug = require('debug')('moltin.server.controller'),
-   var sts = require('./security.server.controller'),
-    config = require('../../config/config'),
-    request = require('request');
+var debug = require('debug')('payment');
+var sts = require('./security.server.controller');
+var config = require('../../config/config');
+var request = require('request');
+var uuid = require('uuid');
+var winston = require('winston');
 
-    var uuid = require('uuid');
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 const DELETE = 'DELETE';
 const GET = 'GET';

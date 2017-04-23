@@ -31,8 +31,7 @@ function *simplifyDetails(orderDetail) {
     debug('amount')
     var itemDetail = {
       title : item.product.value,
-      quantity : item.quantity,
-
+      quantity : item.quantity
     }
     if (item.product.data.modifiers) {
       debug('modifiers')
@@ -486,6 +485,13 @@ function *afterUpdateOrderHistory(orderHistory) {
           default:
               throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
       }
+      debug(msgTarget);
+      var supplemental = {};
+      supplemental.unit_id = orderHistory.unit_id;
+      supplemental.company_id = orderHistory.company_id;
+      supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
+      supplemental.order_id = orderHistory.id;
+      msgTarget.data = supplemental;
       msgTarget.status = status
       
       debug(msgTarget);

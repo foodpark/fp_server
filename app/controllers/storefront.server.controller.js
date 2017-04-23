@@ -1,11 +1,14 @@
-var User = require ('../models/user.server.model'),
-    Company = require ('../models/company.server.model'),
-    Customer = require ('../models/customer.server.model'),
-    auth = require('./authentication.server.controller'),
-    msc = require('./moltin.server.controller'),
-    config = require('../../config/config'),
-    debug = require('debug')('storefront');
+var User = require ('../models/user.server.model');
+var Company = require ('../models/company.server.model');
+var Customer = require ('../models/customer.server.model');
+var auth = require('./authentication.server.controller');
+var msc = require('./moltin.server.controller');
+var config = require('../../config/config');
+var debug = require('debug')('storefront');
 var _ = require('lodash');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 var getErrorMessage = function(err) {
     var message = '';
@@ -311,6 +314,7 @@ exports.createMenuItem=function *(next) {
     debug('...user authorized')
     debug(this.category.company.data.id +'=='+ this.company.order_sys_id)
     if (this.category.company.data.id == this.company.order_sys_id) {
+      debug('..category and company match')
       /** MOLTIN PRODUCT FIELDS
       Name	Slug	Field Type	Required?	Unique?	Title Column?
       *SKU	sku	string	Yes	Yes	No
@@ -333,17 +337,18 @@ exports.createMenuItem=function *(next) {
       Brand	brand	relationship	No	No	No
       *Tax Band	tax_band	tax-band	Yes	No	No
       *Company	company	relationship	Yes **/
-      const company = this.company
-      const title = this.body.title;
-      const price = this.body.price;
-      const status = this.body.status;
-      const category = this.category.id;
-      const description = this.body.description;
+      var company = this.company
+      var title = this.body.title;
+      var price = this.body.price;
+      var status = this.body.status;
+      var category = this.category.id;
+      var description = this.body.description;
 
       if (!status) status = 1; // live by default TODO: turn draft by default when menu availability completed
       if (!title) {return res.status(422).send({ error: 'Title is required.'});}
       if (!price) {return res.status(422).send({ error: 'Price is required.'});}
       if (!description) {return res.status(422).send({ error: 'Description is required.'});}
+      debug('..creating menu item');
       try {
         var menuItem = yield msc.createMenuItem(company, title, status, price, category, description)
       } catch (err) {
@@ -506,7 +511,7 @@ exports.uploadMenuItemImage=function *(next) {
         console.error('uploadMenuItemImage: error uploading menu item image: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    debug(this.menuItem.company.data.id +'=='+ this.company.orderSysId)
+    debug(this.menuItem.company.data.id +'=='+ this.company.order_sys_id)
     if (this.menuItem.company.data.id == this.company.order_sys_id) {
       var data = this.body;
       debug(data)
