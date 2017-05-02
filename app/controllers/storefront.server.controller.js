@@ -193,7 +193,7 @@ exports.createCategory=function *(next) {
     var user = this.passport.user
     debug(user)
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('error creating category: Owner '+ user.id + 'not associated with '+ this.company.name)
+        console.error('error creating category: Owner '+ user.id + ' not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
     var title = this.body.title;

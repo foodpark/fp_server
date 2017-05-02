@@ -98,8 +98,8 @@ var sendRequest = function *(url, method, data) {
     var token = yield getBearerToken()
     debug('...token '+ token)
   } catch (err) {
-    console.error(err)
-    throw (err)
+    console.error(err);
+    throw (err);
   }
   return new Promise(function(resolve, reject) {
     request({
@@ -122,12 +122,20 @@ var sendRequest = function *(url, method, data) {
         bearerToken = '';
         reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
-      var result = res.body.result
-      if (method == GET) result = JSON.parse(res.body).result
-      if (method == DELETE) result = JSON.parse(res.body)
-      resolve (result)
-      return;
-
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        debug('..Moltin call successful');
+        var result = res.body.result;
+        if (method == GET) result = JSON.parse(res.body).result;
+        if (method == DELETE) result = JSON.parse(res.body);
+        debug(result);
+        resolve (result)
+        return;
+      } else { // something went wrong
+        debug('..something went wrong with call to Moltin');
+        var errors = res.body;
+        debug(errors);
+        throw(errors);
+      }
     })
     .catch( function (err) {
       console.error("...statusCode: " + err.statusCode);

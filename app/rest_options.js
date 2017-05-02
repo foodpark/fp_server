@@ -15,11 +15,24 @@ var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
+var winston = require('winston');
+
+var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 
 function *simplifyDetails(orderDetail) {
-  var items = orderDetail
-  debug('array length '+ items.length)
+  logger.info('Simplifying order details', {fn: 'simplifyDetails', 
+    user_id: this.passport.user.id, role: this.passport.user.role});
+  if (!orderDetail) {
+    logger.error('No order details provided', 
+        {fn: 'simplifyDetails', user_id: this.passport.user.id, role: this.passport.user.role, 
+         error: 'Missig order details'});
+    return '';
+  }
+  var items = orderDetail;
+  debug('array length '+ items.length);
+  logger.info('Processing '+ items.length + ' items in order', {fn: 'simplifyDetails', 
+    user_id: this.passport.user.id, role: this.passport.user.role, num_items: items.length});
   var menuItems = {};
   for (i = 0; i < items.length; i++ ) {
     item = items[i];
@@ -76,14 +89,16 @@ function *simplifyDetails(orderDetail) {
     menuItems[item.id] = itemDetail;
     debug(menuItems);
   }
+  logger.info('Order details simplified', {fn: 'simplifyDetails', 
+    user_id: this.passport.user.id, role: this.passport.user.role});
   debug(menuItems);
   return menuItems;
 }
 
 function * calculateDeliveryPickup(unitId, deliveryTime) {
-  debug('calculateDeliveryPickup');
-  debug('..unit id '+ unitId);
-  debug('..desired delivery '+ deliveryTime);
+  logger.info('Calculating delivery pickup', {fn: 'calculateDeliveryPickup', 
+    user_id: this.passport.user.id, role : this.passport.user.role, unit_id: unitId, 
+    delivery_time: deliveryTime});
   var pickup = '';
   if (deliveryTime) { 
     var delivery = new Date(deliveryTime);
@@ -93,8 +108,9 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
       debug('..unit');
       debug(unit);
     } catch (err) {
-      console.error('calculateDeliveryPickup: Error getting unit');
-      console.error(err);
+      logger.error('Error getting unit', 
+          {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, 
+          role: this.passport.user.role, error: err});
       throw err;
     }
     if (unit.delivery_time_offset) {
@@ -104,6 +120,10 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
     }
     debug('..delivery pickup time is '+ pickup.toISOString());
   }
+  logger.info('Delivery pickup time '+ pickup.toIsoString(), 
+    {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role : 
+    this.passport.user.role, unit_id: unitId, delivery_time: deliveryTime, 
+    pickup_time: pickup.toISOString()});
   return pickup;
 }
 
@@ -111,12 +131,21 @@ function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory');
   debug(this.resteasy.object);
   debug('..operation '+ this.resteasy.operation)
+
+  logger.info('Prepare to save order '+ pickup.toIsoString(), 
+    {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role : 
+    this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id}); 
+
+  var osoId = this.resteasy.object.order_sys_order_id;
+  if (! this.resteasy.object.order_sys_order_id) { // is required
+    logger.error('No order id provided for e-commerce system', 
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+        role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
+    throw new Error('order_sys_order_id is required', 422);
+  }
+
   if (this.resteasy.operation == 'create') {
     debug('...create')
-    if (! this.resteasy.object.order_sys_order_id) { // is required
-      console.error('beforeSaveOrderHistory: No order id for the ordering system')
-      throw new Error('order_sys_order_id is required', 422);
-    }
     debug('..getting customer name')
     try {
       debug('..user ')
@@ -126,8 +155,9 @@ function *beforeSaveOrderHistory() {
       debug('..customer')
       debug(customer)
     } catch (err) {
-      console.error('beforeSaveOrderHistory: error getting customer');
-      console.error(err);
+      logger.error('Error getting customer', 
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+          role: this.passport.user.role, order_sys_order_id: osoId, error: err});
       throw err;
     }
     var customerName = user.first_name + " " + user.last_name.charAt(0)
@@ -135,6 +165,9 @@ function *beforeSaveOrderHistory() {
     this.resteasy.object.customer_name = customerName;
     this.resteasy.object.customer_id = customer.id;
 
+    logger.info('Order by customer '+ customerName, 
+      {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role : 
+      this.passport.user.role, order_sys_order_id: osoId});
     //set company
     debug('..get company id');
     if (!this.resteasy.object.company_id) {
@@ -143,41 +176,53 @@ function *beforeSaveOrderHistory() {
       debug(coId)
       this.resteasy.object.company_id = coId[1];
     }
+    var coId = this.resteasy.object.company_id;
     debug('..getting company name')
     var company = '';
     try {
       debug('..company id ');
-      debug(this.resteasy.object.company_id);
-      company = (yield Company.getSingleCompany(this.resteasy.object.company_id))[0];
+      debug(coId);
+      company = (yield Company.getSingleCompany(coId))[0];
       debug('..company');
       debug(company);
     } catch (err) {
-      console.error('beforeSaveOrderHistory: error getting company');
-      console.error(err);
+      logger.error('Error getting company', 
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, error: err});
       throw err;
     }
     debug("..company name is "+ company.name);
     this.resteasy.object.company_name = company.name;
 
+    logger.info('Order for company '+ companyName, 
+      {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+      role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId});
+
     //set unit
     debug('..get unit id');
+    var unId = '';
     if (!this.resteasy.object.unit_id) {
       debug(this.params.context)
-      var unId = this.params.context.match(/units\/(\d+)/)
+      unId = this.params.context.match(/units\/(\d+)/)
       debug(unId)
       this.resteasy.object.unit_id = unId[1];
     }
+    logger.info('Order for unit '+ unId, 
+      {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+      role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId});
 
     // get order details and streamline for display
-    var moltin_order_id = this.resteasy.object.order_sys_order_id
+    var moltin_order_id = osoId
     debug('..order sys order id: '+ moltin_order_id)
     try {
       var order = yield msc.findOrder(moltin_order_id)
       var order_details = yield msc.getOrderDetail(moltin_order_id)
       order_details = yield simplifyDetails(order_details)
     } catch (err) {
-      console.error('beforeSaveOrderHistory: Error retreiving order items from ecommerce system');
-      console.error(err)
+      logger.error('Error retrieving order items from ecommerce system ',
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+        role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+        error: err});
       throw(err)
     }
     debug('...total amount '+ order.totals.formatted.total)
@@ -195,16 +240,21 @@ function *beforeSaveOrderHistory() {
     if (this.resteasy.object.for_delivery) {
       debug('..delivery order')
       if (!this.resteasy.object.delivery_address_id) {
-        console.error('No delivery address specified')
-        throw new Error('No delivery address specified', 422);
+        logger.error('No delivery address provided',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+          error: 'No delivery address provided'});
+        throw new Error('No delivery address provided', 422);
       }
       // Get and streamline address for display
       var addrDetails = '';
       try {
         addrDetails = (yield DeliveryAddress.getSingleAddress(this.resteasy.object.delivery_address_id))[0];
       } catch (err) {
-        console.error('beforeSaveOrderHistory: Error getting delivery address');
-        console.error(err)
+        logger.error('Error getting delivery address',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+          delivery_address_id: this.resteasy.object.delivery_address_id, error: err});
         throw(err)
       }
       debug(addrDetails);
@@ -227,8 +277,11 @@ function *beforeSaveOrderHistory() {
           pickup = yield calculateDeliveryPickup(this.resteasy.object.unit_id, 
                                                  this.resteasy.object.desired_delivery_time);
         } catch (err) {
-          console.error('beforeSaveOrderHistory: Error calculating delivery pickup time');
-          console.error(err);
+          logger.error('Error calculating delivery pickup time',
+            {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+            role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+            delivery_address_id: this.resteasy.object.delivery_address_id, 
+            delivery_time: deliveryTime, error: err});
           throw (err);
         }
         this.resteasy.object.desired_pickup_time = pickup;
@@ -245,31 +298,50 @@ function *beforeSaveOrderHistory() {
       // this will modify this.resteasy.object
       yield payload.limitOrderHistPayloadForPut(this.resteasy.object)
     } catch (err) {
-      console.error(err)
+      logger.error('Error limiting order payload for PUT',
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+        role: this.passport.user.role, order_sys_order_id: osoId, error: err});
       throw(err)
     }
     debug('..limited payload is..')
     debug(this.resteasy.object)
     if (this.resteasy.object.status) {
+      var newStat = this.resteasy.object.status;
+      debug('..status sent is '+ newStat)
+      logger.info('PUT includes a status update '+ unId, 
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+        role: this.passport.user.role, order_sys_order_id: osoId, new_status: newStat});
       try {
         var savedStatus = (yield OrderHistory.getStatus(this.params.id))[0]
       } catch (err) {
-        console.error(err)
+        logger.error('Error getting prior order status',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+          role: this.passport.user.role, order_sys_order_id: osoId,
+          new_status: this.resteasy.object.status,
+          delivery_time: deliveryTime, error: 'Error getting prior order status'});
         throw(err)
       }
-      var newStat = this.resteasy.object.status
       debug (savedStatus)
-      debug('..status sent is '+ newStat)
+      logger.info('Previous statuses are '+ savedStatus, 
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+        role: this.passport.user.role, order_sys_order_id: osoId, new_status: newStat, 
+        prev_status: savedStat});
       if (!savedStatus.status[newStat]) {
         // add subsequent state
         savedStatus.status[newStat] = ''
       } // else previously set
       debug(savedStatus)
-      this.resteasy.object.status = savedStatus.status
+      this.resteasy.object.status = savedStatus.status;
     } else {
       debug('...not a status update')
+      logger.info('PUT does not involve a status update '+ unId, 
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+        role: this.passport.user.role, order_sys_order_id: osoId});
     }
   }
+  logger.info('Pre-flight for order save completed '+ unId, 
+    {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+    role: this.passport.user.role, order_sys_order_id: osoId});
   debug('returning from beforeSaveOrderHistory');
 }
 
@@ -277,16 +349,29 @@ function *beforeSaveOrderHistory() {
 function *afterCreateOrderHistory(orderHistory) {
   debug('afterCreateOrderHistory')
   debug(orderHistory);
+  var meta = {fn: 'afterCreateOrderHistory',user_id: this.passport.user.id,role: this.passport.user.role}
+  meta.order_id = orderHistory.id;
+  meta.company_id = orderHistory.company_id;
+  meta.unit_id = orderHistory.unit_id;
+  meta.customer_id = orderHistory.customer_id;
+  var osoId = orderHistory.order_sys_order_id;
+  meta.order_sys_order_id = osoId;
+
+  logger.info('Post order creation processing started for order '+ orderHistory.id, meta);
   var unit = '';
   try {
     unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
   } catch (err) {
-    console.error('afterCreateOrderHistory: error retrieving unit');
+    var ue = meta;
+    ue.error = err;
+    logger.error('Error error retrieving unit', ue);
     throw err;
   }
   debug(unit);
   if (!unit.gcm_id && !unit.fcm_id) {
-    console.error('afterCreateOrderHistory: No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+    var fge = meta;
+    fge.error = 'No fcm/gcm for unit';
+    logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, fge);
     throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
 
@@ -294,7 +379,9 @@ function *afterCreateOrderHistory(orderHistory) {
   try {
     customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
   } catch (err) {
-    console.error('afterCreateOrderHistory: error retrieving customer');
+    var ce = meta;
+    ce.error = err;
+    logger.error('Error retrieving customer', ce);
     throw err;
   }
   debug(customer);
@@ -318,11 +405,17 @@ function *afterCreateOrderHistory(orderHistory) {
     status : "order_requested"
   }
   debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
+
+  var mm = meta;
+  mm.message = msg;
+  logger.info('sending notification to unit '+ orderHistory.unit_id, mm);
+
   var orderNum = orderHistory.order_sys_order_id;
   orderNum = orderNum.substring(orderNum.length-4);
   yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
+  logger.info('Unit '+ orderHistory.unit_id +' notified of order '+ orderHistory.id, meta);
   debug(timestamp.now()); 
   var hash = {
     status : {
@@ -332,6 +425,7 @@ function *afterCreateOrderHistory(orderHistory) {
   this.resteasy.queries.push(
     this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
   );
+  logger.info('Post order creation processing completed for order '+ orderHistory.id, meta);
 }
 
 var display = {
@@ -351,6 +445,16 @@ var display = {
 function *afterUpdateOrderHistory(orderHistory) {
   debug('afterUpdateOrderHistory')
 
+  var meta = {fn: 'afterUpdateOrderHistory',user_id: this.passport.user.id,role: this.passport.user.role}
+  meta.order_id = orderHistory.id;
+  meta.company_id = orderHistory.company_id;
+  meta.unit_id = orderHistory.unit_id;
+  meta.customer_id = orderHistory.customer_id;
+  var osoId = orderHistory.order_sys_order_id;
+  meta.order_sys_order_id = osoId;
+  meta.status = orderHistory.status;
+  
+  logger.info('Post order update processing started for order '+ orderHistory.id, meta);
   var deviceId = ''
   var title = ''
   var orderHistoryStatus = orderHistory.status
@@ -362,12 +466,15 @@ function *afterUpdateOrderHistory(orderHistory) {
     debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
+      logger.info('Notification not yet sent for status '+status+' for order '+ orderHistory.id, meta); 
       debug('...status '+ status)
       var customer ='';
       try {
         customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
       } catch (err) {
-        console.error('afterUpdateOrderHistory: error retrieving customer '+ orderHistory.customer_id);
+        var ce = meta;
+        ce.error = err;
+        logger.error('Error retrieving customer ', orderHistory.customer_id, ce);
         throw err;
       }
       debug(customer);
@@ -375,7 +482,9 @@ function *afterUpdateOrderHistory(orderHistory) {
       try {
         user = (yield User.getSingleUser(customer.user_id))[0];
       } catch (err) {
-        console.error('afterUpdateOrderHistory: error retrieving user '+ customer.user_id);
+        var ue = meta;
+        ue.error = err;
+        logger.error('Error retrieving user ', customer.user_id, ue);
         throw err;
       }
       debug(user);
@@ -383,18 +492,23 @@ function *afterUpdateOrderHistory(orderHistory) {
       try {
         company = (yield Company.getSingleCompany(orderHistory.company_id))[0];
       } catch (err) {
-        console.error('afterUpdateOrderHistory: error retrieving company '+ orderHistory.company_id);
+        var coe = meta;
+        coe.error = err;
+        logger.error('Error retrieving company ', orderHistory.company_id, coe);
         throw err;
       }
       debug(company);
       var msgTarget = { order_id : orderHistory.id }
       if (status == 'order_paid' || status == 'pay_fail') {
-        debug('...status update from customer. Notify unit')
+        debug('...status update from customer. Notify unit');
+        logger.info('Customer order update. Notify unit', meta); 
         // get unit 
         try {
           var unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
         } catch (err) {
-          console.error('afterUpdateOrderHistory: error retrieving unit '+ orderHistory.unit_id);
+          var eru = meta;
+          eru.error = err;
+          logger.error('Error retrieving unit ', orderHistory.unit_id, eru);
           throw err;
         }
         debug('..Unit gcm id is '+ unit.gcm_id)
@@ -403,7 +517,8 @@ function *afterUpdateOrderHistory(orderHistory) {
         msgTarget.gcmId = unit.gcm_id
         msgTarget.fcmId = unit.fcm_id
       } else {
-        debug('...status update from unit. Notify customer '+ orderHistory.customer_id)
+        debug('...status update from unit. Notify customer '+ orderHistory.customer_id);
+        logger.info('Unit order update. Notify customer', meta); 
         // get customer device id
         debug('..Customer gcm id is '+ customer.gcm_id)
         msgTarget.to = 'customer' 
@@ -412,10 +527,12 @@ function *afterUpdateOrderHistory(orderHistory) {
         msgTarget.fcmId = customer.fcm_id
       }
       if (!msgTarget.gcmId && !msgTarget.fcmId){
-        console.error('afterUpdateOrderHistory: Cannot notify! No fcm/gcm id for ' + msgTarget.to +' '+ msgTarget.toId)
-        throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to)
+        var fge = meta;
+        fge.error = 'No fcm/gcm for '+ msgTarget.to;
+        logger.error('No fcm/gcm id for '+ msgTarget.to + ' ' + msgTarget.toId, fge);
+        throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to);
       }
-      var orderNum = orderHistory.order_sys_order_id;
+      var orderNum = osoId;
       orderNum = orderNum.substring(orderNum.length-4);
       debug('..order number '+ orderNum);
       var custName = user.first_name +' '+ user.last_name.charAt(0);
@@ -482,7 +599,10 @@ function *afterUpdateOrderHistory(orderHistory) {
               msgTarget.body = msgTarget.message;
               break;
           default:
-              throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
+            var eso = meta;
+            eso.error = 'Unknown status for order ';
+            logger.error('Unknown status for order ', fge);
+            throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
       }
       debug(msgTarget);
       var supplemental = {};
@@ -495,7 +615,16 @@ function *afterUpdateOrderHistory(orderHistory) {
       
       debug(msgTarget);
       debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
+
+
+      var mt = meta;
+      mt.message_payload = msg;
+      logger.info('sending notification to unit '+ orderHistory.unit_id, mt);
+
       yield push.notifyOrderUpdated(orderNum, msgTarget);
+
+      logger.info(msgTarget.to +' notified of order '+ orderHistory.id, meta);
+
       debug('..returned from notifying');
 
       // record notification time
@@ -510,6 +639,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
     );
   }
+  logger.info('Post order update processing completed for order '+ orderHistory.id, meta);
 }
 
 function *beforeSaveReview() {

@@ -10,23 +10,30 @@ chai.use(chaiHttp);
 
 // TEST COMPANY CREATION FUNCTIONS
 
+var tests = "- Authentication Tests - ";
+
 // UNAUTHENTICATED ROUTES
 // Test create of company
+var ts = Date.now();
 var userId = '';
 var companyId = '';
+var defaultCat = ''; 
+var dailySpecialCat = '';
 var deliveryChargeCat = '';
 var deliveryChargeItem = '';
+var authName = 'auth.test'+ ts;
+var companyName = 'Auth Test Co '+ ts;
 
-describe('POST /auth/register', function() {
+describe(tests +' POST /auth/register', function() {
   it('should register company and return JWT token', function(done) {
     chai.request(server)
     .post('/auth/register')
     .send( {
         "first_name": "Arthur",
         "last_name": "Test",
-        "company_name": "Auth Test Co 7",
-        "email": "auth.test7@gmail.com",
-        "password": "auth.test7",
+        "company_name": companyName,
+        "email": authName+"@gmail.com",
+        "password": authName,
         "role": "OWNER"
     })
     .end(function (err, res) {
@@ -40,7 +47,7 @@ describe('POST /auth/register', function() {
       userId = res.body.user.id;
 
       res.body.user.should.have.property('username');
-      res.body.user.username.should.equal('auth.test7@gmail.com');
+      res.body.user.username.should.equal(authName+'@gmail.com');
       res.body.user.should.have.property('role');
       res.body.user.role.should.equal('OWNER');
       res.body.user.should.have.property('company_id');
@@ -54,22 +61,53 @@ describe('POST /auth/register', function() {
     chai.request(server)
     .get('/api/v1/mol/companies/' + companyId)
     .end(function(err, res) {
+      console.log(res.status);
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('name');
-      res.body.name.should.equal('Auth Test Co 7');
+      res.body.name.should.equal(companyName);
+      res.body.should.have.property('default_cat');
+      res.body.should.have.property('daily_special_cat_id');
       res.body.should.have.property('delivery_chg_cat_id');
       res.body.should.have.property('delivery_chg_item_id');
 
+      defaultCat = res.body.default_cat;
+      dailySpecialCat = res.body.daily_special_cat_id;
       deliveryChargeCat = res.body.delivery_chg_cat_id;
       deliveryChargeItem = res.body.delivery_chg_item_id;
-      console.log("delivery charge cat "+ deliveryChargeCat)
-      console.log("delivery charge item "+ deliveryChargeItem)
+      console.log("default category "+ defaultCat);
+      console.log("daily special cat "+ dailySpecialCat);
+      console.log("delivery charge cat "+ deliveryChargeCat);
+      console.log("delivery charge item "+ deliveryChargeItem);
       done();
     });
   });
-  it('should read "Delivery Charge Category" (+ '+ deliveryChargeCat +') for company '+ companyId, function(done) {
+  it('should read "Default Category" ', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/' + companyId +'/categories/'+ defaultCat)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal(companyName + ' Menu');
+      done();
+    });
+  });
+  it('should read "Daily Special Category" ', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/' + companyId +'/categories/'+ dailySpecialCat)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('title');
+      res.body.title.should.equal('Daily Specials');
+      done();
+    });
+  });
+  it('should read "Delivery Charge Category" ', function(done) {
     chai.request(server)
     .get('/api/v1/mol/companies/' + companyId +'/categories/'+ deliveryChargeCat)
     .end(function(err, res) {
@@ -81,7 +119,7 @@ describe('POST /auth/register', function() {
       done();
     });
   });
-  it('should read "Delivery Charge Item" (+ '+ deliveryChargeItem +') for company '+ companyId, function(done) {
+  it('should read "Delivery Charge Item" ', function(done) {
     chai.request(server)
     .get('/api/v1/mol/companies/' + companyId +'/menuitems/'+ deliveryChargeItem)
     .end(function(err, res) {
@@ -98,28 +136,28 @@ describe('POST /auth/register', function() {
 token = '';
 
 // Clean up
-describe('Clean up SFEZ/Moltin company, SFEZ user, Moltin category and product for delivery charge', function() {
+describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and product for delivery charge', function() {
   it('should login and retrieve JWT token', function(done) {
     chai.request(server)
     .post('/auth/login')
     .send({
-        "username": "auth.test7@gmail.com",
-        "password": "auth.test7"
+        "username": authName+"@gmail.com",
+        "password": authName
     })
     .end(function (err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object')
       // Save the JWT token
+      res.body.should.have.property('token');
       token = res.body.token;
 
       res.body.should.have.property('user');
       res.body.user.should.have.property('id');
       res.body.user.should.have.property('username');
-      res.body.user.username.should.equal('auth.test7@gmail.com');
+      res.body.user.username.should.equal(authName+'@gmail.com');
       res.body.user.should.have.property('role');
       res.body.user.role.should.equal('OWNER');
-      res.body.should.have.property('token');
       done();
     });
   });

@@ -6,3 +6,8 @@ node_modules
 # Database backups #
 ####################
 backup*
+
+# Log files #
+####################
+*access.log
+*error.log 
