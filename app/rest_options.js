@@ -133,12 +133,6 @@ function *beforeSaveOrderHistory() {
   debug(this.resteasy.object);
   debug('..operation '+ this.resteasy.operation)
   debug(this.passport.user.role)
-  if (this.passport.user.role != 'CUSTOMER') {
-    logger.error('User unauthorized', 
-        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
-        role: this.passport.user.role, error: 'User unauthorized'});
-    throw new Error('User unauthorized', 401);
-  }
   logger.info('Prepare to save order ', 
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role : 
     this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id}); 
@@ -146,6 +140,12 @@ function *beforeSaveOrderHistory() {
 
 
   if (this.resteasy.operation == 'create') {
+    if (this.passport.user.role != 'CUSTOMER') {
+      logger.error('User unauthorized', 
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+          role: this.passport.user.role, error: 'User unauthorized'});
+      throw new Error('User unauthorized', 401);
+    }
     var osoId = this.resteasy.object.order_sys_order_id;
     if (! this.resteasy.object.order_sys_order_id) { // is required
       logger.error('No order id provided for e-commerce system', 

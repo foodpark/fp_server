@@ -8,11 +8,11 @@ module.exports = function() {
         debug('logging in user '+ username)
         User.getUserByUsername(username, function(err, results) {
           if (err) {
-            console.error('error during login: '+ err)
+            console.error('error during login: '+ err);
             return done(err);
           }
-          var user = results[0]
-          debug(user)
+          var user = results[0];
+          debug(user);
           if (!user) {
             console.error('error during login: could not find user')
             return done(null, false, {message: 'We could not verify your login details. Really sorry. Please try again.'});
