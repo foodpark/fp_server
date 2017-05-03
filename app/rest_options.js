@@ -132,21 +132,28 @@ function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory');
   debug(this.resteasy.object);
   debug('..operation '+ this.resteasy.operation)
-
-  logger.info('Prepare to save order '+ pickup.toIsoString(), 
+  debug(this.passport.user.role)
+  if (this.passport.user.role != 'CUSTOMER') {
+    logger.error('User unauthorized', 
+        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+        role: this.passport.user.role, error: 'User unauthorized'});
+    throw new Error('User unauthorized', 401);
+  }
+  logger.info('Prepare to save order ', 
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role : 
     this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id}); 
 
-  var osoId = this.resteasy.object.order_sys_order_id;
-  if (! this.resteasy.object.order_sys_order_id) { // is required
-    logger.error('No order id provided for e-commerce system', 
-        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
-        role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
-    throw new Error('order_sys_order_id is required', 422);
-  }
+
 
   if (this.resteasy.operation == 'create') {
-    debug('...create')
+    var osoId = this.resteasy.object.order_sys_order_id;
+    if (! this.resteasy.object.order_sys_order_id) { // is required
+      logger.error('No order id provided for e-commerce system', 
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+          role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
+      throw new Error('order_sys_order_id is required', 422);
+    }
+      debug('...create')
     debug('..getting customer name')
     try {
       debug('..user ')
@@ -195,7 +202,7 @@ function *beforeSaveOrderHistory() {
     debug("..company name is "+ company.name);
     this.resteasy.object.company_name = company.name;
 
-    logger.info('Order for company '+ companyName, 
+    logger.info('Order for company '+ company.name, 
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId});
 
@@ -218,7 +225,7 @@ function *beforeSaveOrderHistory() {
     try {
       var order = yield msc.findOrder(moltin_order_id)
       var order_details = yield msc.getOrderDetail(moltin_order_id)
-      order_details = yield simplifyDetails(order_details)
+      order_details = yield simplifyDetails.call(this, order_details)
     } catch (err) {
       logger.error('Error retrieving order items from ecommerce system ',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
@@ -301,7 +308,7 @@ function *beforeSaveOrderHistory() {
     } catch (err) {
       logger.error('Error limiting order payload for PUT',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-        role: this.passport.user.role, order_sys_order_id: osoId, error: err});
+        role: this.passport.user.role, order_id: this.params.id, error: err});
       throw(err)
     }
     debug('..limited payload is..')
@@ -309,9 +316,9 @@ function *beforeSaveOrderHistory() {
     if (this.resteasy.object.status) {
       var newStat = this.resteasy.object.status;
       debug('..status sent is '+ newStat)
-      logger.info('PUT includes a status update '+ unId, 
+      logger.info('PUT includes a status update ', 
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-        role: this.passport.user.role, order_sys_order_id: osoId, new_status: newStat});
+        role: this.passport.user.role, order_id: this.params.id, new_status: newStat});
       try {
         var savedStatus = (yield OrderHistory.getStatus(this.params.id))[0]
       } catch (err) {
@@ -323,10 +330,9 @@ function *beforeSaveOrderHistory() {
         throw(err)
       }
       debug (savedStatus)
-      logger.info('Previous statuses are '+ savedStatus, 
+      logger.info('Got previous statuses', 
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-        role: this.passport.user.role, order_sys_order_id: osoId, new_status: newStat, 
-        prev_status: savedStat});
+        role: this.passport.user.role, order_id: this.params.id, new_status: newStat});
       if (!savedStatus.status[newStat]) {
         // add subsequent state
         savedStatus.status[newStat] = ''
@@ -405,18 +411,21 @@ function *afterCreateOrderHistory(orderHistory) {
     body : msg,
     status : "order_requested"
   }
-  debug('sending notification to unit '+ unit.name +' ('+ unit.id +')')
-
+  debug('sending notification to unit '+ unit.id);
+  debug('hello');
+  debug(meta);
   var mm = meta;
+  debug(mm);
   mm.message = msg;
-  logger.info('sending notification to unit '+ orderHistory.unit_id, mm);
+  debug(mm);
+  logger.info('sending notification to unit '+ unit.id, mm);
 
   var orderNum = orderHistory.order_sys_order_id;
   orderNum = orderNum.substring(orderNum.length-4);
   yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
-  logger.info('Unit '+ orderHistory.unit_id +' notified of order '+ orderHistory.id, meta);
+  logger.info('Unit '+ unit.id +' notified of order '+ orderHistory.id, meta);
   debug(timestamp.now()); 
   var hash = {
     status : {
@@ -619,7 +628,8 @@ function *afterUpdateOrderHistory(orderHistory) {
 
 
       var mt = meta;
-      mt.message_payload = msg;
+      mt.message_payload = msgTarget.message;
+
       logger.info('sending notification to unit '+ orderHistory.unit_id, mt);
 
       yield push.notifyOrderUpdated(orderNum, msgTarget);
@@ -962,7 +972,7 @@ function *afterUpdateReviewApproval(approval) {
 
 function *afterReadOrderHistory(orderHistory) {
   debug('afterReadOrderHistory')
-  if (orderHistory.order_sys_order_id && !orderHistory.order_detail) {
+  if (orderHistory && orderHistory.order_sys_order_id && !orderHistory.order_detail) {
     try {
       var moltin_order_items = yield msc.getOrderDetail(orderHistory.order_sys_order_id)
       var details = yield simplifyDetails(moltin_order_items)
@@ -1165,7 +1175,9 @@ module.exports = {
       } else if (this.resteasy.operation == 'index') {
         debug('..read');
         if (this.resteasy.table == 'order_history') {
-          yield afterReadOrderHistory.call(this, res[0]);
+          if (this.params.id) { // specific order history
+            yield afterReadOrderHistory.call(this, res[0]);
+          } // else retrieve all
         }
       }
     },

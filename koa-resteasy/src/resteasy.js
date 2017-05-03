@@ -180,8 +180,8 @@ function *create(next) {
     hash['created_at'] = this.resteasy.knex.raw("now() at time zone 'utc'");
   }
 
-  yield hook(this, 'beforeSave');
   yield hook(this, 'authorize', 'create', hash);
+  yield hook(this, 'beforeSave');
 
   queries.create(this.resteasy.query, hash);
 

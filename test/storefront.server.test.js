@@ -132,18 +132,16 @@ describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('array');
-      res.body[0].should.have.property('title');
-      res.body[0].title.should.equal('OptionItems');
       done();
     });
   });
 });
 
 // Test retrieval of a specific option category for specific menu item for Company and Category
-describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460953328933404891', function() {
+describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515', function() {
   it('should return "OptionItems" option category for BBQ Loaf for Grilla Cheez - Dinner category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460953328933404891')
+    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -158,25 +156,21 @@ describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
 });
 
 // Test retrieval of option items for an option category for specific menu item for Company and Category
-describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460953328933404891/optionitems', function() {
+describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515/optionitems', function() {
   it('should return option items for the "Option Items" option category for BBQ Loaf for Grilla Cheez - Dinner category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460953328933404891/optionitems')
+    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515/optionitems')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('array');
       res.body[0].should.have.property('title');
       res.body[0].title.should.equal('French Fries');
-      res.body[0].should.have.property('id');
-      res.body[0].id.should.equal('1460953332750221532');
       res.body[0].should.have.property('mod_price');
-      res.body[0].mod_price.should.equal('+5');
+      res.body[0].mod_price.should.equal('+5.00');
 
       res.body[1].should.have.property('title');
       res.body[1].title.should.equal('Cole Slaw');
-      res.body[1].should.have.property('id');
-      res.body[1].id.should.equal('1460953498047742173');
       res.body[1].should.have.property('mod_price');
       res.body[1].mod_price.should.equal('+2');
 
@@ -405,10 +399,10 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/categories/1463313172281688785
 });
 
 token = ''
-mochaId = ''
+var ocId = ''
 
-// Test CRUD of an Option Category for a specific Company/Menu Item
-describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories', function() {
+// Test CRU of an Option Category for a specific Company/Menu Item
+describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories', function() {
   it('should login and retrieve JWT token', function(done) {
     chai.request(server)
     .post('/auth/login')
@@ -442,7 +436,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       res.should.be.json;
       res.body.should.be.a('object');
       // Save the newly created id
-      mochaId = res.body.id
+      ocId = res.body.id
       res.body.should.have.property('title');
       res.body.title.should.equal('Pickles');
 
@@ -453,7 +447,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
   });
   it('should read "Pickles" option category in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ mochaId)
+    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -468,7 +462,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
   });
   it('should update "Pickles" option category to "PicklePickle" title in Moltin', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ mochaId)
+    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId)
     .set('Authorization', token)
     .field('title','PicklePickle')
     .end(function(err, res) {
@@ -483,55 +477,16 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       done();
     });
   });
-  it('should delete '+mochaId+': "PicklePickle" option category in Moltin', function(done) {
-    chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ mochaId)
-    .set('Authorization', token)
-    .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('status')
-      res.body.status.should.equal(true)
-      res.body.should.have.property('message')
-      res.body.message.should.equal('Modifier removed successfully');
-      done();
-    });
-  });
 });
 
 
-token = ''
-mochaId = ''
+var oiId = '';
 
-// Test CRUD of an Option Item for an Option Category for a specific Company/Menu Item
-describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460954109233332446/optionitems', function() {
-  it('should login and retrieve JWT token', function(done) {
+// Test CRU of an Option Item for an Option Category for a specific Company/Menu Item
+describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/<optcatId>/optionitems', function() {
+  it('should create option item "Spelt" for option category '+ ocId +' of the BBQ Loaf for Grilla Cheez in Moltin', function(done) {
     chai.request(server)
-    .post('/auth/login')
-    .field("username", "grilla@grillacheez.com")
-    .field("password", "grilla")
-    .end(function (err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object')
-      // Save the JWT token
-      token = res.body.token
-
-      res.body.should.have.property('user');
-      res.body.user.should.have.property('id');
-      res.body.user.id.should.equal(11025);
-      res.body.user.should.have.property('username');
-      res.body.user.username.should.equal('Grilla@grillacheez.com');
-      res.body.user.should.have.property('role');
-      res.body.user.role.should.equal('OWNER');
-      res.body.should.have.property('token');
-      done();
-    });
-  });
-  it('should create option item "Spelt" for the "Sauce" option category of the BBQ Loaf for Grilla Cheez in Moltin', function(done) {
-    chai.request(server)
-    .post('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460954109233332446/optionitems')
+    .post('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems')
     .set('Authorization', token)
     .field('title','Spelt')
     .field('mod_price','+0.00')
@@ -540,7 +495,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       res.should.be.json;
       res.body.should.be.a('object');
       // Save the newly created id
-      mochaId = res.body.id
+      oiId = res.body.id
       res.body.should.have.property('title');
       res.body.title.should.equal('Spelt');
 
@@ -549,9 +504,9 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       done();
     });
   });
-  it('should read "Spelt" option item for the "Sauce" option category of the  BBQ Loaf for Grilla Cheez in Moltin', function(done) {
+  it('should read "Spelt" option item for the '+ ocId +' option category of the  BBQ Loaf for Grilla Cheez in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460954109233332446/optionitems/'+ mochaId)
+    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ oiId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -566,7 +521,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
   });
   it('should update "Spelt" option item title to "Amaranth" ', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460954109233332446/optionitems/'+ mochaId)
+    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ oiId)
     .set('Authorization', token)
     .field('title','Amaranth')
     .end(function(err, res) {
@@ -581,54 +536,13 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       done();
     });
   });
-  it('should delete '+mochaId+': "Amaranth" option item ', function(done) {
-    chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1460954109233332446/optionitems/'+ mochaId)
-    .set('Authorization', token)
-    .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('status')
-      res.body.status.should.equal(true)
-      res.body.should.have.property('message')
-      res.body.message.should.equal('Variation removed successfully');
-      done();
-    });
-  });
 });
 
 
+var multiOiId = '';
 
-token = ''
-mochaId = ''
-var optItemsCat = ''
-
-// Test CRUD of multi-select Option Items for a specific Company/Menu Item
-describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/optionitems', function() {
-  it('should login and retrieve JWT token', function(done) {
-    chai.request(server)
-    .post('/auth/login')
-    .field("username", "grilla@grillacheez.com")
-    .field("password", "grilla")
-    .end(function (err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object')
-      // Save the JWT token
-      token = res.body.token
-
-      res.body.should.have.property('user');
-      res.body.user.should.have.property('id');
-      res.body.user.id.should.equal(11025);
-      res.body.user.should.have.property('username');
-      res.body.user.username.should.equal('Grilla@grillacheez.com');
-      res.body.user.should.have.property('role');
-      res.body.user.role.should.equal('OWNER');
-      res.body.should.have.property('token');
-      done();
-    });
-  });
+// Test CRU of multi-select Option Items for a specific Company/Menu Item
+describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/<optCatId>/optionitems', function() {
   it('should create option item "Iced" for the BBQ Loaf menu item in the Dinner category in Moltin', function(done) {
     chai.request(server)
     .post('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optionitems')
@@ -640,7 +554,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       res.should.be.json;
       res.body.should.be.a('object');
       // Save the newly created id
-      mochaId = res.body.id
+      multOiId = res.body.id
       res.body.should.have.property('title');
       res.body.title.should.equal('Iced');
 
@@ -649,27 +563,9 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       done();
     });
   });
-  it('should read the "OptionItems" option category for the BBQ Loaf menu item for Grilla Cheez Dinner category in Moltin', function(done) {
+  it('should read "Iced" option item for the BBQ Loaf menu item', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories')
-    .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('array');
-      res.body[0].should.have.property('id');
-      optItemsCat = res.body[0].id;
-
-      res.body[0].should.have.property('title');
-      res.body[0].title.should.equal('OptionItems');
-
-      res.body[0].should.have.property('type');
-      res.body[0].type.should.equal('single');
-      done();
-    });
-  });
-  it('should read "Iced" option item for the "OptionItems" option category for the BBQ Loaf menu item', function(done) {
-    chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ optItemsCat +'/optionitems/'+ mochaId)
+    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515/optionitems/'+ multOiId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -684,7 +580,7 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
   });
   it('should update "Iced" option item title to "Blended" ', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ optItemsCat +'/optionitems/'+ mochaId)
+    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515/optionitems/'+ multOiId)
     .set('Authorization', token)
     .field('title','Blended')
     .end(function(err, res) {
@@ -699,9 +595,16 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       done();
     });
   });
-  it('should delete the "Blended" option item ', function(done) {
+});
+
+
+
+
+// Test Delete of option category, option item, and multi-select Option Items for a specific Company/Menu Item
+describe(tests +' Delete /api/v1/mol/companies/1008/menuitems/<menutItemId>/optioncategories/<optCatId>/optionitems', function() {
+  it('should delete '+oiId+': "Amaranth" option item ', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ optItemsCat +'/optionitems/'+ mochaId)
+    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ oiId)
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);
@@ -714,9 +617,24 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/menuitems/1441751723700912337/
       done();
     });
   });
-  it('should delete "OptionItems" option category ', function(done) {
+  it('should delete the "Blended" option item ', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ optItemsCat )
+    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ multOiId)
+    .set('Authorization', token)
+    .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('object');
+      res.body.should.have.property('status')
+      res.body.status.should.equal(true)
+      res.body.should.have.property('message')
+      res.body.message.should.equal('Variation removed successfully');
+      done();
+    });
+  });
+  it('should delete  the '+ ocId +' option category ', function(done) {
+    chai.request(server)
+    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId )
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);
