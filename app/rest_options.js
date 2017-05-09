@@ -655,7 +655,30 @@ function *afterUpdateOrderHistory(orderHistory) {
 
 function *beforeSaveReview() {
   debug('beforeSaveReview: user is ')
-  debug(this.params.user)
+  debug(this.passport.user)
+  // Get the user's first name and initial of last name for the reviewer_name field.
+  // The code also handles cases where only a first name or only a last name is provided.
+  // Must have either defined, else a 403 Forbidden is returned, without saving the review.
+  var firstName = '';
+  var lastName = '';
+  var separator = '';
+  var initialLast = '';
+  if (this.passport.user.first_name) {
+    firstName = this.passport.user.first_name.trim();
+  }
+  if (this.passport.user.last_name) {
+    lastName = this.passport.user.last_name.trim();
+    if (lastName.length > 0) {
+      initialLast = lastName.charAt(0) + '.';
+    }
+  }
+  if (firstName == '' && lastName == '') {
+    this.throw('Save review rejected because a first name or last name is not defined in user account',403);
+  } else if (firstName.length >= 1 && initialLast.length >=1) {
+    separator = ' ';
+  }
+  this.resteasy.object.reviewer_name = firstName + separator + initialLast;
+
   var answersField = this.resteasy.object.answers;
   if (answersField) {
     var answers = answersField.answers;
