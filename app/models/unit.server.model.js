@@ -28,7 +28,7 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','companies.tags']).whereBetween('latitude', [minlat, maxlat]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id').on('query-response', function(response, obj, builder) {});
+  return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','companies.tags']).whereBetween('latitude', [minlat, maxlat]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id').on('query-response', function(response, obj, builder) {});
   //.then( function(response) {
   //  var idList = response.map(function(obj){
   //   return obj['unit_id'];

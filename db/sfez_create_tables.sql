@@ -128,6 +128,8 @@ CREATE TABLE companies (
     stub boolean,
     calculated_rating numeric DEFAULT 0.0,
     user_id integer REFERENCES users(id),
+    show_vendor_setup boolean DEFAULT true,
+    default_unit integer REFERENCES units(id),
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
@@ -155,7 +157,7 @@ CREATE TABLE customers (
 
 CREATE TABLE delivery_addresses (
     id SERIAL PRIMARY KEY,
-    nickname text, 
+    nickname text,
     address1 text,
     address2 text,
     city text,
@@ -267,7 +269,7 @@ CREATE TABLE order_history (
   delivery_address_details jsonb,
   driver_id integer REFERENCES drivers(id),
   contact text,
-  order_detail jsonb, 
+  order_detail jsonb,
   checkin_id integer REFERENCES checkins(id),
   customer_name text,
   customer_id integer REFERENCES customers(id),
@@ -332,6 +334,7 @@ CREATE TABLE reviews (
     status text REFERENCES review_states(name),
     power_reviewer boolean DEFAULT false,
     power_title text,
+    reviewer_name text,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
@@ -345,7 +348,6 @@ CREATE TABLE search_preferences (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
-
 
 
 COPY roles (id, type) FROM stdin;
@@ -442,7 +444,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
 
 REVOKE ALL ON TABLE users FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
-
 
 GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
