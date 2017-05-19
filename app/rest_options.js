@@ -122,10 +122,14 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
     }
     debug('..delivery pickup time is '+ pickup.toISOString());
   }
-  logger.info('Delivery pickup time '+ pickup.toIsoString(), 
+  var puTime = pickup.toISOString();
+  logger.info('Delivery pickup time '+ puTime,
+    {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role: this.passport.user.role,
+    unit_id: unitId, delivery_time: deliveryTime, pickup_time: puTime });
+  /*logger.info('Delivery pickup time '+ pickup.toIsoString(), 
     {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role : 
     this.passport.user.role, unit_id: unitId, delivery_time: deliveryTime, 
-    pickup_time: pickup.toISOString()});
+    pickup_time: pickup.toISOString()});*/
   return pickup;
 }
 
@@ -209,16 +213,18 @@ function *beforeSaveOrderHistory() {
 
     //set unit
     debug('..get unit id');
-    var unId = '';
+    var unitId = '';
     if (!this.resteasy.object.unit_id) {
       debug(this.params.context)
-      unId = this.params.context.match(/units\/(\d+)/)
-      debug(unId)
-      this.resteasy.object.unit_id = unId[1];
+      unitId = this.params.context.match(/units\/(\d+)/);
+      debug(unitId);
+      unitId = unitId[1];
+      debug(unitId);
+      this.resteasy.object.unit_id = unitId;
     }
-    logger.info('Order for unit '+ unId, 
+    logger.info('Order for unit '+ unitId, 
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-      role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId});
+      role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId});
 
     // get order details and streamline for display
     var moltin_order_id = osoId
@@ -230,7 +236,7 @@ function *beforeSaveOrderHistory() {
     } catch (err) {
       logger.error('Error retrieving order items from ecommerce system ',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-        role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+        role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
         error: err});
       throw(err)
     }
@@ -251,7 +257,7 @@ function *beforeSaveOrderHistory() {
       if (!this.resteasy.object.delivery_address_id) {
         logger.error('No delivery address provided',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
           error: 'No delivery address provided'});
         throw new Error('No delivery address provided', 422);
       }
@@ -262,7 +268,7 @@ function *beforeSaveOrderHistory() {
       } catch (err) {
         logger.error('Error getting delivery address',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
           delivery_address_id: this.resteasy.object.delivery_address_id, error: err});
         throw(err)
       }
@@ -283,12 +289,12 @@ function *beforeSaveOrderHistory() {
       if (deliveryTime) {
         var pickup = '';
         try {
-          pickup = yield calculateDeliveryPickup(this.resteasy.object.unit_id, 
+          pickup = yield calculateDeliveryPickup.call(this, this.resteasy.object.unit_id, 
                                                  this.resteasy.object.desired_delivery_time);
         } catch (err) {
           logger.error('Error calculating delivery pickup time',
             {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-            role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unId,
+            role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
             delivery_address_id: this.resteasy.object.delivery_address_id, 
             delivery_time: deliveryTime, error: err});
           throw (err);
@@ -342,12 +348,12 @@ function *beforeSaveOrderHistory() {
       this.resteasy.object.status = savedStatus.status;
     } else {
       debug('...not a status update')
-      logger.info('PUT does not involve a status update '+ unId, 
+      logger.info('PUT does not involve a status update '+ unitId, 
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
         role: this.passport.user.role, order_sys_order_id: osoId});
     }
   }
-  logger.info('Pre-flight for order save completed '+ unId, 
+  logger.info('Pre-flight for order save completed '+ unitId, 
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
     role: this.passport.user.role, order_sys_order_id: osoId});
   debug('returning from beforeSaveOrderHistory');

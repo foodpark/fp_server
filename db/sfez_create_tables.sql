@@ -129,7 +129,7 @@ CREATE TABLE companies (
     calculated_rating numeric DEFAULT 0.0,
     user_id integer REFERENCES users(id),
     show_vendor_setup boolean DEFAULT true,
-    default_unit integer REFERENCES units(id),
+    -- default_unit integer REFERENCES units(id), // circular reference
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
