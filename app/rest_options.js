@@ -4,6 +4,7 @@ var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
 var DeliveryAddress = require('./models/deliveryaddress.server.model');
 var Favorites = require('./models/favorites.server.model');
+var Loyalty = require('./models/loyalty.server.model');
 var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var Reviews = require('./models/reviews.server.model');
@@ -642,6 +643,46 @@ function *afterUpdateOrderHistory(orderHistory) {
       orderHistoryStatus[keys[i]] = timestamp.now();
       debug(orderHistoryStatus)
       updated = true;
+
+      // grant loyalty points
+      if (status == 'order_paid') {
+        var priorBalance = (yield Loyalty.getPointBalance(orderHistory.customer_id, orderHistory.company_id))[0];
+        if (!priorBalance) {
+          logger.info('creating new loyalty points record for customer ' + orderHistory.customer_id + ' at company ' + orderHistory.company_id);
+          var initBalance = '1';
+          var newLoyalty = (yield Loyalty.createNew(orderHistory.customer_id, orderHistory.company_id, initBalance))[0];
+          debug(newLoyalty);
+        } else {
+          debug(priorBalance);
+          logger.info('incrementing loyalty points for customer ' + orderHistory.customer_id + ' at company ' + orderHistory.company_id);
+
+          var priorBalValue = parseInt(priorBalance.balance);
+          var updatedBalValue = priorBalValue + 1;
+          var isEligible_five = false;
+          var isEligible_ten = false;
+          var isEligible_fifteen = false;
+          if (updatedBalValue >= 5) {
+            isEligible_five = true;
+          }
+          if (updatedBalValue >= 10) {
+            isEligible_ten = true;
+          }
+          if (updatedBalValue >= 15) {
+            isEligible_fifteen = true;
+          }
+          var incrementedLoyalty = {
+            balance: updatedBalValue,
+            eligible_five: isEligible_five,
+            eligible_ten: isEligible_ten,
+            eligible_fifteen: isEligible_fifteen,
+            updated_at: this.resteasy.knex.fn.now()
+          };
+
+          this.resteasy.queries.push(
+            this.resteasy.transaction.table('loyalty').where('loyalty.id', priorBalance.id).update(incrementedLoyalty)
+          );
+        }
+      }
     }
   }
   if (updated) {
@@ -966,6 +1007,44 @@ function *afterCreateReview(review) {
   );
 }
 
+function *afterCreateLoyaltyUsed(loyaltyUsed) {
+  if (!loyaltyUsed) {
+    throw new Error('Parameter loyaltyUsed must be defined');
+  }
+  logger.info('afterCreateLoyaltyUsed - subtracting redeemed loyalty points for customer ' + loyaltyUsed.customer_id + ', company ' + loyaltyUsed.company_id);
+  var priorBalance = (yield Loyalty.getPointBalance(loyaltyUsed.customer_id, loyaltyUsed.company_id))[0];
+  if (!priorBalance) {
+    throw new Error('Unable to get loyalty point balance for customer ' + loyaltyUsed.customer_id + ', company ' + loyaltyUsed.company_id);
+  }
+  var oldBal = parseInt(priorBalance.balance);
+  var newBal = oldBal - parseInt(loyaltyUsed.amount_redeemed);
+  var isEligible_five = false;
+  var isEligible_ten = false;
+  var isEligible_fifteen = false;
+  if (newBal >= 5) {
+    isEligible_five = true;
+  }
+  if (newBal >= 10) {
+    isEligible_ten = true;
+  }
+  if (newBal >= 15) {
+    isEligible_fifteen = true;
+  }
+  var updateLoyalty = {
+    balance: newBal,
+    eligible_five: isEligible_five,
+    eligible_ten: isEligible_ten,
+    eligible_fifteen: isEligible_fifteen,
+    updated_at: this.resteasy.knex.fn.now()
+  }
+  debug(updateLoyalty);
+  this.resteasy.queries.push(
+    this.resteasy.transaction.table('loyalty').where('id', priorBalance.id)
+      .update(updateLoyalty)
+  );
+  debug('afterCreateLoyaltyUsed success');
+}
+
 function *afterUpdateReviewApproval(approval) {
   debug('begin afterUpdateReviewApproval function');
   var hash = { status: approval.status };
@@ -1075,7 +1154,7 @@ module.exports = {
           } // else continue
           console.log("...authorized")
         } else if (this.params.table == 'delivery_addresses' || this.params.table == 'favorites' || 
-                   this.params.table == 'reviews' || this.params.table == 'order_history') {
+                   this.params.table == 'reviews' || this.params.table == 'order_history' || this.params.table == 'loyalty_used') {
           debug('..checking POST '+ this.params.table)
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
             this.throw('Create Unauthorized - Customers only',401);
@@ -1088,6 +1167,8 @@ module.exports = {
           } // else continue
           this.resteasy.object.customer_id = customer.id;
           console.log('..authorized')  
+        } else if (this.params.table == 'loyalty') {
+          this.throw('Create Unauthorized', 401); // loyalty create is only allowed in-code when order state is 'order_paid'
         }
         console.log("... create is authorized")
       } else if (operation == 'update' && this.params.table == 'units' && this.isAuthenticated() && this.passport.user && this.passport.user.role == 'UNITMGR') {
@@ -1144,6 +1225,10 @@ module.exports = {
           } else {
             console.log('..authorized')
           }
+        } else if (this.params.table == 'loyalty' || this.params.table == 'loyalty_used') {
+          // loyalty update only allowed in-code when order state is 'order_paid'
+          // loyalty_used should never need to be updated, as it is a transaction registry.
+          this.throw('Update/Delete Unauthorized', 401);
         } 
         console.log("...authorized")
       } else if (operation == 'read') {
@@ -1188,6 +1273,8 @@ module.exports = {
           yield afterCreateReview.call(this, res[0]);
         } else if (this.resteasy.table == 'order_history') {
           yield afterCreateOrderHistory.call(this, res[0]);
+        } else if (this.resteasy.table == 'loyalty_used') {
+          yield afterCreateLoyaltyUsed.call(this, res[0]);
         }
       } else if (this.resteasy.operation == 'update') {
         if (this.resteasy.table == 'review_approvals') {
