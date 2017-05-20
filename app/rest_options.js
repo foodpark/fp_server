@@ -1125,11 +1125,9 @@ module.exports = {
               }
               console.log('verifying owner')
               var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
-              console.log(valid)
               if (!valid) {
                 this.throw('Update/Delete Unauthorized - incorrect Owner',401);
               } // else continue
-              console.log(valid)
             }
           }
         }  else if (this.params.table == 'drivers') {
