@@ -432,7 +432,7 @@ function *afterCreateOrderHistory(orderHistory) {
   yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
-  logger.info('Unit '+ unit.id +' notified of order '+ orderHistory.id, meta);
+  logger.info('Unit '+ unit.id +' notified of order '+ orderNum, meta);
   debug(timestamp.now()); 
   var hash = {
     status : {
