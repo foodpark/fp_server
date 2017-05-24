@@ -1,14 +1,6 @@
 var knex = require('../../config/knex');
 var debug = require('debug')('checkin.model');
 
-/**CREATE TABLE checkins (
-  ID SERIAL PRIMARY KEY,
-  unit_id INTEGER REFERENCES unit (id),
-  point GEOMETRY NOT NULL,
-  food_park_id INTEGER REFERENCES food_park (id),
-  checkin TIMESTAMP,
-)
-**/
 
 exports.findByTimeBox = function(lat1, lon1, lat2, lon2, searchtime) {
   if (lat1 < lat2) {
@@ -25,5 +17,10 @@ exports.findByTimeBox = function(lat1, lon1, lat2, lon2, searchtime) {
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('checkins').select('*').whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime)
+  return knex('checkins').select('*').whereBetween('latitude', [minlat, maxlat]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('check_in','<',searchtime).andWhere('check_out','>',searchtime)
 };
+
+exports.findOpenCheckinForUnit = function(id) {
+  var now = (new Date()).toISOString();
+  return knex('checkins').select('*').where('unit_id',id).andWhere('check_in','<',now).andWhere('check_out','>',now);
+}

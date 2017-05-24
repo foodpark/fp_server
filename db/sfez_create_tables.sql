@@ -284,9 +284,12 @@ CREATE TABLE order_history (
 
 CREATE TABLE loyalty (
   id SERIAL PRIMARY KEY,
-  amount text,
+  balance integer,
   customer_id integer REFERENCES customers(id),
   company_id integer REFERENCES companies(id),
+  eligible_five boolean DEFAULT false,
+  eligible_ten boolean DEFAULT false,
+  eligible_fifteen boolean DEFAULT false,
   created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
@@ -304,10 +307,10 @@ CREATE TABLE loyalty_rewards (
 
 CREATE TABLE loyalty_used (
   id SERIAL PRIMARY KEY,
-  amount integer,
-  order_history_id integer REFERENCES order_history(id),
-  created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-  updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+  amount_redeemed integer,
+  customer_id integer REFERENCES customers(id),
+  company_id integer REFERENCES companies(id),
+  created_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
 CREATE TABLE review_states (
