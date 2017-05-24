@@ -80,6 +80,8 @@ CREATE TABLE users (
     provider text,
     provider_id text,
     provider_data text,
+    fbid text,
+    fb_login boolean,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
