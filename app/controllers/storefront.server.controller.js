@@ -312,6 +312,8 @@ exports.createMenuItem=function *(next) {
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
     debug('...user authorized')
+    debug(this.category.company);
+    debug(this.company);
     debug(this.category.company.data.id +'=='+ this.company.order_sys_id)
     if (this.category.company.data.id == this.company.order_sys_id) {
       debug('..category and company match')

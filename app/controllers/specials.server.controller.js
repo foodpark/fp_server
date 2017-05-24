@@ -1,9 +1,10 @@
 var config  = require('../../config/config');
 var auth = require('./authentication.server.controller');
 var msc  = require('./moltin.server.controller');
+var Checkin = require ('../models/checkin.server.model');
 var Company = require ('../models/company.server.model');
 var Unit    = require ('../models/unit.server.model');
-var payload  = require('../utils/payload');
+var payload = require('../utils/payload');
 var debug   = require('debug')('specials');
 var winston = require('winston');
 
@@ -43,20 +44,34 @@ exports.getSpecials = function * (next) {
   debug('..units');
   debug(units);
   var specials = [];
-  var companies = [];
+  var companies = {};
   for (i=0;i<units.length;i++) {
     var unit = units[i];
-    debug('..unit');
-    debug(unit);
+    debug('unit '+ unit.id);
+    // get checkin for unit lat/lon
+    var checkin = '';
+    try { 
+      checkin = (yield Checkin.findOpenCheckinForUnit(unit.id))[0];
+    } catch (err) {
+      console.error('getSpecials: Error getting checkin');
+      console.error(err);
+    }
+    debug(checkin);
+    var un = {
+      id : unit.id,
+      latitude : checkin.latitude,
+      longitude : checkin.longitude
+    }
+
     debug('..check company '+ unit.company_id +' needs to be processed');
     debug(companies);
-    if (companies.indexOf(unit.company_id) !== -1) {
-      debug('..already processed. Skipping');
+    if (companies[unit.company_id]) {
+      debug('..already processed. Adding unit');
+      companies[unit.company_id].units.push(un);
       continue;
     }
     debug('..company '+ unit.company_id +' not processed. Adding...');
-    companies.push(unit.company_id);
-    debug(companies);
+
     var company = '';
     try {
       company = (yield Company.getSingleCompany(unit.company_id))[0];
@@ -70,6 +85,13 @@ exports.getSpecials = function * (next) {
         debug('..no daily special defined');
         continue;
       }
+      var comp = {
+        id : company.id,
+        units: [un]
+      };
+      companies[company.id] = comp;
+
+      // get special
       debug('..special '+ company.daily_special_item_id);
       var special = '';
       try {
@@ -93,6 +115,12 @@ exports.getSpecials = function * (next) {
         special.company_name = company.name;
         specials.push(special);
       }
+    }
+  }
+  if (specials) {
+    for (i=0; i < specials.length; i++) {
+      // load company's units into special
+      specials[i].units = companies[specials[i].company_id].units;
     }
   }
   this.body = specials;

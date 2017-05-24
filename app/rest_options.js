@@ -432,7 +432,7 @@ function *afterCreateOrderHistory(orderHistory) {
   yield push.notifyOrderUpdated(orderNum, msgTarget)
   debug('..returned from notifying')
 
-  logger.info('Unit '+ unit.id +' notified of order '+ orderHistory.id, meta);
+  logger.info('Unit '+ unit.id +' notified of order '+ orderNum, meta);
   debug(timestamp.now()); 
   var hash = {
     status : {
@@ -1206,11 +1206,9 @@ module.exports = {
               }
               console.log('verifying owner')
               var valid = (yield Company.verifyOwner(coId, this.passport.user.id))[0]
-              console.log(valid)
               if (!valid) {
                 this.throw('Update/Delete Unauthorized - incorrect Owner',401);
               } // else continue
-              console.log(valid)
             }
           }
         }  else if (this.params.table == 'drivers') {
