@@ -65,3 +65,7 @@ exports.authenticate = function(md5password, password) {
 
   return md5password === md5;
 };
+
+exports.updateFB = function(hash){
+  knex('users').update('fbid', hash.facebook_id).where('id', hash.id).returning('*');
+};
