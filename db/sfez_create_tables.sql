@@ -80,6 +80,8 @@ CREATE TABLE users (
     provider text,
     provider_id text,
     provider_data text,
+    fbid text,
+    fb_login boolean,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
@@ -115,6 +117,7 @@ CREATE TABLE companies (
     phone text,
     facebook text,
     twitter text,
+    instagram text,
     photo text,
     featured_dish text,
     hours text,
@@ -129,7 +132,7 @@ CREATE TABLE companies (
     calculated_rating numeric DEFAULT 0.0,
     user_id integer REFERENCES users(id),
     show_vendor_setup boolean DEFAULT true,
-    -- default_unit integer REFERENCES units(id), // circular reference
+    default_unit integer, --// circular reference if REFERENCES is used.  Temporary fix until customer update can be modified properly
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
@@ -168,6 +171,7 @@ CREATE TABLE delivery_addresses (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
+
 
 CREATE TABLE units (
     id SERIAL PRIMARY KEY,

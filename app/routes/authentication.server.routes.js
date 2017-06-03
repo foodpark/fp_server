@@ -17,6 +17,9 @@ module.exports = function(app) {
 
   router.get('/auth/logout', auth.logout);
 
+  router.get('/auth/fbRegister', auth.fbRegister);
+  router.get('/auth/fb', auth.fbAuth);
+
   router.get('/oauth/facebook', passport.authenticate('facebook', {
       failureRedirect: '/login',
       scope:['email'],

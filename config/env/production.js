@@ -20,5 +20,6 @@ module.exports = {
     },
   application_bundle : process.env.appBundleId,
   fcmServerKey: process.env.fcmServerKey,
-  gcmServerKey: process.env.gcmServerKey
+  gcmServerKey: process.env.gcmServerKey,
+  facebook_api_key: "1401488693436528"
 };

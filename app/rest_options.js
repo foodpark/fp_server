@@ -1372,7 +1372,10 @@ module.exports = {
       } else if (this.resteasy.table == 'delivery_addresses' && context && (m = context.match(/customers\/(\d+)$/))) {
         debug('..customer id '+ m[1]);
         return query.select('*').where('customer_id', m[1]);
-      }  
+      } else if (this.resteasy.table == 'reviews' && context && (m = context.match(/companies\/(\d+)$/))) {
+        debug('..company id '+ m[1]);
+        return query.select('*').where('company_id', m[1]);
+      }
     }
   },
 };
