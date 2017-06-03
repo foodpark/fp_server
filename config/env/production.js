@@ -18,6 +18,7 @@ module.exports = {
       sumupAuthUrl:"",
       sumupUrl:""
     },
+  application_bundle : process.env.appBundleId,
   fcmServerKey: process.env.fcmServerKey,
   gcmServerKey: process.env.gcmServerKey
 };

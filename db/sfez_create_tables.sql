@@ -139,6 +139,7 @@ CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
     order_sys_id text,
     description text,
+    apns_id text,
     gcm_id text,
     device_type text,
     fcm_id text,

@@ -623,10 +623,10 @@ function *afterUpdateOrderHistory(orderHistory) {
       }
       debug(msgTarget);
       var supplemental = {};
-      supplemental.unit_id = orderHistory.unit_id;
-      supplemental.company_id = orderHistory.company_id;
+      supplemental.unit_id = ''+ orderHistory.unit_id;
+      supplemental.company_id = ''+ orderHistory.company_id;
       supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
-      supplemental.order_id = orderHistory.id;
+      supplemental.order_id = ''+ orderHistory.id;
       msgTarget.data = supplemental;
       msgTarget.status = status
       
@@ -746,60 +746,73 @@ function *beforeSaveReview() {
   }
 }
 
+
 function *beforeSaveCustomer(){
   debug('beforeSaveCustomer');  
-  // If username or password is changed, we need to update the Users table
-  var username = this.resteasy.object.username;
-  var password = this.resteasy.object.password;
-  if (this.resteasy.operation == 'update') {
-    debug('..starting update of existing Customer'); 
-    // This block of code checks to see if username/password, if provided,
-    // was/were changed. If so, update User.
-    if (!username && !password) {
-      debug('..no update to user data');
-      return;
+  logger.info('Saving customer', {fn: 'beforeSaveCustomer', 
+    user_id: this.passport.user.id, role : this.passport.user.role});
+  if (this.resteasy.operation == 'update') { 
+    // If APNS id provided, retrieve and set GCM id   
+    if (this.resteasy.object.apns_id) {
+      var gcmId = '';
+      try {
+        gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
+      } catch (err) {
+        logger.error('Error sending APNS token to GCM', 
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id, 
+            role: this.passport.user.role, error: err});
+        throw err;
+      }
+      // Set Customer's gcm to that mapped to the apns token just pushed to Google
+      this.resteasy.object.gcm_id = gcmId;
     }
-    // Otherwise username and/or password was changed
-    if (!this.params.id) {
-      console.error('beforeSaveCustomer: No customer id provided');
-      throw new Error('No customer id provided. Update operation requires customer id')
+
+    // If username or password is changed, we need to update the Users table
+    var username = this.resteasy.object.username;
+    var password = this.resteasy.object.password;
+    if (username || password) {
+    // Username and/or password was changed
+      if (!this.params.id) {
+        console.error('beforeSaveCustomer: No customer id provided');
+        throw new Error('No customer id provided. Update operation requires customer id')
+      }
+      var customer = '';
+      try {
+        customer = (yield Customer.getSingleCustomer(this.params.id))[0];
+      } catch (err) {
+        console.error('beforeSaveCustomer: Error getting existing Customer');
+        throw err;
+      }
+      debug('..customer');
+      debug(customer);
+      var user = '';
+      try {
+        user = (yield User.getSingleUser(customer.user_id))[0];
+      } catch (err) {
+        console.error('beforeSaveCustomer: Error getting existing user');
+        throw err;
+      }
+      debug('..user');
+      debug(user);
+      var userHash = {};
+      if (username) {
+        userHash.username = username;
+        delete this.resteasy.object.username;
+      }
+      if (password) {
+        userHash.password = password;
+        delete this.resteasy.object.password;
+      }
+      debug('..updating user');
+      try {
+        user = (yield User.updateUser(user.id, userHash))[0];
+      } catch (err) {
+        console.error('beforeSaveCustomer: Error updating user');
+        throw err;
+      }
+      debug('..user after update');
+      debug(user);
     }
-    var customer = '';
-    try {
-      customer = (yield Customer.getSingleCustomer(this.params.id))[0];
-    } catch (err) {
-      console.error('beforeSaveCustomer: Error getting existing Customer');
-      throw err;
-    }
-    debug('..customer');
-    debug(customer);
-    var user = '';
-    try {
-      user = (yield User.getSingleUser(customer.user_id))[0];
-    } catch (err) {
-      console.error('beforeSaveCustomer: Error getting existing user');
-      throw err;
-    }
-    debug('..user');
-    debug(user);
-    var userHash = {};
-    if (username) {
-      userHash.username = username;
-      delete this.resteasy.object.username;
-    }
-    if (password) {
-      userHash.password = password;
-      delete this.resteasy.object.password;
-    }
-    debug('..updating user');
-    try {
-      user = (yield User.updateUser(user.id, userHash))[0];
-    } catch (err) {
-      console.error('beforeSaveCustomer: Error updating user');
-      throw err;
-    }
-    debug('..user after update');
-    debug(user);
   }
 }
 
@@ -1259,7 +1272,10 @@ module.exports = {
       } else if (this.resteasy.table == 'companies') {
         debug('saving companies')
         yield beforeSaveCompanies.call(this);
-      } else if (this.resteasy.table == 'order_history') {
+      } else if (this.resteasy.table == 'customers') {
+        debug('saving customers')
+        yield beforeSaveCustomer.call(this);
+      }else if (this.resteasy.table == 'order_history') {
         debug('saving order_history')
         yield beforeSaveOrderHistory.call(this);
         debug('saving order_history to repository')
@@ -1327,8 +1343,8 @@ module.exports = {
         debug('..company id '+ m[1]);
         debug('..unit id '+ n[1]);
         return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
-      } else if (this.resteasy.table == 'favorites') {
-        debug('..read favorites');
+      } else if (this.resteasy.table == 'favorites' || this.resteasy.table == 'reviews') {
+        debug('..read favorites / reviews');
         var coId = '';
         var custId = '';
         var unitId = '';

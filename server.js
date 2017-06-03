@@ -41,27 +41,7 @@ router.all('/*', cors(
     headers: 'Content-type,Accept,X-Access-Token,X-Key,Authorization'
   }
 ));
-/* router.all('/*', function *(next) {
-  console.log("setting CORS headers")
-  console.log(this.response.headers)
-  // CORS headers
-  console.log("set allowed origin to *")
-  this.response.header("Access-Control-Allow-Origin", "*");
-  console.log("set allowed methods to GET,PUT,POST,DELETE,OPTIONS")
-  this.response.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  // Custom headers for CORS
-  console.log("set allowed headers to Content-type,Accept,X-Access-Token,X-Key")
-  this.response.header('Access-Control-Allow-Headers', 'Content-type,Accept,X-Access-Token,X-Key');
-  console.log(this.response);
-  if (this.request.method == 'OPTIONS') {
-    console.log("Got preflight request")
-    this.response.status=200;
-    return;
-  } else {
-    console.log("No preflight")
-    next();
-  }
-}); */
+
 app.use(router.routes());
 app.use(router.allowedMethods());
 
