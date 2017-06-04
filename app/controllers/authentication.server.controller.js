@@ -564,7 +564,8 @@ exports.register = function*(next) {
   this.body = { error: 'A user is already logged in.'};
 };
 
-exports.fbRegister = function*(sfezId) {
+
+/*exports.fbRegister = function*(sfezId) {
   passport.use(new FacebookStrategy({
     appId: config.facebook_api_key,
     appSecret : 'secret',
@@ -573,7 +574,7 @@ exports.fbRegister = function*(sfezId) {
   function(access_token, refresh_token, profile, done) {
     User.updateFB(sfezId, profile.id);
 
-  }
+  } */
 
 exports.fbAuth = function*() {
   passport.authenticate('facebook');
