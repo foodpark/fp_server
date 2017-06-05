@@ -565,20 +565,50 @@ exports.register = function*(next) {
 };
 
 
-/*exports.fbRegister = function*(sfezId) {
-  passport.use(new FacebookStrategy({
-    appId: config.facebook_api_key,
-    appSecret : 'secret',
-    callbackURL : 'url'
-  },
-  function(access_token, refresh_token, profile, done) {
-    User.updateFB(sfezId, profile.id);
-
-  } */
+exports.fbRegister = function*() {
+  var sfezId = this.body.sfezId;
+  var fbId = this.body.facebookId;
+  console.log("FB REGISTER: " + sfezId);
+  User.updateFB({id:sfezId, facebook_id:fbId});
+  return;
+}
 
 exports.fbAuth = function*() {
-  passport.authenticate('facebook');
+  passport.use(new FacebookStrategy({
+    clientID: config.FACEBOOK_CLIENT_ID,
+    clientSecret: config.FACEBOOK_CLIENT_SECRET,
+    callbackURL : 'http://198.199.86.137:1337/auth/fb'
+  },
+  function(access_token, refresh_token, profile, done) {
+    logger.info(access_token);
+    logger.info(refresh_token);
+    logger.info(profile);
+    User.findByFB({'facebook_id': profile.id }, function(err, user) {
+      if (err) {
+        logger.error(err);
+      }
+      if (user) {
+        logger.info('found user: ' + user.id + ", " + user.name);
+      }
+      else {
+        // Do FB Register here
+      }
+    })
+  }));
+  yield passport.authenticate('facebook', { failureRedirect : '/#'},
+    function *(req, res, next) {
+      logger.info(res);
+      logger.info('req:' + req);
+    }
+  );
 }
+
+// exports.fbDone = function*() {
+//   passport.authenticate('facebook', { failureRedirect: '/' },
+//   function(req, res) {
+//     res.redirect('/auth/fbRegister');
+//   });
+// }
 
 exports.roleAuthorization = function *(role, role2) {
   debug('roleAuthorization')
