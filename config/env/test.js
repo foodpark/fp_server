@@ -1,4 +1,4 @@
-var port = 1337;
+var port = 11080;
 module.exports = {
   port: port,
   pg_connection_string: process.env.DATABASE_URL || "postgres://sfez_rw:sfez@localhost:5432/sfezdb",

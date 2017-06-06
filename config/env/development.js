@@ -24,5 +24,9 @@ module.exports = {
   gcmServerKey: process.env.fcmServerKey || "AAAAAcAl7Vw:APA91bGzGfWSgV7NE5pOzcbZ4aGH6cH6k41WKuq3oSKZdC4BI4bkgn34tWiF0blBnCv_yaKjlTaghy1Y4XiUmcjV0c0_lO2vqkzL9Ijo-yb_xxYp_NGCDpzdKHR4o5zKJGVCESzJldWU",
   oldGcmServerKey: process.env.gcmServerKey || "AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI",
   oldFcmServerKey: process.env.gcmServerKey || "AIzaSyBHjuQ6j05yKC-BYJa6C2ER9-JfNEaPvYI",
-  facebook_api_key: "1401488693436528"
+  facebook_api_key: "1401488693436528",
+  FACEBOOK_CLIENT_ID: "1580240262270648",
+  FACEBOOK_CLIENT_SECRET: "9262a21aa421194191a90298af79e509",
+  facebook_app_id: "1580240262270648",
+  facebook_app_secret: "9262a21aa421194191a90298af79e509"
 };

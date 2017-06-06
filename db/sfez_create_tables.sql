@@ -81,6 +81,7 @@ CREATE TABLE users (
     provider_id text,
     provider_data text,
     fbid text,
+    fb_token text,
     fb_login boolean,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
@@ -358,6 +359,17 @@ CREATE TABLE search_preferences (
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
+CREATE TABLE order_state (
+  id SERIAL PRIMARY KEY,
+  order_sys_order_id text,
+  step_name text,
+  step_status text,
+  api_call text,
+  param_string text,
+  error_info text,
+  info text
+);
+
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
@@ -453,6 +465,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
 
 REVOKE ALL ON TABLE users FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
+
+REVOKE ALL ON TABLE order_state FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_state TO sfez_rw;
 
 GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;

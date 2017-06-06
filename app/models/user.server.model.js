@@ -1,6 +1,7 @@
 var crypto = require('crypto');
 var knex   = require('../../config/knex');
 var debug  = require('debug')('user.model');
+var logger = require('winston');
 
 
 function encrypt(password) {
@@ -67,9 +68,10 @@ exports.authenticate = function(md5password, password) {
 };
 
 exports.updateFB = function(hash) {
-  knex('users').update('fbid', hash.facebook_id).where('id', hash.id).returning('*');
+  knex('users').update('fbid, fb_token', hash.facebook_id, hash.facebook_token).where('id', hash.id).returning('*');
 };
 
 exports.findByFB = function(hash) {
+  logger.info(hash);
   knex('users').select('*').where('fbid', hash.facebook_id);
 }

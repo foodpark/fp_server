@@ -11,7 +11,7 @@ module.exports=function(app) {
 	var apiversion = '/api/'+ config.apiVersion + '/dly';
 
 	router.post(apiversion + '/specials', specials.getSpecials);
-	
+
 	app.use(router.routes());
-  app.use(router.allowedMethods())
+  app.use(router.allowedMethods());
 };

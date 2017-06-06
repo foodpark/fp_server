@@ -574,28 +574,60 @@ exports.fbRegister = function*() {
 }
 
 exports.fbAuth = function*() {
+  var self = this;
+  var retUser;
   passport.use(new FacebookStrategy({
     clientID: config.FACEBOOK_CLIENT_ID,
     clientSecret: config.FACEBOOK_CLIENT_SECRET,
     callbackURL : 'http://198.199.86.137:1337/auth/fb'
+    //callbackURL : 'http://127.0.0.1:11080/auth/fb',
+    profileFields: ['id', 'email', 'first_name', 'last_name']
   },
   function(access_token, refresh_token, profile, done) {
+    var returnPayload;
+    var fbProfile = profile;
     logger.info(access_token);
     logger.info(refresh_token);
+    logger.info('PROFILE:');
     logger.info(profile);
-    User.findByFB({'facebook_id': profile.id }, function(err, user) {
-      if (err) {
-        logger.error(err);
+    logger.info(fbProfile._raw.last_name);
+    var user = User.findByFB({'facebook_id': fbProfile.id });
+    logger.info("Res of findByFB: " + user);
+    if (user) {
+      logger.info('found user: ' + user.id + ", " + user.name);
+
+      returnPayload = { jwt : sts.generateToken(user),
+                        fbToken : access_token};
+      self.body = returnPayload;
+      return done(null, returnPayload);
+    }
+    else {
+      logger.info("New User -- " + fbProfile.emails[0].value);
+      var newUser = {
+        username: fbProfile.emails[0].value,
+        password: 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        }),
+        first_name: fbProfile.first_name,
+        last_name: fbProfile.last_name,
+        fbid: fbProfile.id,
+        fb_token: access_token,
+        fb_login: true,
+        role: 'CUSTOMER',
+        provider: 'facebook'
       }
-      if (user) {
-        logger.info('found user: ' + user.id + ", " + user.name);
-      }
-      else {
-        // Do FB Register here
-      }
-    })
-  }));
-  yield passport.authenticate('facebook', { failureRedirect : '/#'},
+      returnPayload = { jwt : sts.generateToken(user),
+                        fbToken : access_token};
+      self.body = returnPayload;
+      logger.info(newUser);
+      var usr = User.createUser(newUser);
+      return done(null, newUser);
+    }}));
+  yield passport.authenticate('facebook', {
+    scope: [
+      // 'pages_messaging_subscriptions',  // Requires Facebook Review of app login
+      'email', 'public_profile'], failureRedirect : '/#'},
     function *(req, res, next) {
       logger.info(res);
       logger.info('req:' + req);
