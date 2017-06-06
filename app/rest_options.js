@@ -871,50 +871,62 @@ function *beforeSaveUnit() {
     debug(this.resteasy.object);
   } else if (this.resteasy.operation == 'update') {
     debug('..starting update of existing Unit');
+     // If APNS id provided, retrieve and set GCM id   
+    if (this.resteasy.object.apns_id) {
+      var gcmId = '';
+      try {
+        gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
+      } catch (err) {
+        logger.error('Error sending APNS token to GCM', 
+            {fn: 'beforeSaveUnit', user_id: this.passport.user.id, 
+            role: this.passport.user.role, unit_id: this.params.id, error: err});
+        throw err;
+      }
+      // Set Unit's gcm to that mapped to the apns token just pushed to Google
+      this.resteasy.object.gcm_id = gcmId;
+    }
     // This block of code checks to see if username/password, if provided,
     // was/were changed. If so, update User.
-    if (!username && !password) {
-      debug('..no update to user data');
-      return;
-    }
-    var unitId = this.params.id;
-    if (!unitId) {
-      console.error('beforeSaveUnit: No unit id provided');
-      throw new Error('No unit id provided. Update operation requires unit id')
-    }
-    var unit = '';
-    try {
-      unit = (yield Unit.getSingleUnit(this.params.id))[0];
-    } catch (err) {
-      console.error('beforeSaveUnit: Error getting existing unit');
-      throw err;
-    }
-    debug('..unit');
-    debug(unit);
-    if (username && username != unit.username || password && password != unit.password) {
-      // username or password was changed
-      var user = '';
+    if (username || password) {
+      var unitId = this.params.id;
+      if (!unitId) {
+        console.error('beforeSaveUnit: No unit id provided');
+        throw new Error('No unit id provided. Update operation requires unit id')
+      }
+      var unit = '';
       try {
-        user = (yield User.getSingleUser(unit.unit_mgr_id))[0];
+        unit = (yield Unit.getSingleUnit(this.params.id))[0];
       } catch (err) {
-        console.error('beforeSaveUnit: Error getting existing user');
+        console.error('beforeSaveUnit: Error getting existing unit');
         throw err;
       }
-      debug('..user');
-      debug(user);
-      var userHash = {};
-      if (username) userHash.username = username;
-      if (password) userHash.password = password;
-      debug('..updating user');
-      try {
-        user = (yield User.updateUser(user.id, userHash))[0];
-      } catch (err) {
-        console.error('beforeSaveUnit: Error updating user');
-        throw err;
-      }
-      debug('..user after update');
-      debug(user);
-    } 
+      debug('..unit');
+      debug(unit);
+      if (username && username != unit.username || password && password != unit.password) {
+        // username or password was changed
+        var user = '';
+        try {
+          user = (yield User.getSingleUser(unit.unit_mgr_id))[0];
+        } catch (err) {
+          console.error('beforeSaveUnit: Error getting existing user');
+          throw err;
+        }
+        debug('..user');
+        debug(user);
+        var userHash = {};
+        if (username) userHash.username = username;
+        if (password) userHash.password = password;
+        debug('..updating user');
+        try {
+          user = (yield User.updateUser(user.id, userHash))[0];
+        } catch (err) {
+          console.error('beforeSaveUnit: Error updating user');
+          throw err;
+        }
+        debug('..user after update');
+        debug(user);
+      } 
+    }
   }
 }
 

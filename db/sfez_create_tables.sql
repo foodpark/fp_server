@@ -188,6 +188,7 @@ CREATE TABLE units (
     password text,
     qr_code text,
     phone text,
+    apns_id text,
     fcm_id text,
     gcm_id text,
     device_type text,
