@@ -579,7 +579,7 @@ exports.fbAuth = function*() {
   passport.use(new FacebookStrategy({
     clientID: config.FACEBOOK_CLIENT_ID,
     clientSecret: config.FACEBOOK_CLIENT_SECRET,
-    callbackURL : 'http://198.199.86.137:1337/auth/fb'
+    callbackURL : 'http://198.199.86.137:1337/auth/fb',
     //callbackURL : 'http://127.0.0.1:11080/auth/fb',
     profileFields: ['id', 'email', 'first_name', 'last_name']
   },
@@ -591,7 +591,7 @@ exports.fbAuth = function*() {
     logger.info('PROFILE:');
     logger.info(profile);
     logger.info(fbProfile._raw.last_name);
-    var user = User.findByFB({'facebook_id': fbProfile.id });
+    var user = User.findByFB(fbProfile.id);
     logger.info("Res of findByFB: " + user);
     if (user) {
       logger.info('found user: ' + user.id + ", " + user.name);

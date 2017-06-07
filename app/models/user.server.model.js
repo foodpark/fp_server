@@ -71,7 +71,7 @@ exports.updateFB = function(hash) {
   knex('users').update('fbid, fb_token', hash.facebook_id, hash.facebook_token).where('id', hash.id).returning('*');
 };
 
-exports.findByFB = function(hash) {
-  logger.info(hash);
-  knex('users').select('*').where('fbid', hash.facebook_id);
+exports.findByFB = function(fbid) {
+  logger.info(fbid);
+  knex('users').select('*').where('fbid', fbid);
 }

@@ -378,7 +378,7 @@ function *afterCreateOrderHistory(orderHistory) {
   } catch (err) {
     var ue = meta;
     ue.error = err;
-    logger.error('Error error retrieving unit', ue);
+    logger.error('Error retrieving unit', ue);
     throw err;
   }
   debug(unit);
