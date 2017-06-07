@@ -18,6 +18,7 @@ module.exports = function(app) {
   router.get('/auth/logout', auth.logout);
 
   // fbRegister breaks deployment
+  router.post('/auth/fbLogin', auth.fbLogin);
   router.post('/auth/fbRegister', auth.fbRegister);
   router.get('/auth/fb', auth.fbAuth);
   // router.get('/auth/fbDone', auth.fbDone);

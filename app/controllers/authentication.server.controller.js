@@ -564,13 +564,31 @@ exports.register = function*(next) {
   this.body = { error: 'A user is already logged in.'};
 };
 
+exports.fbLogin = function*() {
+  var fbid = this.body.fbid;
+  var fb_token = this.body.fb_token;
+  logger.info("FBID: " + fbid);
+  logger.info("fb_token: " + fb_token);
+  var user = (yield(User.findByFB(fbid)))[0];
+  var id = { id : user.id };
+  logger.info(user);
+  yield(User.updateFB(id.id, fbid, fb_token));
+  var info = {
+    id: user.id,
+    username: user.username,
+    role: user.role
+  };
+  this.body = sts.generateToken(info);
+  return;
+}
 
 exports.fbRegister = function*() {
   var sfezId = this.body.sfezId;
-  var fbId = this.body.facebookId;
+  var fbId = this.body.fbid;
+  var fb_token = this.body.fb_token;
   console.log("FB REGISTER: " + sfezId);
-  User.updateFB({id:sfezId, facebook_id:fbId});
-  return;
+  var user = (yield(User.updateFB(sfezId, fbId, fb_token)))[0];
+  return user;
 }
 
 exports.fbAuth = function*() {
@@ -591,12 +609,17 @@ exports.fbAuth = function*() {
     logger.info('PROFILE:');
     logger.info(profile);
     logger.info(fbProfile._raw.last_name);
-    var user = User.findByFB(fbProfile.id);
+    var user = (yield(User.findByFB(fbProfile.id)))[0];
+    var info = {
+      id: user.id,
+      username: user.username,
+      role: user.role
+    };
     logger.info("Res of findByFB: " + user);
     if (user) {
       logger.info('found user: ' + user.id + ", " + user.name);
 
-      returnPayload = { jwt : sts.generateToken(user),
+      returnPayload = { jwt : sts.generateToken(info),
                         fbToken : access_token};
       self.body = returnPayload;
       return done(null, returnPayload);
@@ -621,7 +644,7 @@ exports.fbAuth = function*() {
                         fbToken : access_token};
       self.body = returnPayload;
       logger.info(newUser);
-      var usr = User.createUser(newUser);
+      var usr = yield(User.createUser(newUser));
       return done(null, newUser);
     }}));
   yield passport.authenticate('facebook', {

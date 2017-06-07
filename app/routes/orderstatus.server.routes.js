@@ -10,8 +10,8 @@ module.exports = function(app) {
 
   router.get('/stat/:statId', status.getStatus);
 
-  router.post('/stat/update/:statId', status.updateOrdStatus);
-  router.post('/stat/create/:statId', status.createOrdStatus);
+  router.post('/stat/update', status.updateOrdStatus);
+  router.post('/stat/create', status.createOrdStatus);
 
   // router.param('noteId', status.getStatusId);
   router.param('statId', status.getStatusId);

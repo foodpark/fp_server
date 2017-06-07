@@ -67,11 +67,12 @@ exports.authenticate = function(md5password, password) {
   return md5password === md5;
 };
 
-exports.updateFB = function(hash) {
-  knex('users').update('fbid, fb_token', hash.facebook_id, hash.facebook_token).where('id', hash.id).returning('*');
+exports.updateFB = function(id, fbid, fb_token) {
+  logger.info(id + ',' + fbid + ',' + fb_token);
+  return knex('users').update({fbid: fbid, fb_token: fb_token}).where('id', id).returning('*');
 };
 
 exports.findByFB = function(fbid) {
   logger.info(fbid);
-  knex('users').select('*').where('fbid', fbid);
+  return knex('users').select('*').where('fbid', fbid);
 }
