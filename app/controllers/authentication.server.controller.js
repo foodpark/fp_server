@@ -405,9 +405,12 @@ function * removeUserOnFailure(userId) {
   }
 }
 
-exports.register = function*(next) {
+exports.register = function*(next, mapping) {
   debug("register")
   if (!this.isAuthenticated()) {
+    if (mapping) {
+      this.body = mapping;
+    }
     const first_name = this.body.first_name;
     const last_name = this.body.last_name;
     const company_name = this.body.company_name;
@@ -565,11 +568,70 @@ exports.register = function*(next) {
 };
 
 exports.fbLogin = function*() {
-  var fbid = this.body.fbid;
-  var fb_token = this.body.fb_token;
+  const fbid = this.body.fbid;
+  const fb_token = this.body.fb_token;
+  const fb_email = this.body.fb_email;
+  const first_name = this.body.first_name;
+  const last_name = this.body.last_name;
+
   logger.info("FBID: " + fbid);
   logger.info("fb_token: " + fb_token);
   var user = (yield(User.findByFB(fbid)))[0];
+  logger.info(user);
+  if (!user) {
+    var mapping = {};
+    mapping.first_name = first_name;
+    mapping.last_name = last_name;
+    if (fb_email) {
+      mapping.username = fb_email;
+    }
+    else {
+      mapping.email = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+          return v.toString(16);
+      }) + '@sfez.com';
+    }
+    mapping.password = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
+    mapping.role = 'CUSTOMER';
+    mapping.fbid = fbid;
+    mapping.fb_token = fb_token;
+    var user = mapping;
+    debug('register: creating user');
+    try {
+      var userObject = (yield User.createUser(user))[0];
+    } catch (err) {
+      console.error('register: error creating user');
+      console.error(err)
+      throw err;
+    }
+    debug('...user created with id '+ userObject.id)
+    debug('register: creating customer with user id '+ userObject.id);
+
+    try {
+      var customer = (yield Customer.createCustomer(userObject.id))[0]
+    } catch (err) {
+      console.error('register: error creating customer');
+      console.error(err);
+      // clean up user
+      debug('deleting user '+ userObject.id);
+      yield removeUserOnFailure(userObject.id);
+      throw err;
+    }
+    debug('...customer created with id '+ customer.id)
+    debug(customer)
+    userObject.customer_id = customer.id;
+    debug('register: completed. Authenticating user...')
+    var userInfo = setUserInfo(userObject);
+    this.status = 201;
+    this.body = {
+      token: 'JWT ' + sts.generateToken(userInfo),
+      user: userInfo
+    };
+    return;
+  }
   var id = { id : user.id };
   logger.info(user);
   yield(User.updateFB(id.id, fbid, fb_token));
