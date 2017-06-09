@@ -607,6 +607,7 @@ exports.fbLogin = function*() {
     mapping.role = 'CUSTOMER';
     mapping.fbid = fbid;
     mapping.fb_token = fb_token;
+    mapping.fb_login = true;
     var user = mapping;
     debug('register: creating user');
     try {
@@ -620,7 +621,7 @@ exports.fbLogin = function*() {
     debug('register: creating customer with user id '+ userObject.id);
 
     try {
-      var customer = (yield Customer.createCustomer(userObject.id))[0]
+      var customer = (yield Customer.createCustomer(userObject.id))[0];
     } catch (err) {
       console.error('register: error creating customer');
       console.error(err);
@@ -643,13 +644,11 @@ exports.fbLogin = function*() {
   }
   var id = { id : user.id };
   logger.info(user);
-  yield(User.updateFB(id.id, fbid, fb_token));
-  var info = {
-    id: user.id,
-    username: user.username,
-    role: user.role
+  var userInfo = (yield(User.updateFB(id.id, fbid, fb_token)))[0];
+  this.body = {
+    token: 'JWT ' + sts.generateToken(userInfo),
+    user: userInfo
   };
-  this.body = sts.generateToken(info);
   return;
 }
 
