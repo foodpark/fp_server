@@ -1,0 +1,13 @@
+{
+        "payProcessed"     :"Payment Processed - Order #{{orderNum}}",
+        "payFailed"        :"Payment Failed - Order #{{orderNum}}",
+        "orderDeclined"    :"{{company}} did not accept your order at this time. Please try again some other time.",
+        "orderAccepted"    :"Order accepted at {{time}}",
+        "orderQueued"      :"Your order #{{orderNum}} is queued for preparation",
+        "orderCooking"     :"Your order #{{orderNum}} started cooking",
+        "orderReady"       :"Your order #{{orderNum}} is ready!",
+        "orderPickedUp"    :"Your order #{{orderNum}} was picked up!",
+        "orderNotPickedUp" :"Your order #{{orderNum}} was not picked up! Did you forget?",
+        "orderDispatched"  :"Your order #{{orderNum}} is on its way!",
+        "orderDelivered"   :"Your order #{{orderNum}} was delivered. Thanks again! "
+}

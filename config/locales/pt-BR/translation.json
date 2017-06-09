@@ -1,0 +1,13 @@
+{
+      "payProcessed"     : "Pagamento Processado - Pedido #{{orderNum}}",
+      "payFailed"        : "Pagamento Falhou - Pedido #{{orderNum}}",
+      "orderDeclined"    : "Não aceitou seu pedido neste momento. Tente novamente.",
+      "orderAccepted"    : "Pedido Aceito em",
+      "orderQueued"      : "Seu Pedido está na fila para preparação",
+      "orderCooking"     : "Seu Pedido começou a cozinhar",
+      "orderReady"      : "Seu Pedido está pronto",
+      "orderPickedUp"    : "Seu Pedido foi Retirado",
+      "orderNotPickedUp" : "Seu Pedido Não foi Retirado. Você esqueceu?",
+      "orderEnRoute"     : "Seu Pedido está a caminho",
+      "orderDelivered"   : "Seu Pedido foi Entregue"
+}
