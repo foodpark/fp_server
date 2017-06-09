@@ -3,9 +3,7 @@ var fs = require('fs');
 var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('requestretry');
-var winston = require('winston');
-
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
+var logger = require('winston');
 
 
 const DELETE = 'DELETE';

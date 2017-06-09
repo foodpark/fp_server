@@ -8,9 +8,7 @@ var moltin = require('./moltin.server.controller');
 var OrderHistory = require('../models/orderhistory.server.model');
 var timestamp = require('../utils/timestamp');
 var debug = require('debug')('push');
-var winston = require('winston');
-
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
+var logger = require('winston');
 
 var deviceInfo = {};
 

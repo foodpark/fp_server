@@ -9,7 +9,9 @@ if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
 
-winston.loggers.options.transports = [
+//winston.loggers.options.transports = 
+winston.configure({
+    transports:[
   new winston.transports.DailyRotateFile({
     name: 'access-log',
     filename: `${logDir}/-access.log`,
@@ -33,5 +35,6 @@ winston.loggers.options.transports = [
     showLevel : false
   })
 ]
+});
 
 module.exports = require('./env/'+ process.env.NODE_ENV +'.js');

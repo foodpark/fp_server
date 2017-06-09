@@ -6,9 +6,8 @@ var msc = require('./moltin.server.controller');
 var config = require('../../config/config');
 var debug = require('debug')('storefront');
 var _ = require('lodash');
-var winston = require('winston');
+var logger = require('winston');
 
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 var getErrorMessage = function(err) {
     var message = '';

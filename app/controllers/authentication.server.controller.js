@@ -8,11 +8,10 @@ var Admin = require('../models/admin.server.model');
 var Unit = require('../models/unit.server.model');
 var debug = require('debug')('auth');
 var _ = require('lodash');
-var winston = require('winston');
+var logger = require('winston');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var passport = require('passport');
 
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 exports.CUSTOMER = 'CUSTOMER';
 exports.OWNER    = 'OWNER';
@@ -60,6 +59,12 @@ exports.login = function *(next) {
   debug('login complete')
   debug(this.passport.user)
   debug('calling')
+  meta = {
+    fn : 'login',
+    user_id : this.passport.user.id,
+    role : this.passport.user.role
+  };
+  logger.info('User logging in', meta);
   userInfo = setUserInfo(this.passport.user)
   if (this.passport.user.role == 'OWNER') {
     var company = '';
@@ -71,6 +76,7 @@ exports.login = function *(next) {
       throw err;
     }
     userInfo.company_id = company.id;
+    meta.company_id = company.id;
   } else if (this.passport.user.role == 'CUSTOMER') {
     var customer = '';
     try {
@@ -81,6 +87,7 @@ exports.login = function *(next) {
       throw err;
     }
     userInfo.customer_id = customer.id
+    meta.customer_id = customer.id;
   } else if (this.passport.user.role == 'ADMIN') {
     var admin = '';
     try {
@@ -91,6 +98,7 @@ exports.login = function *(next) {
       throw err;
     }
     userInfo.admin_id = admin.id
+    meta.admin_id = admin.id;
   } else if (this.passport.user.role == 'UNITMGR') {
     var unit = '';
     try {
@@ -101,6 +109,7 @@ exports.login = function *(next) {
       throw err;
     }
     userInfo.unit_id = unit.id
+    meta.unit_id = unit.id;
   }
   debug('done')
   debug('userInfo: '+ userInfo)
@@ -110,7 +119,7 @@ exports.login = function *(next) {
     user: userInfo
   };
   debug(this.body);
-  logger.info('login completed for user ', {fn: 'login', user_id: this.passport.user.id});
+  logger.info('login completed for user ', meta);
   return;
 };
 

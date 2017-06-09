@@ -3,9 +3,8 @@ var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('request');
 var uuid = require('uuid');
-var winston = require('winston');
+var logger = require('winston');
 
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 const DELETE = 'DELETE';
 const GET = 'GET';

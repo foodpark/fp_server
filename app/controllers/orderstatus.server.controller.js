@@ -1,7 +1,6 @@
 var ord = require('../../app/models/orderstatus.server.model');
-var winston = require('winston');
+var logger = require('winston');
 
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 exports.getStatus = function *(next) {
   this.body = ord.getOrderStatus(this.orderStatusId);

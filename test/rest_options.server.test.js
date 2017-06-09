@@ -29,10 +29,10 @@ delivery:
   "for_delivery": "true"
 }
 */
-var coId = '1005';
-var unitId = '2006';
+var coId = 1005;
+var unitId = 2006;
 var customer = 'mp10';
-var custId = '9001';
+var custId = 9001;
 var orderSysOrderId = '1505190689619574804';
 
 var puOrderId = '';
@@ -70,8 +70,10 @@ describe(tests +' Create a new order', function() {
     chai.request(server)
     .post('/api/v1/rel/companies/'+ coId +'/units/'+ unitId+'/order_history')
     .set('Authorization', custToken)
-    .field('order_sys_order_id', orderSysOrderId)
-    .field('desired_pickup_time', '6/6/2017, 8:11:56 PM')
+    .send( {
+        "order_sys_order_id": orderSysOrderId,
+        "desired_pickup_time": "6/6/2017, 8:11:56 PM"
+    })
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -97,14 +99,15 @@ describe(tests +' Create a new order', function() {
 describe(tests +' Delete the pickup order', function() {
   it('should delete the pickup order', function(done) {
     chai.request(server)
-    .delete('/api/v1/rel/companies/'+ coId +'/units/'+ unitId +'/orderhistory/'+ puOrderId)
+    .delete('/api/v1/rel/companies/'+ coId +'/units/'+ unitId +'/order_history/'+ puOrderId)
     .set('Authorization', custToken)
     .end(function(err, res) {
+      console.log(err);
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('status');
-      res.body.status.should.equal(true);
+      res.body.should.have.property('success');
+      res.body.success.should.equal(true);
       done();
     });
   });
