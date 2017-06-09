@@ -1,0 +1,13 @@
+{
+        "payProcessed"     :"Pago Procesado - Pedido #{{orderNum}}",
+        "payFailed"        :"Error en el pago - Pedido #{{orderNum}}",
+        "orderDeclined"    :"{{company}} did not accept your order at this time. Please try again some other time.",
+        "orderAccepted"    :"Solicitud aceptada en {{time}}",  
+        "orderQueued"      :"Su pedido #{{orderNum}} está en fila para preparación",
+        "orderCooking"     :"Su pedido #{{orderNum}} se comenzó a cocinar",
+        "orderReady"       :"Su pedido #{{orderNum}} está listo!",
+        "orderPickedUp"    :"Su pedido #{{orderNum}} fue retirado!",
+        "orderNotPickedUp" :"Su pedido #{{orderNum}} Su pedido no fue retirado. Lo olvidó?",
+        "orderDispatched"  :"Su pedido #{{orderNum}} está en camino!",
+        "orderDelivered"   :"Su pedido #{{orderNum}} fue entregado. Gracias! "
+}
