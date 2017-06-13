@@ -2,6 +2,7 @@ var config  = require('../../config/config');
 var auth = require('./authentication.server.controller');
 var Company = require ('../models/company.server.model');
 var Customer = require ('../models/customer.server.model');
+var User = require('../models/user.server.model')
 var moltin  = require('./moltin.server.controller');
 var orderhistory  = require('../models/orderhistory.server.model');
 var Unit    = require ('../models/unit.server.model');
@@ -36,11 +37,12 @@ exports.getActiveOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
-  if (user.role == 'OWNER' && user.id == this.company.user_id || 
+  if (user.role == 'OWNER' && user.id == this.company.user_id ||
       user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
-    try { 
+    try {
+      var unit_manager_fbid = (yield User.getFbId(user.id))[0];
       var orders = yield orderhistory.getActiveOrders(this.company.id, this.unit.id);
     } catch (err) {
       console.error('getActiveOrders: error getting active orders');
@@ -49,7 +51,8 @@ exports.getActiveOrders = function * (next) {
     }
     debug('..orders');
     debug(orders);
-    this.body = orders;
+    this.body = orders
+    this.body.unit_manager_fbid = unit_manager_fbid;
     return;
   } else {
     console.error('get active orders: User not authorized')
@@ -67,11 +70,11 @@ exports.getClosedOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
-  if (user.role == 'OWNER' && user.id == this.company.user_id || 
+  if (user.role == 'OWNER' && user.id == this.company.user_id ||
       user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
-    try { 
+    try {
       var orders = yield orderhistory.getClosedOrders(this.company.id, this.unit.id);
     } catch (err) {
       console.error('getClosedOrders: error getting closed orders');
@@ -98,11 +101,11 @@ exports.getRequestedOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
-  if (user.role == 'OWNER' && user.id == this.company.user_id || 
+  if (user.role == 'OWNER' && user.id == this.company.user_id ||
       user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
-    try { 
+    try {
       var orders = yield orderhistory.getRequestedOrders(this.company.id, this.unit.id);
     } catch (err) {
       console.error('getRequestedOrders: error getting requested orders');
@@ -131,10 +134,11 @@ exports.getCustomerActiveOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
-  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id || 
+  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
-    try { 
+    try {
+      var customer_fbid = (yield User.getFbId(user.id))[0];
       var orders = yield orderhistory.getCustomerActiveOrders(this.customer.id);
     } catch (err) {
       console.error('getCustomerActiveOrders: error getting customer active orders');
@@ -143,7 +147,8 @@ exports.getCustomerActiveOrders = function * (next) {
     }
     debug('..orders');
     debug(orders);
-    this.body = orders;
+    this.body = orders
+    this.body.customer_fbid = customer_fbid;
     return;
   } else {
     console.error('get customer active orders: User not authorized')
@@ -163,10 +168,10 @@ exports.getCustomerClosedOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
-  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id || 
+  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
-    try { 
+    try {
       var orders = yield orderhistory.getCustomerClosedOrders(this.customer.id);
     } catch (err) {
       console.error('getCustomerClosedOrders: error getting customer closed orders');
@@ -195,10 +200,10 @@ exports.getCustomerRequestedOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
-  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id || 
+  if (user.role == 'CUSTOMER' && user.id == this.customer.user_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
-    try { 
+    try {
       var orders = yield orderhistory.getCustomerRequestedOrders(this.customer.id);
     } catch (err) {
       console.error('getCustomerRequestedOrders: error getting customer requested orders');

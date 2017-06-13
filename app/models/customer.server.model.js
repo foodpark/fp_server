@@ -20,6 +20,10 @@ exports.verifyUser = function(customerId, userId) {
   })
 };
 
+exports.getCustomerIdForUser = function(userId) {
+  return knex('customers').select('id').where('user_id', userId);
+}
+
 exports.createCustomer = function(userId) {
   return knex('customers').insert(
     {
