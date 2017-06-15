@@ -164,7 +164,7 @@ exports.getCustomerActiveOrders = function * (next) {
     debug('..orders');
     debug(orders);
     returnBody.orders = orders;
-    returnBody.unit_manager_fbid = customer_fbid;
+    returnBody.customer_fbid = customer_fbid;
     logger.info("Return: " + returnBody);
     this.body = returnBody;
     return;
