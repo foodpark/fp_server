@@ -37,13 +37,19 @@ exports.getActiveOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
+  var orders = {};
+  var unit_manager_fbid = user.fbid;
+  var returnBody = {};
+  logger.info(user);
   if (user.role == 'OWNER' && user.id == this.company.user_id ||
       user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
     try {
-      var unit_manager_fbid = (yield User.getFbId(user.id))[0];
-      var orders = yield orderhistory.getActiveOrders(this.company.id, this.unit.id);
+
+      logger.info("UM FBID: " + unit_manager_fbid);
+      orders = yield orderhistory.getActiveOrders(this.company.id, this.unit.id);
+      logger.info("UM ORDERS: " + orders);
     } catch (err) {
       console.error('getActiveOrders: error getting active orders');
       console.error(err)
@@ -51,8 +57,16 @@ exports.getActiveOrders = function * (next) {
     }
     debug('..orders');
     debug(orders);
-    this.body = orders
-    this.body.unit_manager_fbid = unit_manager_fbid;
+    // order.unit_manager_fbid = unit_manager_fbid;
+    if (orders) {
+    }
+    else {
+      orders = {};
+    }
+    returnBody.orders = orders;
+    returnBody.unit_manager_fbid = unit_manager_fbid;
+    logger.info("Return: " + returnBody);
+    this.body = returnBody;
     return;
   } else {
     console.error('get active orders: User not authorized')
@@ -134,12 +148,14 @@ exports.getCustomerActiveOrders = function * (next) {
   }
   debug('..check authorization');
   var user = this.passport.user;
+  var customer_fbid = user.fbid;
+  var returnBody = {};
+  var orders = {};
   if (user.role == 'CUSTOMER' && user.id == this.customer.user_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
     try {
-      var customer_fbid = (yield User.getFbId(user.id))[0];
-      var orders = yield orderhistory.getCustomerActiveOrders(this.customer.id);
+      orders = yield orderhistory.getCustomerActiveOrders(this.customer.id);
     } catch (err) {
       console.error('getCustomerActiveOrders: error getting customer active orders');
       console.error(err)
@@ -147,8 +163,10 @@ exports.getCustomerActiveOrders = function * (next) {
     }
     debug('..orders');
     debug(orders);
-    this.body = orders
-    this.body.customer_fbid = customer_fbid;
+    returnBody.orders = orders;
+    returnBody.unit_manager_fbid = customer_fbid;
+    logger.info("Return: " + returnBody);
+    this.body = returnBody;
     return;
   } else {
     console.error('get customer active orders: User not authorized')

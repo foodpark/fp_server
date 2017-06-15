@@ -67,9 +67,6 @@ exports.authenticate = function(md5password, password) {
   return md5password === md5;
 };
 
-exports.getFbId = function(id) {
-  return knex('users').select('fbid').where('id',id).returning('fbid');
-}
 
 exports.updateFB = function(id, fbid, fb_token) {
   logger.info(id + ',' + fbid + ',' + fb_token);
