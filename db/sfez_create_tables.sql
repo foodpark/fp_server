@@ -1,4 +1,5 @@
 
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
@@ -360,7 +361,7 @@ CREATE TABLE search_preferences (
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
-CREATE TABLE order_state (
+CREATE TABLE gen_state (
   id SERIAL PRIMARY KEY,
   order_sys_order_id text,
   step_name text,
@@ -370,6 +371,27 @@ CREATE TABLE order_state (
   error_info text,
   info text
 );
+
+CREATE TABLE order_state (
+  id SERIAL PRIMARY KEy,
+  order_id INTEGER REFERENCES order_history(id),
+  order_requested_step boolean DEFAULT false,
+  order_accepted_step boolean DEFAULT false,
+  order_pay_fail boolean DEFAULT false,
+  order_paid_step boolean DEFAULT false,
+  order_in_queue_step boolean DEFAULT false,
+  order_cooking_step boolean DEFAULT false,
+  order_ready_step boolean DEFAULT false,
+  order_dispatched_step boolean DEFAULT false,
+  order_picked_up_step boolean DEFAULT false,
+  order_no_show_step boolean DEFAULT false,
+  order_delivered_step boolean DEFAULT false,
+  apiCall text,
+  paramString text,
+  errorInfo text,
+  callInfo text
+);
+
 
 
 COPY roles (id, type) FROM stdin;
