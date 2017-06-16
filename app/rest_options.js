@@ -1387,6 +1387,12 @@ module.exports = {
       } else if (this.resteasy.table == 'reviews' && context && (m = context.match(/companies\/(\d+)$/))) {
         debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
+      } else if (this.resteasy.table == 'loyalty'
+                && context
+                && (m = context.match(/companies\/(\d+)/))
+                && (n = context.match(/customers\/(\d+)/))) {
+        debug('..reading loyalty');
+        return query.select('*').where('company_id',m[1]).andWhere('customer_id',n[1]);
       }
     }
   },
