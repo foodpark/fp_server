@@ -64,7 +64,9 @@ exports.login = function *(next) {
     user_id : this.passport.user.id,
     role : this.passport.user.role
   };
+  const lang = this.body.default_lang;
   logger.info('User logging in', meta);
+  yield (User.updateUser(meta.user_id, {default_language : lang }));
   userInfo = setUserInfo(this.passport.user)
   if (this.passport.user.role == 'OWNER') {
     var company = '';
@@ -582,6 +584,7 @@ exports.fbLogin = function*() {
   const fb_email = this.body.fb_email;
   const first_name = this.body.first_name;
   const last_name = this.body.last_name;
+  const default_language = this.body.default_language;
 
   logger.info("FBID: " + fbid);
   logger.info("fb_token: " + fb_token);
@@ -591,6 +594,7 @@ exports.fbLogin = function*() {
     var mapping = {};
     mapping.first_name = first_name;
     mapping.last_name = last_name;
+    mapping.default_language = default_language;
     if (fb_email) {
       mapping.username = fb_email;
     }
@@ -641,6 +645,9 @@ exports.fbLogin = function*() {
       user: userInfo
     };
     return;
+  }
+  else {
+    yield (User.updateUser(user.id, {default_language : default_language}));
   }
   var id = { id : user.id };
   logger.info(user);

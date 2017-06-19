@@ -84,7 +84,7 @@ CREATE TABLE users (
     fbid text,
     fb_token text,
     fb_login boolean,
-    default_language text,
+    default_language text DEFAULT 'en',
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
