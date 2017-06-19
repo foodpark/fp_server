@@ -930,44 +930,68 @@ function *beforeSaveUnit() {
 }
 
 function *beforeSaveCompanies() {
+  logger.info('Before company saved',{fn:'beforeSaveCompanies'});
   debug('beforeSaveCompanies');
+  if (!this.resteasy.object){
+    logger.error('No company provided',{fn:'beforeSaveCompanies',error:'No company provided'});
+    throw new Error ('No company provided',422);
+  }
   debug(this.resteasy.object);
   debug(this.params);
   if (this.resteasy.operation == 'update') {
+    logger.info('Before company updated - limit payload update menu items',{fn:'beforeSaveCompanies',params:params,company:this.resteasy.object});
     debug('...update');
     debug('...limit payload elements');
     try {
       // this will modify this.resteasy.object
       yield payload.limitCompanyPayloadForPut(this.resteasy.object)
     } catch (err) {
-      console.error(err)
+      logger.error('Unable to limit payload elements',{fn:'beforeSaveCompanies',company:this.resteasy.object, error:err});
       throw(err)
     }
-    var company = (yield Company.getSingleCompany(this.params.id))[0];
-    debug('company '+ company.id);
-    if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
-
-      var amount = this.resteasy.object.delivery_chg_amount;
-      debug('..delivery charge amount has changed to '+ amount +'. Updating..')
-      // Update moltin
-      var item = '';
-      var data = { price: amount};
-      try {
-          item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
-      } catch (err) {
-        console.error(err);
-        throw new Error ('Error updating delivery charge in ordering system');
+    try{
+      logger.info('Before company updated - get existing company',{fn:'beforeSaveCompanies',params_id:this.params.id});
+      var company = (yield Company.getSingleCompany(this.params.id))[0];
+      if (!company){
+          logger.error('No company exists with the provided id',{fn:'beforeSaveCompanies',params_id:this.params.id,error:'No company exists with the provided id'});
+          throw new Error('No company exists with the provided id',422);
       }
-      debug('..delivery charge updated')
+      debug('company '+ company.id);
+      if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
+        logger.info('Before company updated - update delivery charge amount',
+          {fn:'beforeSaveCompanies',existing_delivery_chg_amt:company.delivery_chg_amount,
+          updated_delivery_chg_amt:this.resteasy.object.delivery_chg_amount});
+        var amount = this.resteasy.object.delivery_chg_amount;
+        debug('..delivery charge amount has changed to '+ amount +'. Updating..')
+        // Update moltin
+        var item = '';
+        var data = { price: amount};
+        try {
+            item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
+          } catch (err) {
+            logger.error('Unable to update delivery charge in the ordering system',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,amount:data.price,error:'Error updating delivery charge in ordering system'});
+            throw new Error ('Error updating delivery charge in ordering system');
+          }
+          debug('..delivery charge updated')
+        }
+        catch (err){
+
+        }
     }
   }
 }
 
 function *beforeSaveDriver() {
+  logger.info('Before driver saved',{fn:'beforeSaveDriver'});
   debug('beforeSaveDriver');
+  if (!this.resteasy.object){
+    logger.error('No driver provided',{fn:'beforeSaveDriver',error:'No driver provided'});
+    throw new Error ('No driver provided',422);
+  }
   debug(this.resteasy.object);
   debug(this.params);
   if (this.resteasy.operation == 'create') {
+    logger.info('Before driver created - check for valid company context and unit',{fn:'beforeSaveDriver', params:this.params});
     debug('...create');
     debug('..getting company')
     var companyId = '';
@@ -976,8 +1000,8 @@ function *beforeSaveDriver() {
       companyId = m[1];
     } else {
       // no company context is an error
-      console.error('beforeSaveDrivers: No company context for driver: '+ this.params.context);
-      throw new Error ('No company context for driver')
+      logger.error('No company context for driver',{fn:'beforeSaveDriver',context:this.params.context, error:'No company context for driver'});
+      throw new Error ('No company context for driver',422);
     }
     var unitId = '';
     if (this.params.context && (n = this.params.context.match(/units\/(\d+)$/))) {
@@ -985,18 +1009,22 @@ function *beforeSaveDriver() {
       unitId = n[1];
     } else {
       // no unit context is an error
-      console.error('beforeSaveDrivers: No unit context for driver: '+ this.params.context);
-      throw new Error ('No unit context for driver')
+      logger.error('No unit context for driver',{fn:'beforeSaveDriver',context:this.params.context, error:'No unit context for driver'});
+      throw new Error ('No unit context for driver',422);
     }
 
     this.resteasy.object.company_id = companyId;
     this.resteasy.object.unit_id = unitId;
+
+    logger.info('Driver will be created',{fn:'beforeSaveDriver',company_id:companyId,unit_id:unitId,driver:this.resteasy.object});
   }
 }
 
 function *beforeSaveLoyaltyRewards() {
+  logger.info('Before loyalty rewards saved',{fn:'beforeSaveLoyaltyRewards'});
   debug('beforeSaveLoyaltyRewards');
   if (this.resteasy.operation == 'create') {
+    logger.info('Before loyalty rewards created - check for existing company context',{fn:'beforeSaveLoyaltyRewards'});
     if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
       var coId = m[1];
       debug('..company id '+ coId);
@@ -1005,45 +1033,74 @@ function *beforeSaveLoyaltyRewards() {
       debug(exists);
       // if vendor already has loyalty rewards defined for their company ID, do not allow a second set to be saved.
       if (exists) {
+        logger.error('Company has existing rewards defined',{fn:'beforeSaveLoyaltyRewards',company_id:coId});
         this.throw('Company has existing rewards defined. Use PUT/PATCH to modify.',405);
       }
       this.resteasy.object.company_id = coId;
+      log.info('Loyalty rewards will be created for company',{fn:'beforeSaveLoyaltyRewards',company_id:this.resteasy.object.company_id});
     } else {
+      log.error('No company context found for loyalty rewards',{fn:'beforeSaveLoyaltyRewards',error:'No company context found for loyalty rewards'});
       this.throw('No company context found for loyalty rewards',422);
     }
   }
 }
 
 function *beforeSaveUser() {
+  logger.info('Before User saved - encrypt password',{fn:'beforeSaveUser',params:this.params});
+  if (!this.params || !this.params.id){
+    logger.error('No user id provided',{fn:'beforeSaveUser',params:this.params,error:'No user id provided'});
+    throw new Error('No user id provided', 422);
+  }
   debug('beforeSaveUser');
   if (this.passport.user.role!='ADMIN' && this.passport.user.id != this.params.id) {
-    console.error('beforeSaveUser: Logged-in user id does not match param user id');
-    throw new Error('Param id does not match logged-in user credentials');
+    logger.error('Logged-in user id does not match param user id',{fn:'beforeSaveUser',loggedIn_user_id:this.passport.user.id,param_user_id:this.params.id,error:'Param id does not match logged-in user credentials'});
+    throw new Error('Param id does not match logged-in user credentials', 422);
   }
   var password = this.resteasy.object.password;
   debug(password);
   if (password) {
-    this.resteasy.object.password = User.encryptPassword(password);
+    try{
+      this.resteasy.object.password = User.encryptPassword(password);
+      logger.info('Password encrypted',{fn:'beforeSaveUser',param_user_id:this.params.id});
+      debug(this.resteasy.object);
+    }
+    catch (err){
+      logger.error('Unable to encrypt user password'{fn:'beforeSaveUser',param_user_id:this.params.id,error:err});
+      throw err;
+    }
   }
-  debug(this.resteasy.object);
 }
 
 function *afterCreateReview(review) {
-  var reviewApproval = { review_id: review.id, status: 'New', updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
+  logger.info('After review created - add review approval record',{fn:'afterCreateReview',review:review});
+  if (!review){
+    log.error('No Review provided',{fn:'afterCreateReview',error:'No Review provided'});
+    throw new Error('No Review provided',422);
+  }
+  try{
+    var reviewApproval = { review_id: review.id, status: 'New', updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
 
-  this.resteasy.queries.push(
-    this.resteasy.transaction.table('review_approvals')
-      .insert(reviewApproval)
-  );
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('review_approvals')
+        .insert(reviewApproval)
+    );
+    logger.info('Review approval record created',{fn:'afterCreateReview',review_id:review.id,reviewApproval:reviewApproval});
+  }
+  catch(err){
+    logger.error('Unable to create review approval record',{fn:'afterCreateReview',review_id:review.id},error:err});
+    throw err;
+  }
 }
 
 function *afterCreateLoyaltyUsed(loyaltyUsed) {
+  logger.info('afterCreateLoyaltyUsed - subtracting redeemed loyalty points for customer',{fn:'afterCreateLoyaltyUsed',loyaltyUsed:loyaltyUsed});
   if (!loyaltyUsed) {
+    logger.error('Parameter loyaltyUsed must be defined', {fn:'afterCreateLoyaltyUsed',error:'Parameter loyaltyUsed must be defined'});
     throw new Error('Parameter loyaltyUsed must be defined');
   }
-  logger.info('afterCreateLoyaltyUsed - subtracting redeemed loyalty points for customer ' + loyaltyUsed.customer_id + ', company ' + loyaltyUsed.company_id);
   var priorBalance = (yield Loyalty.getPointBalance(loyaltyUsed.customer_id, loyaltyUsed.company_id))[0];
   if (!priorBalance) {
+    logger.error('Unable to get loyalty point balance for customer', {fn:'afterCreateLoyaltyUsed', customer_id:loyaltyUsed.customer_id, company:loyaltyUsed.company_id, error:'Unable to get loyalty point balance for customer'});
     throw new Error('Unable to get loyalty point balance for customer ' + loyaltyUsed.customer_id + ', company ' + loyaltyUsed.company_id);
   }
   var oldBal = parseInt(priorBalance.balance);
@@ -1067,37 +1124,63 @@ function *afterCreateLoyaltyUsed(loyaltyUsed) {
     eligible_fifteen: isEligible_fifteen,
     updated_at: this.resteasy.knex.fn.now()
   }
-  debug(updateLoyalty);
-  this.resteasy.queries.push(
-    this.resteasy.transaction.table('loyalty').where('id', priorBalance.id)
-      .update(updateLoyalty)
-  );
-  debug('afterCreateLoyaltyUsed success');
+  try{
+    debug(updateLoyalty);
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('loyalty').where('id', priorBalance.id)
+        .update(updateLoyalty)
+    );
+    debug('afterCreateLoyaltyUsed success');
+    logger.info('Loyalty point balance updated', {fn:'afterCreateLoyaltyUsed',customer_id:loyaltyUsed.customer_id,company_id:loyaltyUsed.company_id,priorBalanc_id:priorBalance.id,updateLoyalty:updateLoyalty});
+  }
+  catch (err){
+    logger.error('Unable to update loyalty points',{fn:'afterCreateLoyaltyUsed',priorBalance_id:priorBalance.id,updatedLoyalty:updateLoyalty});
+    throw err;
+  }
 }
 
 function *afterUpdateReviewApproval(approval) {
+  logger.info('Updating review status and company rating', {fn:'afterUpdateReviewApproval',approval:approval});
   debug('begin afterUpdateReviewApproval function');
+  if (!approval){
+    logger.error('No Approval provided for review',{fn:'afterUpdateReviewApproval'}, error:'No Approval provided for review'});
+    throw new Error('No approval provided for review', 422);
+  }
   var hash = { status: approval.status };
 
-  this.resteasy.queries.push(
-    this.resteasy.transaction.table('reviews').where('id', approval.review_id).update(hash)
-  );
+  try{
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('reviews').where('id', approval.review_id).update(hash)
+    );
+    logger.info('Updated Review Status',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, hash:hash});
+  }
+  catch (err){
+    logger.error('Unable to Update Review Status',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, hash:hash, error:err});
+    throw err;
+  }
 
   // Recalculate company rating
   if (approval.status == "Approved") {
-    var companyId = (yield Reviews.getCompanyId(approval.review_id))[0];
-    if (companyId) {
-      var averageRating = (yield Reviews.getAverageRating(companyId.company_id, approval.review_id))[0];
-      if (averageRating) {
-        debug('average rating is now ' + averageRating.avg_rating + ' for company ID ' + companyId.company_id);
-        var updateCompanyRating = { calculated_rating: averageRating.avg_rating };
+    try{
+      var companyId = (yield Reviews.getCompanyId(approval.review_id))[0];
+      if (companyId) {
+        var averageRating = (yield Reviews.getAverageRating(companyId.company_id, approval.review_id))[0];
+        if (averageRating) {
+          debug('average rating is now ' + averageRating.avg_rating + ' for company ID ' + companyId.company_id);
+          var updateCompanyRating = { calculated_rating: averageRating.avg_rating };
 
-        this.resteasy.queries.push(
-          this.resteasy.transaction.table('companies').where('id', companyId.company_id).update(updateCompanyRating)
-        );
-      } else {
-        console.log('Unable to get avg rating for company '+ companyId.company_id);
+          this.resteasy.queries.push(
+            this.resteasy.transaction.table('companies').where('id', companyId.company_id).update(updateCompanyRating)
+          );
+        } else {
+          logger.info('Unable to get Average Rating for company',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, companyId:companyId.company_id});
+        }
       }
+      logger.info('Updated Average Rating for company',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, companyId:companyId.company_id});
+    }
+    catch (err){
+      logger.error('Unable to update Average Rating', {fn:'afterUpdateReviewApproval', review_id:approval.review_id, error:err});
+      throw err;
     }
   }
 }
