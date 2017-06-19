@@ -64,8 +64,12 @@ exports.login = function *(next) {
     user_id : this.passport.user.id,
     role : this.passport.user.role
   };
-  const lang = this.body.default_lang;
+  var lang = this.passport.default_language;
+
   logger.info('User logging in', meta);
+  if (!lang) {
+    lang = 'en';
+  }
   yield (User.updateUser(meta.user_id, {default_language : lang }));
   userInfo = setUserInfo(this.passport.user)
   if (this.passport.user.role == 'OWNER') {
