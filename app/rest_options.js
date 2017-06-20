@@ -18,22 +18,23 @@ var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 var winston = require('winston');
+var T = require('./utils/translate');
 
 var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 
 function *simplifyDetails(orderDetail) {
-  logger.info('Simplifying order details', {fn: 'simplifyDetails', 
+  logger.info('Simplifying order details', {fn: 'simplifyDetails',
     user_id: this.passport.user.id, role: this.passport.user.role});
   if (!orderDetail) {
-    logger.error('No order details provided', 
-        {fn: 'simplifyDetails', user_id: this.passport.user.id, role: this.passport.user.role, 
+    logger.error('No order details provided',
+        {fn: 'simplifyDetails', user_id: this.passport.user.id, role: this.passport.user.role,
          error: 'Missig order details'});
     return '';
   }
   var items = orderDetail;
   debug('array length '+ items.length);
-  logger.info('Processing '+ items.length + ' items in order', {fn: 'simplifyDetails', 
+  logger.info('Processing '+ items.length + ' items in order', {fn: 'simplifyDetails',
     user_id: this.passport.user.id, role: this.passport.user.role, num_items: items.length});
   var menuItems = {};
   for (i = 0; i < items.length; i++ ) {
@@ -91,18 +92,18 @@ function *simplifyDetails(orderDetail) {
     menuItems[item.id] = itemDetail;
     debug(menuItems);
   }
-  logger.info('Order details simplified', {fn: 'simplifyDetails', 
+  logger.info('Order details simplified', {fn: 'simplifyDetails',
     user_id: this.passport.user.id, role: this.passport.user.role});
   debug(menuItems);
   return menuItems;
 }
 
 function * calculateDeliveryPickup(unitId, deliveryTime) {
-  logger.info('Calculating delivery pickup', {fn: 'calculateDeliveryPickup', 
-    user_id: this.passport.user.id, role : this.passport.user.role, unit_id: unitId, 
+  logger.info('Calculating delivery pickup', {fn: 'calculateDeliveryPickup',
+    user_id: this.passport.user.id, role : this.passport.user.role, unit_id: unitId,
     delivery_time: deliveryTime});
   var pickup = '';
-  if (deliveryTime) { 
+  if (deliveryTime) {
     var delivery = new Date(deliveryTime);
     var unit = '';
     try {
@@ -110,13 +111,13 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
       debug('..unit');
       debug(unit);
     } catch (err) {
-      logger.error('Error getting unit', 
-          {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, 
+      logger.error('Error getting unit',
+          {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id,
           role: this.passport.user.role, error: err});
       throw err;
     }
     if (unit.delivery_time_offset) {
-      pickup = new Date( delivery.getTime() - unit.delivery_time_offset * 60000); 
+      pickup = new Date( delivery.getTime() - unit.delivery_time_offset * 60000);
     } else {
       pickup = new Date(delivery.getTime() - config.deliveryOffset * 60000);
     }
@@ -126,9 +127,9 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
   logger.info('Delivery pickup time '+ puTime,
     {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role: this.passport.user.role,
     unit_id: unitId, delivery_time: deliveryTime, pickup_time: puTime });
-  /*logger.info('Delivery pickup time '+ pickup.toIsoString(), 
-    {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role : 
-    this.passport.user.role, unit_id: unitId, delivery_time: deliveryTime, 
+  /*logger.info('Delivery pickup time '+ pickup.toIsoString(),
+    {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role :
+    this.passport.user.role, unit_id: unitId, delivery_time: deliveryTime,
     pickup_time: pickup.toISOString()});*/
   return pickup;
 }
@@ -138,23 +139,23 @@ function *beforeSaveOrderHistory() {
   debug(this.resteasy.object);
   debug('..operation '+ this.resteasy.operation)
   debug(this.passport.user.role)
-  logger.info('Prepare to save order ', 
-    {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role : 
-    this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id}); 
+  logger.info('Prepare to save order ',
+    {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role :
+    this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id});
 
 
 
   if (this.resteasy.operation == 'create') {
     if (this.passport.user.role != 'CUSTOMER') {
-      logger.error('User unauthorized', 
-          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+      logger.error('User unauthorized',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
           role: this.passport.user.role, error: 'User unauthorized'});
       throw new Error('User unauthorized', 401);
     }
     var osoId = this.resteasy.object.order_sys_order_id;
     if (! this.resteasy.object.order_sys_order_id) { // is required
-      logger.error('No order id provided for e-commerce system', 
-          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+      logger.error('No order id provided for e-commerce system',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
           role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
       throw new Error('order_sys_order_id is required', 422);
     }
@@ -168,8 +169,8 @@ function *beforeSaveOrderHistory() {
       debug('..customer')
       debug(customer)
     } catch (err) {
-      logger.error('Error getting customer', 
-          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+      logger.error('Error getting customer',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
           role: this.passport.user.role, order_sys_order_id: osoId, error: err});
       throw err;
     }
@@ -178,8 +179,8 @@ function *beforeSaveOrderHistory() {
     this.resteasy.object.customer_name = customerName;
     this.resteasy.object.customer_id = customer.id;
 
-    logger.info('Order by customer '+ customerName, 
-      {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role : 
+    logger.info('Order by customer '+ customerName,
+      {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role :
       this.passport.user.role, order_sys_order_id: osoId});
     //set company
     debug('..get company id');
@@ -199,15 +200,15 @@ function *beforeSaveOrderHistory() {
       debug('..company');
       debug(company);
     } catch (err) {
-      logger.error('Error getting company', 
-          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, 
+      logger.error('Error getting company',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
           role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, error: err});
       throw err;
     }
     debug("..company name is "+ company.name);
     this.resteasy.object.company_name = company.name;
 
-    logger.info('Order for company '+ company.name, 
+    logger.info('Order for company '+ company.name,
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId});
 
@@ -222,7 +223,7 @@ function *beforeSaveOrderHistory() {
       debug(unitId);
       this.resteasy.object.unit_id = unitId;
     }
-    logger.info('Order for unit '+ unitId, 
+    logger.info('Order for unit '+ unitId,
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId});
 
@@ -289,13 +290,13 @@ function *beforeSaveOrderHistory() {
       if (deliveryTime) {
         var pickup = '';
         try {
-          pickup = yield calculateDeliveryPickup.call(this, this.resteasy.object.unit_id, 
+          pickup = yield calculateDeliveryPickup.call(this, this.resteasy.object.unit_id,
                                                  this.resteasy.object.desired_delivery_time);
         } catch (err) {
           logger.error('Error calculating delivery pickup time',
             {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
             role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
-            delivery_address_id: this.resteasy.object.delivery_address_id, 
+            delivery_address_id: this.resteasy.object.delivery_address_id,
             delivery_time: deliveryTime, error: err});
           throw (err);
         }
@@ -323,7 +324,7 @@ function *beforeSaveOrderHistory() {
     if (this.resteasy.object.status) {
       var newStat = this.resteasy.object.status;
       debug('..status sent is '+ newStat)
-      logger.info('PUT includes a status update ', 
+      logger.info('PUT includes a status update ',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
         role: this.passport.user.role, order_id: this.params.id, new_status: newStat});
       try {
@@ -337,7 +338,7 @@ function *beforeSaveOrderHistory() {
         throw(err)
       }
       debug (savedStatus)
-      logger.info('Got previous statuses', 
+      logger.info('Got previous statuses',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
         role: this.passport.user.role, order_id: this.params.id, new_status: newStat});
       if (!savedStatus.status[newStat]) {
@@ -348,12 +349,12 @@ function *beforeSaveOrderHistory() {
       this.resteasy.object.status = savedStatus.status;
     } else {
       debug('...not a status update')
-      logger.info('PUT does not involve a status update '+ unitId, 
+      logger.info('PUT does not involve a status update '+ unitId,
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
         role: this.passport.user.role, order_sys_order_id: osoId});
     }
   }
-  logger.info('Pre-flight for order save completed '+ unitId, 
+  logger.info('Pre-flight for order save completed '+ unitId,
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
     role: this.passport.user.role, order_sys_order_id: osoId});
   debug('returning from beforeSaveOrderHistory');
@@ -399,7 +400,7 @@ function *afterCreateOrderHistory(orderHistory) {
     throw err;
   }
   debug(customer);
-  
+
   var orderDetail = JSON.stringify(orderHistory.order_detail, null, 2);
   debug(orderDetail);
   var pickuptime = orderHistory.desired_pickup_time.toISOString();
@@ -433,7 +434,7 @@ function *afterCreateOrderHistory(orderHistory) {
   debug('..returned from notifying')
 
   logger.info('Unit '+ unit.id +' notified of order '+ orderNum, meta);
-  debug(timestamp.now()); 
+  debug(timestamp.now());
   var hash = {
     status : {
       order_requested: timestamp.now()
@@ -457,7 +458,7 @@ var display = {
 	no_show          : ': customer was no show',
 	order_dispatched : 'was dispatched',
 	order_delivered	 : 'was delivered'
-} 
+}
 
 function *afterUpdateOrderHistory(orderHistory) {
   debug('afterUpdateOrderHistory')
@@ -470,7 +471,8 @@ function *afterUpdateOrderHistory(orderHistory) {
   var osoId = orderHistory.order_sys_order_id;
   meta.order_sys_order_id = osoId;
   meta.status = orderHistory.status;
-  
+  var lang = this.passport.user.default_language;
+
   logger.info('Post order update processing started for order '+ orderHistory.id, meta);
   var deviceId = ''
   var title = ''
@@ -483,7 +485,7 @@ function *afterUpdateOrderHistory(orderHistory) {
     debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
-      logger.info('Notification not yet sent for status '+status+' for order '+ orderHistory.id, meta); 
+      logger.info('Notification not yet sent for status '+status+' for order '+ orderHistory.id, meta);
       debug('...status '+ status)
       var customer ='';
       try {
@@ -518,8 +520,8 @@ function *afterUpdateOrderHistory(orderHistory) {
       var msgTarget = { order_id : orderHistory.id }
       if (status == 'order_paid' || status == 'pay_fail') {
         debug('...status update from customer. Notify unit');
-        logger.info('Customer order update. Notify unit', meta); 
-        // get unit 
+        logger.info('Customer order update. Notify unit', meta);
+        // get unit
         try {
           var unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
         } catch (err) {
@@ -535,10 +537,10 @@ function *afterUpdateOrderHistory(orderHistory) {
         msgTarget.fcmId = unit.fcm_id
       } else {
         debug('...status update from unit. Notify customer '+ orderHistory.customer_id);
-        logger.info('Unit order update. Notify customer', meta); 
+        logger.info('Unit order update. Notify customer', meta);
         // get customer device id
         debug('..Customer gcm id is '+ customer.gcm_id)
-        msgTarget.to = 'customer' 
+        msgTarget.to = 'customer'
         msgTarget.toId = customer.id
         msgTarget.gcmId = customer.gcm_id
         msgTarget.fcmId = customer.fcm_id
@@ -558,19 +560,19 @@ function *afterUpdateOrderHistory(orderHistory) {
       switch(status) {
           // From Customer
           case 'order_paid':
-              msgTarget.title = "Payment Processed - Order #"+ orderNum;
+              msgTarget.title = T.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
               msgTarget.message = custName +"'s payment was processed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
           case 'pay_fail':
-              msgTarget.title = "Payment Failed - Order #"+ orderNum;
+              msgTarget.title = T.translate(lang, payFailed, orderNum);//"Payment Failed - Order #"+ orderNum;
               msgTarget.message = custName +" payment failed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
           // From Unit
           case 'order_declined':
               msgTarget.title = "Order Declined";
-              msgTarget.message = company.name +" did not accept your order at this time. Please try again some other time.";
+              msgTarget.message = T.translate(lang, "orderDeclined", company.name);//company.name +" did not accept your order at this time. Please try again some other time.";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_accepted':
@@ -578,41 +580,41 @@ function *afterUpdateOrderHistory(orderHistory) {
               msgTarget.message =  'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'  +
                                    'Customer: '+ custName +'\n'+
                                    'Order: '+ orderNum;
-              msgTarget.body = "Order accepted at "+ timestamp.now();
+              msgTarget.body = T.translate(lang, "orderAccepted", timestamp.now());//"Order accepted at "+ timestamp.now();
               break;
           case 'order_in_queue':
               msgTarget.title = "Order In Queue";
-              msgTarget.message = "Your order #"+ orderNum +" is queued for preparation";
+              msgTarget.message = T.translate(lang, "orderQueued", orderNum);//Your order #"+ orderNum +" is queued for preparation";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_cooking':
               msgTarget.title = "Order Cooking";
-              msgTarget.message = "Your order #"+ orderNum +" started cooking";
+              msgTarget.message = T.translate(lang, "orderCooking", orderNum);//"Your order #"+ orderNum +" started cooking";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_ready':
               msgTarget.title = "Order Ready";
-              msgTarget.message = "Your order #"+ orderNum +" is ready!";
+              msgTarget.message = T.translate(lang, "orderReady", orderNum); //Your order #"+ orderNum +" is ready!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_picked_up':
               msgTarget.title = "Order Picked Up";
-              msgTarget.message = "Your order #"+ orderNum +" was picked up!";
+              msgTarget.message = T.translate(lang, "orderPickedUp", orderNum);// "Your order #"+ orderNum +" was picked up!";
               msgTarget.body = msgTarget.message;
               break;
           case 'no_show':
               msgTarget.title = "No Show";
-              msgTarget.message = "Your order #"+ orderNum +" was not picked up! Did you forget?";
+              msgTarget.message = T.translate(lang, "orderNotPickedUp", orderNum);//"Your order #"+ orderNum +" was not picked up! Did you forget?";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_dispatched':
               msgTarget.title = "Order Dispatched";
-              msgTarget.message = "Your order #"+ orderNum +" is on its way!";
+              msgTarget.message = T.translate(lang, "orderDispatched", orderNum);//"Your order #"+ orderNum +" is on its way!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_delivered':
               msgTarget.title = "Order Delivered";
-              msgTarget.message = "Your order #"+ orderNum +" was delivered. Thanks again!";
+              msgTarget.message = T.translate(lang, "orderDelivered", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
               msgTarget.body = msgTarget.message;
               break;
           default:
@@ -629,7 +631,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       supplemental.order_id = ''+ orderHistory.id;
       msgTarget.data = supplemental;
       msgTarget.status = status
-      
+
       debug(msgTarget);
       debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
 
@@ -748,18 +750,18 @@ function *beforeSaveReview() {
 
 
 function *beforeSaveCustomer(){
-  debug('beforeSaveCustomer');  
-  logger.info('Saving customer', {fn: 'beforeSaveCustomer', 
+  debug('beforeSaveCustomer');
+  logger.info('Saving customer', {fn: 'beforeSaveCustomer',
     user_id: this.passport.user.id, role : this.passport.user.role});
-  if (this.resteasy.operation == 'update') { 
-    // If APNS id provided, retrieve and set GCM id   
+  if (this.resteasy.operation == 'update') {
+    // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
       var gcmId = '';
       try {
         gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
       } catch (err) {
-        logger.error('Error sending APNS token to GCM', 
-            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id, 
+        logger.error('Error sending APNS token to GCM',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
             role: this.passport.user.role, error: err});
         throw err;
       }
@@ -838,7 +840,7 @@ function *beforeSaveUnit() {
       // need both to create new User and Unit
       console.error('beforeSaveUnit: Username/password are required');
       throw new Error ('Username/password are required');
-    } 
+    }
     // make sure it's a unique username
     var existingUser = '';
     try {
@@ -865,20 +867,20 @@ function *beforeSaveUnit() {
     }
     debug('..user created');
     debug(user);
-    this.resteasy.object.unit_mgr_id = user.id; 
+    this.resteasy.object.unit_mgr_id = user.id;
     this.resteasy.object.company_id = parseInt(companyId);
     debug('..ready to create unit');
     debug(this.resteasy.object);
   } else if (this.resteasy.operation == 'update') {
     debug('..starting update of existing Unit');
-     // If APNS id provided, retrieve and set GCM id   
+     // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
       var gcmId = '';
       try {
         gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
       } catch (err) {
-        logger.error('Error sending APNS token to GCM', 
-            {fn: 'beforeSaveUnit', user_id: this.passport.user.id, 
+        logger.error('Error sending APNS token to GCM',
+            {fn: 'beforeSaveUnit', user_id: this.passport.user.id,
             role: this.passport.user.role, unit_id: this.params.id, error: err});
         throw err;
       }
@@ -925,7 +927,7 @@ function *beforeSaveUnit() {
         }
         debug('..user after update');
         debug(user);
-      } 
+      }
     }
   }
 }
@@ -1019,7 +1021,7 @@ function *beforeSaveUser() {
   debug('beforeSaveUser');
   if (this.passport.user.role!='ADMIN' && this.passport.user.id != this.params.id) {
     console.error('beforeSaveUser: Logged-in user id does not match param user id');
-    throw new Error('Param id does not match logged-in user credentials'); 
+    throw new Error('Param id does not match logged-in user credentials');
   }
   var password = this.resteasy.object.password;
   debug(password);
@@ -1175,16 +1177,16 @@ module.exports = {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
         } else if (this.params.table == 'drivers') {
-          if(!this.isAuthenticated() || !this.passport.user || 
+          if(!this.isAuthenticated() || !this.passport.user ||
               (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN'  && this.passport.user.role != 'UNITMGR')) {
             this.throw('Create Unauthorized - Unit Manager/Owners/Admin only',401);
-          } 
+          }
           var valid = yield validUnitMgr(this.params, this.passport.user);
           if (!valid) {
             this.throw('Update Unauthorized - incorrect Unit Manager',401);
           } // else continue
           console.log("...authorized")
-        } else if (this.params.table == 'delivery_addresses' || this.params.table == 'favorites' || 
+        } else if (this.params.table == 'delivery_addresses' || this.params.table == 'favorites' ||
                    this.params.table == 'reviews' || this.params.table == 'order_history' || this.params.table == 'loyalty_used') {
           debug('..checking POST '+ this.params.table)
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
@@ -1197,7 +1199,7 @@ module.exports = {
             this.throw('Unauthorized - no such customer',401);
           } // else continue
           this.resteasy.object.customer_id = customer.id;
-          console.log('..authorized')  
+          console.log('..authorized')
         } else if (this.params.table == 'loyalty') {
           this.throw('Create Unauthorized', 401); // loyalty create is only allowed in-code when order state is 'order_paid'
         }
@@ -1212,7 +1214,7 @@ module.exports = {
       } else if (operation == 'update' && this.params.table == 'users' && this.isAuthenticated() &&
                  this.passport.user && this.passport.user.role != 'UNITMGR') {
         debug('..authorized '+ this.passport.user.role +' to update user info');
-        
+
       } else if (operation == 'update' || operation == 'delete') {
         if (this.params.table == 'territories' || this.params.table == 'food_parks' || this.params.table == 'roles' ||
             this.params.table == 'order_status_audit' || this.params.table == 'users') {
@@ -1237,7 +1239,7 @@ module.exports = {
             }
           }
         }  else if (this.params.table == 'drivers') {
-          if(!this.isAuthenticated() || !this.passport.user || 
+          if(!this.isAuthenticated() || !this.passport.user ||
              (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'UNITMGR')) {
             this.throw('Update/Delete Unauthorized - Unit Managers/Owners/Admin only',401);
           } else {
@@ -1247,7 +1249,7 @@ module.exports = {
             } // else continue
             console.log("...authorized");
           }
-        } else if (this.params.table == 'customers' ||  this.params.table == 'delivery_addresses' || 
+        } else if (this.params.table == 'customers' ||  this.params.table == 'delivery_addresses' ||
                    this.params.table == 'favorites' || this.params.table == 'reviews') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update/Delete Unauthorized - Customers/Admins only',401);
@@ -1258,7 +1260,7 @@ module.exports = {
           // loyalty update only allowed in-code when order state is 'order_paid'
           // loyalty_used should never need to be updated, as it is a transaction registry.
           this.throw('Update/Delete Unauthorized', 401);
-        } 
+        }
         console.log("...authorized")
       } else if (operation == 'read') {
         console.log('got a read')
@@ -1341,15 +1343,15 @@ module.exports = {
       if (this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
         debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
-      } else if (this.resteasy.table == 'order_history' && context 
-                && (m = context.match(/companies\/(\d+)/)) 
+      } else if (this.resteasy.table == 'order_history' && context
+                && (m = context.match(/companies\/(\d+)/))
                 && (n = context.match(/units\/(\d+)/))) {
         debug('..query order history');
         debug('..company id '+ m[1]);
         debug('..unit id '+ n[1]);
         return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
-      } else if (this.resteasy.table == 'drivers' && context 
-                && (m = context.match(/companies\/(\d+)/)) 
+      } else if (this.resteasy.table == 'drivers' && context
+                && (m = context.match(/companies\/(\d+)/))
                 && (n = context.match(/units\/(\d+)/))) {
         debug('..query drivers');
         debug('..company id '+ m[1]);
