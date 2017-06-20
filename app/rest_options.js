@@ -13,14 +13,13 @@ var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
 var timestamp = require('./utils/timestamp');
+var translator = require('./utils/translate');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
-var winston = require('winston');
-var T = require('./utils/translate');
+var logger = require('winston');
 
-var logger = new winston.Logger({transports : winston.loggers.options.transports});
 
 
 function *simplifyDetails(orderDetail) {
@@ -560,19 +559,19 @@ function *afterUpdateOrderHistory(orderHistory) {
       switch(status) {
           // From Customer
           case 'order_paid':
-              msgTarget.title = T.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
+              msgTarget.title = translator.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
               msgTarget.message = custName +"'s payment was processed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
           case 'pay_fail':
-              msgTarget.title = T.translate(lang, payFailed, orderNum);//"Payment Failed - Order #"+ orderNum;
+              msgTarget.title = translator.translate(lang, payFailed, orderNum);//"Payment Failed - Order #"+ orderNum;
               msgTarget.message = custName +" payment failed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
           // From Unit
           case 'order_declined':
               msgTarget.title = "Order Declined";
-              msgTarget.message = T.translate(lang, "orderDeclined", company.name);//company.name +" did not accept your order at this time. Please try again some other time.";
+              msgTarget.message = translator.translate(lang, "orderDeclined", company.name);//company.name +" did not accept your order at this time. Please try again some other time.";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_accepted':
@@ -580,41 +579,41 @@ function *afterUpdateOrderHistory(orderHistory) {
               msgTarget.message =  'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'  +
                                    'Customer: '+ custName +'\n'+
                                    'Order: '+ orderNum;
-              msgTarget.body = T.translate(lang, "orderAccepted", timestamp.now());//"Order accepted at "+ timestamp.now();
+              msgTarget.body = translator.translate(lang, "orderAccepted", timestamp.now());//"Order accepted at "+ timestamp.now();
               break;
           case 'order_in_queue':
               msgTarget.title = "Order In Queue";
-              msgTarget.message = T.translate(lang, "orderQueued", orderNum);//Your order #"+ orderNum +" is queued for preparation";
+              msgTarget.message = translator.translate(lang, "orderQueued", orderNum);//Your order #"+ orderNum +" is queued for preparation";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_cooking':
               msgTarget.title = "Order Cooking";
-              msgTarget.message = T.translate(lang, "orderCooking", orderNum);//"Your order #"+ orderNum +" started cooking";
+              msgTarget.message = translator.translate(lang, "orderCooking", orderNum);//"Your order #"+ orderNum +" started cooking";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_ready':
               msgTarget.title = "Order Ready";
-              msgTarget.message = T.translate(lang, "orderReady", orderNum); //Your order #"+ orderNum +" is ready!";
+              msgTarget.message = translator.translate(lang, "orderReady", orderNum); //Your order #"+ orderNum +" is ready!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_picked_up':
               msgTarget.title = "Order Picked Up";
-              msgTarget.message = T.translate(lang, "orderPickedUp", orderNum);// "Your order #"+ orderNum +" was picked up!";
+              msgTarget.message = translator.translate(lang, "orderPickedUp", orderNum);// "Your order #"+ orderNum +" was picked up!";
               msgTarget.body = msgTarget.message;
               break;
           case 'no_show':
               msgTarget.title = "No Show";
-              msgTarget.message = T.translate(lang, "orderNotPickedUp", orderNum);//"Your order #"+ orderNum +" was not picked up! Did you forget?";
+              msgTarget.message = translator.translate(lang, "orderNotPickedUp", orderNum);//"Your order #"+ orderNum +" was not picked up! Did you forget?";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_dispatched':
               msgTarget.title = "Order Dispatched";
-              msgTarget.message = T.translate(lang, "orderDispatched", orderNum);//"Your order #"+ orderNum +" is on its way!";
+              msgTarget.message = translator.translate(lang, "orderDispatched", orderNum);//"Your order #"+ orderNum +" is on its way!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_delivered':
               msgTarget.title = "Order Delivered";
-              msgTarget.message = T.translate(lang, "orderDelivered", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
+              msgTarget.message = translator.translate(lang, "orderDelivered", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
               msgTarget.body = msgTarget.message;
               break;
           default:
