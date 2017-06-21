@@ -376,16 +376,14 @@ function *afterCreateOrderHistory(orderHistory) {
   try {
     unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
   } catch (err) {
-    var ue = meta;
-    ue.error = err;
-    logger.error('Error retrieving unit', ue);
+    meta.error = err;
+    logger.error('Error retrieving unit', meta);
     throw err;
   }
   debug(unit);
   if (!unit.gcm_id && !unit.fcm_id) {
-    var fge = meta;
-    fge.error = 'No fcm/gcm for unit';
-    logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, fge);
+    meta.error = 'No fcm/gcm for unit';
+    logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, meta);
     throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
 
@@ -393,9 +391,8 @@ function *afterCreateOrderHistory(orderHistory) {
   try {
     customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
   } catch (err) {
-    var ce = meta;
-    ce.error = err;
-    logger.error('Error retrieving customer', ce);
+    meta.error = err;
+    logger.error('Error retrieving customer', meta);
     throw err;
   }
   debug(customer);
