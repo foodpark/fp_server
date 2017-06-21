@@ -1,4 +1,5 @@
 var debug = require('debug')('payload');
+var logger = require('winston');
 
  var COMPANY_ELEMENTS = [ 'id', 'order_sys_id', 'base_slug', 'default_cat', 'daily_special_cat_id', 'delivery_chg_cat_id', 
   'delivery_chg_item_id', 'stub', 'created_at', 'updated_at' ]
@@ -7,35 +8,39 @@ var debug = require('debug')('payload');
   'customer_name', 'customer_id', 'unit_id', 'company_id', 'created_at']
  
 
- exports.testFn = function *(next) {
-  console.log('testFn')
-  debug('..tested')
-};
 
  exports.limitCompanyPayloadForPut = function *(object) {
-     // modifies object passed in
-     debug('limitCompanyPayloadForPut')
-     debug(COMPANY_ELEMENTS)
-     debug(object)
-     try {
-         yield limitPayload(object, COMPANY_ELEMENTS);
-     } catch (err) {
-         console.error(err);
-         throw(err);
-     }
+    // modifies object passed in
+    debug('limitCompanyPayloadForPut')
+    debug(COMPANY_ELEMENTS)
+    debug(object)
+    var meta = { fn: 'limitCompanyPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role, 
+        company_id: this.params.id, company: object};
+    logger.info('Prepare to limit company payload to mutable elements ', meta);
+    try {
+        yield limitPayload(object, COMPANY_ELEMENTS);
+    } catch (err) {
+        meta.error = err;
+        logger.error('Error limiting company payload for PUT', meta);
+        throw(err);
+    }
  }
 
  exports.limitOrderHistPayloadForPut = function *(object) {
-     // modifies object passed in
-     debug('limitOrderHistPayloadForPut')
-     debug(ORDER_HIST_ELEMENTS)
-     debug(object)
-     try {
-         yield limitPayload(object, ORDER_HIST_ELEMENTS);
-     } catch (err) {
-         console.error(err);
-         throw(err);
-     }
+    // modifies object passed in
+    debug('limitOrderHistPayloadForPut')
+    debug(ORDER_HIST_ELEMENTS)
+    debug(object)
+    var meta = { fn: 'limitOrderHistPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role, 
+        order_id: this.params.id, order: object};
+    logger.info('Prepare to limit order payload to mutable elements ', meta);
+    try {
+        yield limitPayload(object, ORDER_HIST_ELEMENTS);
+    } catch (err) {
+        meta.error = err;
+        logger.error('Error limiting order payload for PUT', meta);
+        throw(err);
+    }
  }
 
  function * limitPayload(object, payloadElements) {

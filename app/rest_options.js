@@ -311,7 +311,7 @@ function *beforeSaveOrderHistory() {
     debug('...limit payload elements')
     try {
       // this will modify this.resteasy.object
-      yield payload.limitOrderHistPayloadForPut(this.resteasy.object)
+      yield payload.limitOrderHistPayloadForPut.call(this, this.resteasy.object)
     } catch (err) {
       logger.error('Error limiting order payload for PUT',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
