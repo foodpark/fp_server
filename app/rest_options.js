@@ -1004,7 +1004,7 @@ function *beforeSaveCompanies() {
         logger.error('Unable to update delivery charge in the ordering system',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,amount:data.price,error:err});
         throw new Error ('Error updating delivery charge in ordering system',422);
       }
-      logger.info('Delivery charge updated',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,item:item,amount.data.price});
+      logger.info('Delivery charge updated',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,item:item,amount:data.price});
       debug('..delivery charge updated')
     }
     else{
@@ -1097,7 +1097,7 @@ function *beforeSaveUser() {
       debug(this.resteasy.object);
     }
     catch (err){
-      logger.error('Unable to encrypt user password'{fn:'beforeSaveUser',param_user_id:this.params.id,error:err});
+      logger.error('Unable to encrypt user password',{fn:'beforeSaveUser',param_user_id:this.params.id,error:err});
       throw err;
     }
   }
@@ -1119,7 +1119,7 @@ function *afterCreateReview(review) {
     logger.info('Review approval record created',{fn:'afterCreateReview',review_id:review.id,reviewApproval:reviewApproval});
   }
   catch(err){
-    logger.error('Unable to create review approval record',{fn:'afterCreateReview',review_id:review.id},error:err});
+    logger.error('Unable to create review approval record',{fn:'afterCreateReview',review_id:review.id,error:err});
     throw err;
   }
 }
@@ -1175,7 +1175,7 @@ function *afterUpdateReviewApproval(approval) {
   logger.info('Updating review status and company rating', {fn:'afterUpdateReviewApproval',approval:approval});
   debug('begin afterUpdateReviewApproval function');
   if (!approval){
-    logger.error('No Approval provided for review',{fn:'afterUpdateReviewApproval'}, error:'No Approval provided for review'});
+    logger.error('No Approval provided for review',{fn:'afterUpdateReviewApproval', error:'No Approval provided for review'});
     throw new Error('No approval provided for review', 422);
   }
   var hash = { status: approval.status };
