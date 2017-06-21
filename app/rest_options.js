@@ -701,6 +701,7 @@ function *afterUpdateOrderHistory(orderHistory) {
 }
 
 function *beforeSaveReview() {
+  logger.info('Before save Review - check reviewer and answers',{fn:'beforeSaveReview'});
   debug('beforeSaveReview: user is ')
   debug(this.passport.user)
   // Get the user's first name and initial of last name for the reviewer_name field.
@@ -720,6 +721,7 @@ function *beforeSaveReview() {
     }
   }
   if (firstName == '' && lastName == '') {
+    logger.error('Save review rejected because a first name or last name is not defined in user account',{fn:'beforeSaveReview',first_name:firstName,last_name:lastName});
     this.throw('Save review rejected because a first name or last name is not defined in user account',403);
   } else if (firstName.length >= 1 && initialLast.length >=1) {
     separator = ' ';
@@ -739,18 +741,18 @@ function *beforeSaveReview() {
       this.resteasy.object.rating = total / answers.length;
       debug('Review rating calculated as: ' + total);
     } else {
-      console.log('Review rating not calculated - unexpected answers value: ' + answers);
+      logger.info('Review rating not calculated - unexpected answers value',{fn:'beforeSaveReview', answers:answers});
     }
   } else {
-    console.log('Review rating not calculated - answersField is null');
+    logger.info('Review rating not calculated - answersField is null',{fn:'beforeSaveReview'});
   }
+  logger.info('Ready to save Review',{fn:'beforeSaveReview'});
 }
 
 
 function *beforeSaveCustomer(){
   debug('beforeSaveCustomer');
-  logger.info('Saving customer', {fn: 'beforeSaveCustomer',
-    user_id: this.passport.user.id, role : this.passport.user.role});
+  logger.info('Before Save customer', {fn: 'beforeSaveCustomer'});
   if (this.resteasy.operation == 'update') {
     // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
@@ -765,6 +767,7 @@ function *beforeSaveCustomer(){
       }
       // Set Customer's gcm to that mapped to the apns token just pushed to Google
       this.resteasy.object.gcm_id = gcmId;
+      logger.info('Customer\'s GCM mapped',{fn:'beforeSaveUnit',user_id: this.params.id, gcm_id:gmcId, apns_id:this.resteasy.object.apns_id});
     }
 
     // If username or password is changed, we need to update the Users table
@@ -773,14 +776,18 @@ function *beforeSaveCustomer(){
     if (username || password) {
     // Username and/or password was changed
       if (!this.params.id) {
-        console.error('beforeSaveCustomer: No customer id provided');
+        logger.error('No customer id provided',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw new Error('No customer id provided. Update operation requires customer id')
       }
       var customer = '';
       try {
         customer = (yield Customer.getSingleCustomer(this.params.id))[0];
       } catch (err) {
-        console.error('beforeSaveCustomer: Error getting existing Customer');
+        logger.error('Error getting existing Customer',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw err;
       }
       debug('..customer');
@@ -789,10 +796,12 @@ function *beforeSaveCustomer(){
       try {
         user = (yield User.getSingleUser(customer.user_id))[0];
       } catch (err) {
-        console.error('beforeSaveCustomer: Error getting existing user');
+        logger.error('Error getting existing user',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw err;
       }
-      debug('..user');
+      debug('..customer');
       debug(user);
       var userHash = {};
       if (username) {
@@ -803,17 +812,21 @@ function *beforeSaveCustomer(){
         userHash.password = password;
         delete this.resteasy.object.password;
       }
-      debug('..updating user');
+      debug('..updating customer');
       try {
         user = (yield User.updateUser(user.id, userHash))[0];
       } catch (err) {
-        console.error('beforeSaveCustomer: Error updating user');
+        logger.error('Error updating user',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw err;
       }
-      debug('..user after update');
+      logger.info('Customer updated',{fn:'beforeSaveCustomer',user_id:this.params.id});
+      debug('..customer after update');
       debug(user);
     }
   }
+  logger.info('Ready to save Customer',{fn:'beforeSaveCustomer'});
 }
 
 function *beforeSaveUnit() {
