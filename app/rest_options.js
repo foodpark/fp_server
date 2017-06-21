@@ -817,11 +817,17 @@ function *beforeSaveCustomer(){
 }
 
 function *beforeSaveUnit() {
+  logger.info('Before Save Unit - validate unit information',{fn:'beforeSaveUnit'});
   debug('beforeSaveUnit');
+  if (!this.resteasy.object){
+    logger.error('No Unit information provided',{fn:'beforeSaveUnit'});
+    throw new Error('No Unit information provided',422);
+  }
   // If username or password is changed, we need to update the Users table
   var username = this.resteasy.object.username;
   var password = this.resteasy.object.password;
   if (this.resteasy.operation == 'create') {
+    logger.info('Starting create of new Unit',{fn:'beforeSaveUnit',context:this.params.context});
     debug('..starting create of new Unit');
     // get the company context
     debug('..getting company')
@@ -831,28 +837,31 @@ function *beforeSaveUnit() {
       companyId = m[1];
     } else {
       // no company context is an error
-      console.error('beforeSaveUnit: No company context for unit: '+ this.params.context);
-      throw new Error ('No company context for unit')
+      logger.error('No company context for unit', {fn:'beforeSaveUnit',user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      throw new Error ('No company context for unit', 422)
     }
     if (!username || !password) {
       // need both to create new User and Unit
-      console.error('beforeSaveUnit: Username/password are required');
-      throw new Error ('Username/password are required');
+      logger.error('Username/password are required', {fn:'beforeSaveUnit', user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      throw new Error ('Username/password are required', 422);
     }
     // make sure it's a unique username
     var existingUser = '';
     try {
       existingUser = (yield User.userForUsername(username))[0];
     } catch (err) {
-      console.error('beforeSaveUnit: error during User creation');
+      logger.error('Error during User creation', {fn:'beforeSaveUnit',user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
       throw err;
     }
     debug('..user exists for username '+ username +'? Yes: user details; No: undefined');
     debug(existingUser)
     if (existingUser) {
-      console.error('beforeSaveUnit: Tried to create unit with duplicate name of '+ username );
-      console.error('beforeSaveUnit: Name must be unique within Unit/User tables');
-      throw new Error('That name already exists. Try another name');
+      logger.error('Tried to create unit with duplicate name. Name must be unique within Unit/User tables.', {fn:'beforeSaveUnit',username:username,user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err});
+      throw new Error('That name already exists. Try another name', 422);
     }
 
     var unitmgr = { role: 'UNITMGR', username: username, password: password };
@@ -860,7 +869,8 @@ function *beforeSaveUnit() {
     try {
       user = (yield User.createOrUpdateUser(unitmgr))[0];
     } catch (err) {
-      console.error('beforeSaveUnit: Error creating User-UnitMgr');
+      logger.error('Error creating User-UnitMgr', {fn:'beforeSaveUnit', user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err});
       throw err;
     }
     debug('..user created');
@@ -869,7 +879,9 @@ function *beforeSaveUnit() {
     this.resteasy.object.company_id = parseInt(companyId);
     debug('..ready to create unit');
     debug(this.resteasy.object);
+    logger.info('Unit Manager created, ready to create Unit',{fn:'beforeSaveUnit',unit_mgr_id:user.id,company_id:companyId});
   } else if (this.resteasy.operation == 'update') {
+    logger.info('Starting update of existing Unit',{fn:'beforeSaveUnit', unit_id:this.params.id, context:this.params.context});
     debug('..starting update of existing Unit');
      // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
@@ -879,25 +891,28 @@ function *beforeSaveUnit() {
       } catch (err) {
         logger.error('Error sending APNS token to GCM',
             {fn: 'beforeSaveUnit', user_id: this.passport.user.id,
-            role: this.passport.user.role, unit_id: this.params.id, error: err});
+            role: this.passport.user.role, unit_id: this.params.id, apns_id:this.resteasy.object.apns_id, error: err});
         throw err;
       }
       // Set Unit's gcm to that mapped to the apns token just pushed to Google
       this.resteasy.object.gcm_id = gcmId;
+      logger.info('Unit\'s GCM mapped',{fn:'beforeSaveUnit',unit_id: this.params.id, gcm_id:gmcId, apns_id:this.resteasy.object.apns_id});
     }
     // This block of code checks to see if username/password, if provided,
     // was/were changed. If so, update User.
     if (username || password) {
       var unitId = this.params.id;
       if (!unitId) {
-        console.error('beforeSaveUnit: No unit id provided');
-        throw new Error('No unit id provided. Update operation requires unit id')
+        logger.error('No unit id provided',{fn:'beforeSaveUnit',user_id: this.passport.user.id,
+          role: this.passport.user.role, unit_id: this.params.id, error: err});
+        throw new Error('No unit id provided. Update operation requires unit id', 422);
       }
       var unit = '';
       try {
         unit = (yield Unit.getSingleUnit(this.params.id))[0];
       } catch (err) {
-        console.error('beforeSaveUnit: Error getting existing unit');
+        logger.error('Error getting existing unit', {fn:'beforeSaveUnit', unit_id: this.params.id, user_id: this.passport.user.id,
+          role: this.passport.user.role, unit_id: this.params.id, error: err});
         throw err;
       }
       debug('..unit');
@@ -908,7 +923,8 @@ function *beforeSaveUnit() {
         try {
           user = (yield User.getSingleUser(unit.unit_mgr_id))[0];
         } catch (err) {
-          console.error('beforeSaveUnit: Error getting existing user');
+          logger.error('Error getting existing user',{fn:'beforeSaveUnit',unit_mgr_id:unit.unit_mgr_id,user_id: this.passport.user.id,
+              role: this.passport.user.role, unit_id: this.params.id, error: err});
           throw err;
         }
         debug('..user');
@@ -920,13 +936,16 @@ function *beforeSaveUnit() {
         try {
           user = (yield User.updateUser(user.id, userHash))[0];
         } catch (err) {
-          console.error('beforeSaveUnit: Error updating user');
+          logger.error('Error updating user',{fn:'beforeSaveUnit', update_user_id:user.id,
+            user_id: this.passport.user.id, role: this.passport.user.role, unit_id: this.params.id, error: err});
           throw err;
         }
         debug('..user after update');
         debug(user);
+        logger.info('Unit Manager updated',{fn:'beforeSaveUnit',unit_mgr_id:user.id});
       }
     }
+    logger.info('Ready to update Unit',{fn:'beforeSaveUnit', unit_id:this.params.id});
   }
 }
 
@@ -950,34 +969,33 @@ function *beforeSaveCompanies() {
       logger.error('Unable to limit payload elements',{fn:'beforeSaveCompanies',company:this.resteasy.object, error:err});
       throw(err)
     }
-    try{
-      logger.info('Before company updated - get existing company',{fn:'beforeSaveCompanies',params_id:this.params.id});
-      var company = (yield Company.getSingleCompany(this.params.id))[0];
-      if (!company){
-          logger.error('No company exists with the provided id',{fn:'beforeSaveCompanies',params_id:this.params.id,error:'No company exists with the provided id'});
-          throw new Error('No company exists with the provided id',422);
+    logger.info('Before company updated - get existing company',{fn:'beforeSaveCompanies',params_id:this.params.id});
+    var company = (yield Company.getSingleCompany(this.params.id))[0];
+    if (!company){
+        logger.error('No company exists with the provided id',{fn:'beforeSaveCompanies',params_id:this.params.id,error:'No company exists with the provided id'});
+        throw new Error('No company exists with the provided id',422);
+    }
+    debug('company '+ company.id);
+    if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
+      logger.info('Before company updated - update delivery charge amount',
+        {fn:'beforeSaveCompanies',companyId:company.id,existing_delivery_chg_amt:company.delivery_chg_amount,
+        updated_delivery_chg_amt:this.resteasy.object.delivery_chg_amount});
+      var amount = this.resteasy.object.delivery_chg_amount;
+      debug('..delivery charge amount has changed to '+ amount +'. Updating..')
+      // Update moltin
+      var item = '';
+      var data = { price: amount};
+      try{
+          item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
+      } catch (err) {
+        logger.error('Unable to update delivery charge in the ordering system',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,amount:data.price,error:err});
+        throw new Error ('Error updating delivery charge in ordering system',422);
       }
-      debug('company '+ company.id);
-      if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
-        logger.info('Before company updated - update delivery charge amount',
-          {fn:'beforeSaveCompanies',existing_delivery_chg_amt:company.delivery_chg_amount,
-          updated_delivery_chg_amt:this.resteasy.object.delivery_chg_amount});
-        var amount = this.resteasy.object.delivery_chg_amount;
-        debug('..delivery charge amount has changed to '+ amount +'. Updating..')
-        // Update moltin
-        var item = '';
-        var data = { price: amount};
-        try {
-            item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
-          } catch (err) {
-            logger.error('Unable to update delivery charge in the ordering system',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,amount:data.price,error:'Error updating delivery charge in ordering system'});
-            throw new Error ('Error updating delivery charge in ordering system');
-          }
-          debug('..delivery charge updated')
-        }
-        catch (err){
-
-        }
+      logger.info('Delivery charge updated',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,item:item,amount.data.price});
+      debug('..delivery charge updated')
+    }
+    else{
+      logger.info('No updates needed to company delivery charge amount', {fn:'beforeSaveCompanies',companyId:company.id});
     }
   }
 }
