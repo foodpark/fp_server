@@ -67,6 +67,15 @@ exports.authenticate = function(md5password, password) {
   return md5password === md5;
 };
 
+exports.getFBID = function(id) {
+  logger.info('getting fbid for ' + id);
+  return knex.select('fbid').from('users').leftJoin('customers', 'users.id', 'customers.user_id').where('customers.id',id).returning('*');
+}
+
+exports.getUserIdForUnitMgrByUnitId = function(id) {
+  logger.info('getting fbid for ' + id);
+  return knex.select('fbid').from('users').leftJoin('units', 'users.id', 'units.unit_mgr_id').where('units.id',id).returning('*');
+}
 
 exports.updateFB = function(id, fbid, fb_token) {
   logger.info(id + ',' + fbid + ',' + fb_token);
