@@ -1,6 +1,6 @@
 var knex  = require('../../config/knex');
 var debug = require('debug')('customer.model');
-
+var logger = require('winston');
 exports.getAllCustomers = function() {
   return knex('customers').select()
 };
@@ -21,7 +21,8 @@ exports.verifyUser = function(customerId, userId) {
 };
 
 exports.getCustomerIdForUser = function(userId) {
-  return knex('customers').select('id').where('user_id', userId);
+  logger.info('getting customer for id: ' + userId);
+  return knex('customers').select('id').where('user_id', userId).returning('*');
 }
 
 exports.createCustomer = function(userId) {
