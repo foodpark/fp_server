@@ -1353,7 +1353,7 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Update/Delete Unauthorized - Admin only',401);
           } // else continue
-        } else if (this.params.table == 'companies' && operation == 'update' && this.passoirt.user.role == 'UNITMGR') {
+        } else if (this.params.table == 'companies' && operation == 'update' && this.passport.user.role == 'UNITMGR') {
           if (!this.isAuthenticated() || !this.passport.user || (this.passport.user.role == 'CUSTOMER')) {
             this.throw('Update/Delete Unauthorized - Customer unauthorized');
           }

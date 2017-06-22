@@ -13,7 +13,7 @@ var logger = require('winston');
 var ORDER = '/orders';
 
 exports.getOrders = function*(next){
-  logger.info('Getting Orders',{fn:'getOrders', user_id: this.passport.user.id,
+  logger.info('Getting Orders',{fn:'getOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   var search = this.query;
   var query = '';
@@ -36,11 +36,11 @@ exports.getOrders = function*(next){
 
 
 exports.getActiveOrders = function * (next) {
-  logger.info('Getting Active Orders',{fn:'getActiveOrders', user_id: this.passport.user.id,
+  logger.info('Getting Active Orders',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   debug('getActiveOrders');
   if (!this.company || !this.unit) {
-    logger.error('Company/unit id missing',{fn:'getActiveOrders', user_id: this.passport.user.id,
+    logger.error('Company/unit id missing',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
@@ -61,7 +61,7 @@ exports.getActiveOrders = function * (next) {
       orders = yield orderhistory.getActiveOrders(this.company.id, this.unit.id);
       logger.info("UM ORDERS: " + orders);
     } catch (err) {
-      logger.error('Error getting active orders',{fn:'getActiveOrders', user_id: this.passport.user.id,
+      logger.error('Error getting active orders',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
       throw err;
     }
@@ -92,10 +92,10 @@ exports.getActiveOrders = function * (next) {
 
 exports.getClosedOrders = function * (next) {
   debug('getClosedOrders');
-  logger.info('Getting Closed Orders',{fn:'getClosedOrders', user_id: this.passport.user.id,
+  logger.info('Getting Closed Orders',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   if (!this.company || !this.unit) {
-    logger.error('Company/unit id missing',{fn:'getClosedOrders', user_id: this.passport.user.id,
+    logger.error('Company/unit id missing',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
@@ -108,7 +108,7 @@ exports.getClosedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getClosedOrders(this.company.id, this.unit.id);
     } catch (err) {
-      logger.error('Error getting closed orders',{fn:'getClosedOrders', user_id: this.passport.user.id,
+      logger.error('Error getting closed orders',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
       throw err;
     }
@@ -128,10 +128,10 @@ exports.getClosedOrders = function * (next) {
 
 exports.getRequestedOrders = function * (next) {
   debug('getRequestedOrders');
-  logger.info('Getting Requested Orders',{fn:'getRequestedOrders', user_id: this.passport.user.id,
+  logger.info('Getting Requested Orders',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   if (!this.company || !this.unit) {
-    logger.error('Company/unit id missing',{fn:'getRequestedOrders', user_id: this.passport.user.id,
+    logger.error('Company/unit id missing',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
@@ -144,7 +144,7 @@ exports.getRequestedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getRequestedOrders(this.company.id, this.unit.id);
     } catch (err) {
-      logger.error('Error getting requested orders',{fn:'getRequestedOrders', user_id: this.passport.user.id,
+      logger.error('Error getting requested orders',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
       throw err;
     }
@@ -164,10 +164,10 @@ exports.getRequestedOrders = function * (next) {
 
 exports.getCustomerActiveOrders = function * (next) {
   debug('getCustomerActiveOrders');
-  logger.info('Getting Customer Active Orders',{fn:'getCustomerActiveOrders', user_id: this.passport.user.id,
+  logger.info('Getting Customer Active Orders',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   if (!this.customer) {
-    logger.error('Company id missing',{fn:'getCustomerActiveOrders', user_id: this.passport.user.id,
+    logger.error('Company id missing',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
@@ -192,7 +192,7 @@ exports.getCustomerActiveOrders = function * (next) {
         orders = [];
       }
     } catch (err) {
-      logger.error('Error getting customer active orders',{fn:'getCustomerActiveOrders', user_id: this.passport.user.id,
+      logger.error('Error getting customer active orders',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
       throw err;
     }
@@ -212,10 +212,10 @@ exports.getCustomerActiveOrders = function * (next) {
 
 exports.getCustomerClosedOrders = function * (next) {
   debug('getCustomerClosedOrders');
-  logger.info('Getting Customer Closed Orders',{fn:'getCustomerClosedOrders', user_id: this.passport.user.id,
+  logger.info('Getting Customer Closed Orders',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   if (!this.customer) {
-    logger.error('Company id missing',{fn:'getCustomerClosedOrders', user_id: this.passport.user.id,
+    logger.error('Company id missing',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
@@ -229,7 +229,7 @@ exports.getCustomerClosedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getCustomerClosedOrders(this.customer.id);
     } catch (err) {
-      logger.error('Error getting customer closed orders',{fn:'getCustomerClosedOrders', user_id: this.passport.user.id,
+      logger.error('Error getting customer closed orders',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
       throw err;
     }
@@ -249,10 +249,10 @@ exports.getCustomerClosedOrders = function * (next) {
 
 exports.getCustomerRequestedOrders = function * (next) {
   debug('getCustomerRequestedOrders');
-  logger.info('Getting Customer Requested Orders',{fn:'getCustomerRequestedOrders', user_id: this.passport.user.id,
+  logger.info('Getting Customer Requested Orders',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   if (!this.customer) {
-    logger.error('Company id missing',{fn:'getCustomerRequestedOrders', user_id: this.passport.user.id,
+    logger.error('Company id missing',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
@@ -266,7 +266,7 @@ exports.getCustomerRequestedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getCustomerRequestedOrders(this.customer.id);
     } catch (err) {
-      logger.error('Error getting customer requested orders',{fn:'getCustomerRequestedOrders', user_id: this.passport.user.id,
+      logger.error('Error getting customer requested orders',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
       throw err;
     }
@@ -285,7 +285,7 @@ exports.getCustomerRequestedOrders = function * (next) {
 }
 
 exports.getCompany=function *(id, next) {
-  logger.info('Getting Company',{fn:'getCompany',id:id, user_id: this.passport.user.id,
+  logger.info('Getting Company',{fn:'getCompany',id:id}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   debug('getCompany');
   debug('id ' + id);
@@ -293,7 +293,7 @@ exports.getCompany=function *(id, next) {
   try {
     company = (yield Company.getSingleCompany(id))[0];
   } catch (err) {
-    logger.error('Error getting company',{fn:'getCompany', user_id: this.passport.user.id,
+    logger.error('Error getting company',{fn:'getCompany'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:err});
     throw(err);
   }
@@ -304,15 +304,14 @@ exports.getCompany=function *(id, next) {
 }
 
 exports.getCustomer=function *(id, next) {
-  logger.info('Getting Customer',{fn:'getCustomer',id:id, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+  logger.info('Getting Customer',{fn:'getCustomer',id:id, pp : this.passport});// user_id: this.passport.user.id, role: this.passport.user.role});
   debug('getCustomer');
   debug('id ' + id);
   var customer = '';
   try {
     customer = (yield Customer.getSingleCustomer(id))[0];
   } catch (err) {
-    logger.error('Error getting customer',{fn:'getCustomer', user_id: this.passport.user.id,
+    logger.error('Error getting customer',{fn:'getCustomer'}); //}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:err});
     throw(err);
   }
@@ -323,7 +322,7 @@ exports.getCustomer=function *(id, next) {
 }
 
 exports.getUnit=function *(id, next) {
-  logger.info('Getting Unit',{fn:'getUnit',id:id, user_id: this.passport.user.id,
+  logger.info('Getting Unit',{fn:'getUnit',id:id}); //, user_id: this.passport.user.id,
     role: this.passport.user.role});
   debug('getUnit');
   debug('id ' + id);
@@ -331,7 +330,7 @@ exports.getUnit=function *(id, next) {
   try {
     unit = (yield Unit.getSingleUnit(id))[0];
   } catch (err) {
-    logger.error('Error getting unit',{fn:'getUnit', user_id: this.passport.user.id,
+    logger.error('Error getting unit',{fn:'getUnit'}); //, user_id: this.passport.user.id,
       role: this.passport.user.role, error:err});
     throw(err);
   }
