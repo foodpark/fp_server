@@ -58,7 +58,7 @@ var setUserInfo = function (user) {
 exports.login = function *(next) {
   debug('login complete')
   debug(this.passport.user)
-  debug('calling')
+  debug('calling');
   meta = {
     fn : 'login',
     user_id : this.passport.user.id,
@@ -656,9 +656,12 @@ exports.fbLogin = function*() {
   var id = { id : user.id };
   logger.info(user);
   var userInfo = (yield(User.updateFB(id.id, fbid, fb_token)))[0];
+  logger.info(userInfo);
   var customerId = (yield(Customer.getCustomerIdForUser(id.id)))[0];
-  logger.info("customerId: " + customerId);
-  userInfo.customer_id = customerId.id;
+  if (customerId) {
+    logger.info("customerId: " + customerId);
+    userInfo.customer_id = customerId.id;
+  }
   this.body = {
     token: 'JWT ' + sts.generateToken(userInfo),
     user: userInfo

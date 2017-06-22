@@ -33,6 +33,8 @@ exports.getOrders = function*(next){
   this.body = orders;
 }
 
+
+
 exports.getActiveOrders = function * (next) {
   logger.info('Getting Active Orders',{fn:'getActiveOrders', user_id: this.passport.user.id,
     role: this.passport.user.role});
@@ -42,12 +44,14 @@ exports.getActiveOrders = function * (next) {
       role: this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
+  logger.info('checking authorization');
   debug('..check authorization');
   var user = this.passport.user;
   var orders = {};
   var unit_manager_fbid = user.fbid;
   var returnBody = {};
-  logger.info('User',{fn:'getActiveOrders', user_id: this.passport.user.id, role: this.passport.user.role});
+  logger.info(user);
+  logger.info(this.unit);
   if (user.role == 'OWNER' && user.id == this.company.user_id ||
       user.role == 'UNITMGR' && user.id == this.unit.unit_mgr_id ||
       user.role == 'ADMIN') {
@@ -65,14 +69,17 @@ exports.getActiveOrders = function * (next) {
     debug(orders);
     // order.unit_manager_fbid = unit_manager_fbid;
     if (orders) {
+      for (i = 0; i < orders.length; i++) {
+        logger.info("Order customerID: " + orders[i].customer_id);
+        orders[i].unit_manager_fbid = unit_manager_fbid;
+        orders[i].customer_fbid = (yield User.getFBID(orders[i].customer_id))[0].fbid;
+      }
     }
     else {
-      orders = {};
+      orders = [];
     }
-    returnBody.orders = orders;
-    returnBody.unit_manager_fbid = unit_manager_fbid;
-    logger.info("Active Orders retrieved", {fn:'getActiveOrders',orders:orders});
-    this.body = returnBody;
+    this.body = orders;
+    logger.info("Return: " + orders);
     return;
   } else {
     logger.error('User not authorized',{fn:'getActiveOrders',user_id: this.passport.user.id,
@@ -169,13 +176,21 @@ exports.getCustomerActiveOrders = function * (next) {
   debug('..check authorization');
   var user = this.passport.user;
   var customer_fbid = user.fbid;
-  var returnBody = {};
-  var orders = {};
   if (user.role == 'CUSTOMER' && user.id == this.customer.user_id ||
       user.role == 'ADMIN') {
     debug('..authorized');
     try {
       orders = yield orderhistory.getCustomerActiveOrders(this.customer.id);
+      if (orders) {
+        for (i = 0; i < orders.length; i++) {
+          logger.info("Order unitId: " + orders[i].unit_id);
+          orders[i].unit_manager_fbid = (yield User.getUserIdForUnitMgrByUnitId(orders[i].unit_id))[0].fbid;
+          orders[i].customer_fbid = customer_fbid;
+        }
+      }
+      else {
+        orders = [];
+      }
     } catch (err) {
       logger.error('Error getting customer active orders',{fn:'getCustomerActiveOrders', user_id: this.passport.user.id,
         role: this.passport.user.role, error:err});
@@ -183,10 +198,8 @@ exports.getCustomerActiveOrders = function * (next) {
     }
     debug('..orders');
     debug(orders);
-    returnBody.orders = orders;
-    returnBody.customer_fbid = customer_fbid;
-    logger.info("Customer Active Orders retrieved", {fn:'getCustomerActiveOrders',orders:orders});
-    this.body = returnBody;
+    this.body = orders;
+    logger.info("Return: " + orders);
     return;
   } else {
     logger.error('User not authorized',{fn:'getCustomerActiveOrders',user_id: this.passport.user.id,

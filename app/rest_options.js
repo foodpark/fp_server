@@ -311,7 +311,7 @@ function *beforeSaveOrderHistory() {
     debug('...limit payload elements')
     try {
       // this will modify this.resteasy.object
-      yield payload.limitOrderHistPayloadForPut(this.resteasy.object)
+      yield payload.limitOrderHistPayloadForPut.call(this, this.resteasy.object)
     } catch (err) {
       logger.error('Error limiting order payload for PUT',
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
@@ -376,16 +376,14 @@ function *afterCreateOrderHistory(orderHistory) {
   try {
     unit = (yield Unit.getSingleUnit(orderHistory.unit_id))[0];
   } catch (err) {
-    var ue = meta;
-    ue.error = err;
-    logger.error('Error retrieving unit', ue);
+    meta.error = err;
+    logger.error('Error retrieving unit', meta);
     throw err;
   }
   debug(unit);
   if (!unit.gcm_id && !unit.fcm_id) {
-    var fge = meta;
-    fge.error = 'No fcm/gcm for unit';
-    logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, fge);
+    meta.error = 'No fcm/gcm for unit';
+    logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, meta);
     throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
 
@@ -393,9 +391,8 @@ function *afterCreateOrderHistory(orderHistory) {
   try {
     customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
   } catch (err) {
-    var ce = meta;
-    ce.error = err;
-    logger.error('Error retrieving customer', ce);
+    meta.error = err;
+    logger.error('Error retrieving customer', meta);
     throw err;
   }
   debug(customer);
@@ -1354,7 +1351,15 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Update/Delete Unauthorized - Admin only',401);
           } // else continue
-        } else if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
+        } else if (this.params.table == 'companies' && operation == 'update') {
+          if (!this.isAuthenticated() || !this.passport.user || (this.passport.user.role == 'CUSTOMER')) {
+            this.throw('Update/Delete Unauthorized - Customer unauthorized');
+          }
+          else {
+            logger.info('...authorized for update');
+          }
+        }
+         else if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
             this.throw('Update/Delete Unauthorized - Owners/Admin only',401);
           } else {
