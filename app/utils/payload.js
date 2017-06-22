@@ -1,12 +1,12 @@
 var debug = require('debug')('payload');
 var logger = require('winston');
 
- var COMPANY_ELEMENTS = [ 'id', 'order_sys_id', 'base_slug', 'default_cat', 'daily_special_cat_id', 'delivery_chg_cat_id', 
+ var COMPANY_ELEMENTS = [ 'id', 'order_sys_id', 'base_slug', 'default_cat', 'daily_special_cat_id', 'delivery_chg_cat_id',
   'delivery_chg_item_id', 'stub', 'created_at', 'updated_at' ]
- 
- var ORDER_HIST_ELEMENTS = [ 'id', 'order_sys_order_id', 'amount', 'initiation_time', 'order_detail', 'checkin_id', 
+
+ var ORDER_HIST_ELEMENTS = [ 'id', 'order_sys_order_id', 'amount', 'initiation_time', 'order_detail', 'checkin_id',
   'customer_name', 'customer_id', 'unit_id', 'company_id', 'created_at']
- 
+
 
 
  exports.limitCompanyPayloadForPut = function *(object) {
@@ -14,7 +14,7 @@ var logger = require('winston');
     debug('limitCompanyPayloadForPut')
     debug(COMPANY_ELEMENTS)
     debug(object)
-    var meta = { fn: 'limitCompanyPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role, 
+    var meta = { fn: 'limitCompanyPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role,
         company_id: this.params.id, company: object};
     logger.info('Prepare to limit company payload to mutable elements ', meta);
     try {
@@ -31,7 +31,7 @@ var logger = require('winston');
     debug('limitOrderHistPayloadForPut')
     debug(ORDER_HIST_ELEMENTS)
     debug(object)
-    var meta = { fn: 'limitOrderHistPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role, 
+    var meta = { fn: 'limitOrderHistPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role,
         order_id: this.params.id, order: object};
     logger.info('Prepare to limit order payload to mutable elements ', meta);
     try {
@@ -47,7 +47,7 @@ var logger = require('winston');
      var len = payloadElements.length
      for (var i=0; i<len; i++) {
          debug('...attribute '+ payloadElements[i])
-        if (object.hasOwnProperty(payloadElements[i])) {
+        if (Object.hasOwnProperty.call(object, payloadElements[i])) { // object.hasOwnProperty(payloadElements[i])) {
             debug('..before: '+ object[payloadElements[i]])
             delete object[payloadElements[i]]
             debug('..after: '+ object[payloadElements[i]])
@@ -80,7 +80,7 @@ exports.simplifyItem = function * (item) {
         title : item.product.value,
         quantity : item.quantity
     }
-    if (item.product.data.modifiers) { 
+    if (item.product.data.modifiers) {
         debug('..modifiers');
         var modifiers = item.product.data.modifiers;
         itemDetail.options = [];

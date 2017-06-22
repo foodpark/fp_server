@@ -13,13 +13,14 @@ var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
 var timestamp = require('./utils/timestamp');
-var translator = require('./utils/translate');
+var T = require('./utils/translate');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 var logger = require('winston');
 
+const translator = new T();
 
 
 function *simplifyDetails(orderDetail) {
@@ -363,6 +364,7 @@ function *beforeSaveOrderHistory() {
 function *afterCreateOrderHistory(orderHistory) {
   debug('afterCreateOrderHistory')
   debug(orderHistory);
+  logger.info('afterCreateOrderHistory');
   var meta = {fn: 'afterCreateOrderHistory',user_id: this.passport.user.id,role: this.passport.user.role}
   meta.order_id = orderHistory.id;
   meta.company_id = orderHistory.company_id;
@@ -457,7 +459,6 @@ var display = {
 
 function *afterUpdateOrderHistory(orderHistory) {
   debug('afterUpdateOrderHistory')
-
   var meta = {fn: 'afterUpdateOrderHistory',user_id: this.passport.user.id,role: this.passport.user.role}
   meta.order_id = orderHistory.id;
   meta.company_id = orderHistory.company_id;
@@ -467,7 +468,6 @@ function *afterUpdateOrderHistory(orderHistory) {
   meta.order_sys_order_id = osoId;
   meta.status = orderHistory.status;
   var lang = this.passport.user.default_language;
-
   logger.info('Post order update processing started for order '+ orderHistory.id, meta);
   var deviceId = ''
   var title = ''
@@ -555,7 +555,9 @@ function *afterUpdateOrderHistory(orderHistory) {
       switch(status) {
           // From Customer
           case 'order_paid':
+              logger.info("ORDER PAID");
               msgTarget.title = translator.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
+              logger.info("AFTER TRANS");
               msgTarget.message = custName +"'s payment was processed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
@@ -1351,7 +1353,7 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Update/Delete Unauthorized - Admin only',401);
           } // else continue
-        } else if (this.params.table == 'companies' && operation == 'update') {
+        } else if (this.params.table == 'companies' && operation == 'update' && this.passoirt.user.role == 'UNITMGR') {
           if (!this.isAuthenticated() || !this.passport.user || (this.passport.user.role == 'CUSTOMER')) {
             this.throw('Update/Delete Unauthorized - Customer unauthorized');
           }
