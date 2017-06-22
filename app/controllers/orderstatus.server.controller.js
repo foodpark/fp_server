@@ -47,7 +47,7 @@ exports.updateOrdStatus = function *(next) {
 };
 
 exports.createOrdStatus = function *(next) {
-  logger.info('Creating Order Status',{fn:updateOrdStatus,order_status_id:this.orderStatusId});
+  logger.info('Creating Order Status',{fn:createOrdStatus});
   try{
     var orderId = this.body.orderId;
     var stepName = this.body.stepName;
@@ -65,7 +65,7 @@ exports.createOrdStatus = function *(next) {
   }
   catch (err){
     logger.error('Error updating order status',
-      {fn: 'updateOrdStatus',  user_id: this.passport.user.id, 
+      {fn: 'updateOrdStatus',  user_id: this.passport.user.id,
         role: this.passport.user.role, error: err});
     throw err;
   }
