@@ -971,7 +971,7 @@ function *beforeSaveCompanies() {
   debug(this.resteasy.object);
   debug(this.params);
   if (this.resteasy.operation == 'update') {
-    logger.info('Before company updated - limit payload update menu items',{fn:'beforeSaveCompanies',params:params,company:this.resteasy.object});
+    logger.info('Before company updated - limit payload update menu items',{fn:'beforeSaveCompanies',params:this.params,company:this.resteasy.object});
     debug('...update');
     debug('...limit payload elements');
     try {
