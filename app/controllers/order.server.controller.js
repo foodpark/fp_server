@@ -14,7 +14,7 @@ var ORDER = '/orders';
 
 exports.getOrders = function*(next){
   logger.info('Getting Orders',{fn:'getOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   var search = this.query;
   var query = '';
   for(var q in search){
@@ -37,11 +37,11 @@ exports.getOrders = function*(next){
 
 exports.getActiveOrders = function * (next) {
   logger.info('Getting Active Orders',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   debug('getActiveOrders');
   if (!this.company || !this.unit) {
     logger.error('Company/unit id missing',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:'Company/unit id missing'});
+      // role:this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
   logger.info('checking authorization');
@@ -62,7 +62,7 @@ exports.getActiveOrders = function * (next) {
       logger.info("UM ORDERS: " + orders);
     } catch (err) {
       logger.error('Error getting active orders',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
-        role: this.passport.user.role, error:err});
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -93,10 +93,10 @@ exports.getActiveOrders = function * (next) {
 exports.getClosedOrders = function * (next) {
   debug('getClosedOrders');
   logger.info('Getting Closed Orders',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   if (!this.company || !this.unit) {
     logger.error('Company/unit id missing',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:'Company/unit id missing'});
+      // role:this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
   debug('..check authorization');
@@ -109,7 +109,7 @@ exports.getClosedOrders = function * (next) {
       var orders = yield orderhistory.getClosedOrders(this.company.id, this.unit.id);
     } catch (err) {
       logger.error('Error getting closed orders',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
-        role: this.passport.user.role, error:err});
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -129,10 +129,10 @@ exports.getClosedOrders = function * (next) {
 exports.getRequestedOrders = function * (next) {
   debug('getRequestedOrders');
   logger.info('Getting Requested Orders',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   if (!this.company || !this.unit) {
     logger.error('Company/unit id missing',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:'Company/unit id missing'});
+      // role:this.passport.user.role, error:'Company/unit id missing'});
     throw new Error('Company/unit id missing', 422);
   }
   debug('..check authorization');
@@ -145,7 +145,7 @@ exports.getRequestedOrders = function * (next) {
       var orders = yield orderhistory.getRequestedOrders(this.company.id, this.unit.id);
     } catch (err) {
       logger.error('Error getting requested orders',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
-        role: this.passport.user.role, error:err});
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -165,10 +165,10 @@ exports.getRequestedOrders = function * (next) {
 exports.getCustomerActiveOrders = function * (next) {
   debug('getCustomerActiveOrders');
   logger.info('Getting Customer Active Orders',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   if (!this.customer) {
     logger.error('Company id missing',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:'Company id missing'});
+      // role:this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
     return;
@@ -193,7 +193,7 @@ exports.getCustomerActiveOrders = function * (next) {
       }
     } catch (err) {
       logger.error('Error getting customer active orders',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
-        role: this.passport.user.role, error:err});
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -213,10 +213,10 @@ exports.getCustomerActiveOrders = function * (next) {
 exports.getCustomerClosedOrders = function * (next) {
   debug('getCustomerClosedOrders');
   logger.info('Getting Customer Closed Orders',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   if (!this.customer) {
     logger.error('Company id missing',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:'Company id missing'});
+      // role:this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
     return;
@@ -230,7 +230,7 @@ exports.getCustomerClosedOrders = function * (next) {
       var orders = yield orderhistory.getCustomerClosedOrders(this.customer.id);
     } catch (err) {
       logger.error('Error getting customer closed orders',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
-        role: this.passport.user.role, error:err});
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -250,10 +250,10 @@ exports.getCustomerClosedOrders = function * (next) {
 exports.getCustomerRequestedOrders = function * (next) {
   debug('getCustomerRequestedOrders');
   logger.info('Getting Customer Requested Orders',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   if (!this.customer) {
     logger.error('Company id missing',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:'Company id missing'});
+      // role:this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
     return;
@@ -267,7 +267,7 @@ exports.getCustomerRequestedOrders = function * (next) {
       var orders = yield orderhistory.getCustomerRequestedOrders(this.customer.id);
     } catch (err) {
       logger.error('Error getting customer requested orders',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
-        role: this.passport.user.role, error:err});
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -286,7 +286,7 @@ exports.getCustomerRequestedOrders = function * (next) {
 
 exports.getCompany=function *(id, next) {
   logger.info('Getting Company',{fn:'getCompany',id:id}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   debug('getCompany');
   debug('id ' + id);
   var company = '';
@@ -294,7 +294,7 @@ exports.getCompany=function *(id, next) {
     company = (yield Company.getSingleCompany(id))[0];
   } catch (err) {
     logger.error('Error getting company',{fn:'getCompany'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:err});
+      // role:this.passport.user.role, error:err});
     throw(err);
   }
   debug(company);
@@ -312,7 +312,7 @@ exports.getCustomer=function *(id, next) {
     customer = (yield Customer.getSingleCustomer(id))[0];
   } catch (err) {
     logger.error('Error getting customer',{fn:'getCustomer'}); //}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:err});
+      // role:this.passport.user.role, error:err});
     throw(err);
   }
   debug(customer);
@@ -323,7 +323,7 @@ exports.getCustomer=function *(id, next) {
 
 exports.getUnit=function *(id, next) {
   logger.info('Getting Unit',{fn:'getUnit',id:id}); //, user_id: this.passport.user.id,
-    role: this.passport.user.role});
+    // role:this.passport.user.role});
   debug('getUnit');
   debug('id ' + id);
   var unit = '';
@@ -331,7 +331,7 @@ exports.getUnit=function *(id, next) {
     unit = (yield Unit.getSingleUnit(id))[0];
   } catch (err) {
     logger.error('Error getting unit',{fn:'getUnit'}); //, user_id: this.passport.user.id,
-      role: this.passport.user.role, error:err});
+      // role:this.passport.user.role, error:err});
     throw(err);
   }
   debug(unit);
