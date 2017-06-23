@@ -962,36 +962,41 @@ function *beforeSaveUnit() {
 }
 
 function *beforeSaveCompanies() {
-  logger.info('Before company saved',{fn:'beforeSaveCompanies'});
+  var meta = { fn: 'beforeSaveCompanies'}
+  logger.info('Before company saved',meta);
   debug('beforeSaveCompanies');
-  if (!this.resteasy.object){
-    logger.error('No company provided',{fn:'beforeSaveCompanies',error:'No company provided'});
+  if (!this.params.id){
+    meta.error = 'No company id provided';
+    logger.error('No company provided', meta);
     throw new Error ('No company provided',422);
   }
   debug(this.resteasy.object);
   debug(this.params);
+  meta.company_id = this.params.id;
   if (this.resteasy.operation == 'update') {
-    logger.info('Before company updated - limit payload update menu items',{fn:'beforeSaveCompanies',params:this.params,company:this.resteasy.object});
+    logger.info('Before company updated - limit payload', meta);
     debug('...update');
     debug('...limit payload elements');
     try {
       // this will modify this.resteasy.object
       yield payload.limitCompanyPayloadForPut.call(this, this.resteasy.object)
     } catch (err) {
-      logger.error('Unable to limit payload elements',{fn:'beforeSaveCompanies',company:this.resteasy.object, error:err});
+      meta.error = err;
+      logger.error('Unable to limit payload elements', meta);
       throw(err)
     }
-    logger.info('Before company updated - get existing company',{fn:'beforeSaveCompanies',params_id:this.params.id});
+    logger.info('Before company updated - get existing company', meta);
     var company = (yield Company.getSingleCompany(this.params.id))[0];
     if (!company){
-        logger.error('No company exists with the provided id',{fn:'beforeSaveCompanies',params_id:this.params.id,error:'No company exists with the provided id'});
-        throw new Error('No company exists with the provided id',422);
+      meta.error = "No company for company id "+ this.params.id;
+      logger.error('No company exists with the provided id', meta);
+      throw new Error('No company exists with the provided id',422);
     }
     debug('company '+ company.id);
     if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
-      logger.info('Before company updated - update delivery charge amount',
-        {fn:'beforeSaveCompanies',companyId:company.id,existing_delivery_chg_amt:company.delivery_chg_amount,
-        updated_delivery_chg_amt:this.resteasy.object.delivery_chg_amount});
+      meta.existing_delivery_chg_amt = company.delivery_chg_amount;
+      meta.updated_delivery_chg_amt = this.resteasy.object.delivery_chg_amount;
+      logger.info('Before company updated - update delivery charge amount', meta);
       var amount = this.resteasy.object.delivery_chg_amount;
       debug('..delivery charge amount has changed to '+ amount +'. Updating..')
       // Update moltin
@@ -1000,14 +1005,15 @@ function *beforeSaveCompanies() {
       try{
           item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
       } catch (err) {
-        logger.error('Unable to update delivery charge in the ordering system',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,amount:data.price,error:err});
+        meta.error = err;
+        logger.error('Unable to update delivery charge in the ordering system', meta);
         throw new Error ('Error updating delivery charge in ordering system',422);
       }
-      logger.info('Delivery charge updated',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,item:item,amount:data.price});
+      logger.info('Delivery charge updated', meta);
       debug('..delivery charge updated')
     }
     else{
-      logger.info('No updates needed to company delivery charge amount', {fn:'beforeSaveCompanies',companyId:company.id});
+      logger.info('No updates needed to company delivery charge amount', meta);
     }
   }
 }

@@ -15,7 +15,7 @@ var logger = require('winston');
     debug(COMPANY_ELEMENTS)
     debug(object)
     var meta = { fn: 'limitCompanyPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role,
-        company_id: this.params.id, company: object};
+        company_id: this.params.id};
     logger.info('Prepare to limit company payload to mutable elements ', meta);
     try {
         yield limitPayload(object, COMPANY_ELEMENTS);
@@ -32,7 +32,7 @@ var logger = require('winston');
     debug(ORDER_HIST_ELEMENTS)
     debug(object)
     var meta = { fn: 'limitOrderHistPayloadForPut', user_id: this.passport.user.id, role: this.passport.user.role,
-        order_id: this.params.id, order: object};
+        order_id: this.params.id};
     logger.info('Prepare to limit order payload to mutable elements ', meta);
     try {
         yield limitPayload(object, ORDER_HIST_ELEMENTS);
