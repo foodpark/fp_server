@@ -9,10 +9,14 @@ function Translate() {
   var expression = /\{\{[a-zA-Z0-9_]+\}\}/;
 
   var loadLang = function(lang) {
+    log.info('loading lang ' + lang);
+    // log.info('dirname: ' + __dirname);
     // log.info(lang);
-    var transPath = LOCALES + lang + '/' + TRANS_FILE;
+    var transPath = __dirname + '/' + LOCALES + lang + '/' + TRANS_FILE;
+    log.info(transPath + " : " + fs.existsSync(transPath));
     if (fs.existsSync(transPath)) {
       var transData = fs.readFileSync(transPath);
+      // log.info(transData);
       if (transData !== '') {
         langMap.set(lang, JSON.parse(transData));
       }

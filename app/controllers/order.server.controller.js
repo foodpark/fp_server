@@ -13,35 +13,43 @@ var logger = require('winston');
 var ORDER = '/orders';
 
 exports.getOrders = function*(next){
+  logger.info('Getting Orders',{fn:'getOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   var search = this.query;
   var query = '';
   for(var q in search){
     query = (query)? query + '&'+ q + '=' + search[q]:'?'+ q + '=' + search[q];
   }
-  console.log(query);
+  logger.info('Order Query',{fn:'getOrders',query:query});
+  var orders = {};
   try{
     var flow = ORDER + '/' + 'search' + query
-    var orders = yield moltin.getOrder(flow);
+    orders = yield moltin.getOrder(flow);
   }catch(e){
+    logger.error('Error retrieving Query',{fn:'getOrders',query:query,error:err});
     throw(e);
   }
-  console.log(orders.length)
+  logger.info('Orders retrieved',{fn:'getOrders',orders:orders});
   this.body = orders;
 }
 
 
 
 exports.getActiveOrders = function * (next) {
+  logger.info('Getting Active Orders',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   debug('getActiveOrders');
   if (!this.company || !this.unit) {
-    console.error('getActiveOrders: Company/unit id missing');
-    throw new Error('Company/unit id missing');
+    logger.error('Company/unit id missing',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:'Company/unit id missing'});
+    throw new Error('Company/unit id missing', 422);
   }
   logger.info('checking authorization');
   debug('..check authorization');
   var user = this.passport.user;
   var orders = {};
   var unit_manager_fbid = user.fbid;
+  var returnBody = {};
   logger.info(user);
   logger.info(this.unit);
   if (user.role == 'OWNER' && user.id == this.company.user_id ||
@@ -49,13 +57,12 @@ exports.getActiveOrders = function * (next) {
       user.role == 'ADMIN') {
     debug('..authorized');
     try {
-
       logger.info("UM FBID: " + unit_manager_fbid);
       orders = yield orderhistory.getActiveOrders(this.company.id, this.unit.id);
       logger.info("UM ORDERS: " + orders);
     } catch (err) {
-      console.error('getActiveOrders: error getting active orders');
-      console.error(err)
+      logger.error('Error getting active orders',{fn:'getActiveOrders'}); //, user_id: this.passport.user.id,
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -75,7 +82,8 @@ exports.getActiveOrders = function * (next) {
     logger.info("Return: " + orders);
     return;
   } else {
-    console.error('get active orders: User not authorized')
+    logger.error('User not authorized',{fn:'getActiveOrders',user_id: this.passport.user.id,
+      role: this.passport.user.role, error:'User not authorized'});
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -84,9 +92,12 @@ exports.getActiveOrders = function * (next) {
 
 exports.getClosedOrders = function * (next) {
   debug('getClosedOrders');
+  logger.info('Getting Closed Orders',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   if (!this.company || !this.unit) {
-    console.error('getClosedOrders: Company/unit id missing');
-    throw new Error('Company/unit id missing');
+    logger.error('Company/unit id missing',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:'Company/unit id missing'});
+    throw new Error('Company/unit id missing', 422);
   }
   debug('..check authorization');
   var user = this.passport.user;
@@ -97,16 +108,18 @@ exports.getClosedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getClosedOrders(this.company.id, this.unit.id);
     } catch (err) {
-      console.error('getClosedOrders: error getting closed orders');
-      console.error(err)
+      logger.error('Error getting closed orders',{fn:'getClosedOrders'}); //, user_id: this.passport.user.id,
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
     debug(orders);
+    logger.info("Closed Orders retrieved", {fn:'getClosedOrders',orders:orders});
     this.body = orders;
     return;
   } else {
-    console.error('get closed orders: User not authorized')
+    logger.error('User not authorized',{fn:'getClosedOrders',user_id: this.passport.user.id,
+      role: this.passport.user.role, error:'User not authorized'});
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -115,9 +128,12 @@ exports.getClosedOrders = function * (next) {
 
 exports.getRequestedOrders = function * (next) {
   debug('getRequestedOrders');
+  logger.info('Getting Requested Orders',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   if (!this.company || !this.unit) {
-    console.error('getRequestedOrders: Company/unit id missing');
-    throw new Error('Company/unit id missing');
+    logger.error('Company/unit id missing',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:'Company/unit id missing'});
+    throw new Error('Company/unit id missing', 422);
   }
   debug('..check authorization');
   var user = this.passport.user;
@@ -128,16 +144,18 @@ exports.getRequestedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getRequestedOrders(this.company.id, this.unit.id);
     } catch (err) {
-      console.error('getRequestedOrders: error getting requested orders');
-      console.error(err)
+      logger.error('Error getting requested orders',{fn:'getRequestedOrders'}); //, user_id: this.passport.user.id,
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
     debug(orders);
+    logger.info("Requested Orders retrieved", {fn:'getRequestedOrders',orders:orders});
     this.body = orders;
     return;
   } else {
-    console.error('getRequestedOrders: User not authorized')
+    logger.error('User not authorized',{fn:'getRequestedOrders',user_id: this.passport.user.id,
+      role: this.passport.user.role, error:'User not authorized'});
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -146,8 +164,11 @@ exports.getRequestedOrders = function * (next) {
 
 exports.getCustomerActiveOrders = function * (next) {
   debug('getCustomerActiveOrders');
+  logger.info('Getting Customer Active Orders',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   if (!this.customer) {
-    console.error('getCustomerActiveOrders: Customer id missing');
+    logger.error('Company id missing',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
     return;
@@ -171,8 +192,8 @@ exports.getCustomerActiveOrders = function * (next) {
         orders = [];
       }
     } catch (err) {
-      console.error('getCustomerActiveOrders: error getting customer active orders');
-      console.error(err)
+      logger.error('Error getting customer active orders',{fn:'getCustomerActiveOrders'}); //, user_id: this.passport.user.id,
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
@@ -181,7 +202,8 @@ exports.getCustomerActiveOrders = function * (next) {
     logger.info("Return: " + orders);
     return;
   } else {
-    console.error('get customer active orders: User not authorized')
+    logger.error('User not authorized',{fn:'getCustomerActiveOrders',user_id: this.passport.user.id,
+      role: this.passport.user.role, error:'User not authorized'});
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -190,8 +212,11 @@ exports.getCustomerActiveOrders = function * (next) {
 
 exports.getCustomerClosedOrders = function * (next) {
   debug('getCustomerClosedOrders');
+  logger.info('Getting Customer Closed Orders',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   if (!this.customer) {
-    console.error('getCustomerClosedOrders: Customer id missing');
+    logger.error('Company id missing',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
     return;
@@ -204,16 +229,18 @@ exports.getCustomerClosedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getCustomerClosedOrders(this.customer.id);
     } catch (err) {
-      console.error('getCustomerClosedOrders: error getting customer closed orders');
-      console.error(err)
+      logger.error('Error getting customer closed orders',{fn:'getCustomerClosedOrders'}); //, user_id: this.passport.user.id,
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
     debug(orders);
+    logger.info("Customer Closed Orders retrieved", {fn:'getCustomerClosedOrders',orders:orders});
     this.body = orders;
     return;
   } else {
-    console.error('get customer closed orders: User not authorized')
+    logger.error('User not authorized',{fn:'getCustomerClosedOrders',user_id: this.passport.user.id,
+      role: this.passport.user.role, error:'User not authorized'});
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -222,8 +249,11 @@ exports.getCustomerClosedOrders = function * (next) {
 
 exports.getCustomerRequestedOrders = function * (next) {
   debug('getCustomerRequestedOrders');
+  logger.info('Getting Customer Requested Orders',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   if (!this.customer) {
-    console.error('getCustomerRequestedOrders: Customer id missing');
+    logger.error('Company id missing',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:'Company id missing'});
     this.status= 422;
     this.body = {error: 'Customer id missing'};
     return;
@@ -236,16 +266,18 @@ exports.getCustomerRequestedOrders = function * (next) {
     try {
       var orders = yield orderhistory.getCustomerRequestedOrders(this.customer.id);
     } catch (err) {
-      console.error('getCustomerRequestedOrders: error getting customer requested orders');
-      console.error(err)
+      logger.error('Error getting customer requested orders',{fn:'getCustomerRequestedOrders'}); //, user_id: this.passport.user.id,
+        // role:this.passport.user.role, error:err});
       throw err;
     }
     debug('..orders');
     debug(orders);
+    logger.info("Customer Requested Orders retrieved", {fn:'getCustomerRequestedOrders',orders:orders});
     this.body = orders;
     return;
   } else {
-    console.error('getCustomerRequestedOrders: User not authorized')
+    logger.error('User not authorized',{fn:'getCustomerRequestedOrders',user_id: this.passport.user.id,
+      role: this.passport.user.role, error:'User not authorized'});
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
@@ -253,46 +285,57 @@ exports.getCustomerRequestedOrders = function * (next) {
 }
 
 exports.getCompany=function *(id, next) {
+  logger.info('Getting Company',{fn:'getCompany',id:id}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   debug('getCompany');
   debug('id ' + id);
   var company = '';
   try {
     company = (yield Company.getSingleCompany(id))[0];
   } catch (err) {
-    console.error('error getting company');
+    logger.error('Error getting company',{fn:'getCompany'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:err});
     throw(err);
   }
   debug(company);
+  logger.info('Company retrieved',{fn:'getCompany',company:company});
   this.company = company;
   yield next;
 }
 
 exports.getCustomer=function *(id, next) {
+  logger.info('Getting Customer',{fn:'getCustomer',id:id, pp : this.passport});// user_id: this.passport.user.id, role: this.passport.user.role});
   debug('getCustomer');
   debug('id ' + id);
   var customer = '';
   try {
     customer = (yield Customer.getSingleCustomer(id))[0];
   } catch (err) {
-    console.error('error getting customer');
+    logger.error('Error getting customer',{fn:'getCustomer'}); //}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:err});
     throw(err);
   }
   debug(customer);
+  logger.info('Customer retrieved',{fn:'getCustomer',customer:customer});
   this.customer = customer;
   yield next;
 }
 
 exports.getUnit=function *(id, next) {
+  logger.info('Getting Unit',{fn:'getUnit',id:id}); //, user_id: this.passport.user.id,
+    // role:this.passport.user.role});
   debug('getUnit');
   debug('id ' + id);
   var unit = '';
   try {
     unit = (yield Unit.getSingleUnit(id))[0];
   } catch (err) {
-    console.error('error getting unit');
+    logger.error('Error getting unit',{fn:'getUnit'}); //, user_id: this.passport.user.id,
+      // role:this.passport.user.role, error:err});
     throw(err);
   }
   debug(unit);
+  logger.info('Unit retrieved',{fn:'getUnit',unit:unit});
   this.unit = unit;
   yield next;
 }

@@ -13,13 +13,14 @@ var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
 var timestamp = require('./utils/timestamp');
-var translator = require('./utils/translate');
+var T = require('./utils/translate');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 var logger = require('winston');
 
+const translator = new T();
 
 
 function *simplifyDetails(orderDetail) {
@@ -363,6 +364,7 @@ function *beforeSaveOrderHistory() {
 function *afterCreateOrderHistory(orderHistory) {
   debug('afterCreateOrderHistory')
   debug(orderHistory);
+  logger.info('afterCreateOrderHistory');
   var meta = {fn: 'afterCreateOrderHistory',user_id: this.passport.user.id,role: this.passport.user.role}
   meta.order_id = orderHistory.id;
   meta.company_id = orderHistory.company_id;
@@ -416,7 +418,6 @@ function *afterCreateOrderHistory(orderHistory) {
     status : "order_requested"
   }
   debug('sending notification to unit '+ unit.id);
-  debug('hello');
   debug(meta);
   var mm = meta;
   debug(mm);
@@ -458,7 +459,6 @@ var display = {
 
 function *afterUpdateOrderHistory(orderHistory) {
   debug('afterUpdateOrderHistory')
-
   var meta = {fn: 'afterUpdateOrderHistory',user_id: this.passport.user.id,role: this.passport.user.role}
   meta.order_id = orderHistory.id;
   meta.company_id = orderHistory.company_id;
@@ -468,7 +468,6 @@ function *afterUpdateOrderHistory(orderHistory) {
   meta.order_sys_order_id = osoId;
   meta.status = orderHistory.status;
   var lang = this.passport.user.default_language;
-
   logger.info('Post order update processing started for order '+ orderHistory.id, meta);
   var deviceId = ''
   var title = ''
@@ -556,7 +555,9 @@ function *afterUpdateOrderHistory(orderHistory) {
       switch(status) {
           // From Customer
           case 'order_paid':
+              logger.info("ORDER PAID");
               msgTarget.title = translator.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
+              logger.info("AFTER TRANS");
               msgTarget.message = custName +"'s payment was processed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
@@ -699,6 +700,7 @@ function *afterUpdateOrderHistory(orderHistory) {
 }
 
 function *beforeSaveReview() {
+  logger.info('Before save Review - check reviewer and answers',{fn:'beforeSaveReview'});
   debug('beforeSaveReview: user is ')
   debug(this.passport.user)
   // Get the user's first name and initial of last name for the reviewer_name field.
@@ -718,6 +720,7 @@ function *beforeSaveReview() {
     }
   }
   if (firstName == '' && lastName == '') {
+    logger.error('Save review rejected because a first name or last name is not defined in user account',{fn:'beforeSaveReview',first_name:firstName,last_name:lastName});
     this.throw('Save review rejected because a first name or last name is not defined in user account',403);
   } else if (firstName.length >= 1 && initialLast.length >=1) {
     separator = ' ';
@@ -737,18 +740,18 @@ function *beforeSaveReview() {
       this.resteasy.object.rating = total / answers.length;
       debug('Review rating calculated as: ' + total);
     } else {
-      console.log('Review rating not calculated - unexpected answers value: ' + answers);
+      logger.info('Review rating not calculated - unexpected answers value',{fn:'beforeSaveReview', answers:answers});
     }
   } else {
-    console.log('Review rating not calculated - answersField is null');
+    logger.info('Review rating not calculated - answersField is null',{fn:'beforeSaveReview'});
   }
+  logger.info('Ready to save Review',{fn:'beforeSaveReview'});
 }
 
 
 function *beforeSaveCustomer(){
   debug('beforeSaveCustomer');
-  logger.info('Saving customer', {fn: 'beforeSaveCustomer',
-    user_id: this.passport.user.id, role : this.passport.user.role});
+  logger.info('Before Save customer', {fn: 'beforeSaveCustomer'});
   if (this.resteasy.operation == 'update') {
     // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
@@ -763,6 +766,7 @@ function *beforeSaveCustomer(){
       }
       // Set Customer's gcm to that mapped to the apns token just pushed to Google
       this.resteasy.object.gcm_id = gcmId;
+      logger.info('Customer\'s GCM mapped',{fn:'beforeSaveUnit',user_id: this.params.id, gcm_id:gmcId, apns_id:this.resteasy.object.apns_id});
     }
 
     // If username or password is changed, we need to update the Users table
@@ -771,14 +775,18 @@ function *beforeSaveCustomer(){
     if (username || password) {
     // Username and/or password was changed
       if (!this.params.id) {
-        console.error('beforeSaveCustomer: No customer id provided');
+        logger.error('No customer id provided',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw new Error('No customer id provided. Update operation requires customer id')
       }
       var customer = '';
       try {
         customer = (yield Customer.getSingleCustomer(this.params.id))[0];
       } catch (err) {
-        console.error('beforeSaveCustomer: Error getting existing Customer');
+        logger.error('Error getting existing Customer',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw err;
       }
       debug('..customer');
@@ -787,10 +795,12 @@ function *beforeSaveCustomer(){
       try {
         user = (yield User.getSingleUser(customer.user_id))[0];
       } catch (err) {
-        console.error('beforeSaveCustomer: Error getting existing user');
+        logger.error('Error getting existing user',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw err;
       }
-      debug('..user');
+      debug('..customer');
       debug(user);
       var userHash = {};
       if (username) {
@@ -801,25 +811,35 @@ function *beforeSaveCustomer(){
         userHash.password = password;
         delete this.resteasy.object.password;
       }
-      debug('..updating user');
+      debug('..updating customer');
       try {
         user = (yield User.updateUser(user.id, userHash))[0];
       } catch (err) {
-        console.error('beforeSaveCustomer: Error updating user');
+        logger.error('Error updating user',
+            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: err});
         throw err;
       }
-      debug('..user after update');
+      logger.info('Customer updated',{fn:'beforeSaveCustomer',user_id:this.params.id});
+      debug('..customer after update');
       debug(user);
     }
   }
+  logger.info('Ready to save Customer',{fn:'beforeSaveCustomer'});
 }
 
 function *beforeSaveUnit() {
+  logger.info('Before Save Unit - validate unit information',{fn:'beforeSaveUnit'});
   debug('beforeSaveUnit');
+  if (!this.resteasy.object){
+    logger.error('No Unit information provided',{fn:'beforeSaveUnit'});
+    throw new Error('No Unit information provided',422);
+  }
   // If username or password is changed, we need to update the Users table
   var username = this.resteasy.object.username;
   var password = this.resteasy.object.password;
   if (this.resteasy.operation == 'create') {
+    logger.info('Starting create of new Unit',{fn:'beforeSaveUnit',context:this.params.context});
     debug('..starting create of new Unit');
     // get the company context
     debug('..getting company')
@@ -829,28 +849,31 @@ function *beforeSaveUnit() {
       companyId = m[1];
     } else {
       // no company context is an error
-      console.error('beforeSaveUnit: No company context for unit: '+ this.params.context);
-      throw new Error ('No company context for unit')
+      logger.error('No company context for unit', {fn:'beforeSaveUnit',user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      throw new Error ('No company context for unit', 422)
     }
     if (!username || !password) {
       // need both to create new User and Unit
-      console.error('beforeSaveUnit: Username/password are required');
-      throw new Error ('Username/password are required');
+      logger.error('Username/password are required', {fn:'beforeSaveUnit', user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      throw new Error ('Username/password are required', 422);
     }
     // make sure it's a unique username
     var existingUser = '';
     try {
       existingUser = (yield User.userForUsername(username))[0];
     } catch (err) {
-      console.error('beforeSaveUnit: error during User creation');
+      logger.error('Error during User creation', {fn:'beforeSaveUnit',user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
       throw err;
     }
     debug('..user exists for username '+ username +'? Yes: user details; No: undefined');
     debug(existingUser)
     if (existingUser) {
-      console.error('beforeSaveUnit: Tried to create unit with duplicate name of '+ username );
-      console.error('beforeSaveUnit: Name must be unique within Unit/User tables');
-      throw new Error('That name already exists. Try another name');
+      logger.error('Tried to create unit with duplicate name. Name must be unique within Unit/User tables.', {fn:'beforeSaveUnit',username:username,user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err});
+      throw new Error('That name already exists. Try another name', 422);
     }
 
     var unitmgr = { role: 'UNITMGR', username: username, password: password };
@@ -858,7 +881,8 @@ function *beforeSaveUnit() {
     try {
       user = (yield User.createOrUpdateUser(unitmgr))[0];
     } catch (err) {
-      console.error('beforeSaveUnit: Error creating User-UnitMgr');
+      logger.error('Error creating User-UnitMgr', {fn:'beforeSaveUnit', user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, error: err});
       throw err;
     }
     debug('..user created');
@@ -867,7 +891,9 @@ function *beforeSaveUnit() {
     this.resteasy.object.company_id = parseInt(companyId);
     debug('..ready to create unit');
     debug(this.resteasy.object);
+    logger.info('Unit Manager created, ready to create Unit',{fn:'beforeSaveUnit',unit_mgr_id:user.id,company_id:companyId});
   } else if (this.resteasy.operation == 'update') {
+    logger.info('Starting update of existing Unit',{fn:'beforeSaveUnit', unit_id:this.params.id, context:this.params.context});
     debug('..starting update of existing Unit');
      // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
@@ -877,25 +903,28 @@ function *beforeSaveUnit() {
       } catch (err) {
         logger.error('Error sending APNS token to GCM',
             {fn: 'beforeSaveUnit', user_id: this.passport.user.id,
-            role: this.passport.user.role, unit_id: this.params.id, error: err});
+            role: this.passport.user.role, unit_id: this.params.id, apns_id:this.resteasy.object.apns_id, error: err});
         throw err;
       }
       // Set Unit's gcm to that mapped to the apns token just pushed to Google
       this.resteasy.object.gcm_id = gcmId;
+      logger.info('Unit\'s GCM mapped',{fn:'beforeSaveUnit',unit_id: this.params.id, gcm_id:gmcId, apns_id:this.resteasy.object.apns_id});
     }
     // This block of code checks to see if username/password, if provided,
     // was/were changed. If so, update User.
     if (username || password) {
       var unitId = this.params.id;
       if (!unitId) {
-        console.error('beforeSaveUnit: No unit id provided');
-        throw new Error('No unit id provided. Update operation requires unit id')
+        logger.error('No unit id provided',{fn:'beforeSaveUnit',user_id: this.passport.user.id,
+          role: this.passport.user.role, unit_id: this.params.id, error: err});
+        throw new Error('No unit id provided. Update operation requires unit id', 422);
       }
       var unit = '';
       try {
         unit = (yield Unit.getSingleUnit(this.params.id))[0];
       } catch (err) {
-        console.error('beforeSaveUnit: Error getting existing unit');
+        logger.error('Error getting existing unit', {fn:'beforeSaveUnit', unit_id: this.params.id, user_id: this.passport.user.id,
+          role: this.passport.user.role, unit_id: this.params.id, error: err});
         throw err;
       }
       debug('..unit');
@@ -906,7 +935,8 @@ function *beforeSaveUnit() {
         try {
           user = (yield User.getSingleUser(unit.unit_mgr_id))[0];
         } catch (err) {
-          console.error('beforeSaveUnit: Error getting existing user');
+          logger.error('Error getting existing user',{fn:'beforeSaveUnit',unit_mgr_id:unit.unit_mgr_id,user_id: this.passport.user.id,
+              role: this.passport.user.role, unit_id: this.params.id, error: err});
           throw err;
         }
         debug('..user');
@@ -918,55 +948,81 @@ function *beforeSaveUnit() {
         try {
           user = (yield User.updateUser(user.id, userHash))[0];
         } catch (err) {
-          console.error('beforeSaveUnit: Error updating user');
+          logger.error('Error updating user',{fn:'beforeSaveUnit', update_user_id:user.id,
+            user_id: this.passport.user.id, role: this.passport.user.role, unit_id: this.params.id, error: err});
           throw err;
         }
         debug('..user after update');
         debug(user);
+        logger.info('Unit Manager updated',{fn:'beforeSaveUnit',unit_mgr_id:user.id});
       }
     }
+    logger.info('Ready to update Unit',{fn:'beforeSaveUnit', unit_id:this.params.id});
   }
 }
 
 function *beforeSaveCompanies() {
+  logger.info('Before company saved',{fn:'beforeSaveCompanies'});
   debug('beforeSaveCompanies');
+  if (!this.resteasy.object){
+    logger.error('No company provided',{fn:'beforeSaveCompanies',error:'No company provided'});
+    throw new Error ('No company provided',422);
+  }
   debug(this.resteasy.object);
   debug(this.params);
   if (this.resteasy.operation == 'update') {
+    logger.info('Before company updated - limit payload update menu items',{fn:'beforeSaveCompanies',params:this.params,company:this.resteasy.object});
     debug('...update');
     debug('...limit payload elements');
     try {
       // this will modify this.resteasy.object
       yield payload.limitCompanyPayloadForPut.call(this, this.resteasy.object)
     } catch (err) {
-      console.error(err)
+      logger.error('Unable to limit payload elements',{fn:'beforeSaveCompanies',company:this.resteasy.object, error:err});
       throw(err)
     }
+    logger.info('Before company updated - get existing company',{fn:'beforeSaveCompanies',params_id:this.params.id});
     var company = (yield Company.getSingleCompany(this.params.id))[0];
+    if (!company){
+        logger.error('No company exists with the provided id',{fn:'beforeSaveCompanies',params_id:this.params.id,error:'No company exists with the provided id'});
+        throw new Error('No company exists with the provided id',422);
+    }
     debug('company '+ company.id);
     if (this.resteasy.object.delivery_chg_amount && company.delivery_chg_amount != this.resteasy.object.delivery_chg_amount) {
-
+      logger.info('Before company updated - update delivery charge amount',
+        {fn:'beforeSaveCompanies',companyId:company.id,existing_delivery_chg_amt:company.delivery_chg_amount,
+        updated_delivery_chg_amt:this.resteasy.object.delivery_chg_amount});
       var amount = this.resteasy.object.delivery_chg_amount;
       debug('..delivery charge amount has changed to '+ amount +'. Updating..')
       // Update moltin
       var item = '';
       var data = { price: amount};
-      try {
+      try{
           item = yield msc.updateMenuItem(company.delivery_chg_item_id, data)
       } catch (err) {
-        console.error(err);
-        throw new Error ('Error updating delivery charge in ordering system');
+        logger.error('Unable to update delivery charge in the ordering system',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,amount:data.price,error:err});
+        throw new Error ('Error updating delivery charge in ordering system',422);
       }
+      logger.info('Delivery charge updated',{fn:'beforeSaveCompanies',deliveryChgItemId:company.delivery_chg_item_id,item:item,amount:data.price});
       debug('..delivery charge updated')
+    }
+    else{
+      logger.info('No updates needed to company delivery charge amount', {fn:'beforeSaveCompanies',companyId:company.id});
     }
   }
 }
 
 function *beforeSaveDriver() {
+  logger.info('Before driver saved',{fn:'beforeSaveDriver'});
   debug('beforeSaveDriver');
+  if (!this.resteasy.object){
+    logger.error('No driver provided',{fn:'beforeSaveDriver',error:'No driver provided'});
+    throw new Error ('No driver provided',422);
+  }
   debug(this.resteasy.object);
   debug(this.params);
   if (this.resteasy.operation == 'create') {
+    logger.info('Before driver created - check for valid company context and unit',{fn:'beforeSaveDriver', params:this.params});
     debug('...create');
     debug('..getting company')
     var companyId = '';
@@ -975,8 +1031,8 @@ function *beforeSaveDriver() {
       companyId = m[1];
     } else {
       // no company context is an error
-      console.error('beforeSaveDrivers: No company context for driver: '+ this.params.context);
-      throw new Error ('No company context for driver')
+      logger.error('No company context for driver',{fn:'beforeSaveDriver',context:this.params.context, error:'No company context for driver'});
+      throw new Error ('No company context for driver',422);
     }
     var unitId = '';
     if (this.params.context && (n = this.params.context.match(/units\/(\d+)$/))) {
@@ -984,18 +1040,22 @@ function *beforeSaveDriver() {
       unitId = n[1];
     } else {
       // no unit context is an error
-      console.error('beforeSaveDrivers: No unit context for driver: '+ this.params.context);
-      throw new Error ('No unit context for driver')
+      logger.error('No unit context for driver',{fn:'beforeSaveDriver',context:this.params.context, error:'No unit context for driver'});
+      throw new Error ('No unit context for driver',422);
     }
 
     this.resteasy.object.company_id = companyId;
     this.resteasy.object.unit_id = unitId;
+
+    logger.info('Driver will be created',{fn:'beforeSaveDriver',company_id:companyId,unit_id:unitId,driver:this.resteasy.object});
   }
 }
 
 function *beforeSaveLoyaltyRewards() {
+  logger.info('Before loyalty rewards saved',{fn:'beforeSaveLoyaltyRewards'});
   debug('beforeSaveLoyaltyRewards');
   if (this.resteasy.operation == 'create') {
+    logger.info('Before loyalty rewards created - check for existing company context',{fn:'beforeSaveLoyaltyRewards'});
     if (this.params.context && (m = this.params.context.match(/companies\/(\d+)$/))) {
       var coId = m[1];
       debug('..company id '+ coId);
@@ -1004,45 +1064,74 @@ function *beforeSaveLoyaltyRewards() {
       debug(exists);
       // if vendor already has loyalty rewards defined for their company ID, do not allow a second set to be saved.
       if (exists) {
+        logger.error('Company has existing rewards defined',{fn:'beforeSaveLoyaltyRewards',company_id:coId});
         this.throw('Company has existing rewards defined. Use PUT/PATCH to modify.',405);
       }
       this.resteasy.object.company_id = coId;
+      log.info('Loyalty rewards will be created for company',{fn:'beforeSaveLoyaltyRewards',company_id:this.resteasy.object.company_id});
     } else {
+      log.error('No company context found for loyalty rewards',{fn:'beforeSaveLoyaltyRewards',error:'No company context found for loyalty rewards'});
       this.throw('No company context found for loyalty rewards',422);
     }
   }
 }
 
 function *beforeSaveUser() {
+  logger.info('Before User saved - encrypt password',{fn:'beforeSaveUser',params:this.params});
+  if (!this.params || !this.params.id){
+    logger.error('No user id provided',{fn:'beforeSaveUser',params:this.params,error:'No user id provided'});
+    throw new Error('No user id provided', 422);
+  }
   debug('beforeSaveUser');
   if (this.passport.user.role!='ADMIN' && this.passport.user.id != this.params.id) {
-    console.error('beforeSaveUser: Logged-in user id does not match param user id');
-    throw new Error('Param id does not match logged-in user credentials');
+    logger.error('Logged-in user id does not match param user id',{fn:'beforeSaveUser',loggedIn_user_id:this.passport.user.id,param_user_id:this.params.id,error:'Param id does not match logged-in user credentials'});
+    throw new Error('Param id does not match logged-in user credentials', 422);
   }
   var password = this.resteasy.object.password;
   debug(password);
   if (password) {
-    this.resteasy.object.password = User.encryptPassword(password);
+    try{
+      this.resteasy.object.password = User.encryptPassword(password);
+      logger.info('Password encrypted',{fn:'beforeSaveUser',param_user_id:this.params.id});
+      debug(this.resteasy.object);
+    }
+    catch (err){
+      logger.error('Unable to encrypt user password',{fn:'beforeSaveUser',param_user_id:this.params.id,error:err});
+      throw err;
+    }
   }
-  debug(this.resteasy.object);
 }
 
 function *afterCreateReview(review) {
-  var reviewApproval = { review_id: review.id, status: 'New', updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
+  logger.info('After review created - add review approval record',{fn:'afterCreateReview',review:review});
+  if (!review){
+    log.error('No Review provided',{fn:'afterCreateReview',error:'No Review provided'});
+    throw new Error('No Review provided',422);
+  }
+  try{
+    var reviewApproval = { review_id: review.id, status: 'New', updated_at: this.resteasy.knex.fn.now(), created_at: this.resteasy.knex.fn.now() };
 
-  this.resteasy.queries.push(
-    this.resteasy.transaction.table('review_approvals')
-      .insert(reviewApproval)
-  );
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('review_approvals')
+        .insert(reviewApproval)
+    );
+    logger.info('Review approval record created',{fn:'afterCreateReview',review_id:review.id,reviewApproval:reviewApproval});
+  }
+  catch(err){
+    logger.error('Unable to create review approval record',{fn:'afterCreateReview',review_id:review.id,error:err});
+    throw err;
+  }
 }
 
 function *afterCreateLoyaltyUsed(loyaltyUsed) {
+  logger.info('afterCreateLoyaltyUsed - subtracting redeemed loyalty points for customer',{fn:'afterCreateLoyaltyUsed',loyaltyUsed:loyaltyUsed});
   if (!loyaltyUsed) {
+    logger.error('Parameter loyaltyUsed must be defined', {fn:'afterCreateLoyaltyUsed',error:'Parameter loyaltyUsed must be defined'});
     throw new Error('Parameter loyaltyUsed must be defined');
   }
-  logger.info('afterCreateLoyaltyUsed - subtracting redeemed loyalty points for customer ' + loyaltyUsed.customer_id + ', company ' + loyaltyUsed.company_id);
   var priorBalance = (yield Loyalty.getPointBalance(loyaltyUsed.customer_id, loyaltyUsed.company_id))[0];
   if (!priorBalance) {
+    logger.error('Unable to get loyalty point balance for customer', {fn:'afterCreateLoyaltyUsed', customer_id:loyaltyUsed.customer_id, company:loyaltyUsed.company_id, error:'Unable to get loyalty point balance for customer'});
     throw new Error('Unable to get loyalty point balance for customer ' + loyaltyUsed.customer_id + ', company ' + loyaltyUsed.company_id);
   }
   var oldBal = parseInt(priorBalance.balance);
@@ -1066,49 +1155,77 @@ function *afterCreateLoyaltyUsed(loyaltyUsed) {
     eligible_fifteen: isEligible_fifteen,
     updated_at: this.resteasy.knex.fn.now()
   }
-  debug(updateLoyalty);
-  this.resteasy.queries.push(
-    this.resteasy.transaction.table('loyalty').where('id', priorBalance.id)
-      .update(updateLoyalty)
-  );
-  debug('afterCreateLoyaltyUsed success');
+  try{
+    debug(updateLoyalty);
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('loyalty').where('id', priorBalance.id)
+        .update(updateLoyalty)
+    );
+    debug('afterCreateLoyaltyUsed success');
+    logger.info('Loyalty point balance updated', {fn:'afterCreateLoyaltyUsed',customer_id:loyaltyUsed.customer_id,company_id:loyaltyUsed.company_id,priorBalanc_id:priorBalance.id,updateLoyalty:updateLoyalty});
+  }
+  catch (err){
+    logger.error('Unable to update loyalty points',{fn:'afterCreateLoyaltyUsed',priorBalance_id:priorBalance.id,updatedLoyalty:updateLoyalty});
+    throw err;
+  }
 }
 
 function *afterUpdateReviewApproval(approval) {
+  logger.info('Updating review status and company rating', {fn:'afterUpdateReviewApproval',approval:approval});
   debug('begin afterUpdateReviewApproval function');
+  if (!approval){
+    logger.error('No Approval provided for review',{fn:'afterUpdateReviewApproval', error:'No Approval provided for review'});
+    throw new Error('No approval provided for review', 422);
+  }
   var hash = { status: approval.status };
 
-  this.resteasy.queries.push(
-    this.resteasy.transaction.table('reviews').where('id', approval.review_id).update(hash)
-  );
+  try{
+    this.resteasy.queries.push(
+      this.resteasy.transaction.table('reviews').where('id', approval.review_id).update(hash)
+    );
+    logger.info('Updated Review Status',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, hash:hash});
+  }
+  catch (err){
+    logger.error('Unable to Update Review Status',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, hash:hash, error:err});
+    throw err;
+  }
 
   // Recalculate company rating
   if (approval.status == "Approved") {
-    var companyId = (yield Reviews.getCompanyId(approval.review_id))[0];
-    if (companyId) {
-      var averageRating = (yield Reviews.getAverageRating(companyId.company_id, approval.review_id))[0];
-      if (averageRating) {
-        debug('average rating is now ' + averageRating.avg_rating + ' for company ID ' + companyId.company_id);
-        var updateCompanyRating = { calculated_rating: averageRating.avg_rating };
+    try{
+      var companyId = (yield Reviews.getCompanyId(approval.review_id))[0];
+      if (companyId) {
+        var averageRating = (yield Reviews.getAverageRating(companyId.company_id, approval.review_id))[0];
+        if (averageRating) {
+          debug('average rating is now ' + averageRating.avg_rating + ' for company ID ' + companyId.company_id);
+          var updateCompanyRating = { calculated_rating: averageRating.avg_rating };
 
-        this.resteasy.queries.push(
-          this.resteasy.transaction.table('companies').where('id', companyId.company_id).update(updateCompanyRating)
-        );
-      } else {
-        console.log('Unable to get avg rating for company '+ companyId.company_id);
+          this.resteasy.queries.push(
+            this.resteasy.transaction.table('companies').where('id', companyId.company_id).update(updateCompanyRating)
+          );
+        } else {
+          logger.info('Unable to get Average Rating for company',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, companyId:companyId.company_id});
+        }
       }
+      logger.info('Updated Average Rating for company',{fn:'afterUpdateReviewApproval', review_id:approval.review_id, companyId:companyId.company_id});
+    }
+    catch (err){
+      logger.error('Unable to update Average Rating', {fn:'afterUpdateReviewApproval', review_id:approval.review_id, error:err});
+      throw err;
     }
   }
 }
 
 function *afterReadOrderHistory(orderHistory) {
+  logger.info('After Read Order History',{fn:'afterReadOrderHistory',orderHistory:orderHistory});
   debug('afterReadOrderHistory')
   if (orderHistory && orderHistory.order_sys_order_id && !orderHistory.order_detail) {
     try {
       var moltin_order_items = yield msc.getOrderDetail(orderHistory.order_sys_order_id)
       var details = yield simplifyDetails(moltin_order_items)
     } catch (err) {
-      console.error(err)
+      logger.error('Error getting Order Details',
+          {fn: 'afterReadOrderHistory', orderHistory:orderHistory, error: err});
       throw(err)
     }
     debug('..order details')
@@ -1117,11 +1234,26 @@ function *afterReadOrderHistory(orderHistory) {
     try {
       var updatedOrder = yield OrderHistory.updateOrder(orderHistory.id, orderDetail)
     } catch (err) {
-      console.error(err)
+      logger.error('Error updating Order',
+          {fn: 'afterReadOrderHistory', order_detail:details, orderHistory:orderHistory, error: err});
       throw(err)
     }
     debug('updatedOrder')
     debug(updatedOrder)
+    logger.info('Updated Order', {fn:'afterReadOrderHistory',updatedOrder:updatedOrder});
+  }
+  else{
+    if (!orderHistory){
+      logger.error('No Order History found', {fn:'afterReadOrderHistory',error:'No Order History found'});
+    }
+    else {
+      if (!orderHistory.order_sys_order_id){
+        logger.error('No Order ID exists on the Order History', {fn:'afterReadOrderHistory',orderHistory:orderHistory,error:'No Order ID exists on the Order History'});
+      }
+      if (orderHistory.order_detail){
+        logger.info('Order Detail already exists on the Order History; skipping get', {fn:'afterReadOrderHistory',orderHistory:orderHistory});
+      }
+    }
   }
   /* this.resteasy.queries.push(
     this.resteasy.transaction.table('order_history').where('order_history.id', order_history.id).update(order_detail)
@@ -1129,6 +1261,7 @@ function *afterReadOrderHistory(orderHistory) {
 }
 
 function *validUnitMgr(params, user) {
+  logger.info('Validating Unit Manager',{fn:'validUnitMgr', user:user, params:params});
   debug('validUnitMgr');
   var compId = '';
   var unitId = '';
@@ -1140,20 +1273,23 @@ function *validUnitMgr(params, user) {
     if (params.context && (n = params.context.match(/units\/(\d+)$/))) unitId = n[1];
   }
   if (!compId) {
-    console.error('No company id provided for unit');
+    logger.error('No company id provided for unit', {fn: 'validUnitMgr', user:user, params:params, error: 'No company id provided for unit'});
     throw new Error('No company id provided for unit',422);
   }
   if (!unitId) {
-    console.error('No unit id provided');
+    logger.error('No unit id provided', {fn: 'validUnitMgr', user:user, params:params, error: 'No unit id provided'});
     throw new Error('No unit ide provided', 422);
   }
   debug('.. for company '+ compId);
   debug('.. for unit '+ unitId);
   var valid = (yield Unit.verifyUnitManager(compId, unitId, user.id))[0]
   debug('..unit manager is '+ valid);
+
   if (!valid) {
+    logger.info('Unit Manager Invalid',{fn:'validUnitMgr',user:user,valid:valid});
     return false;
   } // else continue
+    logger.info('Unit Manager Validated',{fn:'validUnitMgr',user:user,valid:valid});
   return true;
 }
 
@@ -1217,7 +1353,7 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Update/Delete Unauthorized - Admin only',401);
           } // else continue
-        } else if (this.params.table == 'companies' && operation == 'update') {
+        } else if (this.params.table == 'companies' && operation == 'update' && this.passport.user.role == 'UNITMGR') {
           if (!this.isAuthenticated() || !this.passport.user || (this.passport.user.role == 'CUSTOMER')) {
             this.throw('Update/Delete Unauthorized - Customer unauthorized');
           }
