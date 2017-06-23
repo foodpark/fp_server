@@ -937,7 +937,7 @@ function *beforeSaveCompanies() {
     debug('...limit payload elements');
     try {
       // this will modify this.resteasy.object
-      yield payload.limitCompanyPayloadForPut(this.resteasy.object)
+      yield payload.limitCompanyPayloadForPut.call(this, this.resteasy.object)
     } catch (err) {
       console.error(err)
       throw(err)
