@@ -9,5 +9,6 @@
       "orderPickedUp"    : "Seu Pedido foi Retirado",
       "orderNotPickedUp" : "Seu Pedido Não foi Retirado. Você esqueceu?",
       "orderEnRoute"     : "Seu Pedido está a caminho",
-      "orderDelivered"   : "Seu Pedido foi Entregue"
+      "orderDelivered"   : "Seu Pedido foi Entregue",
+      "orderRequested"   : "'Tempo para Retirada: '+ pickuptime +'\n'+ 'Cliente: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+'Detalhes do Pedido:' + orderDetail +'\n';"
 }
