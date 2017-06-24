@@ -405,6 +405,8 @@ function *afterCreateOrderHistory(orderHistory) {
   var msg = 'Pickup Time: '+ pickuptime +'\n'+
             'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+
             'Order Details: ' + orderDetail +'\n';
+msgTarget.title = "Order Requested";
+msgTarget.title = translator.translate(lang,"orderRequested", pickupTime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
   debug('msg');
   debug(msg);
   var msgTarget = {
