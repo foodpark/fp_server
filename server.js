@@ -17,6 +17,18 @@ var cors = require('kcors');
 var app = Koa();
 
 app.use(require('koa-error')());
+app.use(function *(next) {
+  try{
+    yield next;
+  }
+  catch (err) {
+    this.status = err.status || 500;
+    this.body = {'error':{
+      code:this.status,
+      message:err.message
+    }};
+  }
+});
 app.keys = [config.secret];
 
 app.use(Helmet());
