@@ -347,6 +347,7 @@ CREATE TABLE reviews (
     power_reviewer boolean DEFAULT false,
     power_title text,
     reviewer_name text,
+    review_photo text,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
