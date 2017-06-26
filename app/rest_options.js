@@ -372,6 +372,9 @@ function *afterCreateOrderHistory(orderHistory) {
   meta.customer_id = orderHistory.customer_id;
   var osoId = orderHistory.order_sys_order_id;
   meta.order_sys_order_id = osoId;
+  var lang = this.passport.user.default_language;
+  debug('language: '+ lang)
+  meta.lang = lang;
 
   logger.info('Post order creation processing started for order '+ orderHistory.id, meta);
   var unit = '';
@@ -401,12 +404,10 @@ function *afterCreateOrderHistory(orderHistory) {
 
   var orderDetail = JSON.stringify(orderHistory.order_detail, null, 2);
   debug(orderDetail);
-  var pickuptime = orderHistory.desired_pickup_time.toISOString();
-  var msg = 'Pickup Time: '+ pickuptime +'\n'+
+  var pickupTime = orderHistory.desired_pickup_time.toISOString();
+  var msg = 'Pickup Time: '+ pickupTime +'\n'+
             'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+
             'Order Details: ' + orderDetail +'\n';
-msgTarget.title = "Order Requested";
-msgTarget.title = translator.translate(lang,"orderRequested", pickupTime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
   debug('msg');
   debug(msg);
   var msgTarget = {
@@ -419,6 +420,9 @@ msgTarget.title = translator.translate(lang,"orderRequested", pickupTime, this.p
     body : msg,
     status : "order_requested"
   }
+  logger.info('Translating message', meta)
+  msgTarget.title = translator.translate(lang,"orderRequested", pickupTime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
+ 
   debug('sending notification to unit '+ unit.id);
   debug(meta);
   var mm = meta;
@@ -470,6 +474,7 @@ function *afterUpdateOrderHistory(orderHistory) {
   meta.order_sys_order_id = osoId;
   meta.status = orderHistory.status;
   var lang = this.passport.user.default_language;
+  meta.lang = lang;
   logger.info('Post order update processing started for order '+ orderHistory.id, meta);
   var deviceId = ''
   var title = ''

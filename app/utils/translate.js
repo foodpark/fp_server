@@ -32,6 +32,7 @@ function Translate() {
   }
 
   var trans = function (lang, key) {
+    log.info('Invoking translation ', {fn: 'trans', lang: lang, key: key})
     if (!(langMap.get(lang))) {
         loadLang(lang);
         if (!(langMap.get(lang))) {
@@ -52,6 +53,7 @@ function Translate() {
     },
 
     translate : function (lang, key, ...values) {
+      log.info('Translate string', {fn:'translate', lang: lang, key: key, values: values})
       var transLang = lang;
       if (lang === null) {
         transLang = 'en';

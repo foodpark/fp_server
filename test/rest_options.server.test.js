@@ -17,13 +17,13 @@ var tests = "- Rest Options/RestEasy Tests - ";
 /*
 pickup:
 { 
-  "order_sys_order_id": "1364458146390605831",
+  "order_sys_order_id": "1505190689619574804",
   "desired_pickup_time":  "11/6/2016, 8:11:56 PM"
 }
 
 delivery:
 { 
-  "order_sys_order_id": "1364458146390605831",
+  "order_sys_order_id": "1505190689619574804",
   "desired_pickup_time":  "11/6/2016, 8:11:56 PM",
   "delivery_address_id" : "1",
   "for_delivery": "true"
@@ -75,6 +75,7 @@ describe(tests +' Create a new order', function() {
         "desired_pickup_time": "6/6/2017, 8:11:56 PM"
     })
     .end(function(err, res) {
+      console.log(err);
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
