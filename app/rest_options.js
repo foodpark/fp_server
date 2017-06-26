@@ -421,8 +421,9 @@ function *afterCreateOrderHistory(orderHistory) {
     status : "order_requested"
   }
   logger.info('Translating message', meta)
-  msgTarget.title = translator.translate(lang,"orderRequested", pickupTime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
- 
+  msgTarget.title = translator.translate(lang,"orderRequested_pickup", pickupTime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
+ msgTarget.title = translator.translate(lang,"orderRequested_delivery", deliveryTime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
+	
   debug('sending notification to unit '+ unit.id);
   debug(meta);
   var mm = meta;
