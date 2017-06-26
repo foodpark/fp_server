@@ -10,5 +10,6 @@
         "orderNotPickedUp" :"Your order #{{orderNum}} was not picked up! Did you forget?",
         "orderDispatched"  :"Your order #{{orderNum}} is on its way!",
         "orderDelivered"   :"Your order #{{orderNum}} was delivered. Thanks again! ",
-        "orderRequested"   :"'Pickup Time: '+ pickuptime +'\n'+ 'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+'Order Details: ' + orderDetail +'\n';"
+        "orderRequested_delivery"   :"'Delivery Time: '+ deliverytime +'\n'+ 'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+'Order Details: ' + orderDetail +'\n';",
+        "orderRequested_pickup"   :"'Pickup Time: '+ pickuptime +'\n'+ 'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+'Order Details: ' + orderDetail +'\n';"
 }
