@@ -20,10 +20,10 @@ SELECT pg_catalog.setval('food_parks_id_seq', 30020, true);
 
 
 
-COPY users (id, username, password, first_name, last_name, role, provider, provider_id, provider_data, created_at, updated_at) FROM stdin;
-11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	local	local	{}	2016-08-21 23:31:43.131352+00	2017-02-03 09:25:30.279083+00
-11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	local	local	{}	2016-08-21 23:03:07.177813+00	2017-01-31 23:32:49.172208+00
-11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	local	local	{}	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
+COPY users (id, username, password, first_name, last_name, role, provider, provider_id, provider_data, fbid, fb_token, fb_login, default_language, created_at, updated_at) FROM stdin;
+11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	local	local	{}	\N	\N	\N	en	2016-08-21 23:31:43.131352+00	2017-02-03 09:25:30.279083+00
+11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	local	local	{}	\N	\N	\N	en	2016-08-21 23:03:07.177813+00	2017-01-31 23:32:49.172208+00
+11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
 11013	mg_admin	2c544a0fca5a8146c790a295e389bbd8	Matt	Guiger	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:10:50.642758+00
 11012	mp_admin	4789d4e7d1316d4dcf8ba7c8868bc6a3	Mike	Peter	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:11:23.159019+00
 \.
