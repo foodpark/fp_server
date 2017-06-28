@@ -2,7 +2,6 @@ var knex    = require('../../config/knex');
 var Checkin = require ('../models/checkin.server.model');
 var debug   = require('debug')('unit.model');
 
-
 exports.getSingleUnit = function(id) {
   return knex('units').select().where('id', id)
 };
@@ -13,7 +12,7 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
   var lat2 = latitude - 180/Math.PI * (distance/earth);
   var lon1 = longitude - 180/Math.PI * (distance/earth/Math.cos(latitude * Math.PI/180));
   var lon2 = longitude + 180/Math.PI * (distance/earth/Math.cos(latitude * Math.PI/180));
-  console.log(lat1 + ", "+ lon1  + " " + lat2 + ", " + lon2 + " d:" + distance);
+  debug(lat1 + ", "+ lon1  + " " + lat2 + ", " + lon2 + " d:" + distance);
   if (lat1 < lat2) {
     var minlat = lat1;
     var maxlat = lat2;
@@ -28,7 +27,7 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','companies.tags', 'companies.calculated_rating as rating'])
+  return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','checkins.food_park_name','checkins.food_park_id','companies.tags','companies.calculated_rating as rating'])
   .whereRaw('(latitude >= ? and latitude <= ?) and (longitude >= ? and longitude <= ?) and check_in < ? and check_out > ?',
   [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');//.on('query-response', function(response, obj, builder) {});
   //.then( function(response) {
