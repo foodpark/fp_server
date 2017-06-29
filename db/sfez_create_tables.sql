@@ -130,7 +130,7 @@ CREATE TABLE companies (
     taxband text,
     tags text,
     stub boolean,
-    calculated_rating numeric DEFAULT 0.0,
+    calculated_rating numeric,
     user_id integer REFERENCES users(id),
     show_vendor_setup boolean DEFAULT true,
     default_unit integer, --// circular reference if REFERENCES is used.  Temporary fix until customer update can be modified properly
