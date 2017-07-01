@@ -27,20 +27,9 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','checkins.food_park_name','checkins.food_park_id','companies.tags','companies.calculated_rating as rating','companies.photo'])
+  return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','checkins.food_park_name','checkins.food_park_id','checkins.display_address','companies.tags','companies.calculated_rating as rating','companies.photo'])
   .whereRaw('(latitude >= ? and latitude <= ?) and (longitude >= ? and longitude <= ?) and check_in < ? and check_out > ?',
-  [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');//.on('query-response', function(response, obj, builder) {});
-  //.then( function(response) {
-  //  var idList = response.map(function(obj){
-  //   return obj['unit_id'];
-  //  });
-  //  return idList;
-  //}).then( function(idList) {
-  //  //fix response object: only return desired columns AND join the lat-lon
-  //   return knex('units').select(['id','name','number','type','description','qr_code','unit_order_sys_id','company_id','updated_at']).whereIn('id', idList).on('query-response', function(response, obj, builder) {}).then( function(response) {
-  //      return response;
-  //  }).catch(console.log.bind(console));
-  //}).catch(console.log.bind(console));
+  [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');
 };
 
 exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
