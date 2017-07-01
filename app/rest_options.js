@@ -9,6 +9,7 @@ var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var Reviews = require('./models/reviews.server.model');
 var User = require('./models/user.server.model');
+var Territories = require('./models/territories.server.model');
 var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
@@ -423,7 +424,7 @@ function *afterCreateOrderHistory(orderHistory) {
   logger.info('Translating message', meta)
   msgTarget.title = translator.translate(lang,"orderRequested_pickup", pickuptime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
  msgTarget.title = translator.translate(lang,"orderRequested_delivery", deliverytime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
-	
+
   debug('sending notification to unit '+ unit.id);
   debug(meta);
   var mm = meta;
@@ -566,61 +567,61 @@ function *afterUpdateOrderHistory(orderHistory) {
               logger.info("ORDER PAID");
               msgTarget.title = translator.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
               logger.info("AFTER TRANS");
-              msgTarget.message = translator.translate(lang, “payProcessedMessage”, custName);//custName +"'s payment
+              msgTarget.message = translator.translate(lang, "payProcessedMessage", custName);//custName +"'s payment
               msgTarget.body = msgTarget.message;
               break;
           case 'pay_fail':
-              msgTarget.title = translator.translate(lang, payFailed, orderNum);//"Payment Failed - Order #"+ orderNum;
-              msgTarget.message = translator.translate(lang, “payFailedMessage”, custName);//"custName +" payment failed at "+ timestamp.now();
+              msgTarget.title = translator.translate(lang, "payFailed", orderNum);//"Payment Failed - Order #"+ orderNum;
+              msgTarget.message = translator.translate(lang, "payFailedMessage", custName);//"custName +" payment failed at "+ timestamp.now();
               msgTarget.body = msgTarget.message;
               break;
           // From Unit
           case 'order_declined':
-	      msgTarget.title = translator.translate(lang, OrderDeclined);//"Order Declined;
+	      msgTarget.title = translator.translate(lang, "orderDeclined");//"Order Declined;
               msgTarget.message = translator.translate(lang, "orderDeclinedMessage", company.name);//"company.name +" did not accept your order at this time. Please try again some other time.";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_accepted':
-              msgTarget.title = translator.translate(lang, OrderAccepted);//"Order Accepted";
+              msgTarget.title = translator.translate(lang, "orderAccepted");//"Order Accepted";
               msgTarget.message =  'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'  +
                                    'Customer: '+ custName +'\n'+
                                    'Order: '+ orderNum;
               msgTarget.body = translator.translate(lang, "orderAcceptedMessage", timestamp.now());//"Order accepted at "+ timestamp.now();
               break;
           case 'order_in_queue':
-	     msgTarget.title = translator.translate(lang, OrderQueued);//"Order In Queue";
+	     msgTarget.title = translator.translate(lang, "orderQueued");//"Order In Queue";
               msgTarget.message = translator.translate(lang, "orderQueuedMessage", orderNum);//Your order #"+ orderNum +" is queued for preparation";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_cooking':
-	      msgTarget.title = translator.translate(lang, OrderCooking);//"Order Cooking";
+	      msgTarget.title = translator.translate(lang, "orderCooking");//"Order Cooking";
               msgTarget.message = translator.translate(lang, "orderCookingMessage", orderNum);//"Your order #"+ orderNum +" started cooking";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_ready':
               msgTarget.title = "Order Ready";
-	      msgTarget.title = translator.translate(lang, OrderReady);//"Order Ready";
+	      msgTarget.title = translator.translate(lang, "orderReady");//"Order Ready";
               msgTarget.message = translator.translate(lang, "orderReadyMessage", orderNum); //Your order #"+ orderNum +" is ready!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_picked_up':
-	      msgTarget.title = translator.translate(lang, OrderPickedUp);//"Order Picked Up";
+	      msgTarget.title = translator.translate(lang, "orderPickedUp");//"Order Picked Up";
               msgTarget.message = translator.translate(lang, "orderPickedUpMessage", orderNum);// "Your order #"+ orderNum +" was picked up!";
               msgTarget.body = msgTarget.message;
               break;
           case 'no_show':
               msgTarget.title = "No Show";
-	      msgTarget.title = translator.translate(lang, NoShow);//"No Show";   
+	      msgTarget.title = translator.translate(lang, "NoShow");//"No Show";
               msgTarget.message = translator.translate(lang, "NoShowMessage", orderNum);//"Your order #"+ orderNum +" was not picked up! Did you forget?";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_dispatched':
-	      msgTarget.title = translator.translate(lang, OrderDispatched);//"Order Dispatched";
+	      msgTarget.title = translator.translate(lang, "orderDispatched");//"Order Dispatched";
               msgTarget.message = translator.translate(lang, "orderDispatchedMessage", orderNum);//"Your order #"+ orderNum +" is on its way!";
               msgTarget.body = msgTarget.message;
               break;
           case 'order_delivered':
-	      msgTarget.title = translator.translate(lang, OrderDelivered);//"Order Delivered";  
+	      msgTarget.title = translator.translate(lang, "orderDelivered");//"Order Delivered";
               msgTarget.message = translator.translate(lang, "orderDeliveredMessage", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
               msgTarget.body = msgTarget.message;
               break;
@@ -1545,6 +1546,17 @@ module.exports = {
       } else if (this.resteasy.table == 'reviews' && context && (m = context.match(/companies\/(\d+)$/))) {
         debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
+      } else if (this.resteasy.table == 'checkins' && context && (m = context.match(/territory\/(\d+)(\/active|\/closed)?$/i))) {
+        var date=new Date();
+        return query.select('checkins.*').innerJoin('units','units.id','checkins.unit_id').where('territory_id',m[1])
+
+        // if (context.match(/active/i)){
+        //   fullQuery = fullQuery.andWhere('checkins.check_out', '>=', date).orWhereRaw('checkins.check_out is null');
+        // }
+        // else if (context.match(/closed/i)){
+        //   fullQUery = fullQuery.andWhere('checkins.check_out','<', date);
+        // }
+        // return fullQuery;
       } else if (this.resteasy.table == 'loyalty'
                 && context
                 && (m = context.match(/companies\/(\d+)/))
