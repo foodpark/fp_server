@@ -752,7 +752,10 @@ function *beforeSaveReview() {
 
 function *beforeSaveCustomer(){
   debug('beforeSaveCustomer');
-  logger.info('Before Save customer', {fn: 'beforeSaveCustomer'});
+  var meta = {fn: 'beforeSaveCustomer',user_id: this.passport.user.id, role: this.passport.user.role,
+    target_user_id: this.params.id}
+
+  logger.info('Before Save customer', meta);
   if (this.resteasy.operation == 'update') {
     // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
@@ -760,14 +763,15 @@ function *beforeSaveCustomer(){
       try {
         gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
       } catch (err) {
-        logger.error('Error sending APNS token to GCM',
-            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
-            role: this.passport.user.role, error: err});
+        meta.error = err;
+        logger.error('Error sending APNS token to GCM', meta);
         throw err;
       }
       // Set Customer's gcm to that mapped to the apns token just pushed to Google
       this.resteasy.object.gcm_id = gcmId;
-      logger.info('Customer\'s GCM mapped',{fn:'beforeSaveUnit',user_id: this.params.id, gcm_id:gmcId, apns_id:this.resteasy.object.apns_id});
+      meta.gcm_id = gcmId;
+      meta.apns_id = this.resteasy.object.apns_id;
+      logger.info('Customer\'s GCM mapped', meta);
     }
 
     // If username or password is changed, we need to update the Users table
@@ -776,18 +780,17 @@ function *beforeSaveCustomer(){
     if (username || password) {
     // Username and/or password was changed
       if (!this.params.id) {
-        logger.error('No customer id provided',
-            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
-            role: this.passport.user.role, error: err});
-        throw new Error('No customer id provided. Update operation requires customer id')
+        var noIdErr = 'No customer id provided. Update operation requires customer id';
+        meta.error = noIdErr;
+        logger.error('No customer id provided', meta);
+        throw new Error(noIdErr);
       }
       var customer = '';
       try {
         customer = (yield Customer.getSingleCustomer(this.params.id))[0];
       } catch (err) {
-        logger.error('Error getting existing Customer',
-            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
-            role: this.passport.user.role, error: err});
+        meta.error = err;
+        logger.error('Error getting existing Customer', meta);
         throw err;
       }
       debug('..customer');
@@ -796,9 +799,8 @@ function *beforeSaveCustomer(){
       try {
         user = (yield User.getSingleUser(customer.user_id))[0];
       } catch (err) {
-        logger.error('Error getting existing user',
-            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
-            role: this.passport.user.role, error: err});
+        meta.error = err;
+        logger.error('Error getting existing user', meta);
         throw err;
       }
       debug('..customer');
@@ -816,17 +818,16 @@ function *beforeSaveCustomer(){
       try {
         user = (yield User.updateUser(user.id, userHash))[0];
       } catch (err) {
-        logger.error('Error updating user',
-            {fn: 'beforeSaveCustomer', user_id: this.passport.user.id,
-            role: this.passport.user.role, error: err});
+        meta.error = err;
+        logger.error('Error updating user', meta);
         throw err;
       }
-      logger.info('Customer updated',{fn:'beforeSaveCustomer',user_id:this.params.id});
+      logger.info('Customer updated', meta);
       debug('..customer after update');
       debug(user);
     }
   }
-  logger.info('Ready to save Customer',{fn:'beforeSaveCustomer'});
+  logger.info('Ready to save Customer', meta);
 }
 
 function *beforeSaveUnit() {
