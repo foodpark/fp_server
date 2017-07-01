@@ -1,6 +1,7 @@
 function Translate() {
   var fs = require('fs');
   var log = require('winston');
+  var debug = require('debug')('translate');
 
   const LOCALES = '../../config/locales/';
   const TRANS_FILE = 'translation.json';
@@ -23,9 +24,12 @@ function Translate() {
     }
   }
 
-  var interpolate = function(input, ...values) {
+  var interpolate = function(input, values) {
     var interpolated = input;
+    debug(interpolated);
+    debug(values);
     for (i = 0; i < values.length; i++) {
+      debug('current val: '+ values[i]);
       interpolated = interpolated.replace(expression, values[i]);
     }
     return interpolated

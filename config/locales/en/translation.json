@@ -22,7 +22,7 @@
         "orderDelivered"  : "Your order #{{orderNum}} was delivered. Thanks again! ",
         "orderDeliveredMessage"   : "Your order #{{orderNum}} was delivered. Thanks again! ",
         "orderRequested_delivery" : "'Delivery Order Request",
-        "orderRequested_deliveryMessage" : "Delivery Time: {{deliverytime}}\nCustomer: {{this.passport.user.first_name}} {{this.passport.user.last_name.charAt(0)}}\nOrder Details: {{orderDetail}}",
+        "orderRequested_deliveryMessage" : "Delivery Time: {{deliverytime}}\nCustomer: {{custName}}\nOrder Details: {{orderDetail}}",
         "orderRequested_pickup"  :"'Takeout Order Request",
-        "orderRequested_pickupMessage" :"Pickup Time: {{pickuptime}}\nCustomer: {{this.passport.user.first_name}} {{this.passport.user.last_name.charAt(0)}}\nOrder Details: {{orderDetail}}"
+        "orderRequested_pickupMessage" :"Pickup Time: {{pickuptime}}\nCustomer: {{custName}}\nOrder Details: {{orderDetail}}"
 }

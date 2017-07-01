@@ -128,10 +128,7 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
   logger.info('Delivery pickup time '+ puTime,
     {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role: this.passport.user.role,
     unit_id: unitId, delivery_time: deliveryTime, pickup_time: puTime });
-  /*logger.info('Delivery pickup time '+ pickup.toIsoString(),
-    {fn: 'calculateDeliveryPickup', user_id: this.passport.user.id, role :
-    this.passport.user.role, unit_id: unitId, delivery_time: deliveryTime,
-    pickup_time: pickup.toISOString()});*/
+
   return pickup;
 }
 
@@ -405,10 +402,21 @@ function *afterCreateOrderHistory(orderHistory) {
 
   var orderDetail = JSON.stringify(orderHistory.order_detail, null, 2);
   debug(orderDetail);
-  var pickuptime = orderHistory.desired_pickup_time.toISOString();
-  var msg = 'Pickup Time: '+ pickuptime +'\n'+
-            'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+
-            'Order Details: ' + orderDetail +'\n';
+  var custName = this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0);
+  var msg = '';
+  var title = '';
+
+  logger.info('Translating message', meta)
+  if (orderHistory.for_delivery) {
+    var deliverytime = orderHistory.desired_delivery_time.toISOString();
+    title = translator.translate(lang,"orderRequested_delivery");
+    msg = translator.translate(lang,"orderRequested_deliveryMessage", [deliverytime, custName, orderDetail]);
+  } else { 
+    var pickuptime = orderHistory.desired_pickup_time.toISOString();
+    title = translator.translate(lang,"orderRequested_pickup");
+    msg = translator.translate(lang,"orderRequested_pickupMessage", pickuptime, custName, orderDetail);
+  }
+
   debug('msg');
   debug(msg);
   var msgTarget = {
@@ -416,16 +424,12 @@ function *afterCreateOrderHistory(orderHistory) {
     toId   : unit.id,
     gcmId  : unit.gcm_id,
     fcmId  : unit.fcm_id,
-    title  : "Order Requested",
+    title  : title,
     message : msg,
     body : msg,
     status : "order_requested"
   }
-  logger.info('Translating message', meta)
-  msgTarget.title = translator.translate(lang,"orderRequested_pickup", pickuptime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
 
-  //msgTarget.title = translator.translate(lang,"orderRequested_delivery", deliverytime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
- 
   debug('sending notification to unit '+ unit.id);
   debug(meta);
   var mm = meta;
@@ -565,66 +569,49 @@ function *afterUpdateOrderHistory(orderHistory) {
       switch(status) {
           // From Customer
           case 'order_paid':
-              logger.info("ORDER PAID");
               msgTarget.title = translator.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
-              logger.info("AFTER TRANS");
               msgTarget.message = translator.translate(lang, "payProcessedMessage", custName);//custName +"'s payment
-              msgTarget.body = msgTarget.message;
               break;
           case 'pay_fail':
               msgTarget.title = translator.translate(lang, "payFailed", orderNum);//"Payment Failed - Order #"+ orderNum;
               msgTarget.message = translator.translate(lang, "payFailedMessage", custName);//"custName +" payment failed at "+ timestamp.now();
-              msgTarget.body = msgTarget.message;
               break;
           // From Unit
           case 'order_declined':
-	      msgTarget.title = translator.translate(lang, "orderDeclined");//"Order Declined;
+              msgTarget.title = translator.translate(lang, "orderDeclined");//"Order Declined;
               msgTarget.message = translator.translate(lang, "orderDeclinedMessage", company.name);//"company.name +" did not accept your order at this time. Please try again some other time.";
-              msgTarget.body = msgTarget.message;
               break;
           case 'order_accepted':
               msgTarget.title = translator.translate(lang, "orderAccepted");//"Order Accepted";
-              msgTarget.message =  'Pickup Time: '+  orderHistory.desired_pickup_time +'\n'  +
-                                   'Customer: '+ custName +'\n'+
-                                   'Order: '+ orderNum;
-              msgTarget.body = translator.translate(lang, "orderAcceptedMessage", timestamp.now());//"Order accepted at "+ timestamp.now();
+              msgTarget.message =  translator.translate(lang, "orderAcceptedMessage", timestamp.now());//"Order accepted at "+ timestamp.now();
               break;
           case 'order_in_queue':
-	     msgTarget.title = translator.translate(lang, "orderQueued");//"Order In Queue";
+	            msgTarget.title = translator.translate(lang, "orderQueued");//"Order In Queue";
               msgTarget.message = translator.translate(lang, "orderQueuedMessage", orderNum);//Your order #"+ orderNum +" is queued for preparation";
-              msgTarget.body = msgTarget.message;
               break;
           case 'order_cooking':
-	      msgTarget.title = translator.translate(lang, "orderCooking");//"Order Cooking";
+	            msgTarget.title = translator.translate(lang, "orderCooking");//"Order Cooking";
               msgTarget.message = translator.translate(lang, "orderCookingMessage", orderNum);//"Your order #"+ orderNum +" started cooking";
-              msgTarget.body = msgTarget.message;
               break;
           case 'order_ready':
-              msgTarget.title = "Order Ready";
-	      msgTarget.title = translator.translate(lang, "orderReady");//"Order Ready";
+	            msgTarget.title = translator.translate(lang, "orderReady");//"Order Ready";
               msgTarget.message = translator.translate(lang, "orderReadyMessage", orderNum); //Your order #"+ orderNum +" is ready!";
-              msgTarget.body = msgTarget.message;
               break;
           case 'order_picked_up':
-	      msgTarget.title = translator.translate(lang, "orderPickedUp");//"Order Picked Up";
+	            msgTarget.title = translator.translate(lang, "orderPickedUp");//"Order Picked Up";
               msgTarget.message = translator.translate(lang, "orderPickedUpMessage", orderNum);// "Your order #"+ orderNum +" was picked up!";
-              msgTarget.body = msgTarget.message;
               break;
           case 'no_show':
-              msgTarget.title = "No Show";
-	      msgTarget.title = translator.translate(lang, "NoShow");//"No Show";
+	            msgTarget.title = translator.translate(lang, "NoShow");//"No Show";
               msgTarget.message = translator.translate(lang, "NoShowMessage", orderNum);//"Your order #"+ orderNum +" was not picked up! Did you forget?";
-              msgTarget.body = msgTarget.message;
               break;
           case 'order_dispatched':
-	      msgTarget.title = translator.translate(lang, "orderDispatched");//"Order Dispatched";
+	            msgTarget.title = translator.translate(lang, "orderDispatched");//"Order Dispatched";
               msgTarget.message = translator.translate(lang, "orderDispatchedMessage", orderNum);//"Your order #"+ orderNum +" is on its way!";
-              msgTarget.body = msgTarget.message;
               break;
           case 'order_delivered':
-	      msgTarget.title = translator.translate(lang, "orderDelivered");//"Order Delivered";
+	            msgTarget.title = translator.translate(lang, "orderDelivered");//"Order Delivered";
               msgTarget.message = translator.translate(lang, "orderDeliveredMessage", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
-              msgTarget.body = msgTarget.message;
               break;
           default:
             var eso = meta;
@@ -632,6 +619,7 @@ function *afterUpdateOrderHistory(orderHistory) {
             logger.error('Unknown status for order ', fge);
             throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
       }
+      msgTarget.body = msgTarget.message;
       debug(msgTarget);
       var supplemental = {};
       supplemental.unit_id = ''+ orderHistory.unit_id;

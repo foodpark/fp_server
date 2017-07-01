@@ -10,6 +10,6 @@
         "orderNotPickedUp" :"Su pedido #{{orderNum}} Su pedido no fue retirado. Lo olvidó?",
         "orderDispatched"  :"Su pedido #{{orderNum}} está en camino!",
         "orderDelivered"   :"Su pedido #{{orderNum}} fue entregado. Gracias! ",
-        "orderRequested_pickup"   : "Tiempo para Retirada: {{pickuptime}}\nCliente: {{this.passport.user.first_name}} {{this.passport.user.last_name.charAt(0)}}\nDetalhes do Pedido: {{orderDetail}}",
-        "orderRequested_delivery" : "'Tiempo para Entrega: {{deliverytime}}\nCliente: {{this.passport.user.first_name}} {{this.passport.user.last_name.charAt(0)}}\nDetalles del Pedido: {{orderDetail}}"
+        "orderRequested_pickup"   : "Tiempo para Retirada: {{pickuptime}}\nCliente: {{custName}}\nDetalhes do Pedido: {{orderDetail}}",
+        "orderRequested_delivery" : "'Tiempo para Entrega: {{deliverytime}}\nCliente: {{custName}}\nDetalles del Pedido: {{orderDetail}}"
 }
