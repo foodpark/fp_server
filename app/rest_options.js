@@ -404,8 +404,8 @@ function *afterCreateOrderHistory(orderHistory) {
 
   var orderDetail = JSON.stringify(orderHistory.order_detail, null, 2);
   debug(orderDetail);
-  var pickupTime = orderHistory.desired_pickup_time.toISOString();
-  var msg = 'Pickup Time: '+ pickupTime +'\n'+
+  var pickuptime = orderHistory.desired_pickup_time.toISOString();
+  var msg = 'Pickup Time: '+ pickuptime +'\n'+
             'Customer: '+ this.passport.user.first_name +' '+ this.passport.user.last_name.charAt(0) +'\n'+
             'Order Details: ' + orderDetail +'\n';
   debug('msg');
@@ -422,7 +422,7 @@ function *afterCreateOrderHistory(orderHistory) {
   }
   logger.info('Translating message', meta)
   msgTarget.title = translator.translate(lang,"orderRequested_pickup", pickuptime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
- msgTarget.title = translator.translate(lang,"orderRequested_delivery", deliverytime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
+  //msgTarget.title = translator.translate(lang,"orderRequested_delivery", deliverytime, this.passport.user.first_name, this.passport.user.last_name, orderDetail);
 	
   debug('sending notification to unit '+ unit.id);
   debug(meta);
