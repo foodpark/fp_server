@@ -20,6 +20,7 @@ var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var debug = require('debug')('rest_options');
 var logger = require('winston');
+var knex = require('../config/knex.js');
 
 const translator = new T();
 
@@ -1535,17 +1536,10 @@ module.exports = {
       } else if (this.resteasy.table == 'reviews' && context && (m = context.match(/companies\/(\d+)$/))) {
         debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
-      } else if (this.resteasy.table == 'checkins' && context && (m = context.match(/territory\/(\d+)(\/active|\/closed)?$/i))) {
-        var date=new Date();
-        return query.select('checkins.*').innerJoin('units','units.id','checkins.unit_id').where('territory_id',m[1])
-
-        // if (context.match(/active/i)){
-        //   fullQuery = fullQuery.andWhere('checkins.check_out', '>=', date).orWhereRaw('checkins.check_out is null');
-        // }
-        // else if (context.match(/closed/i)){
-        //   fullQUery = fullQuery.andWhere('checkins.check_out','<', date);
-        // }
-        // return fullQuery;
+      } else if (this.resteasy.table == 'checkins' && context && (m = context.match(/territories\/(\d+)$/i))) {
+        return query.select(
+            knex.raw('((checkins.check_in is null OR checkins.check_in <= current_timestamp) AND (checkins.check_out is null OR checkins.check_out >= current_timestamp)) as is_active')
+          ).innerJoin('units','units.id','checkins.unit_id').where('territory_id',m[1]).andWhereRaw('checkins.check_in >= current_date');
       } else if (this.resteasy.table == 'loyalty'
                 && context
                 && (m = context.match(/companies\/(\d+)/))
