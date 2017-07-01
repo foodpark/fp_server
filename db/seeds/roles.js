@@ -7,8 +7,9 @@ exports.seed = function(knex, Promise) {
         // Inserts seed entries
         knex('roles').insert({id: 1, type: 'CUSTOMER'}),
         knex('roles').insert({id: 2, type: 'OWNER'}),
-        knex('roles').insert({id: 3, type: 'UNITMGR'})
-        knex('roles').insert({id: 4, type: 'ADMIN'})
+        knex('roles').insert({id: 3, type: 'UNITMGR'}),
+        knex('roles').insert({id: 4, type: 'ADMIN'}),
+        knex('roles').insert({id: 5, type: 'DRIVER'})
       ]);
     });
 };

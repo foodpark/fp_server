@@ -209,7 +209,8 @@ CREATE TABLE drivers (
     unit_id integer REFERENCES units(id),
     company_id integer REFERENCES companies(id),
     created_at timestamptz DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz DEFAULT (now() at time zone 'utc')
+    updated_at timestamptz DEFAULT (now() at time zone 'utc'),
+    user_id integer REFERENCES users(id)
 );
 
 CREATE TABLE checkins (
@@ -398,6 +399,7 @@ COPY roles (id, type) FROM stdin;
 2	OWNER
 3	UNITMGR
 4	ADMIN
+5	DRIVER
 \.
 SELECT pg_catalog.setval('roles_id_seq', 5, true);
 
