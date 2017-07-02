@@ -1080,7 +1080,7 @@ function *beforeSaveDriver() {
     }
     else if (createUser){
       debug('..user' + createUser);
-      var driver={ role: 'DRIVER', username: createUser.username, password: createUser.password };
+      var driver={ role: 'DRIVER', first_name:this.resteasy.object.name, last_name:createUser.last_name, username:createUser.username, password:createUser.password };
       delete this.resteasy.object.user; //remove user object from the main objectbecause it's not a real domian field
       var newUser='';
       try{  
