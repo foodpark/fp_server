@@ -1021,41 +1021,86 @@ function *beforeSaveCompanies() {
 }
 
 function *beforeSaveDriver() {
-  logger.info('Before driver saved',{fn:'beforeSaveDriver'});
+  meta={fn:'beforeSaveDriver'};
+  logger.info('Before driver saved',meta);
   debug('beforeSaveDriver');
   if (!this.resteasy.object){
-    logger.error('No driver provided',{fn:'beforeSaveDriver',error:'No driver provided'});
+    meta.error='No driver provided';
+    logger.error('No driver provided',meta);
     throw new Error ('No driver provided',422);
   }
-  debug(this.resteasy.object);
+  meta.name=this.resteasy.object.name;
+  meta.phone=this.resteasy.object.phone;
+  debug(meta.driver);
   debug(this.params);
   if (this.resteasy.operation == 'create') {
-    logger.info('Before driver created - check for valid company context and unit',{fn:'beforeSaveDriver', params:this.params});
+    logger.info('Before driver created - check for valid company context and unit',meta);
     debug('...create');
     debug('..getting company')
     var companyId = '';
     if (this.params.context && (m = this.params.context.match(/companies\/(\d+)/))) {
       debug('..company '+ m[1]);
       companyId = m[1];
+      meta.company_id=companyId;
     } else {
+      meta.error='No company context for driver';
       // no company context is an error
-      logger.error('No company context for driver',{fn:'beforeSaveDriver',context:this.params.context, error:'No company context for driver'});
+      logger.error('No company context for driver',meta);
       throw new Error ('No company context for driver',422);
     }
     var unitId = '';
     if (this.params.context && (n = this.params.context.match(/units\/(\d+)$/))) {
       debug('..unit '+ n[1]);
       unitId = n[1];
+      meta.unit_id=unitId;
     } else {
       // no unit context is an error
-      logger.error('No unit context for driver',{fn:'beforeSaveDriver',context:this.params.context, error:'No unit context for driver'});
+      meta.error='No unit context for driver';
+      logger.error('No unit context for driver',meta);
       throw new Error ('No unit context for driver',422);
+    }
+    var userId=this.resteasy.object.user_id;
+    var createUser=this.resteasy.object.user;
+    if (userId){
+      debug('..userId' + userId);
+      meta.user_id=userId;
+      var existingUser='';
+      try{
+        existingUser = (yield User.getSingleUser(userId))[0]
+      } catch (err) {
+        meta.error=err;
+        logger.error('Error during Driver creation', meta);
+        throw err;
+      }
+      if (!existingUser){
+        meta.error('Provided User ID did not match an existing User');
+        logger.error('Provided User ID did not match an existing User', meta);
+        throw new Error('Provided User ID did not match an existing User', 422);
+      }
+    }
+    else if (createUser){
+      debug('..user' + createUser);
+      var driver={ role: 'DRIVER', username: createUser.username, password: createUser.password };
+      delete this.resteasy.object.user; //remove user object from the main objectbecause it's not a real domian field
+      var newUser='';
+      try{  
+        newUser = (yield User.createOrUpdateUser(driver))[0];
+      }
+      catch (err) {
+        meta.error=err;
+        logger.error('Error creating User-Driver', {meta});
+        throw err;
+      }
+      meta.user_id=newUser.id;
+      debug('..user created');
+      this.resteasy.object.user_id = newUser.id;
+      debug(newUser);
     }
 
     this.resteasy.object.company_id = companyId;
     this.resteasy.object.unit_id = unitId;
 
-    logger.info('Driver will be created',{fn:'beforeSaveDriver',company_id:companyId,unit_id:unitId,driver:this.resteasy.object});
+    logger.info('Driver will be created',meta);
   }
 }
 
@@ -1286,7 +1331,7 @@ function *validUnitMgr(params, user) {
   }
   if (!unitId) {
     logger.error('No unit id provided', {fn: 'validUnitMgr', user:user, params:params, error: 'No unit id provided'});
-    throw new Error('No unit ide provided', 422);
+    throw new Error('No unit id provided', 422);
   }
   debug('.. for company '+ compId);
   debug('.. for unit '+ unitId);
