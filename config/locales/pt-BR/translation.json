@@ -20,7 +20,9 @@
       "orderDispatched" : "Pedido Despachou",
       "orderDispatchedMessage" :"Seu Pedido #{{orderNum}} está a caminho!",
       "orderDelivered" : "Pedido Entregue",
-      "orderDeliveredMessage" : "Seu Pedido #{{orderNum}} foi entregue",
-      "orderRequested_pickup"   : "Tiempo para Retirada: {{pickuptime}}\nCliente: {{custName}}\nDetalhes do Pedido: {{orderDetail}}",
-      "orderRequested_delivery" : "'Tiempo para Entrega: {{deliverytime}}\nCliente: {{custName}}\nDetalles del Pedido: {{orderDetail}}"
+      "orderDeliveredMessage" : "Seu Pedido #{{orderNum}} foi entregue",       
+      "orderRequested_pickup"   : "Tempo para Retirada",
+      "orderRequested_pickupMessage"   : "{{pickuptime}}\nCliente: {{custName}}\nDetalhes do Pedido: {{orderDetail}}",
+      "orderRequested_delivery" : "Tempo para Entrega",
+      "orderRequested_deliveryMessage" : "{{deliverytime}}\nCliente: {{custName}}\nDetalles del Pedido: {{orderDetail}}"
 }
