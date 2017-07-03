@@ -96,7 +96,7 @@ exports.importAPNS = function *( apns ) {
 	try {
 		gcmId = yield sendRequest.call(this, authKey, gcmUrl, 'POST', data);
 	} catch (err) {
-		debug(err);s
+		debug(err);
 		logger.error('Error sending APNS token to GCM', 
 			{fn: 'importAPNS', user_id: this.passport.user.id, 
 			role: this.passport.user.role, error: err});
