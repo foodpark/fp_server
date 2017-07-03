@@ -762,15 +762,19 @@ function *beforeSaveCustomer(){
       var gcmId = '';
       try {
         gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
+        debug('got here')
       } catch (err) {
+        debug(err);
         meta.error = err;
         logger.error('Error sending APNS token to GCM', meta);
         throw err;
       }
       // Set Customer's gcm to that mapped to the apns token just pushed to Google
+      debug('Setting GCM id');
       this.resteasy.object.gcm_id = gcmId;
       meta.gcm_id = gcmId;
       meta.apns_id = this.resteasy.object.apns_id;
+      debug('APNS and GCM ids set');
       logger.info('Customer\'s GCM mapped', meta);
     }
 
@@ -831,17 +835,19 @@ function *beforeSaveCustomer(){
 }
 
 function *beforeSaveUnit() {
-  logger.info('Before Save Unit - validate unit information',{fn:'beforeSaveUnit'});
   debug('beforeSaveUnit');
-  if (!this.resteasy.object){
-    logger.error('No Unit information provided',{fn:'beforeSaveUnit'});
+  var meta = {fn: 'beforeSaveUnit', user_id: this.passport.user.id,
+        role: this.passport.user.role, unit_id: this.params.id, context:this.params.context};
+  logger.info('Before Save Unit - validate unit information',meta);
+  if (!this.resteasy.object){ // Not sure what this is checking
+    logger.error('No Unit information provided', meta);
     throw new Error('No Unit information provided',422);
   }
   // If username or password is changed, we need to update the Users table
   var username = this.resteasy.object.username;
   var password = this.resteasy.object.password;
   if (this.resteasy.operation == 'create') {
-    logger.info('Starting create of new Unit',{fn:'beforeSaveUnit',context:this.params.context});
+    logger.info('Starting create of new Unit',meta);
     debug('..starting create of new Unit');
     // get the company context
     debug('..getting company')
@@ -851,14 +857,13 @@ function *beforeSaveUnit() {
       companyId = m[1];
     } else {
       // no company context is an error
-      logger.error('No company context for unit', {fn:'beforeSaveUnit',user_id: this.passport.user.id,
-        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      meta.error = 'No company context for unit';
+      logger.error('No company context for unit', meta);
       throw new Error ('No company context for unit', 422)
     }
     if (!username || !password) {
       // need both to create new User and Unit
-      logger.error('Username/password are required', {fn:'beforeSaveUnit', user_id: this.passport.user.id,
-        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      logger.error('Username/password are required', meta);
       throw new Error ('Username/password are required', 422);
     }
     // make sure it's a unique username
@@ -866,15 +871,15 @@ function *beforeSaveUnit() {
     try {
       existingUser = (yield User.userForUsername(username))[0];
     } catch (err) {
-      logger.error('Error during User creation', {fn:'beforeSaveUnit',user_id: this.passport.user.id,
-        role: this.passport.user.role, unit_id: this.params.id, error: err, context:this.params.context});
+      meta.error = err;
+      logger.error('Error during User creation', meta);
       throw err;
     }
     debug('..user exists for username '+ username +'? Yes: user details; No: undefined');
     debug(existingUser)
     if (existingUser) {
-      logger.error('Tried to create unit with duplicate name. Name must be unique within Unit/User tables.', {fn:'beforeSaveUnit',username:username,user_id: this.passport.user.id,
-        role: this.passport.user.role, unit_id: this.params.id, error: err});
+      meta.error = 'Name must be unique';
+      logger.error('Tried to create unit with duplicate name. Name must be unique within Unit/User tables.', meta);
       throw new Error('That name already exists. Try another name', 422);
     }
 
@@ -883,8 +888,8 @@ function *beforeSaveUnit() {
     try {
       user = (yield User.createOrUpdateUser(unitmgr))[0];
     } catch (err) {
-      logger.error('Error creating User-UnitMgr', {fn:'beforeSaveUnit', user_id: this.passport.user.id,
-        role: this.passport.user.role, unit_id: this.params.id, error: err});
+      meta.error = err;
+      logger.error('Error creating User-UnitMgr', meta);
       throw err;
     }
     debug('..user created');
@@ -893,40 +898,43 @@ function *beforeSaveUnit() {
     this.resteasy.object.company_id = parseInt(companyId);
     debug('..ready to create unit');
     debug(this.resteasy.object);
-    logger.info('Unit Manager created, ready to create Unit',{fn:'beforeSaveUnit',unit_mgr_id:user.id,company_id:companyId});
+    meta.company_id = companyId;
+    logger.info('Unit Manager created, ready to create Unit', meta);
   } else if (this.resteasy.operation == 'update') {
-    logger.info('Starting update of existing Unit',{fn:'beforeSaveUnit', unit_id:this.params.id, context:this.params.context});
+    logger.info('Starting update of existing Unit', meta);
     debug('..starting update of existing Unit');
      // If APNS id provided, retrieve and set GCM id
     if (this.resteasy.object.apns_id) {
+      meta.apns_id = this.resteasy.object.apns_id;
       var gcmId = '';
       try {
         gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
       } catch (err) {
-        logger.error('Error sending APNS token to GCM',
-            {fn: 'beforeSaveUnit', user_id: this.passport.user.id,
-            role: this.passport.user.role, unit_id: this.params.id, apns_id:this.resteasy.object.apns_id, error: err});
+        meta.error = err;
+        logger.error('Error sending APNS token to GCM', meta);
         throw err;
       }
       // Set Unit's gcm to that mapped to the apns token just pushed to Google
       this.resteasy.object.gcm_id = gcmId;
-      logger.info('Unit\'s GCM mapped',{fn:'beforeSaveUnit',unit_id: this.params.id, gcm_id:gmcId, apns_id:this.resteasy.object.apns_id});
+      meta.gcm_id = gcmId;
+      logger.info('Unit\'s GCM mapped', meta);
     }
     // This block of code checks to see if username/password, if provided,
     // was/were changed. If so, update User.
     if (username || password) {
       var unitId = this.params.id;
       if (!unitId) {
-        logger.error('No unit id provided',{fn:'beforeSaveUnit',user_id: this.passport.user.id,
-          role: this.passport.user.role, unit_id: this.params.id, error: err});
-        throw new Error('No unit id provided. Update operation requires unit id', 422);
+        var noUnitIdErr = 'No unit id provided. Update operation requires unit id';
+        meta.error = noUnitIdErr;
+        logger.error('No unit id provided', meta);
+        throw new Error(noUnitIdErr, 422);
       }
       var unit = '';
       try {
         unit = (yield Unit.getSingleUnit(this.params.id))[0];
       } catch (err) {
-        logger.error('Error getting existing unit', {fn:'beforeSaveUnit', unit_id: this.params.id, user_id: this.passport.user.id,
-          role: this.passport.user.role, unit_id: this.params.id, error: err});
+        meta.error = err;
+        logger.error('Error getting existing unit', meta);
         throw err;
       }
       debug('..unit');
@@ -937,8 +945,8 @@ function *beforeSaveUnit() {
         try {
           user = (yield User.getSingleUser(unit.unit_mgr_id))[0];
         } catch (err) {
-          logger.error('Error getting existing user',{fn:'beforeSaveUnit',unit_mgr_id:unit.unit_mgr_id,user_id: this.passport.user.id,
-              role: this.passport.user.role, unit_id: this.params.id, error: err});
+          meta.error = err;
+          logger.error('Error getting existing user', meta);
           throw err;
         }
         debug('..user');
@@ -950,16 +958,17 @@ function *beforeSaveUnit() {
         try {
           user = (yield User.updateUser(user.id, userHash))[0];
         } catch (err) {
-          logger.error('Error updating user',{fn:'beforeSaveUnit', update_user_id:user.id,
-            user_id: this.passport.user.id, role: this.passport.user.role, unit_id: this.params.id, error: err});
+          meta.error = err;
+          logger.error('Error updating user', meta);
           throw err;
         }
         debug('..user after update');
         debug(user);
-        logger.info('Unit Manager updated',{fn:'beforeSaveUnit',unit_mgr_id:user.id});
+        meta.unit_mgr_id = user.id;
+        logger.info('Unit Manager updated', meta);
       }
     }
-    logger.info('Ready to update Unit',{fn:'beforeSaveUnit', unit_id:this.params.id});
+    logger.info('Ready to update Unit', meta);
   }
 }
 

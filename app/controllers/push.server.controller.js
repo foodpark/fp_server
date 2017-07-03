@@ -26,10 +26,10 @@ admin.initializeApp({
 });
 
 function *sendRequest(authKey, url, method, data) {
-  debug('request');
+  debug('sendRequest');
   debug(data);
-  logger.info('request', {fn: 'request', 
-    user_id: this.passport.user.id, role : this.passport.user.role, url: url, method: method });
+  var meta = {fn: 'sendRequest', user_id: this.passport.user.id, role : this.passport.user.role, url: url, method: method};
+  logger.info('Starting request', meta);
   return new Promise(function(resolve, reject) {
     request({
       method: method,
@@ -47,38 +47,47 @@ function *sendRequest(authKey, url, method, data) {
       debug('sendRequest: parsing...')
       debug(res.body)
       if (res.statusCode == 401 ) { // Unauthorized
-        logger.error('Error sending request - unauthorized.', 
-            {fn: 'request', user_id: this.passport.user.id, 
-            role: this.passport.user.role, error: err});
-        reject({'statusCode': 401, 'error': 'Unauthorized'})
+		  var unauth = 'User not authorized';
+		  meta.error = unauth;
+		  logger.error('Error sending request - unauthorized.', meta);
+          reject(new Error('Unauthorized'));
+		  return;
       }
       if (res.statusCode == 200 || res.statusCode == 201) {
         debug('..call successful');
         var payload = res.body.results;
         debug(payload);
-		var gcmId = payload[0].registration_token;
-		debug(gcmId);
-        resolve (gcmId);
-        return;
+		if (payload[0].status == 'OK') {
+			debug('Status OK');
+			var gcmId = payload[0].registration_token;
+			debug(gcmId);
+			resolve (gcmId);
+			return;
+		} else { // status indicates failure
+			debug('..received failure');
+			var statErr = "Google import API indicated: "+ payload[0].status;
+			debug('Status '+ statErr);
+			meta.error = statErr;
+			logger.error('Error returned from APNS-GCM request', meta);
+            reject(new Error(statErr));
+			return;
+		}
       } else { // something went wrong
         debug('..something went wrong with call');
         var errors = res.body;
-        logger.error('Error returned from request', 
-            {fn: 'request', user_id: this.passport.user.id, 
-            role: this.passport.user.role, error: errors});
+		meta.error = errors;
+        logger.error('Error returned from APNS-GCM request', meta);
         debug(errors);
-        throw(errors);
+        reject(new Error(errors));
+		return;
       }
     })
     .catch( function (err) {
-		debug("...statusCode: " + err.statusCode);
-		debug("...statusText: " + err.statusText);
-		logger.error('Error sending request.', 
-			{fn: 'request', user_id: this.passport.user.id, 
-			role: this.passport.user.role, error: err});
-      	reject (err)
-    })
-  })
+		meta.error = err;
+		logger.error('Error sending APNS-GCM request', meta);
+      	reject (err);
+    });
+  });
 }
 
 exports.importAPNS = function *( apns ) {
@@ -102,6 +111,7 @@ exports.importAPNS = function *( apns ) {
 			role: this.passport.user.role, error: err});
 		throw err;
 	}
+	debug('Got gcm id '+ gcmId);
 	return gcmId;
 }
 
