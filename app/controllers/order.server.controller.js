@@ -6,6 +6,7 @@ var User = require('../models/user.server.model')
 var moltin  = require('./moltin.server.controller');
 var orderhistory  = require('../models/orderhistory.server.model');
 var Unit    = require ('../models/unit.server.model');
+var Driver = require ('../models/driver.server.model');
 var debug   = require('debug')('orders');
 var logger = require('winston');
 
@@ -338,4 +339,61 @@ exports.getUnit=function *(id, next) {
   logger.info('Unit retrieved',{fn:'getUnit',unit:unit});
   this.unit = unit;
   yield next;
+}
+
+exports.getDriverActiveOrders = function * (next) {
+  debug('getDriverActiveOrders');
+  var meta={fn:'getDriverActiveOrders'};
+  logger.info('Getting Driver Active Orders',meta); 
+  if (!this.params.userId) {
+    logger.error('Driver User id missing',{fn:meta}); 
+    this.status= 422;
+    this.body = {error: 'Driver User id missing'};
+    return;
+  }
+  debug('..check authorization');
+  var user = this.passport.user;
+  var driverUserId=this.params.userId;
+  meta.driver_user_id=driverUserId;
+  if (user.role == 'DRIVER' && user.id == driverUserId ||
+      user.role == 'ADMIN') {
+    debug('..authorized');
+    try {
+      //get list of driver ids
+      var drivers = yield Driver.getDriversByUser(driverUserId);
+      var driverIds = [];
+      drivers.forEach(function(element) {
+        driverIds.push(element.id);
+      }, this);
+      meta.driver_ids=driverIds;
+      var orders = yield orderhistory.getDriverActiveOrders(driverIds);
+      if (orders) {
+        for (i = 0; i < orders.length; i++) {
+          logger.info("Order unitId: " + orders[i].unit_id);
+          orders[i].unit_manager_fbid = (yield User.getUserIdForUnitMgrByUnitId(orders[i].unit_id))[0].fbid;
+          orders[i].customer_fbid = (yield User.getFBID(orders[i].customer_id))[0].fbid;
+        }
+      }
+      else {
+        orders = [];
+      }
+    } catch (err) {
+      meta.error=err;
+      logger.error('Error getting driver active orders',meta); 
+      throw err;
+    }
+    debug('..orders');
+    debug(orders);
+    this.body = orders;
+    logger.info("Return: " + orders);
+    return;
+  } else {
+    meta.error='User not authorized';
+    meta.user_id=this.passport.user.id;
+    meta.role=this.passport.user.role;
+    logger.error('User not authorized',meta);
+    this.status=401
+    this.body = {error: 'User not authorized'}
+    return;
+  }
 }
