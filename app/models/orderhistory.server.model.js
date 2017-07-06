@@ -80,6 +80,6 @@ exports.getDriverActiveOrders = function(driverIds) {
   }
   var query= knex('order_history').select('*').
     whereRaw("status \\? ? and not (status \\?| ?) and driver_id in (??) and for_delivery=true",
-    ['order_paid', ['order_picked_up', 'order_delivered', 'no_show', 'order_dispatched'], driverIds]).returning('*');
+    ['order_paid', ['order_picked_up', 'order_delivered', 'no_show'], driverIds]).returning('*');
   return query;
 };
