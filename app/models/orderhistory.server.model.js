@@ -71,3 +71,15 @@ exports.getCustomerRequestedOrders = function(customerId) {
     " and customer_id = ? ",
     ['order_requested', ['order_paid', 'pay_fail'], customerId]).returning('*');
 };
+
+
+exports.getDriverActiveOrders = function(driverIds) {
+  if (!driverIds) {
+    console.error('Missing driver ids ('+ driverIds+')');
+    throw new Error('Missing driver ids ('+ driverIds+')');
+  }
+  var query= knex('order_history').select('*').
+    whereRaw("status \\? ? and not (status \\?| ?) and driver_id in (??) and for_delivery=true",
+    ['order_paid', ['order_picked_up', 'order_delivered', 'no_show', 'order_dispatched'], driverIds]).returning('*');
+  return query;
+};

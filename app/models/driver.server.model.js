@@ -24,3 +24,7 @@ exports.updateDriver = function(id, hash) {
 exports.deleteDriver = function(id) {
   return knex('drivers').where('id', id).del()
 };
+
+exports.getDriversByUser = function(id) {
+  return knex('drivers').where('user_id',id);
+};
