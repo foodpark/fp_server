@@ -116,7 +116,18 @@ exports.login = function *(next) {
     }
     userInfo.unit_id = unit.id
     meta.unit_id = unit.id;
-  }
+  }else if (this.passport.user.role == 'DRIVER') {
+    var drivers = '';
+    try {
+      drivers = (yield Driver.getDriversByUser(this.passport.user.id))[0];
+    } catch (err) {
+      logger.error('Error retrieving drives for driver user',
+        {fn: 'login', user_id: this.passport.user.id, error: err});
+      throw err;
+    }
+    userInfo.drivers=drivers;
+    meta.drivers = drivers;
+  } 
   debug('done')
   debug('userInfo: '+ userInfo)
   this.status = 200;
