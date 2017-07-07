@@ -373,7 +373,7 @@ CREATE TABLE gen_state (
 );
 
 CREATE TABLE order_state (
-  id SERIAL PRIMARY KEy,
+  id SERIAL PRIMARY KEY,
   order_id INTEGER REFERENCES order_history(id),
   order_requested_step boolean DEFAULT false,
   order_accepted_step boolean DEFAULT false,
@@ -392,7 +392,19 @@ CREATE TABLE order_state (
   callInfo text
 );
 
+CREATE TABLE countries (
+  id SERIAL PRIMARY KEY,
+  name text,
+  is_enabled boolean DEFAULT false
+);
 
+COPY countries (id, name) FROM stdin;
+1	Brazil
+2	USA
+\.
+SELECT pg_catalog.setval('countries_id_seq', 3, true);
+
+update countries set is_enabled=true where id=1;
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
@@ -401,7 +413,7 @@ COPY roles (id, type) FROM stdin;
 4	ADMIN
 5	DRIVER
 \.
-SELECT pg_catalog.setval('roles_id_seq', 5, true);
+SELECT pg_catalog.setval('roles_id_seq', 6, true);
 
 COPY unit_types (id, type) FROM stdin;
 1	TRUCK
@@ -432,6 +444,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE checkin_history TO sfez_rw;
 
 REVOKE ALL ON TABLE companies FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE companies TO sfez_rw;
+
+REVOKE ALL ON TABLE countries FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE countries TO sfez_rw;
 
 REVOKE ALL ON TABLE customers FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE customers TO sfez_rw;

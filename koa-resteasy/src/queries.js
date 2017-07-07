@@ -34,7 +34,10 @@ module.exports = {
         query = query.where(key, 'IS NOT', null);
       } else if (value.match(/^\-?[0-9.\-Ee]+$/)) {
         query = query.where(key, '=', Number(value));
-      } else {
+      } else if (value.match(/true|false/i)){
+        query = query.where(key, '=', value);
+      } 
+      else {
         query = query.where(key, 'ILIKE', value);
       }
     });
