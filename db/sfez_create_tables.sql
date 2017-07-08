@@ -26,12 +26,19 @@ CREATE TABLE unit_types (
     type text NOT NULL UNIQUE
 );
 
+CREATE TABLE countries (
+  id SERIAL PRIMARY KEY,
+  name text,
+  is_enabled boolean DEFAULT false
+);
+
 CREATE TABLE territories (
     id SERIAL PRIMARY KEY,
     city text,
     territory text,
     state text,
     country text,
+    country_id integer REFERENCES countries(id),
     timezone text,
     latitude float8,
     longitude float8,
@@ -392,17 +399,11 @@ CREATE TABLE order_state (
   callInfo text
 );
 
-CREATE TABLE countries (
-  id SERIAL PRIMARY KEY,
-  name text,
-  is_enabled boolean DEFAULT false
-);
-
 COPY countries (id, name) FROM stdin;
 1	Brazil
 2	USA
 \.
-SELECT pg_catalog.setval('countries_id_seq', 3, true);
+SELECT pg_catalog.setval('countries_id_seq', 2, true);
 
 update countries set is_enabled=true where id=1;
 
