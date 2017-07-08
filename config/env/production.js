@@ -9,7 +9,8 @@ module.exports = {
   clientId: process.env.MOLTIN_CLIENT_ID,
   client_secret: process.env.MOLTIN_CLIENT_SECRET,
   grant_type: "client_credentials",
-  defaultTaxBand: "1427064502431515521", // Brazil ICMS
+  defaultTaxBand: "", // Brazil ICMS
+  defaultCurrency: "1554610428930163616", // Brazilian Real
   deliveryCharge: "",
   deliveryOffset: 15,
   sumup:{
