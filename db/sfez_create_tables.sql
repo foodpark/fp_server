@@ -205,7 +205,9 @@ CREATE TABLE units (
     company_id integer REFERENCES companies(id),
     unit_mgr_id integer REFERENCES users(id),
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    currency text DEFAULT ('BRL'),
+    payment text DEFAULT ('SumUp')
 );
 
 CREATE TABLE drivers (
