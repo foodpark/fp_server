@@ -1,11 +1,12 @@
 
-
 COPY territories (id, city, territory, state, country, timezone, latitude, longitude, created_at, updated_at) FROM stdin;
 1	Natal	 Natal-RN	RN	Brazil	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
 2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
 3	Ponta Negra	 Ponta Negra-RN	RN	Brazil	Buenos Aires	-6.22899400000000014	-35.0487759999999966	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
 \.
 SELECT pg_catalog.setval('territories_id_seq', 3, true);
+
+
 
 COPY food_parks (id, name, photo, territory_id, city, state, postal_code, country, latitude, longitude, created_at, updated_at) FROM stdin;
 3004	Truck Garden Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.87437400000000043	-35.1786949999999976	2016-08-21 23:03:07.177813+00	2017-03-22 02:30:49.056127+00
