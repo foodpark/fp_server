@@ -896,6 +896,26 @@ function *beforeSaveUnit() {
     debug(user);
     this.resteasy.object.unit_mgr_id = user.id;
     this.resteasy.object.company_id = parseInt(companyId);
+    
+    //get the company's currency
+    var currency='';
+    try{
+      var company = (yield Company.getSingleCompany(this.resteasy.object.company_id))[0];
+      if (company){
+        var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',company.country_id))[0];
+        if (currencyObject){
+          currency=currencyObject.currency;
+        }
+      }
+    } catch (err) {
+      meta.error = err;
+      logger.error('Error retrieving country currency', meta);
+      throw err;
+    }
+    meta.currency=currency;
+    if (currency){
+      this.resteasy.object.currency=currency;
+    }
     debug('..ready to create unit');
     debug(this.resteasy.object);
     meta.company_id = companyId;
