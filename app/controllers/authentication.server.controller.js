@@ -4,6 +4,7 @@ var config = require('../../config/config');
 var User = require('../models/user.server.model');
 var Company = require('../models/company.server.model');
 var Customer = require('../models/customer.server.model');
+var Driver = require('../models/driver.server.model');
 var Admin = require('../models/admin.server.model');
 var Unit = require('../models/unit.server.model');
 var debug = require('debug')('auth');
