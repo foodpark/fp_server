@@ -252,8 +252,8 @@ var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
 
 
 var createCompany = function *(company_name, email, userId) {
-  logger.info('start create of SFEZ company', {fn: 'createCompany',
-    company_name: company_name, param_user_id: userId});
+  var meta = {fn: 'createCompany', company_name: company_name, param_user_id: userId};
+  logger.info('start create of SFEZ company', meta);
   debug('..email '+ email);
   var company = {
     name: company_name,
@@ -264,24 +264,22 @@ var createCompany = function *(company_name, email, userId) {
   try {
     moltinCompany = yield createMoltinCompany(company)
   } catch (err) {
-    logger.error('Error during Moltin company creation',
-      {fn: 'createCompany', company_name: company_name, param_user_id: userId, error: err});
+    meta.error = err;
+    logger.error('Error during Moltin company creation', meta);
     throw (err);
   }
   debug(moltinCompany);
   company.order_sys_id = moltinCompany.id;
-
-  logger.info('Moltin company successfully created', {fn: 'createCompany',
-    company_name: company_name, param_user_id: userId, moltin_company_id: moltinCompany.id});
+  meta.moltin_company_id = moltinCompanyId;
+  logger.info('Moltin company successfully created', meta);
 
   debug('..create default category');
   var moltinCat = '';
   try {
     moltinCat = yield createMoltinDefaultCategory(moltinCompany);
   } catch (err) {
-    logger.error('Error during Moltin default category creation',
-      {fn: 'createCompany', param_user_id: userId,
-      company_name: company_name, moltin_company_id: moltinCompany.id, error: err});
+    meta.error = err;
+    logger.error('Error during Moltin default category creation', meta);
     debug('Removing Moltin company');
     yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
@@ -289,9 +287,9 @@ var createCompany = function *(company_name, email, userId) {
   company.default_cat = moltinCat.id;
   company.base_slug = moltinCat.slug;
 
-  logger.info('Moltin default category successfully created', {fn: 'createCompany',
-    company_name: company_name, param_user_id: userId,
-    moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id});
+  meta.default_cat = moltinCat.id;
+
+  logger.info('Moltin default category successfully created', meta);
 
   debug('..create daily special category');
   var dailySpecialCat = '';
@@ -299,19 +297,16 @@ var createCompany = function *(company_name, email, userId) {
     var co =
     dailySpecialCat = yield createMoltinDailySpecialCategory(company, moltinCat.id);
   } catch (err) {
-    logger.error('Error during Moltin daily special category creation',
-      {fn: 'createCompany',
-      company_name: company_name, param_user_id: userId,
-      moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id, error: err});
+    meta.error = err;
+    logger.error('Error during Moltin daily special category creation', meta);
     debug('Removing Moltin company');
     yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
   }
 
-  logger.info('daily special category successfully created', {fn: 'createCompany',
-    company_name: company_name, param_user_id: userId,
-    moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id,
-    daily_special_cat_id: dailySpecialCat.id});
+  meta.daily_special_cat_id = dailySpecialCat.id;
+
+  logger.info('daily special category successfully created', meta);
 
   debug('..create delivery charge category');
   var deliveryChgCat = '';
@@ -319,39 +314,29 @@ var createCompany = function *(company_name, email, userId) {
     var co =
     deliveryChgCat = yield createMoltinDeliveryChargeCategory(company, moltinCat.id);
   } catch (err) {
-    logger.error('Error during Moltin delivery charge category creation',
-      {fn: 'createCompany',
-      company_name: company_name, param_user_id: userId,
-      moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id, error: err});
+    meta.error = err;
+    logger.error('Error during Moltin delivery charge category creation', meta);
     debug('Removing Moltin company');
     yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
   }
+  meta.delivery_chg_cat_id= deliveryChgCat.id;
 
-  logger.info('delivery charge category successfully created', {fn: 'createCompany',
-    company_name: company_name, param_user_id: userId,
-    moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id,
-    daily_special_cat_id: dailySpecialCat.id, delivery_chg_cat_id: deliveryChgCat.id});
+  logger.info('delivery charge category successfully created', meta);
 
   debug('..create delivery charge item');
   var deliveryChgItem = '';
   try {
     deliveryChgItem = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
   } catch (err) {
-    logger.error('Error during Moltin delivery charge item creation',
-      {fn: 'createCompany', param_user_id: userId,
-      company_name: company_name, moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id,
-      delivery_chg_cat_id: deliveryChgCat.id, error: err});
+    meta.error = err;
+    logger.error('Error during Moltin delivery charge item creation', meta);
       debug('Removing Moltin company');
       yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
   }
-
-  logger.info('delivery charge item successfully created', {fn: 'createCompany',
-    param_user_id: userId,
-    company_name: company_name, moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id,
-    daily_special_cat_id: dailySpecialCat.id, delivery_chg_cat_id: deliveryChgCat.id,
-    delivery_chg_item_id: deliveryChgItem.id});
+  meta.delivery_chg_item_id= deliveryChgItem.id;
+  logger.info('delivery charge item successfully created', meta);
 
  var sfezCompany = '';
   try {
@@ -359,10 +344,8 @@ var createCompany = function *(company_name, email, userId) {
       moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
       dailySpecialCat.id);
   } catch (err) {
-    logger.error('Error creating SFEZ company',
-      {fn: 'createCompany', param_user_id: userId,
-      company_name: company_name, moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id,
-      delivery_chg_cat_id: deliveryChgCat.id, delivery_chg_item_id: deliveryChgItem.id, error: err});
+    meta.error = err;
+    logger.error('Error creating SFEZ company', meta);
       debug('Removing Moltin company');
       yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
@@ -370,11 +353,9 @@ var createCompany = function *(company_name, email, userId) {
   debug('..SFEZ company');
   debug(sfezCompany);
 
-  logger.info('SFEZ company successfully created', {fn: 'createCompany',
-    param_user_id: userId,
-    company_id: sfezCompany.id, moltin_company_id: moltinCompany.id, default_cat_id: moltinCat.id,
-    daily_special_cat_id: dailySpecialCat.id, delivery_chg_cat_id: deliveryChgCat.id,
-    delivery_chg_item_id: deliveryChgItem.id});
+  meta.company_id = sfezCompany.id;
+
+  logger.info('SFEZ company successfully created', meta);
   return sfezCompany;
 };
 
