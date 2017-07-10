@@ -29,7 +29,9 @@ CREATE TABLE unit_types (
 CREATE TABLE countries (
   id SERIAL PRIMARY KEY,
   name text,
-  is_enabled boolean DEFAULT false
+  is_enabled boolean DEFAULT(false),
+  tax_band text,
+  currency text DEFAULT('BRL')
 );
 
 CREATE TABLE territories (
@@ -134,6 +136,7 @@ CREATE TABLE companies (
     city text,
     state text,
     country text,
+    country_id integer REFERENCES countries(id),
     taxband text,
     tags text,
     stub boolean,
@@ -400,14 +403,6 @@ CREATE TABLE order_state (
   errorInfo text,
   callInfo text
 );
-
-COPY countries (id, name) FROM stdin;
-1	Brazil
-2	USA
-\.
-SELECT pg_catalog.setval('countries_id_seq', 2, true);
-
-update countries set is_enabled=true where id=1;
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
