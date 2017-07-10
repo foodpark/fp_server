@@ -270,7 +270,7 @@ var createCompany = function *(company_name, email, userId) {
   }
   debug(moltinCompany);
   company.order_sys_id = moltinCompany.id;
-  meta.moltin_company_id = moltinCompanyId;
+  meta.moltin_company_id = moltinCompany.id;
   logger.info('Moltin company successfully created', meta);
 
   debug('..create default category');
