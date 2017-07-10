@@ -232,8 +232,8 @@ var createMoltinDeliveryChargeCategory = function *(company, defaultCat) {
 
 
 var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
-  logger.info('start create of Moltin Delivery Charge Item',
-    {fn: 'createMoltinDeliveryChargeItem', company_id: company.id, delivery_cat: deliveryCat});
+  var meta = {fn: 'createMoltinDeliveryChargeItem', company_id: company, delivery_chg_cat_id: deliveryCat};
+  logger.info('start create of Moltin Delivery Charge Item', meta);
   var chargeItem = '';
   var title = "Delivery Charge";
   var status = 1; // live
@@ -241,13 +241,12 @@ var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
   try {
     chargeItem = yield msc.createMenuItem(company, title, status, config.deliveryCharge, deliveryCat, description);
   } catch (err) {
-    logger.error('Error creating delivery charge item',
-      {fn: 'createMoltinDailySpecialCategory', company_id: company.id, default_cat: defaultCat, error: err});
+    meta.error = err;
+    logger.error('Error creating delivery charge item', meta);
     throw(err)
   }
-  logger.info('createMoltinDeliveryChargeItem',
-    {fn: 'createMoltinDeliveryChargeItem', company_id: company.id, delivery_chg_cat_id: deliveryCat,
-    delivery_cat_item: chargeItem.id});
+  meta.delivery_chg_item_id = chargeItem.id;
+  logger.info('createMoltinDeliveryChargeItem', meta);
   return chargeItem;
 };
 
