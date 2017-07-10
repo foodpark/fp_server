@@ -442,7 +442,7 @@ exports.register = function*(next, mapping) {
     const company_name = this.body.company_name;
     const email = this.body.email;
     const password = this.body.password;
-    const role = this.body.role.toUpperCase();
+    const role = this.body.role;
 
     if (!email) {
       this.throw(422, 'Please enter an email address.');
@@ -465,7 +465,7 @@ exports.register = function*(next, mapping) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!role || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(role) < 0) {
+    if (!role || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(role.toUpperCase()) < 0) {
       this.status = 422
       this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
       return;
