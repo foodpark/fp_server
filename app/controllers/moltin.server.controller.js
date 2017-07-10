@@ -4,6 +4,7 @@ var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('requestretry');
 var logger = require('winston');
+var Country = require('../models/countries.server.model');
 
 
 const DELETE = 'DELETE';
@@ -251,7 +252,7 @@ exports.deleteCategory=function(categoryId) {
   return requestEntities(CATEGORIES, DELETE, '', categoryId)
 };
 
-exports.createMenuItem=function(company, title, status, price, category, description) {
+exports.createMenuItem=function(company, title, status, price, category, description, taxBand) {
   debug('createMenuItem')
   //generate unique sku
   var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
@@ -261,6 +262,11 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
   var stockStatus = 0; // unlimited
   var requiresShipping = 0; // No shipping required
   var catalogOnly = 0; // Not catalog only
+
+  
+  if (!taxBand){
+     taxBand=config.defaultTaxBand;
+  }
   var data = {
     sku : sku,
     slug : slug,
@@ -273,7 +279,7 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
     stock_status : stockStatus,
     requires_shipping : requiresShipping,
     catalog_only : catalogOnly,
-    tax_band : config.defaultTaxBand,
+    tax_band : taxBand,
     company : company.order_sys_id
   }
   debug(data)

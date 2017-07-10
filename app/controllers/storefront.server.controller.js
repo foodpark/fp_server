@@ -1,4 +1,5 @@
 var User = require ('../models/user.server.model');
+var Country = require ('../models/countries.server.model');
 var Company = require ('../models/company.server.model');
 var Customer = require ('../models/customer.server.model');
 var auth = require('./authentication.server.controller');
@@ -303,11 +304,13 @@ exports.deleteCategory=function *(next) {
 
 exports.createMenuItem=function *(next) {
   debug('createMenuItem')
+  var meta={fn:'createMenuItem'};
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('...Role authorized')
     var user = this.passport.user
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('error creating menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
+        meta.error='error creating menu item: Owner '+ user.id + 'not associated with '+ this.company.name;
+        logger.error('error creating menu item: Owner '+ user.id + 'not associated with '+ this.company.name, meta);
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
     debug('...user authorized')
@@ -349,25 +352,39 @@ exports.createMenuItem=function *(next) {
       if (!title) {return res.status(422).send({ error: 'Title is required.'});}
       if (!price) {return res.status(422).send({ error: 'Price is required.'});}
       if (!description) {return res.status(422).send({ error: 'Description is required.'});}
+      var taxBand = '';
+      if (company.country_id){
+        try{
+          var country = (yield Country.getSingleCountry(company.country_id))[0];
+          taxBand=country.tax_band;
+        }
+        catch(err){
+          meta.error=err;
+          logger.error('error retrieving country tax band', meta);
+          throw(err);
+        }
+      }
       debug('..creating menu item');
       try {
-        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description)
+        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand)
       } catch (err) {
-        console.error(err)
-        console.error('error creating menu item in ordering system ')
+        meta.error=err;
+        logger.error('error creating menu item in ordering system ', meta);
         throw(err)
       }
       debug(menuItem)
       this.body = menuItem
       return;
     } else {
-      console.error('createMenuItem: Category does not belong to company')
+      meta.error='Category does not belong to company';
+      logger.error('createMenuItem: Category does not belong to company', meta);
       this.status=422
       this.body = {error: 'Category does not belong to company'}
       return;
     }
   } else {
-    console.error('createMenuItem: User not authorized')
+    meta.error='User not authorized';
+    logger.error('createMenuItem: User not authorized', meta);
     this.status=401
     this.body = {error: 'User not authorized'}
     return;
