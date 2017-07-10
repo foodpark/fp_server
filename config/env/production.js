@@ -11,7 +11,7 @@ module.exports = {
   grant_type: "client_credentials",
   defaultTaxBand: "1554615357396746864", // Brazil ICMS
   defaultCurrency: "1554610428930163616", // Brazilian Real
-  deliveryCharge: "",
+  deliveryCharge: "10",
   deliveryOffset: 15,
   sumup:{
       clientId:"",
