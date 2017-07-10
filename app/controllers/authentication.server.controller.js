@@ -383,35 +383,31 @@ function * removeMoltinCompanyOnFailure(moltinCompanyId) {
   var results ='';
   if (moltinCompanyId) {
     try {
-      results = yield msc.deleteCompany(company_name, email, userId, moltinCompany.id,
-        moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
-        dailySpecialCat.id);
+      results = yield msc.deleteCompany(moltinCompanyId);
     } catch (err) {
       logger.error('Error removing Moltin company',
-        {fn: 'removeMoltinCompanyOnFailure', param_user_id: userId, company_id: companyId, error: err});
+        {fn: 'removeMoltinCompanyOnFailure', moltin_company_id: moltinCompanyId, error: err});
       throw (err);
     }
     debug(results);
     logger.info('Moltin company successfully deleted', {fn: 'removeMoltinCompanyOnFailure',
-      param_user_id: userId, company_id: companyId});
+     moltin_company_id: moltinCompanyId});
   }
 }
 
-function * removeCompanyOnFailure(moltinCompanyId) {
+function * removeCompanyOnFailure(companyId) {
   var results ='';
   if (companyId) {
     try {
-      results = yield Company.createCompany(company_name, email, userId, moltinCompany.id,
-        moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
-        dailySpecialCat.id);
+      results = yield Company.deleteCompany(companyId);
     } catch (err) {
       logger.error('Error removing SFEZ company',
-        {fn: 'removeCompanyOnFailure', param_user_id: userId, company_id: companyId, error: err});
+        {fn: 'removeCompanyOnFailure', company_id: companyId, error: err});
       throw (err);
     }
     debug(results);
     logger.info('SFEZ company successfully deleted', {fn: 'removeCompanyOnFailure',
-      param_user_id: userId, company_id: companyId});
+      company_id: companyId});
   }
 }
 
