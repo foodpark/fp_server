@@ -232,8 +232,8 @@ var createMoltinDeliveryChargeCategory = function *(company, defaultCat) {
 
 
 var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
-  logger.info('start create of Moltin Delivery Charge Item',
-    {fn: 'createMoltinDeliveryChargeItem', company_id: company.id, delivery_cat: deliveryCat});
+  var meta = {fn: 'createMoltinDeliveryChargeItem', company_id: company, delivery_chg_cat_id: deliveryCat};
+  logger.info('start create of Moltin Delivery Charge Item', meta);
   var chargeItem = '';
   var title = "Delivery Charge";
   var status = 1; // live
@@ -241,13 +241,12 @@ var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
   try {
     chargeItem = yield msc.createMenuItem(company, title, status, config.deliveryCharge, deliveryCat, description);
   } catch (err) {
-    logger.error('Error creating delivery charge item',
-      {fn: 'createMoltinDailySpecialCategory', company_id: company.id, default_cat: defaultCat, error: err});
+    meta.error = err;
+    logger.error('Error creating delivery charge item', meta);
     throw(err)
   }
-  logger.info('createMoltinDeliveryChargeItem',
-    {fn: 'createMoltinDeliveryChargeItem', company_id: company.id, delivery_chg_cat_id: deliveryCat,
-    delivery_cat_item: chargeItem.id});
+  meta.delivery_chg_item_id = chargeItem.id;
+  logger.info('createMoltinDeliveryChargeItem', meta);
   return chargeItem;
 };
 
@@ -383,35 +382,31 @@ function * removeMoltinCompanyOnFailure(moltinCompanyId) {
   var results ='';
   if (moltinCompanyId) {
     try {
-      results = yield msc.deleteCompany(company_name, email, userId, moltinCompany.id,
-        moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
-        dailySpecialCat.id);
+      results = yield msc.deleteCompany(moltinCompanyId);
     } catch (err) {
       logger.error('Error removing Moltin company',
-        {fn: 'removeMoltinCompanyOnFailure', param_user_id: userId, company_id: companyId, error: err});
+        {fn: 'removeMoltinCompanyOnFailure', moltin_company_id: moltinCompanyId, error: err});
       throw (err);
     }
     debug(results);
     logger.info('Moltin company successfully deleted', {fn: 'removeMoltinCompanyOnFailure',
-      param_user_id: userId, company_id: companyId});
+     moltin_company_id: moltinCompanyId});
   }
 }
 
-function * removeCompanyOnFailure(moltinCompanyId) {
+function * removeCompanyOnFailure(companyId) {
   var results ='';
   if (companyId) {
     try {
-      results = yield Company.createCompany(company_name, email, userId, moltinCompany.id,
-        moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
-        dailySpecialCat.id);
+      results = yield Company.deleteCompany(companyId);
     } catch (err) {
       logger.error('Error removing SFEZ company',
-        {fn: 'removeCompanyOnFailure', param_user_id: userId, company_id: companyId, error: err});
+        {fn: 'removeCompanyOnFailure', company_id: companyId, error: err});
       throw (err);
     }
     debug(results);
     logger.info('SFEZ company successfully deleted', {fn: 'removeCompanyOnFailure',
-      param_user_id: userId, company_id: companyId});
+      company_id: companyId});
   }
 }
 
@@ -442,7 +437,7 @@ exports.register = function*(next, mapping) {
     const company_name = this.body.company_name;
     const email = this.body.email;
     const password = this.body.password;
-    const role = this.body.role.toUpperCase();
+    const role = this.body.role;
 
     if (!email) {
       this.throw(422, 'Please enter an email address.');
@@ -465,7 +460,7 @@ exports.register = function*(next, mapping) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!role || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(role) < 0) {
+    if (!role || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(role.toUpperCase()) < 0) {
       this.status = 422
       this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
       return;
