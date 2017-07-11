@@ -419,7 +419,9 @@ exports.register = function*(next, mapping) {
     const company_name = this.body.company_name;
     const email = this.body.email;
     const password = this.body.password;
-    const role = this.body.role;
+    const sentRole = this.body.role; //this is the value sent by the call; 
+                                     //it will be stored in another const as upepr case after it is confirmed to have a value
+                                    //otherwise we get errors trying to assign to a const
 
     if (!email) {
       this.throw(422, 'Please enter an email address.');
@@ -442,12 +444,12 @@ exports.register = function*(next, mapping) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!role || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(role.toUpperCase()) < 0) {
+    if (!sentRole || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(sentRole.toUpperCase()) < 0) {
       this.status = 422
       this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
       return;
     }
-    role = role.toUpperCase(); 
+    const role = sentRole.toUpperCase(); 
     if (role == 'OWNER') {
       if (!company_name) {
         this.status = 422
