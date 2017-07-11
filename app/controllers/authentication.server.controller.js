@@ -447,6 +447,7 @@ exports.register = function*(next, mapping) {
       this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
       return;
     }
+    role = role.toUpperCase(); 
     if (role == 'OWNER') {
       if (!company_name) {
         this.status = 422
