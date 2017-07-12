@@ -1184,6 +1184,44 @@ function *beforeSaveUser() {
   }
 }
 
+function *afterUpdateTerritory(territory){
+  meta={fn:'afterUpdateTerritory'};
+  logger.info('After Territory updated - update units with currency', meta);
+  if (!territory){
+    meta.error='No Territory provided';
+    log.error('No Territory provided',meta);
+    throw new Error('No Territory provided', 422);
+  }
+  meta.territory_id=territory.id;
+  //get the territory's currency
+  var currency='';
+  try{
+    if (territory.country_id){
+      var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',territory.country_id))[0];
+      if (currencyObject){
+        currency=currencyObject.currency;
+      }
+    }
+  } catch (err) {
+    meta.error = err;
+    logger.error('Error retrieving country currency', meta);
+    throw err;
+  }
+  meta.currency=currency;
+  if (currency){
+    try{
+      (yield this.resteasy.knex('units').where('territory_id',territory.id).update({
+        'currency':currency
+      }));
+    }
+    catch(err){
+      meta.error=err;
+      logger.error('Error save currency to units', meta);
+      throw err;
+    }
+  }
+}
+
 function *afterCreateReview(review) {
   logger.info('After review created - add review approval record',{fn:'afterCreateReview',review:review});
   if (!review){
@@ -1537,6 +1575,8 @@ module.exports = {
           yield afterUpdateReviewApproval.call(this, res[0]);
         } else if (this.resteasy.table == 'order_history') {
             yield afterUpdateOrderHistory.call(this, res[0]);
+        } else if (this.resteasy.table == 'territories') {
+          yield afterUpdateTerritory.call(this,res[0]);
         }
       } else if (this.resteasy.operation == 'index') {
         debug('..read');
