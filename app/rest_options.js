@@ -9,7 +9,7 @@ var LoyaltyRewards = require('./models/loyaltyrewards.server.model');
 var OrderHistory = require('./models/orderhistory.server.model');
 var Reviews = require('./models/reviews.server.model');
 var User = require('./models/user.server.model');
-// var Territories = require('./models/territories.server.model');
+var Territories = require('./models/territories.server.model');
 var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
 var payload = require('./utils/payload');
@@ -897,12 +897,12 @@ function *beforeSaveUnit() {
     this.resteasy.object.unit_mgr_id = user.id;
     this.resteasy.object.company_id = parseInt(companyId);
     
-    //get the company's currency
+    //get the territory's currency
     var currency='';
     try{
-      var company = (yield Company.getSingleCompany(this.resteasy.object.company_id))[0];
-      if (company){
-        var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',company.country_id))[0];
+      var territory = (yield Territories.getSingleTerritory(this.resteasy.object.territory_id))[0];
+      if (territory){
+        var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',territory.country_id))[0];
         if (currencyObject){
           currency=currencyObject.currency;
         }
