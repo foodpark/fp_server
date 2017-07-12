@@ -988,6 +988,27 @@ function *beforeSaveUnit() {
         logger.info('Unit Manager updated', meta);
       }
     }
+    if (this.resteasy.object.territory_id){
+      //get the territory's currency
+      var currency='';
+      try{
+        var territory = (yield Territories.getSingleTerritory(this.resteasy.object.territory_id))[0];
+        if (territory){
+          var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',territory.country_id))[0];
+          if (currencyObject){
+            currency=currencyObject.currency;
+          }
+        }
+      } catch (err) {
+        meta.error = err;
+        logger.error('Error retrieving country currency', meta);
+        throw err;
+      }
+      meta.currency=currency;
+      if (currency){
+        this.resteasy.object.currency=currency;
+      }
+    }
     logger.info('Ready to update Unit', meta);
   }
 }
