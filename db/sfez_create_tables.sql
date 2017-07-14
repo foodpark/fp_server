@@ -193,6 +193,7 @@ CREATE TABLE units (
     prep_notice integer,
     delivery boolean DEFAULT false,
     delivery_time_offset integer,
+    delivery_chg_amount text,
     delivery_radius integer,
     description text,
     username text,
