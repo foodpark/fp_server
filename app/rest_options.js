@@ -458,17 +458,17 @@ function *afterCreateOrderHistory(orderHistory) {
 }
 
 var display = {
-	order_requested	 : 'was requested',
-	order_declined   : 'was rejected',
-	order_accepted   : 'was accepted',
-	pay_fail         : 'payment failed',
-	order_in_queue   : 'is in queue',
-	order_cooking    : 'is cooking',
-	order_ready	     : 'is ready',
-	order_picked_up  : 'was picked up',
-	no_show          : ': customer was no show',
-	order_dispatched : 'was dispatched',
-	order_delivered	 : 'was delivered'
+  order_requested  : 'was requested',
+  order_declined   : 'was rejected',
+  order_accepted   : 'was accepted',
+  pay_fail         : 'payment failed',
+  order_in_queue   : 'is in queue',
+  order_cooking    : 'is cooking',
+  order_ready      : 'is ready',
+  order_picked_up  : 'was picked up',
+  no_show          : ': customer was no show',
+  order_dispatched : 'was dispatched',
+  order_delivered  : 'was delivered'
 }
 
 function *afterUpdateOrderHistory(orderHistory) {
@@ -587,31 +587,31 @@ function *afterUpdateOrderHistory(orderHistory) {
               msgTarget.message =  translator.translate(lang, "orderAcceptedMessage", timestamp.now());//"Order accepted at "+ timestamp.now();
               break;
           case 'order_in_queue':
-	            msgTarget.title = translator.translate(lang, "orderQueued");//"Order In Queue";
+              msgTarget.title = translator.translate(lang, "orderQueued");//"Order In Queue";
               msgTarget.message = translator.translate(lang, "orderQueuedMessage", orderNum);//Your order #"+ orderNum +" is queued for preparation";
               break;
           case 'order_cooking':
-	            msgTarget.title = translator.translate(lang, "orderCooking");//"Order Cooking";
+              msgTarget.title = translator.translate(lang, "orderCooking");//"Order Cooking";
               msgTarget.message = translator.translate(lang, "orderCookingMessage", orderNum);//"Your order #"+ orderNum +" started cooking";
               break;
           case 'order_ready':
-	            msgTarget.title = translator.translate(lang, "orderReady");//"Order Ready";
+              msgTarget.title = translator.translate(lang, "orderReady");//"Order Ready";
               msgTarget.message = translator.translate(lang, "orderReadyMessage", orderNum); //Your order #"+ orderNum +" is ready!";
               break;
           case 'order_picked_up':
-	            msgTarget.title = translator.translate(lang, "orderPickedUp");//"Order Picked Up";
+              msgTarget.title = translator.translate(lang, "orderPickedUp");//"Order Picked Up";
               msgTarget.message = translator.translate(lang, "orderPickedUpMessage", orderNum);// "Your order #"+ orderNum +" was picked up!";
               break;
           case 'no_show':
-	            msgTarget.title = translator.translate(lang, "NoShow");//"No Show";
+              msgTarget.title = translator.translate(lang, "NoShow");//"No Show";
               msgTarget.message = translator.translate(lang, "NoShowMessage", orderNum);//"Your order #"+ orderNum +" was not picked up! Did you forget?";
               break;
           case 'order_dispatched':
-	            msgTarget.title = translator.translate(lang, "orderDispatched");//"Order Dispatched";
+              msgTarget.title = translator.translate(lang, "orderDispatched");//"Order Dispatched";
               msgTarget.message = translator.translate(lang, "orderDispatchedMessage", orderNum);//"Your order #"+ orderNum +" is on its way!";
               break;
           case 'order_delivered':
-	            msgTarget.title = translator.translate(lang, "orderDelivered");//"Order Delivered";
+              msgTarget.title = translator.translate(lang, "orderDelivered");//"Order Delivered";
               msgTarget.message = translator.translate(lang, "orderDeliveredMessage", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
               break;
           default:
@@ -986,6 +986,7 @@ function *beforeSaveUnit() {
         debug(user);
         meta.unit_mgr_id = user.id;
         logger.info('Unit Manager updated', meta);
+
       }
     }
     if (this.resteasy.object.territory_id){
@@ -1008,6 +1009,40 @@ function *beforeSaveUnit() {
       if (currency){
         this.resteasy.object.currency=currency;
       }
+
+      //Updating teritory Id
+       var unitId = this.params.id;
+
+        if (!unitId) {
+          var noUnitIdErr = 'No unit id provided. Update operation requires unit id';
+          meta.error = noUnitIdErr;
+          logger.error('No unit id provided', meta);
+          throw new Error(noUnitIdErr, 422);
+        }
+        var unit = '';
+        try {
+          unit = (yield Unit.getSingleUnit(this.params.id))[0];
+        } catch (err) {
+          meta.error = err;
+          logger.error('Error getting existing unit', meta);
+          throw err;
+        }
+
+        var userHash = {};
+        if (username) userHash.username = unit.username;
+        if (password) userHash.password = unit.password;
+        userHash.territory_id = this.resteasy.object.territory_id;
+        userHash.country_id = territory.country_id;
+
+       var user = '';
+        try {
+          user = (yield User.updateUser(meta.user_id,userHash))[0];
+        } catch (err) {
+          meta.error = err;
+          logger.error('Error getting existing user', meta);
+          throw err;
+        }
+      //Updating teritory Id
     }
     logger.info('Ready to update Unit', meta);
   }
@@ -1438,7 +1473,8 @@ module.exports = {
   hooks: {
     authorize: function *(operation, object) {
       console.log('checking authorization of ' + operation + ' on ')
-      console.log(this.params)
+      console.log(this.resteasy.table);
+
       if (operation == 'create') {
         if (this.params.table == 'companies' || this.params.table == 'food_parks' || this.params.table == 'roles' ||
             this.params.table == 'order_status_audit' || this.params.table == 'territories' || this.params.table == 'countries') {
@@ -1479,6 +1515,7 @@ module.exports = {
         console.log("... create is authorized")
       } else if (operation == 'update' && this.params.table == 'units' && this.isAuthenticated() && this.passport.user && this.passport.user.role == 'UNITMGR') {
         debug('unit mgr update');
+
         var valid = yield validUnitMgr(this.params, this.passport.user);
         if (!valid) {
           this.throw('Update Unauthorized - incorrect Unit Manager',401);
@@ -1550,7 +1587,6 @@ module.exports = {
         this.throw('Unknown operation - '+ operation, 405)
       }
     },
-
     beforeSave: function *() {
       if (this.resteasy.table == 'reviews') {
         debug('saving reviews')
@@ -1615,10 +1651,13 @@ module.exports = {
   // for example.
   applyContext: function (query) {
     debug('applyContext')
+    console.log('context');
     var context = this.params.context;
+    console.log(context);
     var m;
     debug('..operation '+ this.resteasy.operation);
     debug('..table '+ this.resteasy.table);
+    console.log('..table '+ this.resteasy.table);
     debug('context');
     if (!context) debug('..no context')
     else debug(context);
@@ -1682,6 +1721,8 @@ module.exports = {
                 && (n = context.match(/customers\/(\d+)/))) {
         debug('..reading loyalty');
         return query.select('*').where('company_id',m[1]).andWhere('customer_id',n[1]);
+      } else if (this.resteasy.table == 'users' && context && (m = context.match(/territories\/(\d+)/) ) ) {
+        return query.select('*').where('territory_id', m[1]);
       }
     }
   },
