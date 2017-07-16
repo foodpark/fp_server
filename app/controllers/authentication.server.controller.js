@@ -252,14 +252,15 @@ var createMoltinDeliveryChargeItem = function *(company, deliveryCat) {
 };
 
 
-var createCompany = function *(company_name, email, userId) {
-  var meta = {fn: 'createCompany', company_name: company_name, param_user_id: userId};
+var createCompany = function *(company_name, email, country_id, userId) {
+  var meta = {fn: 'createCompany', company_name: company_name, param_user_id: userId, country_id: country_id};
   logger.info('start create of SFEZ company', meta);
   debug('..email '+ email);
   var company = {
     name: company_name,
     email: email,
     userId: userId,
+    country_id: country_id
   };
   var moltinCompany = '';
   try {
@@ -341,9 +342,9 @@ var createCompany = function *(company_name, email, userId) {
 
  var sfezCompany = '';
   try {
-    sfezCompany = yield Company.createCompany(company_name, email, userId, moltinCompany.id,
+    sfezCompany = (yield Company.createCompany(company_name, email, userId, moltinCompany.id,
       moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
-      dailySpecialCat.id);
+      dailySpecialCat.id, country_id))[0];
   } catch (err) {
     meta.error = err;
     logger.error('Error creating SFEZ company', meta);
@@ -414,15 +415,16 @@ exports.register = function*(next, mapping) {
     if (mapping) {
       this.body = mapping;
     }
-    const first_name = this.body.first_name;
-    const last_name = this.body.last_name;
-    const company_name = this.body.company_name;
-    const email = this.body.email;
-    const password = this.body.password;
+    var first_name = this.body.first_name;
+    var last_name = this.body.last_name;
+    var company_name = this.body.company_name;
+    var email = this.body.email;
+    var password = this.body.password;
+    var country_id = this.body.country_id;
     const sentRole = this.body.role; //this is the value sent by the call; 
-                                     //it will be stored in another const as upepr case after it is confirmed to have a value
+                                     //it will be stored in another const as upper case after it is confirmed to have a value
                                     //otherwise we get errors trying to assign to a const
-
+                              
     if (!email) {
       this.throw(422, 'Please enter an email address.');
       //this.status = 422
@@ -454,6 +456,11 @@ exports.register = function*(next, mapping) {
       if (!company_name) {
         this.status = 422
         this.body = {error: 'Please enter a company name.'}
+        return;
+      }
+      if (!country_id) {
+        this.status = 422
+        this.body = {error: 'Please enter a country.'}
         return;
       }
       debug('register: checking for duplicate company name');
@@ -510,7 +517,7 @@ exports.register = function*(next, mapping) {
       debug('register: creating company');
 
       try {
-        var company  = (yield createCompany(company_name, email, userObject.id))[0];
+        var company  = yield createCompany(company_name, email, country_id, userObject.id);
       } catch (err) {
         console.error('register: error creating company');
         console.error(err)

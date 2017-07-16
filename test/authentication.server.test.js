@@ -23,6 +23,7 @@ var deliveryChargeCat = '';
 var deliveryChargeItem = '';
 var authName = 'auth.test'+ ts;
 var companyName = 'Auth Test Co '+ ts;
+var countryId = 1;
 
 describe(tests +' POST /auth/register', function() {
   it('should register company and return JWT token', function(done) {
@@ -34,7 +35,8 @@ describe(tests +' POST /auth/register', function() {
         "company_name": companyName,
         "email": authName+"@gmail.com",
         "password": authName,
-        "role": "OWNER"
+        "role": "OWNER",
+        "country_id" : countryId
     })
     .end(function (err, res) {
       res.should.have.status(201);
@@ -61,12 +63,13 @@ describe(tests +' POST /auth/register', function() {
     chai.request(server)
     .get('/api/v1/mol/companies/' + companyId)
     .end(function(err, res) {
-      console.log(res.status);
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('name');
       res.body.name.should.equal(companyName);
+      res.body.should.have.property('country_id');
+      res.body.country_id.should.equal(countryId);
       res.body.should.have.property('default_cat');
       res.body.should.have.property('daily_special_cat_id');
       res.body.should.have.property('delivery_chg_cat_id');
@@ -76,10 +79,6 @@ describe(tests +' POST /auth/register', function() {
       dailySpecialCat = res.body.daily_special_cat_id;
       deliveryChargeCat = res.body.delivery_chg_cat_id;
       deliveryChargeItem = res.body.delivery_chg_item_id;
-      console.log("default category "+ defaultCat);
-      console.log("daily special cat "+ dailySpecialCat);
-      console.log("delivery charge cat "+ deliveryChargeCat);
-      console.log("delivery charge item "+ deliveryChargeItem);
       done();
     });
   });
