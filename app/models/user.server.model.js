@@ -45,6 +45,13 @@ exports.updateUser = function(id, hash) {
   return knex('users').update(hash).where('id',id).returning('*');
 };
 
+exports.updateUserByIds = function(ids, hash) {
+  debug('updateUser');
+  if (hash.password) hash.password = encrypt(hash.password);
+  debug(hash);
+  return knex('users').update(hash).whereIn('id', ids).returning('*');
+};
+
 exports.createOrUpdateUser = function(hash) {
   debug('createOrUpdateUser');
   var userId = hash.id;

@@ -18,6 +18,7 @@ var T = require('./utils/translate');
 var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
+var Driver = require('./models/driver.server.model');
 var debug = require('debug')('rest_options');
 var logger = require('winston');
 var knex = require('../config/knex.js');
@@ -1027,21 +1028,41 @@ function *beforeSaveUnit() {
           logger.error('Error getting existing unit', meta);
           throw err;
         }
+        var drivers = '';
+        var user_ids = [];
 
-        var userHash = {};
-        if (username) userHash.username = unit.username;
-        if (password) userHash.password = unit.password;
-        userHash.territory_id = this.resteasy.object.territory_id;
-        userHash.country_id = territory.country_id;
-
-       var user = '';
         try {
-          user = (yield User.updateUser(meta.user_id,userHash))[0];
+          drivers = (yield Driver.getDriversForUnit(this.params.id));
+         
+          if(drivers.length > 0){
+            drivers.forEach(function(value){
+              if(value.user_id !== null)
+                user_ids.push(value.user_id);
+            });
+          }
+
         } catch (err) {
           meta.error = err;
-          logger.error('Error getting existing user', meta);
+          logger.error('Error getting existing unit', meta);
           throw err;
         }
+
+        if(user_ids.length > 0){
+          userHash = {};
+          userHash.territory_id = this.resteasy.object.territory_id;
+          userHash.country_id = territory.country_id;
+
+         var user = '';
+          try {
+            user = (yield User.updateUserByIds(user_ids,userHash));
+          } catch (err) {
+            meta.error = err;
+            logger.error('Error getting existing user', meta);
+            throw err;
+          }
+        }
+
+        
       //Updating teritory Id
     }
     logger.info('Ready to update Unit', meta);
