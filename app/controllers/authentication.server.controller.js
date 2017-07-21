@@ -421,6 +421,10 @@ exports.register = function*(next, mapping) {
     var email = this.body.email;
     var password = this.body.password;
     var country_id = this.body.country_id;
+
+     var territory_id = this.body.territory_id;
+    var phone = this.body.phone;
+
     const sentRole = this.body.role; //this is the value sent by the call; 
                                      //it will be stored in another const as upper case after it is confirmed to have a value
                                     //otherwise we get errors trying to assign to a const
@@ -492,12 +496,30 @@ exports.register = function*(next, mapping) {
       return;
     }
 
+    if (role == 'DRIVER') {
+
+      if (!territory_id) {
+        this.status = 422;
+        this.body = {error: 'Please enter a territory.'}
+        return;
+      }
+
+      if (!phone) {
+        this.status = 422;
+        this.body = {error: 'Please enter your phone number.'}
+        return;
+      }
+
+    }
+
     var user = {
       first_name: first_name,
       last_name: last_name,
       username: email,
       password: password,
       role: role,
+      territory_id: territory_id,
+      phone: phone,
       provider: 'local',
       provider_id: 'local',
       provider_data: '{}'
