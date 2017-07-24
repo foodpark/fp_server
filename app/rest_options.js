@@ -1744,6 +1744,9 @@ module.exports = {
         return query.select('*').where('company_id',m[1]).andWhere('customer_id',n[1]);
       } else if (this.resteasy.table == 'users' && context && (m = context.match(/territories\/(\d+)/) ) ) {
         return query.select('*').where('territory_id', m[1]);
+      }  else if (this.resteasy.table == 'territories' && context && (m = context.match(/countries\/(\d+)$/))) {
+        debug('..country id '+ m[1]);
+        return query.select('*').where('country_id', m[1]);
       }
     }
   },
