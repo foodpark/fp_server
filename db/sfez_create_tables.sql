@@ -31,6 +31,7 @@ CREATE TABLE countries (
   name text,
   is_enabled boolean DEFAULT(false),
   tax_band text,
+  currency_id text DEFAULT('19883724893479'),
   currency text DEFAULT('BRL')
 );
 
@@ -213,6 +214,7 @@ CREATE TABLE units (
     unit_mgr_id integer REFERENCES users(id),
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    currency_id text DEFAULT('19883724893479'),
     currency text DEFAULT ('BRL'),
     payment text DEFAULT ('SumUp')
 );

@@ -900,12 +900,14 @@ function *beforeSaveUnit() {
     
     //get the territory's currency
     var currency='';
+    var currencyId='';
     try{
       var territory = (yield Territories.getSingleTerritory(this.resteasy.object.territory_id))[0];
       if (territory){
-        var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',territory.country_id))[0];
+        var currencyObject=(yield this.resteasy.knex('countries').select('currency','currency_id').where('id',territory.country_id))[0];
         if (currencyObject){
           currency=currencyObject.currency;
+          currencyId=currencyObject.currency_id;
         }
       }
     } catch (err) {
@@ -914,8 +916,12 @@ function *beforeSaveUnit() {
       throw err;
     }
     meta.currency=currency;
+    meta.currencyId=currencyId;
     if (currency){
       this.resteasy.object.currency=currency;
+    }
+    if (currencyId){
+      this.resteasy.object.currency_id=currencyId;
     }
     debug('..ready to create unit');
     debug(this.resteasy.object);
@@ -993,12 +999,14 @@ function *beforeSaveUnit() {
     if (this.resteasy.object.territory_id){
       //get the territory's currency
       var currency='';
+      var currencyId='';
       try{
         var territory = (yield Territories.getSingleTerritory(this.resteasy.object.territory_id))[0];
         if (territory){
-          var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',territory.country_id))[0];
+          var currencyObject=(yield this.resteasy.knex('countries').select('currency','currency_id').where('id',territory.country_id))[0];
           if (currencyObject){
             currency=currencyObject.currency;
+            currencyId=currencyObject.currency_id;
           }
         }
       } catch (err) {
@@ -1007,8 +1015,12 @@ function *beforeSaveUnit() {
         throw err;
       }
       meta.currency=currency;
+      meta.currencyId=currencyId;
       if (currency){
         this.resteasy.object.currency=currency;
+      }
+      if (currencyId){
+        this.resteasy.object.currency_id=currencyId;
       }
 
       //Updating teritory Id
@@ -1272,11 +1284,13 @@ function *afterUpdateTerritory(territory){
   meta.territory_id=territory.id;
   //get the territory's currency
   var currency='';
+  var currencyId='';
   try{
     if (territory.country_id){
-      var currencyObject=(yield this.resteasy.knex('countries').select('currency').where('id',territory.country_id))[0];
+      var currencyObject=(yield this.resteasy.knex('countries').select('currency','currency_id').where('id',territory.country_id))[0];
       if (currencyObject){
         currency=currencyObject.currency;
+        currencyId=currencyObject.currency_id;
       }
     }
   } catch (err) {
@@ -1285,10 +1299,12 @@ function *afterUpdateTerritory(territory){
     throw err;
   }
   meta.currency=currency;
-  if (currency){
+  meta.currencyId=currencyId;
+  if (currency || currencyId){
     try{
       (yield this.resteasy.knex('units').where('territory_id',territory.id).update({
-        'currency':currency
+        'currency':currency,
+        'currency_id':currencyId
       }));
     }
     catch(err){
