@@ -31,7 +31,7 @@ CREATE TABLE countries (
   name text,
   is_enabled boolean DEFAULT(false),
   tax_band text,
-  currency_id text DEFAULT('19883724893479'),
+  currency_id text DEFAULT('1435543251393183865'),
   currency text DEFAULT('BRL')
 );
 
@@ -149,7 +149,8 @@ CREATE TABLE companies (
     show_vendor_setup boolean DEFAULT true,
     default_unit integer, --// circular reference if REFERENCES is used.  Temporary fix until customer update can be modified properly
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    is_deleted boolean DEFAULT(false)
 );
 
 
@@ -214,9 +215,10 @@ CREATE TABLE units (
     unit_mgr_id integer REFERENCES users(id),
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    currency_id text DEFAULT('19883724893479'),
+    currency_id text DEFAULT('1435543251393183865'),
     currency text DEFAULT ('BRL'),
-    payment text DEFAULT ('SumUp')
+    payment text DEFAULT ('SumUp'),
+    is_deleted boolean DEFAULT(false)
 );
 
 CREATE TABLE drivers (

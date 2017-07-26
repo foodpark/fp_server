@@ -214,14 +214,26 @@ function *update(next) {
 // destroy is special - it does the query itself, as it is unusual in
 // how it creates a response - the object isn't returned.
 function *destroy(next) {
-  queries.destroy(this.resteasy.query, this.params.id);
+  yield hook(this, 'authorize', 'delete', this.params.id);
 
-  yield next;
+  var q = this.resteasy.options.checkForSoftDelete.call(this, this.resteasy.query);
 
-  var res = yield this.resteasy.query;
-  delete this.resteasy.query;
+  if (q){
+    this.resteasy.query=q;
+    yield next;
+    var res=yield this.resteasy.query.returning('*');
+    this.body = {success: res[0].is_deleted};
+  }
+  else{
+    queries.destroy(this.resteasy.query, this.params.id);
 
-  this.body = { success: !!res };
+    yield next;
+
+    var res = yield this.resteasy.query;
+    delete this.resteasy.query;
+
+    this.body = { success: !!res };
+  }
 }
 
 const HAS_ID_RE = /\/(\d+)$/;

@@ -1681,6 +1681,20 @@ module.exports = {
         }
       }
     },
+
+  },
+
+  checkForSoftDelete: function (query) {
+    
+    if (this.resteasy.operation == 'destroy') {
+      if  (this.params.table=='units' || this.params.table=='companies'){
+        debug('Soft delete table: '+this.params.table);
+        debug('Soft delete id: '+this.params.id);
+        return query.update( {
+          is_deleted: true
+        }).where({id: this.params.id});
+      }
+    }
   },
 
   // the apply context option allows you to specify special
@@ -1699,6 +1713,11 @@ module.exports = {
     if (!context) debug('..no context')
     else debug(context);
     if (this.resteasy.operation == 'index') {
+      //soft deleted tables
+      if (this.resteasy.table == 'units' || this.resteasy.table == 'companies'){
+        query=query.select('*').where('is_deleted',false);
+      }
+      //context checks
       if (this.resteasy.table == 'units' && context && (m = context.match(/companies\/(\d+)$/))) {
         debug('..company id '+ m[1]);
         return query.select('*').where('company_id', m[1]);
@@ -1763,7 +1782,7 @@ module.exports = {
       }  else if (this.resteasy.table == 'territories' && context && (m = context.match(/countries\/(\d+)$/))) {
         debug('..country id '+ m[1]);
         return query.select('*').where('country_id', m[1]);
-      }
+      } 
     }
   },
 };
