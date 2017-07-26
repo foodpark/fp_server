@@ -1770,7 +1770,7 @@ module.exports = {
       } else if (this.resteasy.table == 'checkins' && context && (m = context.match(/territories\/(\d+)$/i))) {
         return query.select(
             knex.raw('((checkins.check_in is null OR checkins.check_in <= current_timestamp) AND (checkins.check_out is null OR checkins.check_out >= current_timestamp)) as is_active')
-          ).innerJoin('units','units.id','checkins.unit_id').where('territory_id',m[1]).andWhereRaw('checkins.check_in >= current_date');
+          ).innerJoin('units','units.id','checkins.unit_id').where('territory_id',m[1]).andWhere('units.is_deleted',false).andWhereRaw('checkins.check_in >= current_date');
       } else if (this.resteasy.table == 'loyalty'
                 && context
                 && (m = context.match(/companies\/(\d+)/))

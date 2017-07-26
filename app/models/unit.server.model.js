@@ -29,7 +29,7 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
   }
   return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery','checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','checkins.food_park_name','checkins.food_park_id','checkins.display_address','companies.tags','companies.calculated_rating as rating','companies.photo'])
   .whereRaw('(latitude >= ? and latitude <= ?) and (longitude >= ? and longitude <= ?) and check_in < ? and check_out > ?',
-  [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');
+  [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).andWhere('units.is_deleted',false).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');
 };
 
 exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
@@ -47,7 +47,7 @@ exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
     var minlon = lon2;
     var maxlon = lon1;
   }
-  return knex('units').select(['id','name','number','customer_order_window','territory_id','type','description','qr_code','unit_order_sys_id']).whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon])
+  return knex('units').select(['id','name','number','customer_order_window','territory_id','type','description','qr_code','unit_order_sys_id']).whereBetween('latitude', [minlon, maxlon]).andWhereBetween('longitude', [minlon, maxlon]).andWhere('is_deleted',false)
 };
 
 
