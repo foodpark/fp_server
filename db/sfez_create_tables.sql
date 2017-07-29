@@ -46,7 +46,8 @@ CREATE TABLE territories (
     latitude float8,
     longitude float8,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    is_deleted boolean DEFAULT(false)
 );
 
 CREATE TABLE food_parks (
@@ -61,7 +62,8 @@ CREATE TABLE food_parks (
     latitude float8,
     longitude float8,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    is_deleted boolean DEFAULT(false)
 );
 
 CREATE TABLE locations (

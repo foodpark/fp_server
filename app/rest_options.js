@@ -25,6 +25,8 @@ var knex = require('../config/knex.js');
 
 const translator = new T();
 
+const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units'];
+
 
 function *simplifyDetails(orderDetail) {
   logger.info('Simplifying order details', {fn: 'simplifyDetails',
@@ -1687,7 +1689,7 @@ module.exports = {
   checkForSoftDelete: function (query) {
     
     if (this.resteasy.operation == 'destroy') {
-      if  (this.params.table=='units' || this.params.table=='companies'){
+      if (softDeleteTables.indexOf(this.params.table.toLowerCase()) > -1){
         debug('Soft delete table: '+this.params.table);
         debug('Soft delete id: '+this.params.id);
         return query.update( {
@@ -1714,7 +1716,7 @@ module.exports = {
     else debug(context);
     if (this.resteasy.operation == 'index') {
       //soft deleted tables
-      if (this.resteasy.table == 'units' || this.resteasy.table == 'companies'){
+       if (softDeleteTables.indexOf(this.resteasy.table.toLowerCase()) > -1){
         query=query.select('*').where('is_deleted',false);
       }
       //context checks
