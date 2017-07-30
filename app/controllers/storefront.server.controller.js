@@ -146,7 +146,7 @@ exports.deleteCompany=function *(next) {
     }
     debug(results)
     try {
-      results = yield Company.deleteCompany(this.company.id)
+      results = yield Company.softDeleteCompany(this.company.id)
     }catch (err) {
       console.error('error deleting company ('+ this.company.id +') in SFEZ')
       throw(err)

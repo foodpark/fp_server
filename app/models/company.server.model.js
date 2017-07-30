@@ -61,3 +61,9 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
 exports.deleteCompany = function(companyId) {
   return knex('companies').where('id', companyId).del();
 };
+
+exports.softDeleteCompany = function(companyId) {
+ return knex('companies').update( {
+          is_deleted: true
+        }).where({id: companyId});
+}
