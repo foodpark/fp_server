@@ -4,7 +4,6 @@ COPY countries (id, name, is_enabled, tax_band, currency_id, currency) FROM stdi
 2	USA	false	1427064502431515521	1435543251393183865	USD
 \.
 
-update countries set is_enabled=true where id=1;
 
 COPY territories (id, city, territory, state, country, timezone, latitude, longitude, created_at, updated_at, country_id) FROM stdin;
 1	Natal	 Natal-RN	RN	Brazil	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00	1

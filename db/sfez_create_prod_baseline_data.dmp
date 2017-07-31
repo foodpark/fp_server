@@ -1,4 +1,10 @@
 
+COPY countries (id, name, is_enabled, tax_band, currency_id, currency) FROM stdin;
+1	Brazil	true	1554615357396746864	1554610428930163616	BRL
+\.
+SELECT pg_catalog.setval('countries_id_seq', 1, true);
+
+
 COPY territories (id, city, territory, state, country, timezone, latitude, longitude, created_at, updated_at) FROM stdin;
 1	Natal	 Natal-RN	RN	Brazil	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
 2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
@@ -25,11 +31,15 @@ COPY users (id, username, password, first_name, last_name, role, provider, provi
 11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	local	local	{}	\N	\N	\N	en	2016-08-21 23:31:43.131352+00	2017-02-03 09:25:30.279083+00
 11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	local	local	{}	\N	\N	\N	en	2016-08-21 23:03:07.177813+00	2017-01-31 23:32:49.172208+00
 11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
-11013	mg_admin	2c544a0fca5a8146c790a295e389bbd8	Matt	Guiger	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:10:50.642758+00
 11012	mp_admin	4789d4e7d1316d4dcf8ba7c8868bc6a3	Mike	Peter	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:11:23.159019+00
+11013	mg_admin	2c544a0fca5a8146c790a295e389bbd8	Matt	Guiger	ADMIN	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:10:50.642758+00
+11021	Fogo@thaitanicexpress.com	705eb2cad4537d7ace7fc73bb273f50d	Jimmy	Chu	OWNER	local	local	{}	\N	\N	\N	en	2017-07-10 17:25:51.747138+00	2017-07-10 17:25:51.747138+00
+11022	Frank@bbq.com	26253c50741faa9c2e2b836773c69fe6	Frank	Smith	OWNER	local	local	{}	\N	\N	\N	en	2017-07-10 17:27:49.656958+00	2017-07-10 17:27:49.656958+00
+11023	Pizzariabr@gmail.com	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Cobello	OWNER	local	local	{}	\N	\N	\N	en	2017-07-10 17:29:27.498133+00	2017-07-10 17:29:27.498133+00
+11024	pacos@tacos.com	dacedf41210444fe8547f5b1cf085a6c	Pacos	Tacos	OWNER	local	local	{}	\N	\N	\N	en	2017-07-11 01:13:53.170026+00	2017-07-11 01:13:53.170026+00
+11020	manny@classycuban.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Lopez	OWNER	local	local	{}	\N	\N	\N	en	2017-07-10 17:18:42.696392+00	2017-07-10 17:18:42.696392+00
 \.
-SELECT pg_catalog.setval('users_id_seq', 11013, true);
-
+SELECT pg_catalog.setval('users_id_seq', 11024, true);
 
 COPY admins (id, description, photo, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
 1	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
@@ -38,9 +48,16 @@ COPY admins (id, description, photo, super_admin, city, state, country, user_id,
 \.
 SELECT pg_catalog.setval('admins_id_seq', 3, true);
 
-COPY companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, daily_special_item_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, photo, featured_dish, hours, schedule, business_address, city, state, country, taxband, tags, stub, calculated_rating, user_id, show_vendor_setup, created_at, updated_at) FROM stdin;
+
+COPY companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, daily_special_item_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, instagram, photo, featured_dish, hours, schedule, business_address, city, state, country, taxband, tags, stub, calculated_rating, user_id, show_vendor_setup, default_unit, created_at, updated_at) FROM stdin;
+11002	Classy Cuban	1555978584605066120	classy-cuban-1499707123374	1555978591534056329	1555978598169445258	\N	1555978605408813963	1555978615877796748	10	\N	manny@classycuban.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	\N	\N	\N	\N	11020	t	\N	2017-07-10 17:18:47.317737+00	2017-07-10 17:18:47.317737+00
+11003	Thaitanic Express	1555982182294487949	thaitanic-express-1499707552245	1555982188913099662	1555982195976307599	\N	1555982202787857296	1555982212535419793	10	\N	Fogo@thaitanicexpress.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	\N	\N	\N	\N	11021	t	\N	2017-07-10 17:25:56.073485+00	2017-07-10 17:25:56.073485+00
+11005	Pizzaria Brasil	1555983991952114583	pizzaria-brasil-1499707767975	1555983998528783256	1555984005524882329	\N	1555984012336432026	1555984022696362907	10	\N	Pizzariabr@gmail.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	\N	\N	\N	\N	11023	t	\N	2017-07-10 17:29:31.85494+00	2017-07-10 17:29:31.85494+00
+11006	Pacos Tacos	1556217747979894867	pacos-tacos-1499735633862	1556217754606895189	1556217761410056279	\N	1556217769018523736	1556217779328122969	10	\N	pacos@tacos.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	\N	\N	\N	\N	11024	t	\N	2017-07-11 01:13:57.822209+00	2017-07-11 01:13:57.822209+00
+11004	Frank's BBQ	1555983171344925586	frank-s-bbq-1499707670148	1555983178106143635	1555983184909304724	\N	1555983191687299989	1555983201644577686	10	Frank's Delicious Fresh BBQ	Frank@bbq.com	\N	www.facebook.com/bbq	\N	\N	https://commercecdn.com/1278235777548943678/b73963cc-0025-4b0f-a2e3-3d1ac4ec1994.jpeg	https://commercecdn.com/1278235777548943678/3800a579-f9a8-4964-949e-fb53ed5d16d4.jpeg	11:00 AM-8:00 PM	\N	\N	\N	\N	USA	\N	\N	\N	\N	11022	t	\N	2017-07-10 17:27:53.969488+00	2017-07-10 17:27:53.969488+00
 \.
-SELECT pg_catalog.setval('companies_id_seq', 11000, true);
+SELECT pg_catalog.setval('companies_id_seq', 11006, true);
+
 
 
 COPY customers (id, order_sys_id, description, gcm_id, device_type, fcm_id, phone, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at, updated_at) FROM stdin;

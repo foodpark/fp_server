@@ -414,6 +414,14 @@ CREATE TABLE order_state (
   callInfo text
 );
 
+
+
+COPY countries (id, name, is_enabled, tax_band, currency) FROM stdin;
+1	Brazil	t	\N	BRL
+2	USA	t	\N	BRL
+\.
+SELECT pg_catalog.setval('countries_id_seq', 2, true);
+
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
 2	OWNER
