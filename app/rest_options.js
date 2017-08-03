@@ -999,6 +999,8 @@ function *beforeSaveUnit() {
       }
     }
     if (this.resteasy.object.territory_id){
+      logger.info('unit territory changed - finding new currency and updating driver territories');
+      meta.territoryId=this.resteasy.object.territory_id;
       //get the territory's currency
       var currency='';
       var currencyId='';
@@ -1024,6 +1026,7 @@ function *beforeSaveUnit() {
       if (currencyId){
         this.resteasy.object.currency_id=currencyId;
       }
+       logger.info('unit currency will be updated', meta);
 
       //Updating teritory Id
        var unitId = this.params.id;
@@ -1076,7 +1079,8 @@ function *beforeSaveUnit() {
           }
         }
 
-        
+        logger.info('driver territories updated', meta);
+
       //Updating teritory Id
     }
     logger.info('Ready to update Unit', meta);
@@ -1273,6 +1277,48 @@ function *beforeSaveUser() {
       throw err;
     }
   }
+}
+
+function *afterUpdateUnit(unit){
+   meta={fn:'afterUpdateUnit'};
+   logger.info('After Unit updated - check for delivery charge amount change', meta);
+  if (this.resteasy.object.delivery_chg_amount){
+      logger.info('unit delivery charge amount changed - updating company');
+      //also update the companies table
+      meta.deliveryChgAmount=this.resteasy.object.delivery_chg_amount;
+      var chargeAmt=this.resteasy.object.delivery_chg_amount;
+
+      //get unit by id
+      var unitId = this.params.id;
+
+      if (!unitId) {
+         var noUnitIdErr = 'No unit id provided. Update operation requires unit id';
+         meta.error = noUnitIdErr;
+         logger.error('No unit id provided', meta);
+         throw new Error(noUnitIdErr, 422);
+      }
+      var unit = '';
+      try {
+        unit = (yield Unit.getSingleUnit(this.params.id))[0];
+      } catch (err) {
+         meta.error = err;
+         logger.error('Error getting existing unit', meta);
+         throw err;
+      }
+
+      //update company by company id
+      meta.companyId=unit.company_id;
+
+      try{
+        (yield this.resteasy.knex('companies').update('delivery_chg_amount',chargeAmt).where('id',unit.company_id))[0];
+      }
+      catch (err) {
+         meta.error = err;
+         logger.error('Error updating company delivery charge', meta);
+         throw err;
+      }
+      logger.info('company charge amount updated');
+    }
 }
 
 function *afterUpdateTerritory(territory){
@@ -1673,6 +1719,8 @@ module.exports = {
             yield afterUpdateOrderHistory.call(this, res[0]);
         } else if (this.resteasy.table == 'territories') {
           yield afterUpdateTerritory.call(this,res[0]);
+        } else if (this.resteasy.table == 'units') {
+          yield afterUpdateUnit.call(this,res[0]);
         }
       } else if (this.resteasy.operation == 'index') {
         debug('..read');
