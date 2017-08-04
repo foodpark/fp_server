@@ -1,8 +1,8 @@
 {
         "payProcessed"     :"Pago Procesado - Pedido #{{orderNum}}",
-        "payProcessedMessage" : "{{custName}} pago se procesó en {{timestamp.now()}}",
+        "payProcessedMessage" : "{{custName}} pago se procesó en {{time}}",
         "payFailed"        :"Error en el pago - Pedido #{{orderNum}}",
-        "payFailedMessage" : "{{custName}} pago falló en {{timestamp.now()}}",
+        "payFailedMessage" : "{{custName}} pago falló en {{time}}",
         "orderDeclined"    :"Orden Rechazada",
         "orderDeclinedMessage" : "{{company}} no aceptó su pedido en este momento. Inténtalo de nuevo en otro momento.",
         "orderAccepted"    :"Solicitud Aceptada",  
