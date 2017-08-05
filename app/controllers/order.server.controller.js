@@ -366,8 +366,8 @@ exports.getDriverActiveOrders = function * (next) {
         driverIds.push(element.id);
       }, this);
       meta.driver_ids=driverIds;
-      var orders = yield orderhistory.getDriverActiveOrders(driverIds);
-      if (orders) {
+      var orders = driverIds != null && driverIds.length > 0 ? yield orderhistory.getDriverActiveOrders(driverIds) : [];
+      if (typeof orders != 'undefined' && orders != null && orders.length > 0) {
         for (i = 0; i < orders.length; i++) {
           logger.info("Order unitId: " + orders[i].unit_id);
           orders[i].unit_manager_fbid = (yield User.getUserIdForUnitMgrByUnitId(orders[i].unit_id))[0].fbid;
