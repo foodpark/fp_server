@@ -14,7 +14,7 @@ var config = require('./config/config');
 var dbConfig = require('./config/knex');
 var cors = require('kcors');
 
-var app = Koa();
+var app = new Koa();
 
 app.use(require('koa-error')());
 app.use(function *(next) {

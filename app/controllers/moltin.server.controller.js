@@ -133,7 +133,7 @@ var sendRequest = function *(url, method, data) {
         debug('..something went wrong with call to Moltin');
         var errors = res.body;
         debug(errors);
-        throw(errors);
+        reject(errors);
       }
     })
     .catch( function (err) {
