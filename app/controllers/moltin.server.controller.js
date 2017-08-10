@@ -196,6 +196,11 @@ exports.deleteCompany=function(companyId) {
   return requestEntities(COMPANIES, DELETE, '', companyId)
 };
 
+exports.updateCompany=function(companyId, data) {
+  debug('updateCompany')
+  return requestEntities(COMPANIES, PUT, data, companyId)
+}
+
 exports.createDefaultCategory=function(moltincompany) {
   debug('company name : '+ moltincompany.name)
   debug('company email : '+ moltincompany.email)
@@ -382,7 +387,6 @@ exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
   debug('deleteOptionCategory')
   return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
 };
-
 
 exports.findOrder=function(orderSysOrderId) {
   debug('findOrder')
