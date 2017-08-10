@@ -3,6 +3,7 @@ var msc = require('./moltin.server.controller');
 var config = require('../../config/config');
 var User = require('../models/user.server.model');
 var Company = require('../models/company.server.model');
+var Country = require('../models/countries.server.model');
 var Customer = require('../models/customer.server.model');
 var Driver = require('../models/driver.server.model');
 var Admin = require('../models/admin.server.model');
@@ -340,11 +341,28 @@ var createCompany = function *(company_name, email, country_id, userId) {
   meta.delivery_chg_item_id= deliveryChgItem.id;
   logger.info('delivery charge item successfully created', meta);
 
+  //get tax band from country
+  var taxband='';
+  try{
+    var country=(yield Country.getSingleCountry(country_id));
+    if (country.length > 0){
+      taxband=country[0].tax_band;
+    }
+  } catch (err){
+    meta.error = err;
+    logger.error('Error during Country retrieval', meta);
+    throw (err);
+  }
+  if (!taxband){
+     taxband=config.defaultTaxBand;
+  }
+  meta.taxband=taxband;
+
  var sfezCompany = '';
   try {
     sfezCompany = (yield Company.createCompany(company_name, email, userId, moltinCompany.id,
       moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
-      dailySpecialCat.id, country_id))[0];
+      dailySpecialCat.id, country_id, taxband))[0];
   } catch (err) {
     meta.error = err;
     logger.error('Error creating SFEZ company', meta);
