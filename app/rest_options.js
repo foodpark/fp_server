@@ -414,7 +414,7 @@ function *afterCreateOrderHistory(orderHistory) {
   if (orderHistory.for_delivery) {
     var deliverytime = orderHistory.desired_delivery_time.toISOString();
     title = translator.translate(lang,"orderRequested_delivery");
-    msg = translator.translate(lang,"orderRequested_deliveryMessage", [deliverytime, custName, orderDetail]);
+    msg = translator.translate(lang,"orderRequested_deliveryMessage", deliverytime, custName, orderDetail);
   } else { 
     var pickuptime = orderHistory.desired_pickup_time.toISOString();
     title = translator.translate(lang,"orderRequested_pickup");
