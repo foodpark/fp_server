@@ -84,7 +84,9 @@ exports.login = function *(next) {
       throw err;
     }
     userInfo.company_id = company.id;
+    userInfo.default_unit_id = company.default_unit;
     meta.company_id = company.id;
+    meta.default_unit_id = company.default_unit;
   } else if (this.passport.user.role == 'CUSTOMER') {
     var customer = '';
     try {
