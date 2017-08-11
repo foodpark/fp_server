@@ -574,7 +574,7 @@ function *afterUpdateOrderHistory(orderHistory) {
           // From Customer
           case 'order_paid':
               msgTarget.title = translator.translate(lang, "payProcessed", orderNum);//"Payment Processed - Order #"+ orderNum;
-              msgTarget.message = translator.translate(lang, "payProcessedMessage", custName);//custName +"'s payment
+              msgTarget.message = translator.translate(lang, "payProcessedMessage", custName, timestamp.now());//custName +"'s payment
               break;
           case 'pay_fail':
               msgTarget.title = translator.translate(lang, "payFailed", orderNum);//"Payment Failed - Order #"+ orderNum;

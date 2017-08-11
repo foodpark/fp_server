@@ -1,6 +1,6 @@
 {
       "payProcessed"     : "Pagamento Processado - Pedido #{{orderNum}}",
-      "payProcessedMessage" : "{{custName}} pagamento foi processado em {{time}}",
+      "payProcessedMessage" : "{{custName}}'s pagamento foi processado em {{time}}",
       "payFailed"        : "Pagamento Falhou - Pedido #{{orderNum}}",
       "payFailedMessage" : "{{custName}} pagamento falhou em {{time}}",
       "orderDeclined"    : "Pedido Recusado",

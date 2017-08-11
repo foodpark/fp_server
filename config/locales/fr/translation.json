@@ -1,6 +1,6 @@
 {
         "payProcessed" : "Paiement réalisé - Commande# {{orderNum}}",
-        "payProcessedMessage" : "{{custName}} paiement réalisé à {{time}}",
+        "payProcessedMessage" : "{{custName}}'s paiement réalisé à {{time}}",
         "payFailed" : "Paiement non réalisé - Commande #{{orderNum}}",
         "payFailedMessage" : "{{custName}} paiement non réalisé à {{time}}",
         "orderDeclined" : "Commande refusée",
