@@ -1,95 +1,552 @@
+--
+-- PostgreSQL database dump
+--
 
-COPY countries (id, name, is_enabled, tax_band, currency_id, currency) FROM stdin;
-1	Brazil	true	1554615357396746864	1554610428930163616	BRL
-\.
-SELECT pg_catalog.setval('countries_id_seq', 1, true);
-
-
-COPY territories (id, city, territory, state, country, country_id, timezone, latitude, longitude, created_at, updated_at) FROM stdin;
-1	Natal	 Natal-RN	RN	Brazil	1	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
-2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	1	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
-3	Ponta Negra	 Ponta Negra-RN	RN	Brazil	1	Buenos Aires	-6.22899400000000014	-35.0487759999999966	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00
-\.
-SELECT pg_catalog.setval('territories_id_seq', 3, true);
+-- Dumped from database version 9.6.3
+-- Dumped by pg_dump version 9.6.3
 
 
 
-COPY food_parks (id, name, photo, territory_id, city, state, postal_code, country, latitude, longitude, created_at, updated_at) FROM stdin;
-3004	Truck Garden Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.87437400000000043	-35.1786949999999976	2016-08-21 23:03:07.177813+00	2017-03-22 02:30:49.056127+00
-3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.86576900000000023	-35.1858780000000024	2016-08-21 23:05:04.914807+00	2017-03-22 02:30:49.056127+00
-3006	Natal Shopping Food Park - Av. das Brancas Dunas	\N	1	Natal	RN	\N	BR	-5.84256300000000017	-35.2106240000000028	2016-08-21 23:12:10.112015+00	2017-03-22 02:30:49.056127+00
-3007	Bar 54 Food Park - Rua Porto Mirim	\N	1	Natal	RN	\N	BR	-5.87467399999999973	-35.1835140000000024	2016-08-29 20:54:42.540882+00	2017-03-22 02:30:49.056127+00
-3008	Bar Trove Food Park - Rua Presidente José Bento	\N	1	Natal	RN	\N	BR	-5.80574800000000035	-35.2147050000000021	2016-08-30 21:12:08.717913+00	2017-03-22 02:30:49.056127+00
-30019	Ponta Negra Beach Boardwalk	\N	3	\N	\N	\N	\N	-5.87119999999999997	-35.1799999999999997	2017-04-08 16:01:23.846383+00	2017-04-08 16:03:08.092697+00
-30020	Big 5 Sports Bar Food Park	\N	3	\N	\N	\N	\N	-5.66999999999999993	-36.2100000000000009	2017-04-09 02:27:13.714836+00	2017-04-09 02:27:13.714836+00
-\.
-SELECT pg_catalog.setval('food_parks_id_seq', 30020, true);
-
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
 
 COPY users (id, username, password, first_name, last_name, role, territory_id, country_id, phone, provider, provider_id, provider_data, fbid, fb_token, fb_login, default_language, created_at, updated_at) FROM stdin;
-11013	mg_admin	2c544a0fca5a8146c790a295e389bbd8	Matt	Guiger	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:10:50.642758+00
-11021	Fogo@thaitanicexpress.com	705eb2cad4537d7ace7fc73bb273f50d	Jimmy	Chu	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:25:51.747138+00	2017-07-10 17:25:51.747138+00
-11024	pacos@tacos.com	dacedf41210444fe8547f5b1cf085a6c	Pacos	Tacos	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-11 01:13:53.170026+00	2017-07-11 01:13:53.170026+00
 11012	mp_admin	4789d4e7d1316d4dcf8ba7c8868bc6a3	Mike	Peter	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:11:23.159019+00
-11027	mannytruck1	8fe78ac0eaabf2f474b0de3a968e165e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:31:09.131805+00	2017-08-01 14:31:09.131805+00
-11037	Jack@crazyjacks.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Crazy	Jack	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-04 10:53:46.640291+00	2017-08-04 10:53:46.640291+00
-11038	jacktruck1	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-04 10:53:54.072583+00	2017-08-04 10:53:54.072583+00
-11020	manny@classycuban.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Lopez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:18:42.696392+00	2017-07-10 17:18:42.696392+00
-11022	Frank@bbq.com	26253c50741faa9c2e2b836773c69fe6	Frank	Smith	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:27:49.656958+00	2017-07-10 17:27:49.656958+00
-11030	s56	73ebb0e2299c89dc70a54abbde5c0a7c	Sally	Jones	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-03 20:23:51.214036+00	2017-08-03 20:23:51.214036+00
-11047	franktruck2	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-06 16:00:04.548186+00	2017-08-06 16:00:04.548186+00
-11031	bob56	90c4b084124e57b98082ce30f93e87dd	Bob	Ucker	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-03 20:31:33.175532+00	2017-08-03 20:31:33.175532+00
-11026	franktruck1	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:19:26.57913+00	2017-08-01 14:19:26.57913+00
-11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
 11028	pizzariabrtruck1	170f9a8f689fc69157ad6d3a62ecd92f	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:41:29.768181+00	2017-08-01 14:41:29.768181+00
 11023	Pizzariabr@gmail.com	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Cobello	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:29:27.498133+00	2017-07-10 17:29:27.498133+00
-11053	d56@me.com	cf508e934b1acddf6ee2080e1a90a020	Dirk	Novitski	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-07 15:58:38.875632+00	2017-08-07 15:58:38.875632+00
 11048	ca56	ff5131992322dd78e85fadd5c20c1dce	Candy	\N	DRIVER	3	\N	999-5554	\N	\N	\N	\N	\N	\N	en	2017-08-07 12:35:43.338207+00	2017-08-07 12:35:43.338207+00
 11049	l56	10b1d0f1601e7ed83195d0e79ff0c810	Larry	Lemon	DRIVER	3	\N	333-8888	local	local	{}	\N	\N	\N	en	2017-08-07 12:43:45.778481+00	2017-08-07 12:43:45.778481+00
+11071	needletruck1	4bf84babe76dabda6c4da4d25354704d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-08 18:11:49.893209+00	2017-08-08 18:11:49.893209+00
+11072	stevejones@stevejone.com	416a88b9efa03e0f809958793624cea5	Steve	Jones	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 18:16:12.004023+00	2017-08-08 18:16:12.004023+00
+11073	stevejonestruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-08 18:16:19.392069+00	2017-08-08 18:16:19.392069+00
+11047	franktruck2	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-06 16:00:04.548186+00	2017-08-06 16:00:04.548186+00
+11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
+11053	d56@me.com	cf508e934b1acddf6ee2080e1a90a020	Dirk	Novitski	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-07 15:58:38.875632+00	2017-08-07 15:58:38.875632+00
+11027	mannytruck1	8fe78ac0eaabf2f474b0de3a968e165e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:31:09.131805+00	2017-08-01 14:31:09.131805+00
+11076	mattG	81dc9bdb52d04dc20036dbd8313ed055	Matt G	\N	DRIVER	3	\N	99934-6321	\N	\N	\N	\N	\N	\N	en	2017-08-08 18:28:07.458835+00	2017-08-08 18:28:07.458835+00
+11077	DennisN	81dc9bdb52d04dc20036dbd8313ed055	Dennis N	\N	DRIVER	3	\N	9996-59632	\N	\N	\N	\N	\N	\N	en	2017-08-08 18:30:42.96532+00	2017-08-08 18:30:42.96532+00
+11062	Low1@me.com	8d05596d440ea2ddc2bec7f7e9cd935d	Low1	Down1	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 14:40:03.759877+00	2017-08-08 14:40:03.759877+00
+11080	jacktruck2	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 15:06:48.940672+00	2017-08-10 15:06:48.940672+00
+11024	pacos@tacos.com	dacedf41210444fe8547f5b1cf085a6c	Pacos	Tacos	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-11 01:13:53.170026+00	2017-07-11 01:13:53.170026+00
+11055	Churros@me.com	47b1ef10d0341c5bb08ad678bc33599b	Churro	Factory	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 09:52:23.546816+00	2017-08-08 09:52:23.546816+00
+11092	steve@me.com	737bdf2c50995d2da864c4fea87bf90b	steve	galaxy	DRIVER	3	\N	555-6666	local	local	{}	\N	\N	\N	en	2017-08-10 19:34:47.915909+00	2017-08-10 19:34:47.915909+00
+11082	churrotruck1	47b1ef10d0341c5bb08ad678bc33599b	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 15:53:02.476864+00	2017-08-10 15:53:02.476864+00
+11026	franktruck1	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:19:26.57913+00	2017-08-01 14:19:26.57913+00
+11056	bill56	fe99a0dc54577e0d63fa4ee50f89b414	Bill	\N	DRIVER	3	\N	444-7777	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:21:42.940407+00	2017-08-08 11:21:42.940407+00
+11093	daniel.berezin@sumup.com	6862647f5d1bd8f99371e469bc7481fa	Daniel	Berezin	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-11 14:05:34.879149+00	2017-08-11 14:05:34.879149+00
+11063	Low@me.com	bbd4ae7d10d1881050d251adb50c8e6d	Low	Down	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:20:12.383531+00	2017-08-08 16:20:12.383531+00
+11064	test@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:34:04.558535+00	2017-08-08 16:34:04.558535+00
+11065	test123@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:55:33.408429+00	2017-08-08 16:55:33.408429+00
+11066	test12@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:01:04.455188+00	2017-08-08 17:01:04.455188+00
+11067	test12ghgh@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:06:48.676412+00	2017-08-08 17:06:48.676412+00
+11068	test1gh2ghgh@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:15:00.78017+00	2017-08-08 17:15:00.78017+00
+11069	test1gh9090h@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:27:06.887883+00	2017-08-08 17:27:06.887883+00
+11070	needle@me.com	4bf84babe76dabda6c4da4d25354704d	Needle	Nitz	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 18:11:41.591073+00	2017-08-08 18:11:41.591073+00
+11078	Luiz@saborbr.com	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Cabello	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-09 18:24:06.038623+00	2017-08-09 18:24:06.038623+00
+11038	jacktruck1	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-04 10:53:54.072583+00	2017-08-04 10:53:54.072583+00
+11085	lennytruck1	a5835fc6854dd0313b32b12af6aadd3d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 16:35:59.683825+00	2017-08-10 16:35:59.683825+00
+11083	fogotruck1	705eb2cad4537d7ace7fc73bb273f50d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 16:17:00.415795+00	2017-08-10 16:17:00.415795+00
+11087	Mannytruck22	8fe78ac0eaabf2f474b0de3a968e165e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 16:54:59.913849+00	2017-08-10 16:54:59.913849+00
+11084	Lenny@cubanrush.com	a5835fc6854dd0313b32b12af6aadd3d	Lenny	Bandito	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 16:35:51.67896+00	2017-08-10 16:35:51.67896+00
+11030	s56	73ebb0e2299c89dc70a54abbde5c0a7c	Sally	Jones	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-03 20:23:51.214036+00	2017-08-03 20:23:51.214036+00
+11021	Fogo@thaitanicexpress.com	705eb2cad4537d7ace7fc73bb273f50d	Jimmy	Chu	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:25:51.747138+00	2017-07-10 17:25:51.747138+00
+11013	mg_admin	2c544a0fca5a8146c790a295e389bbd8	Matt	Guiger	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:10:50.642758+00
+11081	Churro@me.com	47b1ef10d0341c5bb08ad678bc33599b	Churro	Nation	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 15:52:54.977659+00	2017-08-10 15:52:54.977659+00
+11088	lou56	7338ada6c4f343a2798192c0cf1c20ba	Lou Jones	\N	DRIVER	1	\N	444-9998	\N	\N	\N	\N	\N	\N	en	2017-08-10 17:43:13.739367+00	2017-08-11 19:37:18.831625+00
+11031	bob56	90c4b084124e57b98082ce30f93e87dd	Bob	Ucker	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-03 20:31:33.175532+00	2017-08-03 20:31:33.175532+00
+11037	Jack@crazyjacks.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Crazy	Jack	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-04 10:53:46.640291+00	2017-08-04 10:53:46.640291+00
+11089	tacostruck1	dacedf41210444fe8547f5b1cf085a6c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 17:50:04.829749+00	2017-08-10 17:50:04.829749+00
+11090	ralph@me.com	0ab19c178f922c03d297dbcad252f75e	ralph	brown	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 19:29:03.423928+00	2017-08-10 19:29:03.423928+00
+11091	juan@me.com	0d02e44a4d3521153e057f212bb8598e	juan	gonzales	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 19:32:17.624677+00	2017-08-10 19:32:17.624677+00
+11079	luiztruck1	170f9a8f689fc69157ad6d3a62ecd92f	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-09 18:32:43.324813+00	2017-08-09 18:32:43.324813+00
+11020	manny@classycuban.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Lopez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:18:42.696392+00	2017-07-10 17:18:42.696392+00
+11094	daniel.berezintruck1	6862647f5d1bd8f99371e469bc7481fa	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-11 14:05:42.268431+00	2017-08-11 14:05:42.268431+00
+11054	madan_test1	d70cbdcb2bdf7e5af94791aeeb4ef335	test	\N	DRIVER	1	\N	3457394075	\N	\N	\N	\N	\N	\N	en	2017-08-08 06:40:51.151404+00	2017-08-11 19:41:10.826073+00
+11060	vklast	905fdcc0f57436658bc6fab3c3ddb288	vk2 vklast	\N	DRIVER	1	\N	65412333	\N	\N	\N	\N	\N	\N	en	2017-08-08 12:29:25.420575+00	2017-08-11 19:38:04.319075+00
+11058	vk@sh.com	f0c76d4c541cca93d7b506872309a163	vk	\N	DRIVER	1	\N	356345345	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:59:57.520108+00	2017-08-11 19:38:10.279287+00
+11059	vk1@sh.com	f0c76d4c541cca93d7b506872309a163	vk1	\N	DRIVER	1	\N	356345345	\N	\N	\N	\N	\N	\N	en	2017-08-08 12:00:16.049988+00	2017-08-11 19:38:12.318087+00
+11057	test123	cc03e747a6afbbcbf8be7668acfebee5	testfirstname	\N	DRIVER	1	\N	854666135	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:46:12.355217+00	2017-08-11 19:40:09.609404+00
+11061	tst123	d8b168f3003804d89da1092b8160f0f5	testing first testing last	\N	DRIVER	1	\N	56412233	\N	\N	\N	\N	\N	\N	en	2017-08-08 13:45:07.738799+00	2017-08-11 19:40:13.612668+00
+11022	Frank@bbq.com	26253c50741faa9c2e2b836773c69fe6	Frank	Smith	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:27:49.656958+00	2017-07-10 17:27:49.656958+00
+11086	Manny@cubanreuben.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Lopez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 16:50:07.93737+00	2017-08-10 16:50:07.93737+00
+11097	Mad	cf1ef61fbec0eb674a2ad96ddfe5256d	Mad Max	Max	DRIVER	3	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-11 20:02:57.293279+00	2017-08-11 20:02:57.293279+00
+11096	franktruck3	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-11 18:00:15.732535+00	2017-08-11 18:00:15.732535+00
+11095	marcy@me.com	0b468c9abf7ae8243eb9d850fbba615f	marcy	bond	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-11 16:29:02.090025+00	2017-08-11 16:29:02.090025+00
 \.
-SELECT pg_catalog.setval('users_id_seq', 11053, true);
 
 
-COPY admins (id, description, photo, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
-1	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
-2	\N	\N	f	\N	\N	\N	11012	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
-3	\N	\N	f	\N	\N	\N	11013	2016-10-20 23:33:15.198515	2016-10-20 23:33:15.198515
+--
+-- Data for Name: admins; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY admins (id, description, photo, phone, super_admin, city, state, country, user_id, created_at, updated_at) FROM stdin;
+1	\N	\N	\N	f	\N	\N	\N	11011	2016-10-20 23:33:15.198515+00	2016-10-20 23:33:15.198515+00
+2	\N	\N	\N	f	\N	\N	\N	11012	2016-10-20 23:33:15.198515+00	2016-10-20 23:33:15.198515+00
+3	\N	\N	\N	f	\N	\N	\N	11013	2016-10-20 23:33:15.198515+00	2016-10-20 23:33:15.198515+00
 \.
+
+
+--
+-- Name: admins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
 SELECT pg_catalog.setval('admins_id_seq', 3, true);
 
 
-COPY companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, daily_special_item_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, instagram, photo, featured_dish, hours, schedule, business_address, city, state, country, country_id, taxband, tags, stub, calculated_rating, user_id, show_vendor_setup, default_unit, created_at, updated_at, is_deleted) FROM stdin;
-11003	Thaitanic Express	1555982182294487949	thaitanic-express-1499707552245	1555982188913099662	1555982195976307599	\N	1555982202787857296	1555982212535419793	10	\N	Fogo@thaitanicexpress.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	\N	\N	\N	\N	\N	11021	t	\N	2017-07-10 17:25:56.073485+00	2017-07-10 17:25:56.073485+00	f
-11006	Pacos Tacos	1556217747979894867	pacos-tacos-1499735633862	1556217754606895189	1556217761410056279	\N	1556217769018523736	1556217779328122969	10	\N	pacos@tacos.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	\N	\N	\N	\N	\N	11024	t	\N	2017-07-11 01:13:57.822209+00	2017-07-11 01:13:57.822209+00	f
-11002	Classy Cuban	1555978584605066120	classy-cuban-1499707123374	1555978591534056329	1555978598169445258	\N	1555978605408813963	1555978615877796748	10	Manny's secret cuban recipe!	streetfoodez@sumup.com	555-7878	www.facebook.com/classycuban	\N	\N	https://commercecdn.com/1278235777548943678/fe7ae581-d6a9-4d14-86a3-aef5e12e989e.jpeg	https://commercecdn.com/1278235777548943678/ddb53e6f-62aa-4a47-bfef-b912f1fd93a6.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Cuban dr	\N	\N	Brazil	\N	\N	\N	\N	\N	11020	t	\N	2017-07-10 17:18:47.317737+00	2017-07-10 17:18:47.317737+00	f
-11004	Frank's BBQ	1555983171344925586	frank-s-bbq-1499707670148	1555983178106143635	1555983184909304724	1573900915901989480	1555983191687299989	1555983201644577686	10	Frank's Delicious Fresh BBQ	streetfoodez@sumup.com	777-8888	www.facebook.com/bbq	\N	\N	https://commercecdn.com/1278235777548943678/b73963cc-0025-4b0f-a2e3-3d1ac4ec1994.jpeg	https://commercecdn.com/1278235777548943678/3800a579-f9a8-4964-949e-fb53ed5d16d4.jpeg	11:00 AM-8:00 PM	\N	\N	\N	\N	USA	1	\N	bbq, smoked pork	\N	\N	11022	t	\N	2017-07-10 17:27:53.969488+00	2017-07-10 17:27:53.969488+00	f
-11005	Pizzaria Brasil	1555983991952114583	pizzaria-brasil-1499707767975	1555983998528783256	1555984005524882329	\N	1555984012336432026	1555984022696362907	10	Aqui nós temos a mais típica pizza brasileira e os mais variados pratos tradicionais de todas as regiões do Brasil.	streetfoodez@sumup.com	(84) 99999-9999	facebook.com/pizzaria-natal	\N	\N	https://commercecdn.com/1278235777548943678/80c61edd-09b7-40d6-a340-399dc6534eb1.jpeg	https://commercecdn.com/1278235777548943678/b2203621-5caa-482e-b308-b64a932066a6.jpeg	10:00 AM-10:00 PM	1,2,3,4,5,6	Rua Brasil, 123	\N	\N	Brazil	\N	\N	\N	\N	\N	11023	t	\N	2017-07-10 17:29:31.85494+00	2017-07-10 17:29:31.85494+00	f
-11011	Crazy Jack's	1573904234334650985	crazy-jack-s-1501844027350	1573904242479989354	1573904250591773291	\N	1573904259190096492	1573904273165517421	10	A little Texan flavor with "Crazy Jack" as the head chef!	Jack@crazyjacks.com	999-3333	www.facebook.com/crazyjacks	\N	\N	https://commercecdn.com/1544371371390271966/42db8c7f-b722-4c10-83cf-7383dd1a95b0.jpeg	https://commercecdn.com/1544371371390271966/ef38d6a5-05fa-4da9-86cf-97add60b6cc0.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Crazy lane	\N	\N	\N	1	\N	Subs, Deli Sandwiches	\N	\N	11037	t	\N	2017-08-04 10:53:52.33254+00	2017-08-04 10:53:52.33254+00	f
+--
+-- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY countries (id, name, is_enabled, tax_band, currency_id, currency) FROM stdin;
+1	Brazil	t	1554615357396746864	1554610428930163616	BRL
+2	US	f	1554615357396746864	1554610428930163616	USD
 \.
-SELECT pg_catalog.setval('companies_id_seq', 11011, true);
+
+
+--
+-- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, daily_special_item_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, instagram, photo, featured_dish, hours, schedule, business_address, city, state, country, country_id, taxband, tags, stub, calculated_rating, user_id, show_vendor_setup, default_unit, created_at, updated_at, is_deleted) FROM stdin;
+11005	Pizzaria Brasil	1555983991952114583	pizzaria-brasil-1499707767975	1555983998528783256	1555984005524882329	\N	1555984012336432026	1555984022696362907	10	Aqui nós temos a mais típica pizza brasileira e os mais variados pratos tradicionais de todas as regiões do Brasil.	streetfoodez@sumup.com	(84) 99999-9999	facebook.com/pizzaria-natal	\N	\N	https://commercecdn.com/1278235777548943678/80c61edd-09b7-40d6-a340-399dc6534eb1.jpeg	https://commercecdn.com/1278235777548943678/b2203621-5caa-482e-b308-b64a932066a6.jpeg	10:00 AM-10:00 PM	1,2,3,4,5,6	Rua Brasil, 123	\N	\N	Brazil	\N	\N	\N	\N	\N	11023	t	\N	2017-07-10 17:29:31.85494+00	2017-07-10 17:29:31.85494+00	f
+11004	Frank's BBQ	1555983171344925586	frank-s-bbq-1499707670148	1555983178106143635	1555983184909304724	1573900915901989480	1555983191687299989	1555983201644577686	6	Frank's Delicious Fresh BBQ	streetfoodez@sumup.com	777-8888	www.facebook.com/bbq	\N	\N	https://commercecdn.com/1278235777548943678/b73963cc-0025-4b0f-a2e3-3d1ac4ec1994.jpeg	https://commercecdn.com/1278235777548943678/3800a579-f9a8-4964-949e-fb53ed5d16d4.jpeg	11:00 AM-8:00 PM	\N	\N	\N	\N	USA	1	\N	BBQ, Smoked Pork	\N	4.42	11022	t	2001	2017-07-10 17:27:53.969488+00	2017-07-10 17:27:53.969488+00	f
+11013	Low Down1	1576917229482541212	low-down1-1502203204349	1576917238131196061	1576917246754685086	\N	1576917256695185567	1576917268565065888	10	\N	Low1@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11062	t	\N	2017-08-08 14:40:09.222998+00	2017-08-08 14:40:09.222998+00	f
+11002	Classy Cuban	1555978584605066120	classy-cuban-1499707123374	1555978591534056329	1555978598169445258	\N	1555978605408813963	1555978615877796748	10	Manny's secret cuban recipe!	streetfoodez@sumup.com	555-7878	www.facebook.com/classycuban	\N	\N	https://commercecdn.com/1278235777548943678/fe7ae581-d6a9-4d14-86a3-aef5e12e989e.jpeg	https://commercecdn.com/1278235777548943678/ddb53e6f-62aa-4a47-bfef-b912f1fd93a6.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Cuban dr	\N	\N	Brazil	1	\N	\N	\N	\N	11020	t	2002	2017-07-10 17:18:47.317737+00	2017-07-10 17:18:47.317737+00	t
+11014	Low Down	1576967636292468901	low-down-1502209213385	1576967644639133862	1576967653489115303	\N	1576967663521890472	1576967674217365673	10	\N	Low@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11063	t	\N	2017-08-08 16:20:18.043931+00	2017-08-08 16:20:18.043931+00	f
+11015	SSSSS	1576974614448308394	sssss-1502210045167	1576974622820139179	1576974631024197804	\N	1576974639521857709	1576974666331848878	10	\N	test@test.in	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11064	t	\N	2017-08-08 16:34:11.711638+00	2017-08-08 16:34:11.711638+00	f
+11016	SSS	1576985426147672239	sss-1502211334021	1576985434393673904	1576985444996874417	\N	1576985453603586226	1576985464508776627	10	\N	test123@test.in	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11065	t	\N	2017-08-08 16:55:38.828631+00	2017-08-08 16:55:38.828631+00	f
+11017	S6767SS	1576988204790186164	s6767ss-1502211665261	1576988216651677877	1576988225921089718	\N	1576988234276143287	1576988247697916088	10	\N	test12@test.in	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11066	t	\N	2017-08-08 17:01:10.598809+00	2017-08-08 17:01:10.598809+00	f
+11018	8989	1576991090748162233	8989-1502212009295	1576991099212267706	1576991108414570683	\N	1576991117096779964	1576991128253628605	10	\N	test12ghgh@test.in	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11067	t	\N	2017-08-08 17:06:54.192182+00	2017-08-08 17:06:54.192182+00	f
+11019	8gh989	1576995223899209918	8gh989-1502212502015	1576995239493632191	1576995256153407680	\N	1576995269852004545	1576995286880878786	10	\N	test1gh2ghgh@test.in	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11068	t	\N	2017-08-08 17:15:09.938847+00	2017-08-08 17:15:09.938847+00	f
+11020	8g97777	1577001311075827911	8g97777-1502213227653	1577001319028228296	1577001330008916169	\N	1577001343179030730	1577001355954880715	10	\N	test1gh9090h@test.in	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11069	t	\N	2017-08-08 17:27:13.218471+00	2017-08-08 17:27:13.218471+00	f
+11021	Needle Nitz	1577023749067112652	needle-nitz-1502215902544	1577023762455331021	1577023773746397390	\N	1577023783150026959	1577023794357207248	10	\N	needle@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11070	t	\N	2017-08-08 18:11:48.090017+00	2017-08-08 18:11:48.090017+00	f
+11022	Sunshine & Lolipops	1577026015106957525	sunshine-lolipops-1502216172608	1577026024745468118	1577026034224595159	\N	1577026043225571544	1577026057662365913	10	\N	stevejones@stevejone.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11072	t	\N	2017-08-08 18:16:17.896305+00	2017-08-08 18:16:17.896305+00	f
+11006	Pacos Tacos	1556217747979894867	pacos-tacos-1499735633862	1556217754606895189	1556217761410056279	\N	1556217769018523736	1556217779328122969	10	\N	pacos@tacos.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	1	\N	\N	\N	\N	11024	t	\N	2017-07-11 01:13:57.822209+00	2017-07-11 01:13:57.822209+00	f
+11003	Thaitanic Express	1555982182294487949	thaitanic-express-1499707552245	1555982188913099662	1555982195976307599	\N	1555982202787857296	1555982212535419793	10	\N	streetfoodez@sumup.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Brazil	1	\N	\N	\N	\N	11021	t	\N	2017-07-10 17:25:56.073485+00	2017-07-10 17:25:56.073485+00	f
+11012	Churro Factory	1576772440372019337	churro-factory-1502185944143	1576772450203467914	1576772458717905035	\N	1576772467324616844	1576772478187864205	10	\N	Churros@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11055	t	\N	2017-08-08 09:52:28.872241+00	2017-08-08 09:52:28.872241+00	t
+11023	Sabor Brasil	1577754770888720703	sabor-brasil-1502303047091	1577754782104289600	1577754791071711553	\N	1577754799435153730	1577754810860437827	10	Simplicidade ótimo e saboroso!	streetfoodez@sumup.com	\N	www.facebook.com/saborbr	\N	\N	https://commercecdn.com/1544371371390271966/71f10792-dfe8-4590-935b-5285351f1a3d.jpeg	https://commercecdn.com/1544371371390271966/3a045230-9a34-4647-88d5-1bde6d6594c8.jpeg	11:00 AM-8:00 PM	\N	Rua	\N	\N	\N	1	1554615357396746864	Margherita, Portuguesa	\N	3.88	11078	t	\N	2017-08-09 18:24:12.062541+00	2017-08-09 18:24:12.062541+00	f
+11025	Cuban Rush	1578425066796876386	cuban-rush-1502382952573	1578425075915293283	1578425086895981156	\N	1578425096853258853	1578425108689584742	10	Lenny's secret cuban recipe!	streetfoodez@sumup.com	555-7878	www.facebook.com/cubanrush	\N	\N	https://commercecdn.com/1278235777548943678/fe7ae581-d6a9-4d14-86a3-aef5e12e989e.jpeg	https://commercecdn.com/1278235777548943678/ddb53e6f-62aa-4a47-bfef-b912f1fd93a6.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Cuban dr	\N	\N	\N	1	\N	\N	\N	\N	11084	t	\N	2017-08-10 16:35:57.779637+00	2017-08-10 16:35:57.779637+00	t
+11026	Cuban Reuben	1578432247311106666	cuban-reuben-1502383808591	1578432257184498283	1578432270295892588	1578442915129066101	1578432282165772909	1578432293557502574	8	Chef Manny que serve comida tradicional cubana a um preço fantástico!!!  Ele pode até surpreendê-lo com suas canções !!	streetfoodez@sumup.com	(84) 99781-7878	www.facebook.com/cubanreuben	\N	\N	https://commercecdn.com/1278235777548943678/fe7ae581-d6a9-4d14-86a3-aef5e12e989e.jpeg	https://commercecdn.com/1278235777548943678/ddb53e6f-62aa-4a47-bfef-b912f1fd93a6.jpeg	5:00 PM-10:00 PM	2,3,4,5,6	Rua da Cubano 123	\N	\N	\N	1	\N	Pastrami, queijo suíço, carne de porco, carne, frango, sanduíche	\N	4.75	11086	t	\N	2017-08-10 16:50:14.278605+00	2017-08-10 16:50:14.278605+00	f
+11011	Crazy Jack's	1573904234334650985	crazy-jack-s-1501844027350	1573904242479989354	1573904250591773291	1578304433983324701	1573904259190096492	1573904273165517421	10	A little Texan flavor with "Crazy Jack" as the head chef!	streetfoodez@sumup.com	999-3333	www.facebook.com/crazyjacks	\N	\N	https://commercecdn.com/1544371371390271966/42db8c7f-b722-4c10-83cf-7383dd1a95b0.jpeg	https://commercecdn.com/1544371371390271966/ef38d6a5-05fa-4da9-86cf-97add60b6cc0.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Crazy lane	\N	\N	\N	1	\N	Subs, Deli Sandwiches	\N	4.38	11037	t	\N	2017-08-04 10:53:52.33254+00	2017-08-04 10:53:52.33254+00	f
+11027	Mexican Delight	1578513868223677067	mexican-delight-1502393538514	1578513876318683788	1578513884799566477	\N	1578513894924616334	1578513905813029519	10	\N	juan@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11091	t	\N	2017-08-10 19:32:23.250482+00	2017-08-10 19:32:23.250482+00	f
+11024	Churro Nation	1578403451426046543	churro-nation-1502380375818	1578403459906929232	1578403469352501841	1578455154066195062	1578403478856794706	1578403490726675027	10	Deep-fried pastries and bites coated with sugar, cinnamon, sprinkles, jam, chocolate, etc.	streetfoodez@sumup.com	1-800-Churro	www.Facebook.com/ChurroNation	\N	\N	https://commercecdn.com/1544371371390271966/edf1474c-d3e0-412e-846b-8ca70eb161f8.jpeg	https://commercecdn.com/1544371371390271966/9b012823-2e08-48a0-a98f-749049af1768.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Churro Lane	\N	\N	\N	1	\N	Pastries, Donuts, Churros	\N	3.50	11081	t	2012	2017-08-10 15:53:00.842868+00	2017-08-10 15:53:00.842868+00	f
+11028	Daniel	1579074204068741951	daniel-1502460335756	1579074212851614528	1579074222129414977	\N	1579074231038116674	1579074242379514691	10	\N	daniel.berezin@sumup.com	\N	\N	\N	\N	\N	\N	2:00 PM-8:00 PM	0,1,2,3,4,5	\N	\N	\N	\N	1	1554615357396746864	pizzas	\N	\N	11093	t	\N	2017-08-11 14:05:40.549803+00	2017-08-11 14:05:40.549803+00	f
+\.
+
+
+--
+-- Data for Name: territories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY territories (id, city, territory, state, country, country_id, timezone, latitude, longitude, created_at, updated_at, is_deleted) FROM stdin;
+1	Natal	 Natal-RN	RN	Brazil	1	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00	f
+2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	1	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00	f
+3	Ponta Negra	 Ponta Negra-RN	RN	Brazil	1	Buenos Aires	-6.22899400000000014	-35.0487759999999966	2016-09-06 23:00:00+00	2017-03-04 19:56:28.353788+00	f
+4	recife	Recife	Pernambuco	Brazil	1	\N	8.02999999999999936	34.5200000000000031	2017-08-08 09:55:45.338176+00	2017-08-08 10:00:36.268152+00	f
+5	\N	Austin	Texas	US	2	\N	30.2699309999999997	-97.8168579999999963	2017-08-11 17:55:50.957136+00	2017-08-11 17:57:26.397083+00	f
+\.
+
+
+--
+-- Data for Name: food_parks; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY food_parks (id, name, photo, territory_id, city, state, postal_code, country, latitude, longitude, created_at, updated_at, is_deleted) FROM stdin;
+3004	Truck Garden Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.87437400000000043	-35.1786949999999976	2016-08-21 23:03:07.177813+00	2017-03-22 02:30:49.056127+00	f
+3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.86576900000000023	-35.1858780000000024	2016-08-21 23:05:04.914807+00	2017-03-22 02:30:49.056127+00	f
+3006	Natal Shopping Food Park - Av. das Brancas Dunas	\N	1	Natal	RN	\N	BR	-5.84256300000000017	-35.2106240000000028	2016-08-21 23:12:10.112015+00	2017-03-22 02:30:49.056127+00	f
+3007	Bar 54 Food Park - Rua Porto Mirim	\N	1	Natal	RN	\N	BR	-5.87467399999999973	-35.1835140000000024	2016-08-29 20:54:42.540882+00	2017-03-22 02:30:49.056127+00	f
+3008	Bar Trove Food Park - Rua Presidente José Bento	\N	1	Natal	RN	\N	BR	-5.80574800000000035	-35.2147050000000021	2016-08-30 21:12:08.717913+00	2017-03-22 02:30:49.056127+00	f
+30019	Ponta Negra Beach Boardwalk	\N	3	\N	\N	\N	\N	-5.87119999999999997	-35.1799999999999997	2017-04-08 16:01:23.846383+00	2017-04-08 16:03:08.092697+00	f
+30020	Big 5 Sports Bar Food Park	\N	3	\N	\N	\N	\N	-5.66999999999999993	-36.2100000000000009	2017-04-09 02:27:13.714836+00	2017-04-09 02:27:13.714836+00	f
+30021	Midway Food Park	\N	5	\N	\N	\N	\N	30.2699309999999997	-97.8168579999999963	2017-08-11 18:10:18.80487+00	2017-08-11 18:10:18.80487+00	f
+\.
+
+
+
+--
+-- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: postgres
+--
 
 COPY units (id, name, number, type, customer_order_window, prep_notice, delivery, delivery_time_offset, delivery_chg_amount, delivery_radius, description, username, password, qr_code, phone, apns_id, fcm_id, gcm_id, device_type, unit_order_sys_id, territory_id, company_id, unit_mgr_id, created_at, updated_at, currency_id, currency, payment, is_deleted) FROM stdin;
-2007	Frank Truck #2	2	TRUCK	30	30	f	15	8	10	\N	franktruck2	frank	\N	\N	\N	\N	\N	\N	\N	1	11004	11047	2017-08-06 16:00:04.541953+00	2017-08-06 16:00:04.541953+00	1554610428930163616	BRL	SumUp	f
-2002	Classy Cuban Truck #1	1	TRUCK	30	30	f	15	8	10	\N	mannytruck1	manny	\N	\N	\N	\N	\N	\N	\N	3	11002	11027	2017-08-01 14:31:09.127709+00	2017-08-01 14:31:09.127709+00	1554610428930163616	BRL	SumUp	f
-2001	Frank Truck #1	1	TRUCK	30	30	t	15	9	10	\N	franktruck1	frank	\N	\N	\N	fvzwzbCIC54:APA91bEkzTphSti6bbmUGHlXmMEdnrQxgfXkrH6wA5LTFlh5KiOrHT9Xi1vP0HbfnqbNX_HWn3w0MszbA3ALIarE4AMvKvYZJHsWTSRZGCTUdA9l6zvipfruZjTvAKb3k5n9gTr1Vf4e	APA91bH89KlHfiaEpOpc6WfxQP8r21ypl6lGehcrzXSmWN3aO2-RJSZEyk7TfYegwpbI-T9Dw8-bscSZVbMHzYGKbgAtw_p3GCQUv1Bcwr6nhqaDjK6b6E8Af-xJSmAKOfCRLN0d1dr6	\N	\N	3	11004	11026	2017-08-01 14:19:26.554974+00	2017-08-06 16:18:53.1411+00	1554610428930163616	BRL	SumUp	f
-2006	Crazy Truck #1	1	CART	30	25	f	15	12	10	\N	jacktruck1	jack	\N	\N	\N	\N	\N	\N	\N	3	11011	11038	2017-08-04 10:53:54.058314+00	2017-08-04 11:03:52.523246+00	1554610428930163616	BRL	SumUp	f
 2003	Pizzaria Brazil Truck #1	1	CART	30	30	f	15	9	15	\N	pizzariabrtruck1	lui123	\N	\N	\N	\N	\N	\N	\N	3	11005	11028	2017-08-01 14:41:29.762757+00	2017-08-01 14:41:29.762757+00	1554610428930163616	BRL	SumUp	f
+2009	Steve Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	stevejonestruck1	smiley66	\N	\N	\N	\N	\N	\N	\N	1	11022	11073	2017-08-08 18:16:19.388213+00	2017-08-08 18:20:38.968784+00	1554610428930163616	BRL	SumUp	f
+2008	Needle Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	needletruck1	needle	\N	\N	\N	\N	\N	\N	\N	1	11021	11071	2017-08-08 18:11:49.887752+00	2017-08-08 18:24:37.670755+00	1554610428930163616	BRL	SumUp	f
+2007	Frank Truck #2	2	TRUCK	30	20	f	15	6	10	\N	franktruck2	frank	\N	\N	\N	\N	\N	\N	\N	1	11004	11047	2017-08-06 16:00:04.541953+00	2017-08-11 13:48:34.253471+00	1554610428930163616	BRL	SumUp	f
+2017	Daniel Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	daniel.berezintruck1	tgp6v2TEiBdA	\N	\N	\N	\N	\N	\N	\N	1	11028	11094	2017-08-11 14:05:42.263381+00	2017-08-11 14:05:42.263381+00	1554610428930163616	BRL	SumUp	f
+2001	Frank Truck #1	1	TRUCK	20	30	t	15	8	10	\N	franktruck1	frank	\N	\N	\N	c7Qt8LWLAFc:APA91bEcL_YE7kBMy4R4mZlxiIpAXmhH-6XcCr2Djn7nig7aKUN8DD4QmDv7v5lqXRJicyKkAPkvfoIQwdQP2sxt2NZL6oefY-25mISJ_4HCN1OmKAGA9j0-lm7zmmZ6bH-NNWUL0pNJ	APA91bFePwA6h5oTfdc8koHU1wYJh-0_TID-aOOnr8KTX8TAgRdPEVzTcgfuD5fyKynSGJkVHT3Xsjxr0dd23o_VVzhruMIz_tKZevi84RK3KWXMPyfgczgSs3FQ7q0hdn9IKoUmO7Tg	\N	\N	3	11004	11026	2017-08-01 14:19:26.554974+00	2017-08-11 18:24:00.232787+00	1554610428930163616	BRL	SumUp	f
+2015	Cuban Truck #1	1	TRUCK	30	30	f	20	8	10	\N	Mannytruck22	manny	\N	\N	\N	\N	APA91bHgA9Uwssy1LcfnDX_Ci-s3C4rXy_kEyayZdlh29hcil4-XS9lQeqHBMRLBzuyeb3FfbX70XlKj1k-uhIh73lVDtY4u41wT5Ax9mnZ1HDWAK74LZya47HPuYQN0nz726Wq1-mpa	\N	\N	3	11026	11087	2017-08-10 16:54:59.909123+00	2017-08-11 15:40:31.199618+00	1554610428930163616	BRL	SumUp	f
+2002	Classy Cuban Truck #1	1	TRUCK	30	30	f	15	8	10	\N	mannytruck1	manny	\N	\N	\N	\N	\N	\N	\N	3	11002	11027	2017-08-01 14:31:09.127709+00	2017-08-10 12:16:07.845003+00	1554610428930163616	BRL	SumUp	f
+2016	Pacos Truck #1	1	RESTAURANT	30	30	f	\N	\N	\N	\N	tacostruck1	tacos	\N	\N	\N	\N	\N	\N	\N	3	11006	11089	2017-08-10 17:50:04.824261+00	2017-08-10 17:51:23.34532+00	1554610428930163616	BRL	SumUp	f
+2011	Crazy Truck #2	2	TRUCK	30	30	f	20	6	10	\N	jacktruck2	jack	\N	\N	\N	\N	\N	\N	\N	1	11011	11080	2017-08-10 15:06:48.935831+00	2017-08-10 15:06:48.935831+00	1554610428930163616	BRL	SumUp	f
+2010	Sabor Truck #1	1	TRUCK	30	30	t	15	8	10	\N	luiztruck1	lui123	\N	\N	\N	\N	APA91bFePwA6h5oTfdc8koHU1wYJh-0_TID-aOOnr8KTX8TAgRdPEVzTcgfuD5fyKynSGJkVHT3Xsjxr0dd23o_VVzhruMIz_tKZevi84RK3KWXMPyfgczgSs3FQ7q0hdn9IKoUmO7Tg	\N	\N	3	11023	11079	2017-08-09 18:32:43.321274+00	2017-08-11 16:10:52.037876+00	1554610428930163616	BRL	SumUp	f
+2014	Lenny Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	lennytruck1	lenny	\N	\N	\N	\N	\N	\N	\N	1	11025	11085	2017-08-10 16:35:59.679267+00	2017-08-10 16:39:43.043701+00	1554610428930163616	BRL	SumUp	f
+2006	Crazy Truck #1	1	CART	30	25	t	15	12	10	\N	jacktruck1	jack	\N	\N	\N	\N	APA91bHgA9Uwssy1LcfnDX_Ci-s3C4rXy_kEyayZdlh29hcil4-XS9lQeqHBMRLBzuyeb3FfbX70XlKj1k-uhIh73lVDtY4u41wT5Ax9mnZ1HDWAK74LZya47HPuYQN0nz726Wq1-mpa	\N	\N	3	11011	11038	2017-08-04 10:53:54.058314+00	2017-08-11 05:50:40.228115+00	1554610428930163616	BRL	SumUp	f
+2013	Fogo Truck #1	1	TRUCK	30	30	f	\N	\N	\N	\N	fogotruck1	fogo	\N	\N	\N	\N	APA91bHgA9Uwssy1LcfnDX_Ci-s3C4rXy_kEyayZdlh29hcil4-XS9lQeqHBMRLBzuyeb3FfbX70XlKj1k-uhIh73lVDtY4u41wT5Ax9mnZ1HDWAK74LZya47HPuYQN0nz726Wq1-mpa	\N	\N	3	11003	11083	2017-08-10 16:17:00.41019+00	2017-08-11 05:52:04.558902+00	1554610428930163616	BRL	SumUp	f
+2012	Churro Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	churrotruck1	churro	\N	\N	\N	\N	APA91bHgA9Uwssy1LcfnDX_Ci-s3C4rXy_kEyayZdlh29hcil4-XS9lQeqHBMRLBzuyeb3FfbX70XlKj1k-uhIh73lVDtY4u41wT5Ax9mnZ1HDWAK74LZya47HPuYQN0nz726Wq1-mpa	\N	\N	3	11024	11082	2017-08-10 15:53:02.471433+00	2017-08-11 05:56:46.230093+00	1554610428930163616	BRL	SumUp	f
+2018	Frank Truck #3	4	TRUCK	30	30	f	15	6	10	\N	franktruck3	frank	\N	\N	\N	\N	APA91bFePwA6h5oTfdc8koHU1wYJh-0_TID-aOOnr8KTX8TAgRdPEVzTcgfuD5fyKynSGJkVHT3Xsjxr0dd23o_VVzhruMIz_tKZevi84RK3KWXMPyfgczgSs3FQ7q0hdn9IKoUmO7Tg	\N	\N	5	11004	11096	2017-08-11 18:00:15.726322+00	2017-08-11 18:25:31.280105+00	1554610428930163616	USD	SumUp	f
 \.
-SELECT pg_catalog.setval('units_id_seq', 2007, true);
+
+
+--
+-- Data for Name: checkin_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY checkin_history (id, unit_name, unit_id, company_name, company_id, user_id, service_cancellation_time, check_in, check_out, latitude, longitude, food_park_name, food_park_id, note, display_address, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: checkin_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('checkin_history_id_seq', 1, false);
+
+
+--
+-- Data for Name: checkins; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY checkins (id, check_in, check_out, latitude, longitude, display_address, food_park_name, note, food_park_id, unit_id, company_id, created_at, updated_at) FROM stdin;
+1	2017-08-10 14:03:27+00	2017-08-10 18:25:27+00	-5.87119999999999997	-35.1799999999999997	\N	Ponta Negra Beach Boardwalk	\N	30019	2001	11004	2017-08-10 14:03:28.491493+00	2017-08-10 14:03:28.491493+00
+2	2017-08-10 17:18:43+00	2017-08-11 02:55:41+00	-5.87437400000000043	-35.1786949999999976	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2015	11026	2017-08-10 17:18:41.506753+00	2017-08-10 17:18:41.506753+00
+3	2017-08-10 17:19:35+00	2017-08-11 02:10:33+00	-5.87437400000000043	-35.1786949999999976	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2006	11011	2017-08-10 17:19:33.432467+00	2017-08-10 17:19:33.432467+00
+5	2017-08-10 17:29:32+00	2017-08-11 02:20:31+00	-5.86576900000000023	-35.1858780000000024	\N	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3005	2012	11024	2017-08-10 17:29:30.719787+00	2017-08-10 17:29:30.719787+00
+4	2017-08-10 17:20:28+00	2017-08-10 17:36:49+00	-5.86576900000000023	-35.1858780000000024	\N	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3005	2013	11003	2017-08-10 17:20:26.602186+00	2017-08-10 17:36:47.896416+00
+6	2017-08-10 17:51:12.55+00	2017-08-11 02:50:00+00	-5.66999999999999993	-36.2100000000000009	\N	Big 5 Sports Bar Food Park	\N	\N	2016	11006	2017-08-10 17:51:12.731901+00	2017-08-10 17:51:12.731901+00
+7	2017-08-10 17:58:48+00	2017-08-11 01:10:46+00	-5.87437400000000043	-35.1786949999999976	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2010	11023	2017-08-10 17:58:46.284806+00	2017-08-10 17:58:46.284806+00
+8	2017-08-10 19:50:19+00	2017-08-11 02:00:17+00	-5.87437400000000043	-35.1786949999999976	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2001	11004	2017-08-10 19:50:17.275066+00	2017-08-10 19:50:17.275066+00
+9	2017-08-11 02:40:33+00	2017-08-11 17:40:23+00	-5.87119999999999997	-35.1799999999999997	\N	Ponta Negra Beach Boardwalk	\N	30019	2001	11004	2017-08-11 02:40:34.906378+00	2017-08-11 02:40:34.906378+00
+10	2017-08-11 12:36:49+00	2017-08-12 02:10:48+00	-5.87437400000000043	-35.1786949999999976	\N	Truck Garden Food Park - Av. Roberto Freire	\N	3004	2010	11023	2017-08-11 12:36:48.101385+00	2017-08-11 12:36:48.101385+00
+11	2017-08-11 18:11:37+00	2017-08-12 01:20:35+00	30.2699309999999997	-97.8168579999999963	\N	Midway Food Park	\N	30021	2018	11004	2017-08-11 18:11:35.829627+00	2017-08-11 18:11:35.829627+00
+\.
+
+
+--
+-- Name: checkins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('checkins_id_seq', 11, true);
+
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('companies_id_seq', 11028, true);
+
+
+--
+-- Name: countries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('countries_id_seq', 2, true);
+
+
+--
+-- Data for Name: customers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
 
 COPY customers (id, order_sys_id, description, apns_id, gcm_id, device_type, fcm_id, phone, facebook, twitter, photo, power_reviewer, city, state, country, user_id, created_at, updated_at) FROM stdin;
-1	\N	\N	\N	APA91bFuqouEMsxcVoIrTN5WUAdJCS41WsnjB_Hr4wYSacW6vNvDr67FrVQIDPA-_Kd8v68mc0MRsIfy_SYnHbO2SRHVeu5pSQlMwc6Wz4EAWX3j36fsHxCIVnuszVUNfB1uSbIlOx1n	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11053	2017-08-07 15:58:38.878789+00	2017-08-07 17:43:51.877865+00
-9003	\N	\N	\N	APA91bF1KzWYW2i3JIXuXa7WqTKdyjRIChw5INNssT_O43BmVKp1o00ECVHkl3oTnw-_01cA652Hdzry7VsNEoy0y5XEGrE-mq9RQV0tpR8cz9SkMeCQcc3IlapXj9mw0nLRCODQz8pw	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11030	2017-08-03 20:23:51.216936+00	2017-08-05 15:55:06.013986+00
-9004	\N	\N	\N	APA91bH89KlHfiaEpOpc6WfxQP8r21ypl6lGehcrzXSmWN3aO2-RJSZEyk7TfYegwpbI-T9Dw8-bscSZVbMHzYGKbgAtw_p3GCQUv1Bcwr6nhqaDjK6b6E8Af-xJSmAKOfCRLN0d1dr6	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11031	2017-08-03 20:31:33.177725+00	2017-08-06 16:19:45.948001+00
+1	\N	\N	\N	APA91bFuqouEMsxcVoIrTN5WUAdJCS41WsnjB_Hr4wYSacW6vNvDr67FrVQIDPA-_Kd8v68mc0MRsIfy_SYnHbO2SRHVeu5pSQlMwc6Wz4EAWX3j36fsHxCIVnuszVUNfB1uSbIlOx1n	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11053	2017-08-07 15:58:38.878789+00	2017-08-07 22:19:04.106205+00
+9005	\N	\N	\N	APA91bHgA9Uwssy1LcfnDX_Ci-s3C4rXy_kEyayZdlh29hcil4-XS9lQeqHBMRLBzuyeb3FfbX70XlKj1k-uhIh73lVDtY4u41wT5Ax9mnZ1HDWAK74LZya47HPuYQN0nz726Wq1-mpa	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11090	2017-08-10 19:29:03.427949+00	2017-08-10 19:30:35.576042+00
+9004	\N	\N	\N	APA91bHvLSOnjj2AqHHIsXo8iAHvt2pdhTZDwkKTzdbFKq2Eu-Md8yj0Q9VkW_OH93GYy6ZPuHvM9uUsQ5N3sIk9-IC3MQrFw5n5ohRLHvLdc_SE3yigoy0nhX3ord0mOSGO7TcelE3x	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11031	2017-08-03 20:31:33.177725+00	2017-08-11 12:37:51.452474+00
+9003	\N	\N	\N	APA91bFePwA6h5oTfdc8koHU1wYJh-0_TID-aOOnr8KTX8TAgRdPEVzTcgfuD5fyKynSGJkVHT3Xsjxr0dd23o_VVzhruMIz_tKZevi84RK3KWXMPyfgczgSs3FQ7q0hdn9IKoUmO7Tg	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11030	2017-08-03 20:23:51.216936+00	2017-08-11 16:06:20.911033+00
+9006	\N	\N	\N	APA91bFePwA6h5oTfdc8koHU1wYJh-0_TID-aOOnr8KTX8TAgRdPEVzTcgfuD5fyKynSGJkVHT3Xsjxr0dd23o_VVzhruMIz_tKZevi84RK3KWXMPyfgczgSs3FQ7q0hdn9IKoUmO7Tg	\N	\N	\N	\N	\N	\N	f	\N	\N	\N	11095	2017-08-11 16:29:02.093733+00	2017-08-11 22:06:47.525745+00
 \.
-SELECT pg_catalog.setval('customers_id_seq', 9004, true);
+
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('customers_id_seq', 9006, true);
+
+
+--
+-- Data for Name: delivery_addresses; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY delivery_addresses (id, nickname, address1, address2, city, state, phone, customer_id, created_at, updated_at) FROM stdin;
+1	Nordestao	Av. Engenheiro Roberto Freire, 2895	null	Natal	RN	Sally / 444-3636	9003	2017-08-10 22:54:55.61693+00	2017-08-10 22:54:55.61693+00
+2	Camarões	Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000	\N	Natal	RN	Bob / 555-9988	9003	2017-08-10 23:07:32.782241+00	2017-08-10 23:07:32.782241+00
+3	Home	Av. Engenheiro Roberto Freire, 2160	140	Ponta Negra Natal-RN	\N	Marcy / 444-8882	9006	2017-08-11 16:34:26.010012+00	2017-08-11 16:34:26.010012+00
+\.
+
+
+--
+-- Name: delivery_addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('delivery_addresses_id_seq', 3, true);
+
+
+--
+-- Data for Name: drivers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
 
 COPY drivers (id, name, phone, available, unit_id, company_id, created_at, updated_at, user_id) FROM stdin;
-1	Candy	999-5554	t	2001	11004	2017-08-07 12:35:43.314803+00	2017-08-07 12:35:50.336233+00	11048
-2	Larry Lemon	333-8888	t	2001	11004	2017-08-07 12:44:11.486304+00	2017-08-07 12:57:50.73713+00	11049
+18	Bill	444-7777	t	2001	11004	2017-08-08 18:26:49.135928+00	2017-08-08 18:28:29.819965+00	11056
+21	Candy	999-5554	t	2001	11004	2017-08-08 18:29:28.449091+00	2017-08-08 18:29:31.497155+00	11048
+22	Dennis N	9996-59632	f	2001	11004	2017-08-08 18:30:42.960913+00	2017-08-08 18:31:18.348946+00	11077
+19	vk1	356345345	f	2001	11004	2017-08-08 18:26:59.320624+00	2017-08-08 18:31:19.312075+00	11059
+23	Lou Jones	444-9998	t	2006	11011	2017-08-10 17:43:13.732005+00	2017-08-10 17:43:37.304932+00	11088
+25	steve galaxy	555-6666	t	2001	11004	2017-08-10 19:37:54.772887+00	2017-08-10 19:38:01.547948+00	11092
+26	steve galaxy	555-6666	t	2010	11023	2017-08-10 23:14:36.840613+00	2017-08-10 23:14:42.157576+00	11092
+27	Bill	444-7777	t	2010	11023	2017-08-10 23:16:25.859667+00	2017-08-10 23:16:32.87343+00	11056
+28	Mad Max	1234567890	f	2018	11004	2017-08-11 20:02:57.28492+00	2017-08-11 20:02:57.28492+00	11097
 \.
-SELECT pg_catalog.setval('drivers_id_seq', 2, true);
+
+
+--
+-- Name: drivers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('drivers_id_seq', 28, true);
+
+
+--
+-- Data for Name: favorites; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY favorites (customer_id, unit_id, company_id, created_at) FROM stdin;
+\.
+
+
+--
+-- Name: food_parks_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('food_parks_id_seq', 30021, true);
+
+
+--
+-- Data for Name: gen_state; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY gen_state (id, order_sys_order_id, step_name, step_status, api_call, param_string, error_info, info) FROM stdin;
+\.
+
+
+--
+-- Name: gen_state_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('gen_state_id_seq', 1, false);
+
+
+--
+-- Data for Name: locations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY locations (id, name, type, main_loc_text, secondary_loc_text, regex_seed, hitcount, territory_id, latitude, longitude, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: locations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('locations_id_seq', 1, false);
+
+
+--
+-- Data for Name: loyalty; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY loyalty (id, balance, customer_id, company_id, eligible_five, eligible_ten, eligible_fifteen, created_at, updated_at) FROM stdin;
+3	1	9004	11023	f	f	f	2017-08-11 12:41:02.809494+00	2017-08-11 12:41:02.809494+00
+1	4	9003	11023	f	f	f	2017-08-10 23:02:33.174485+00	2017-08-11 13:19:49.990628+00
+2	4	9003	11004	f	f	f	2017-08-11 04:04:15.965166+00	2017-08-11 16:17:03.090738+00
+4	3	9004	11004	f	f	f	2017-08-11 15:21:22.758342+00	2017-08-11 16:17:08.927445+00
+5	1	9006	11004	f	f	f	2017-08-11 16:35:59.968114+00	2017-08-11 16:35:59.968114+00
+\.
+
+
+--
+-- Name: loyalty_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('loyalty_id_seq', 5, true);
+
+
+--
+-- Data for Name: loyalty_rewards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY loyalty_rewards (id, company_id, gold_reward_item, silver_reward_item, bronze_reward_item, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: loyalty_rewards_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('loyalty_rewards_id_seq', 1, false);
+
+
+--
+-- Data for Name: loyalty_used; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY loyalty_used (id, amount_redeemed, customer_id, company_id, created_at) FROM stdin;
+\.
+
+
+--
+-- Name: loyalty_used_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('loyalty_used_id_seq', 1, false);
+
+
+--
+-- Data for Name: order_history; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY order_history (id, order_sys_order_id, amount, initiation_time, payment_time, actual_pickup_time, desired_pickup_time, prep_notice_time, status, messages, qr_code, manual_pickup, for_delivery, desired_delivery_time, delivery_address_id, delivery_address_details, driver_id, contact, order_detail, checkin_id, customer_name, customer_id, unit_id, company_name, company_id, created_at, updated_at) FROM stdin;
+2	1578497679862792832	R$24.00	\N	\N	\N	2017-08-08 12:55:00+00	\N	{"order_accepted": "2017-08-10T19:00:57.317Z", "order_delivered": "2017-08-11T01:04:21.503Z", "order_requested": "2017-08-10T19:00:31.699Z"}	\N	\N	t	f	\N	\N	\N	\N	\N	{"1578497682094162561": {"title": "Margherita pizza", "options": [], "quantity": 2, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-10 19:00:29.184328+00	2017-08-11 01:17:55.896973+00
+12	1579030764761121576	R$43.00	\N	\N	\N	2017-08-11 13:35:00+00	\N	{"order_paid": "2017-08-11T12:41:02.806Z", "order_ready": "2017-08-11T16:12:24.895Z", "order_accepted": "2017-08-11T12:40:54.949Z", "order_requested": "2017-08-11T12:39:25.423Z"}	\N	1502455264516	f	f	\N	\N	\N	\N	\N	{"1579030767051211561": {"title": "Hot Wings", "options": [], "quantity": 2, "selections": {}}, "1579030768695378730": {"title": "Margherita pizza", "options": ["Ovos", "Bacon"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2010	Sabor Brasil	11023	2017-08-11 12:39:22.513504+00	2017-08-11 16:12:24.78013+00
+6	1578691732231422726	R$36.00	\N	\N	\N	2017-08-11 15:34:34+00	\N	{"order_declined": "2017-08-11T16:11:19.011Z", "order_requested": "2017-08-11T01:46:29.867Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1578691735142269703": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:46:27.302424+00	2017-08-11 16:11:18.903971+00
+3	1578608148703347443	R$24.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_accepted": "2017-08-10T22:59:31.931Z", "order_requested": "2017-08-10T22:57:43.628Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	1	{"city": "Natal", "phone": "Sally / 444-3636", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2895", "address2": "null", "nickname": "Nordestao"}	\N	\N	{"1578608152008458996": {"title": "Margherita pizza", "options": [], "quantity": 2, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-10 22:57:41.321595+00	2017-08-10 22:59:31.837335+00
+4	1578622654200414965	R$36.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_paid": "2017-08-10T23:12:25.164Z", "order_accepted": "2017-08-10T23:11:45.493Z", "order_requested": "2017-08-10T23:10:21.237Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	26	\N	{"1578622656607945462": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-10 23:10:18.83125+00	2017-08-10 23:18:14.63106+00
+5	1578691732231422726	R$36.00	\N	\N	\N	2017-08-08 12:55:00+00	\N	{"order_declined": "2017-08-11T16:11:31.137Z", "order_requested": "2017-08-11T01:26:43.589Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1578691735142269703": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:26:41.034505+00	2017-08-11 16:11:31.027458+00
+10	1578750383742780187	R$9.00	\N	\N	\N	2017-08-11 12:20:00+00	\N	{"order_paid": "2017-08-11T04:04:15.961Z", "order_ready": "2017-08-11T16:16:07.998Z", "order_accepted": "2017-08-11T03:29:20.398Z", "order_requested": "2017-08-11T03:28:43.232Z"}	\N	1502424255727	f	f	\N	\N	\N	\N	\N	{"1578750385814766364": {"title": "Bacon and Eggs Whole Grain", "options": [], "quantity": 1, "selections": {"Bread": "Whole Grain"}}}	\N	Sally J	9003	2001	Frank's BBQ	11004	2017-08-11 03:28:40.646625+00	2017-08-11 16:16:07.933491+00
+9	1578706301968450322	R$36.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_paid": "2017-08-11T12:42:28.225Z", "order_ready": "2017-08-11T13:21:20.922Z", "order_cooking": "2017-08-11T13:21:17.400Z", "order_accepted": "2017-08-11T12:42:20.002Z", "order_requested": "2017-08-11T01:55:24.301Z"}	\N	1502455348891	f	t	2017-08-11 15:34:34+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	\N	\N	{"1578706304032047891": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:55:21.677246+00	2017-08-11 13:21:20.818698+00
+1	1578478935082009214	R$12.00	\N	\N	\N	2017-08-08 12:55:00+00	\N	{"order_paid": "2017-08-10T23:02:33.168Z", "order_cooking": "2017-08-10T23:04:27.703Z", "order_accepted": "2017-08-10T18:56:19.190Z", "order_requested": "2017-08-10T18:54:24.687Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	2	\N	27	\N	{"1578478941599957631": {"title": "Margherita pizza", "options": [], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-10 18:54:21.937281+00	2017-08-11 12:42:47.856246+00
+13	1579049801591292715	R$34.00	\N	\N	\N	2017-08-11 14:15:00+00	\N	{"order_paid": "2017-08-11T13:19:50.112Z", "order_accepted": "2017-08-11T13:19:42.563Z", "order_requested": "2017-08-11T13:17:12.582Z"}	\N	1502457591779	f	t	2017-08-11 14:30:00+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	27	\N	{"1579049803772330796": {"title": "Hot Wings", "options": [], "quantity": 2, "selections": {}}, "1579049805458441005": {"title": "Delivery Charge", "options": [], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 13:17:09.86498+00	2017-08-11 13:21:14.018471+00
+11	1579010841649349409	R$20.00	\N	\N	\N	2017-08-11 12:45:00+00	\N	{"order_paid": "2017-08-11T12:03:03.508Z", "order_ready": "2017-08-11T13:00:26.699Z", "order_accepted": "2017-08-11T12:02:54.870Z", "order_requested": "2017-08-11T12:00:50.128Z"}	\N	1502452984471	f	f	\N	\N	\N	\N	\N	{"1579010846556685090": {"title": "Bacon and Eggs Whole Grain", "options": [], "quantity": 1, "selections": {"Bread": "Whole Grain"}}, "1579010848418956067": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2001	Frank's BBQ	11004	2017-08-11 12:00:46.804713+00	2017-08-11 13:00:26.613469+00
+7	1578702811720319758	R$36.00	\N	\N	\N	2017-08-11 15:34:34+00	\N	{"order_declined": "2017-08-11T16:11:08.253Z", "order_requested": "2017-08-11T01:48:10.923Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1578702814933156623": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:48:08.557446+00	2017-08-11 16:11:08.145749+00
+8	1578703986209325840	R$36.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_accepted": "2017-08-11T13:45:11.325Z", "order_requested": "2017-08-11T01:50:56.585Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	\N	\N	{"1578703988516193041": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:50:54.061341+00	2017-08-11 13:45:11.232434+00
+14	1579056869228413855	R$24.00	\N	\N	\N	2017-08-11 22:40:00+00	\N	{"order_paid": "2017-08-11T16:17:03.428Z", "order_accepted": "2017-08-11T16:16:48.820Z", "order_requested": "2017-08-11T13:31:46.319Z"}	\N	1502468224837	f	f	\N	\N	\N	\N	\N	{"1579056871283622816": {"title": "Bacon and Eggs Whole Grain item", "options": [], "quantity": 1, "selections": {"Bread": "Whole Grain", "Topping": "item"}}}	\N	Sally J	9003	2001	Frank's BBQ	11004	2017-08-11 13:31:43.694641+00	2017-08-11 16:17:03.090738+00
+16	1579090131225150397	R$11.00	\N	\N	\N	2017-08-11 23:30:00+00	\N	{"order_requested": "2017-08-11T14:37:49.323Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579090133297136574": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 14:37:46.825062+00	2017-08-11 14:37:46.825062+00
+20	1579106715041792965	R$11.00	\N	\N	\N	2017-08-12 00:10:00+00	\N	{"pay_fail": "2017-08-11T15:10:52.581Z", "order_paid": "2017-08-11T15:21:22.754Z", "order_accepted": "2017-08-11T15:10:46.051Z", "order_requested": "2017-08-11T15:10:34.626Z"}	\N	1502464884088	f	f	\N	\N	\N	\N	\N	{"1579106717239608262": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:10:32.11572+00	2017-08-11 15:21:24.244348+00
+17	1579092687871542207	R$11.00	\N	\N	\N	2017-08-12 00:00:00+00	\N	{"order_accepted": "2017-08-11T14:43:42.049Z", "order_requested": "2017-08-11T14:42:44.327Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579092690438456256": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 14:42:41.90514+00	2017-08-11 14:43:41.975201+00
+21	1579112483971400647	R$11.00	\N	\N	\N	2017-08-12 00:15:00+00	\N	{"order_requested": "2017-08-11T15:22:00.644Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579112486026609608": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:21:58.285039+00	2017-08-11 15:21:58.285039+00
+18	1579101920474170305	R$11.00	\N	\N	\N	2017-08-11 23:50:00+00	\N	{"order_accepted": "2017-08-11T15:02:01.526Z", "order_requested": "2017-08-11T15:01:12.564Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579101922588099522": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:01:08.843854+00	2017-08-11 15:02:01.426597+00
+22	1579113848135222217	R$11.00	\N	\N	\N	2017-08-12 00:15:00+00	\N	{"order_requested": "2017-08-11T15:24:50.558Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579113850173653962": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:24:47.078152+00	2017-08-11 15:24:47.078152+00
+19	1579104471324033987	R$11.00	\N	\N	\N	2017-08-11 23:55:00+00	\N	{"order_accepted": "2017-08-11T15:06:44.759Z", "order_requested": "2017-08-11T15:06:29.171Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579104473421185988": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:06:25.880101+00	2017-08-11 15:06:44.659631+00
+23	1579117576678540235	R$11.00	\N	\N	\N	2017-08-12 00:25:00+00	\N	{"order_paid": "2017-08-11T15:32:46.185Z", "order_accepted": "2017-08-11T15:32:38.985Z", "order_requested": "2017-08-11T15:32:06.034Z"}	\N	1502465572152	f	f	\N	\N	\N	\N	\N	{"1579117578725360588": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:32:03.484012+00	2017-08-11 15:32:52.238666+00
+24	1579119141002937293	R$11.00	\N	\N	\N	2017-08-12 00:25:00+00	\N	{"order_requested": "2017-08-11T15:35:24.582Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1579119143301415886": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 15:35:21.949369+00	2017-08-11 15:35:21.949369+00
+25	1579136335837397856	R$20.00	\N	\N	\N	2017-08-11 16:55:00+00	\N	{"order_paid": "2017-08-11T16:16:59.829Z", "order_accepted": "2017-08-11T16:14:42.162Z", "order_requested": "2017-08-11T16:10:12.906Z"}	\N	1502468092058	f	f	\N	\N	\N	\N	\N	{"1579136338127487841": {"title": "Bacon and Eggs Whole Grain", "options": [], "quantity": 1, "selections": {"Bread": "Whole Grain"}}, "1579136339788432226": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2001	Frank's BBQ	11004	2017-08-11 16:10:09.676032+00	2017-08-11 16:14:50.290164+00
+15	1579088035205612475	R$11.00	\N	\N	\N	2017-08-12 00:00:00+00	\N	{"order_paid": "2017-08-11T16:17:09.222Z", "order_accepted": "2017-08-11T16:17:00.498Z", "order_requested": "2017-08-11T14:35:24.146Z"}	\N	1502468230639	f	f	\N	\N	\N	\N	\N	{"1579088037285987260": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Bob U	9004	2001	Frank's BBQ	11004	2017-08-11 14:35:21.580835+00	2017-08-11 16:17:08.927445+00
+26	1579149190255084387	R$21.00	\N	\N	\N	2017-08-11 17:10:00+00	\N	{"order_paid": "2017-08-11T16:35:59.965Z", "order_cooking": "2017-08-11T16:40:04.135Z", "order_accepted": "2017-08-11T16:35:50.498Z", "order_requested": "2017-08-11T16:34:43.159Z"}	\N	1502469360077	f	t	2017-08-11 17:25:00+00	3	{"city": "Ponta Negra Natal-RN", "phone": "Marcy / 444-8882", "state": null, "address1": "Av. Engenheiro Roberto Freire, 2160", "address2": "140", "nickname": "Home"}	25	\N	{"1579149192503231332": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}, "1579149194399056741": {"title": "Delivery Charge", "options": [], "quantity": 1, "selections": {}}}	\N	marcy b	9006	2001	Frank's BBQ	11004	2017-08-11 16:34:38.76816+00	2017-08-11 16:40:04.039184+00
+\.
+
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('order_history_id_seq', 26, true);
+
+
+--
+-- Data for Name: order_state; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY order_state (id, order_id, order_requested_step, order_accepted_step, order_pay_fail, order_paid_step, order_in_queue_step, order_cooking_step, order_ready_step, order_dispatched_step, order_picked_up_step, order_no_show_step, order_delivered_step, apicall, paramstring, errorinfo, callinfo) FROM stdin;
+\.
+
+
+--
+-- Name: order_state_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('order_state_id_seq', 1, false);
+
+
+--
+-- Data for Name: review_approvals; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY review_approvals (id, review_id, reviewer_id, status, created_at, updated_at) FROM stdin;
+1	1	\N	Approved	2017-08-08 10:40:23.241111+00	2017-08-08 15:17:39.04564+00
+2	2	\N	Approved	2017-08-10 19:55:03.352425+00	2017-08-10 20:09:13.659032+00
+3	3	\N	Approved	2017-08-10 20:09:42.32946+00	2017-08-10 21:56:40.350802+00
+4	4	\N	Approved	2017-08-10 21:54:50.548841+00	2017-08-10 21:56:44.756514+00
+5	5	\N	Approved	2017-08-10 21:55:24.204635+00	2017-08-10 22:00:59.076185+00
+6	6	\N	Approved	2017-08-10 21:59:42.737428+00	2017-08-10 22:01:02.468803+00
+7	7	\N	Approved	2017-08-10 22:00:37.419881+00	2017-08-10 22:01:04.388537+00
+10	10	\N	New	2017-08-10 22:02:06.766156+00	2017-08-10 22:02:06.766156+00
+8	8	\N	Approved	2017-08-10 22:00:45.878396+00	2017-08-10 22:02:12.426218+00
+9	9	\N	Approved	2017-08-10 22:02:00.164282+00	2017-08-10 22:02:15.131299+00
+\.
+
+
+--
+-- Name: review_approvals_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('review_approvals_id_seq', 10, true);
 
 
 
+--
+-- Data for Name: reviews; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY reviews (id, comment, rating, answers, customer_id, company_id, unit_id, status, power_reviewer, power_title, reviewer_name, review_photo, created_at, updated_at) FROM stdin;
+1	Holy Guacamole!	4.25	{"answers":[{"answer":5},{"answer":4},{"answer":4},{"answer":4}]}	9004	11004	\N	Approved	t	FoodieReview.com	Bob U.	\N	2017-08-08 10:40:23.241111+00	2017-08-08 10:40:23.241111+00
+2	Delicious Carne Asada plate!	4.5	{"answers":[{"answer":5},{"answer":4},{"answer":4},{"answer":5}]}	9003	11004	\N	Approved	f	\N	Matt G.	http://commercecdn.com/1278235777548943678/24d4fccf-16b6-4022-b4d8-a733a3604314.jpeg	2017-08-10 19:55:03.352425+00	2017-08-10 19:57:25.147544+00
+3	Delicious Carne Asada plate!	4.5	{"answers":[{"answer":5},{"answer":4},{"answer":4},{"answer":5}]}	9003	11004	\N	Approved	f	\N	Sally J.	http://commercecdn.com/1278235777548943678/24d4fccf-16b6-4022-b4d8-a733a3604314.jpeg	2017-08-10 20:09:42.32946+00	2017-08-10 20:09:42.32946+00
+4	Delicious Carne Asada plate!	4	{"answers":[{"answer":5},{"answer":4},{"answer":4},{"answer":3}]}	9003	11023	\N	Approved	f	\N	Sally J.	http://commercecdn.com/1278235777548943678/24d4fccf-16b6-4022-b4d8-a733a3604314.jpeg	2017-08-10 21:54:50.548841+00	2017-08-10 21:54:50.548841+00
+5	Delicious Carne Asada plate!	3.75	{"answers":[{"answer":4},{"answer":4},{"answer":4},{"answer":3}]}	9003	11023	\N	Approved	f	\N	Sally J.	http://commercecdn.com/1278235777548943678/24d4fccf-16b6-4022-b4d8-a733a3604314.jpeg	2017-08-10 21:55:24.204635+00	2017-08-10 21:55:24.204635+00
+6	Oh My!	4.75	{"answers":[{"answer":4},{"answer":5},{"answer":5},{"answer":5}]}	9003	11026	\N	Approved	t	FoodieReview.com	Sally J.	\N	2017-08-10 21:59:42.737428+00	2017-08-10 21:59:42.737428+00
+7	Oh My!	4.5	{"answers":[{"answer":4},{"answer":4},{"answer":5},{"answer":5}]}	9003	11011	\N	Approved	t	FoodieReview.com	Sally J.	\N	2017-08-10 22:00:37.419881+00	2017-08-10 22:00:37.419881+00
+10	Oh My!	3.75	{"answers":[{"answer":4},{"answer":4},{"answer":4},{"answer":3}]}	9003	11024	\N	New	t	FoodieReview.com	Sally J.	\N	2017-08-10 22:02:06.766156+00	2017-08-10 22:02:06.766156+00
+8	Oh My!	4.25	{"answers":[{"answer":4},{"answer":4},{"answer":4},{"answer":5}]}	9003	11011	\N	Approved	t	FoodieReview.com	Sally J.	\N	2017-08-10 22:00:45.878396+00	2017-08-10 22:00:45.878396+00
+9	Oh My!	3.5	{"answers":[{"answer":4},{"answer":4},{"answer":3},{"answer":3}]}	9003	11024	\N	Approved	t	FoodieReview.com	Sally J.	\N	2017-08-10 22:02:00.164282+00	2017-08-10 22:02:00.164282+00
+\.
+
+
+--
+-- Name: reviews_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('reviews_id_seq', 10, true);
+
+
+
+--
+-- Data for Name: search_preferences; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY search_preferences (id, customer_id, territory_id, distance, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- Name: search_preferences_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('search_preferences_id_seq', 1, false);
+
+
+--
+-- Name: territories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('territories_id_seq', 5, true);
+
+
+
+--
+-- Name: units_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('units_id_seq', 2018, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('users_id_seq', 11097, true);
+
+
+--
+-- PostgreSQL database dump complete
+--
 
