@@ -578,7 +578,7 @@ function *afterUpdateOrderHistory(orderHistory) {
               break;
           case 'pay_fail':
               msgTarget.title = translator.translate(lang, "payFailed", orderNum);//"Payment Failed - Order #"+ orderNum;
-              msgTarget.message = translator.translate(lang, "payFailedMessage", custName);//"custName +" payment failed at "+ timestamp.now();
+              msgTarget.message = translator.translate(lang, "payFailedMessage", custName, timestamp.now());//"custName +" payment failed at "+ timestamp.now();
               break;
           // From Unit
           case 'order_declined':
