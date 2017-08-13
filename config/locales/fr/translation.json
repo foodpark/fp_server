@@ -21,8 +21,8 @@
         "orderDispatchedMessage" :"Votre commande #{{orderNum}} est en route!",
         "orderDelivered" : "Votre commande #{{orderNum}} a été livrée. Merci à vous! ",
         "orderDeliveredMessage" : "Votre commande #{{orderNum}} a été livrée. Merci à vous! ",
-        "orderRequested_delivery" : "'Demande de livraison de commande",
+        "orderRequested_delivery" : "Demande de livraison de commande",
         "orderRequested_deliveryMessage" : "Heure de livraison: {{deliverytime}}\nCustomer: {{custName}}\nOrder Details: {{orderDetail}}",
-        "orderRequested_pickup" :"'Demande de commande à emporter",
+        "orderRequested_pickup" :"Demande de commande à emporter",
         "orderRequested_pickupMessage" :"Pickup Time: {{pickuptime}}\nCustomer: {{custName}}\nOrder Details: {{orderDetail}}"
 }

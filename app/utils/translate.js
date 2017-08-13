@@ -67,6 +67,7 @@ function Translate() {
         var finalStr = interpolate(str, values);
         return finalStr;
       }
+      return str;
     }
 
   };

@@ -21,8 +21,8 @@
         "orderDispatchedMessage"  :"Your order #{{orderNum}} is on its way!",
         "orderDelivered"  : "Your order #{{orderNum}} was delivered. Thanks again! ",
         "orderDeliveredMessage"   : "Your order #{{orderNum}} was delivered. Thanks again! ",
-        "orderRequested_delivery" : "'Delivery Order Request",
+        "orderRequested_delivery" : "Delivery Order Request",
         "orderRequested_deliveryMessage" : "Delivery Time: {{deliverytime}}\nCustomer: {{custName}}\nOrder Details: {{orderDetail}}",
-        "orderRequested_pickup"  :"'Takeout Order Request",
+        "orderRequested_pickup"  : "Takeout Order Request",
         "orderRequested_pickupMessage" :"Pickup Time: {{pickuptime}}\nCustomer: {{custName}}\nOrder Details: {{orderDetail}}"
 }
