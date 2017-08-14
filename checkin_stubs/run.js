@@ -17,7 +17,7 @@ var currHour = currentDateTime.getHours(); // TODO: account for time zone in sql
 var doCheckIn = function(companyId) {
   // find all unit IDs for the company then check-in each unit
   // TODO: figure out how to get lat/long
-  return knex.select('id','company_id').from('units').where('company_id', companyId)
+  return knex.select('id','company_id').from('units').where('company_id', companyId).andWhere('type','RESTAURANT')
     .then(function(units) {
       console.log("About to loop through each unit");
       units.forEach(function(row) {
@@ -50,7 +50,7 @@ var doInsert = function(companyId, unitId) {
 var doCheckOut = function(companyId) {
   var meta = {fn:'doCheckOut'}
   meta.company_id=companyId;
-  return knex.select('id','company_id').from('units').where('company_id', companyId)
+  return knex.select('id','company_id').from('units').where('company_id', companyId).andWhere('type','RESTAURANT')
     .then(function(units) {
       units.forEach(function(row) {
         if (row.id) {
