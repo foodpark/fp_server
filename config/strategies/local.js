@@ -17,6 +17,10 @@ module.exports = function() {
             console.error('error during login: could not find user')
             return done(null, false, {message: 'We could not verify your login details. Really sorry. Please try again.'});
           }
+          else if (user.is_deleted){
+            console.error('error during login: user has been deleted')
+            return done(null, false, {message: 'We could not verify your login details. Really sorry. Please try again.'});
+          }
           if (!User.authenticate(user.password, password)) {
             console.error('error during login: authentication failed')
             return done(null, false, {message: 'Invalid password'});

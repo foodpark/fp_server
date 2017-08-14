@@ -25,7 +25,7 @@ var knex = require('../config/knex.js');
 
 const translator = new T();
 
-const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units'];
+const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units','users'];
 
 
 function *simplifyDetails(orderDetail) {

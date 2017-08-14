@@ -99,7 +99,8 @@ CREATE TABLE users (
     fb_login boolean,
     default_language text DEFAULT 'en',
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc')
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    is_deleted boolean DEFAULT(false)
 );
 
 CREATE TABLE admins (
