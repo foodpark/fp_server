@@ -31,25 +31,39 @@ var doCheckIn = function(companyId) {
 }
 
 var doInsert = function(companyId, unitId) {
-  return knex('checkins').insert(
+  var meta = {fn:'doInsert'}
+  meta.company_id=companyId;
+  meta.unit_id=unitId;
+   return knex('checkins').insert(
     {
       company_id: companyId,
       unit_id: unitId,
-      check_in: '2016-11-17T01:49:23.123456Z'
+      check_in: currentDateTime
     }
-  );
+  ).catch(function(err) { 
+    meta.error=err;
+    console.error('error inserting checkin: ', meta); 
+    throw err;
+  }); // catch error on the insert because otherwise you just return the query definition and it doesn't do work
 }
 
 var doCheckOut = function(companyId) {
+  var meta = {fn:'doCheckOut'}
+  meta.company_id=companyId;
   return knex.select('id','company_id').from('units').where('company_id', companyId)
     .then(function(units) {
       units.forEach(function(row) {
-        if (units.id) {
+        if (row.id) {
+          meta.unit_id=units.id;
           return knex('checkins').where(
           {
             company_id: row.company_id,
             unit_id: row.id
-          }).del();
+          }).update({check_out:currentDateTime}).catch(function(err) { 
+            meta.error=err;
+            console.error('error inserting checkin: ', meta); 
+            throw err;
+          }); // catch error on the update because otherwise you just return the query definition and it doesn't do work
         }
       });
     })
@@ -58,8 +72,9 @@ var doCheckOut = function(companyId) {
 
 // Main logic
 
+var currDayOfWeekOrdinal = currentDateTime.getDay();
 var currDayOfWeek = "";
-switch (currentDateTime.getDay()) {
+switch (currDayOfWeekOrdinal) {
   case 0:
     currDayOfWeek = 'Su';
     break;
@@ -88,7 +103,7 @@ console.log('Hour: ' + currHour);
 
 var results;
 
-knex.select('id', 'schedule', 'hours').from('companies').whereRaw('stub IS true AND schedule LIKE \'%' + currDayOfWeek + '%\'')
+knex.select('id', 'schedule', 'hours').from('companies').whereRaw('stub IS true AND schedule LIKE \'%' + currDayOfWeekOrdinal + '%\'')
   .then(function(stubs) {
     stubs.forEach(function(row) {
       if (row.hours) {
@@ -100,13 +115,13 @@ knex.select('id', 'schedule', 'hours').from('companies').whereRaw('stub IS true 
           var closeHourRaw = splitHours[1];
 
           var openHour;
-          if (openHourRaw.indexOf('a') > 0) {
-            openHour = parseInt(openHourRaw.split('a'));
+          if (openHourRaw.toLowerCase().indexOf('a') > 0) {
+            openHour = parseInt(openHourRaw.toLowerCase().split('a'));
             if (openHour == 12) {
               openHour = 0; // 12am is 0 hours
             }
-          } else if (openHourRaw.indexOf('p') > 0) {
-            openHour = parseInt(openHourRaw.split('p'));
+          } else if (openHourRaw.toLowerCase().indexOf('p') > 0) {
+            openHour = parseInt(openHourRaw.toLowerCase().split('p'));
             if (openHour < 12) {
               openHour += 12;
             }
@@ -116,13 +131,13 @@ knex.select('id', 'schedule', 'hours').from('companies').whereRaw('stub IS true 
           console.log(openHour);
 
           var closeHour;
-          if (closeHourRaw.indexOf('a') > 0) {
-            closeHour = parseInt(closeHourRaw.split('a'));
+          if (closeHourRaw.toLowerCase().indexOf('a') > 0) {
+            closeHour = parseInt(closeHourRaw.toLowerCase().split('a'));
             if (closeHour == 12) {
               closeHour = 0; // 12am is 0 hours
             }
-          } else if (closeHourRaw.indexOf('p') > 0) {
-            closeHour = parseInt(closeHourRaw.split('p'));
+          } else if (closeHourRaw.toLowerCase().indexOf('p') > 0) {
+            closeHour = parseInt(closeHourRaw.toLowerCase().split('p'));
             if (closeHour < 12) {
               closeHour += 12;
             }
