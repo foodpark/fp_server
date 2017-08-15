@@ -1245,9 +1245,9 @@ function *beforeSaveLoyaltyRewards() {
         this.throw('Company has existing rewards defined. Use PUT/PATCH to modify.',405);
       }
       this.resteasy.object.company_id = coId;
-      log.info('Loyalty rewards will be created for company',{fn:'beforeSaveLoyaltyRewards',company_id:this.resteasy.object.company_id});
+      logger.info('Loyalty rewards will be created for company',{fn:'beforeSaveLoyaltyRewards',company_id:this.resteasy.object.company_id});
     } else {
-      log.error('No company context found for loyalty rewards',{fn:'beforeSaveLoyaltyRewards',error:'No company context found for loyalty rewards'});
+      logger.error('No company context found for loyalty rewards',{fn:'beforeSaveLoyaltyRewards',error:'No company context found for loyalty rewards'});
       this.throw('No company context found for loyalty rewards',422);
     }
   }
@@ -1326,7 +1326,7 @@ function *afterUpdateTerritory(territory){
   logger.info('After Territory updated - update units with currency', meta);
   if (!territory){
     meta.error='No Territory provided';
-    log.error('No Territory provided',meta);
+    logger.error('No Territory provided',meta);
     throw new Error('No Territory provided', 422);
   }
   meta.territory_id=territory.id;
@@ -1366,7 +1366,7 @@ function *afterUpdateTerritory(territory){
 function *afterCreateReview(review) {
   logger.info('After review created - add review approval record',{fn:'afterCreateReview',review:review});
   if (!review){
-    log.error('No Review provided',{fn:'afterCreateReview',error:'No Review provided'});
+    logger.error('No Review provided',{fn:'afterCreateReview',error:'No Review provided'});
     throw new Error('No Review provided',422);
   }
   try{
