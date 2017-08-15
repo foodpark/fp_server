@@ -24,8 +24,6 @@ COPY users (id, username, password, first_name, last_name, role, territory_id, c
 11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-01-31 23:32:49.172208+00
 11053	d56@me.com	cf508e934b1acddf6ee2080e1a90a020	Dirk	Novitski	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-07 15:58:38.875632+00	2017-08-07 15:58:38.875632+00
 11027	mannytruck1	8fe78ac0eaabf2f474b0de3a968e165e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:31:09.131805+00	2017-08-01 14:31:09.131805+00
-11076	mattG	81dc9bdb52d04dc20036dbd8313ed055	Matt G	\N	DRIVER	3	\N	99934-6321	\N	\N	\N	\N	\N	\N	en	2017-08-08 18:28:07.458835+00	2017-08-08 18:28:07.458835+00
-11077	DennisN	81dc9bdb52d04dc20036dbd8313ed055	Dennis N	\N	DRIVER	3	\N	9996-59632	\N	\N	\N	\N	\N	\N	en	2017-08-08 18:30:42.96532+00	2017-08-08 18:30:42.96532+00
 11062	Low1@me.com	8d05596d440ea2ddc2bec7f7e9cd935d	Low1	Down1	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 14:40:03.759877+00	2017-08-08 14:40:03.759877+00
 11080	jacktruck2	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 15:06:48.940672+00	2017-08-10 15:06:48.940672+00
 11024	pacos@tacos.com	dacedf41210444fe8547f5b1cf085a6c	Pacos	Tacos	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-11 01:13:53.170026+00	2017-07-11 01:13:53.170026+00
@@ -36,12 +34,6 @@ COPY users (id, username, password, first_name, last_name, role, territory_id, c
 11056	bill56	fe99a0dc54577e0d63fa4ee50f89b414	Bill	\N	DRIVER	3	\N	444-7777	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:21:42.940407+00	2017-08-08 11:21:42.940407+00
 11093	daniel.berezin@sumup.com	6862647f5d1bd8f99371e469bc7481fa	Daniel	Berezin	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-11 14:05:34.879149+00	2017-08-11 14:05:34.879149+00
 11063	Low@me.com	bbd4ae7d10d1881050d251adb50c8e6d	Low	Down	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:20:12.383531+00	2017-08-08 16:20:12.383531+00
-11064	test@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:34:04.558535+00	2017-08-08 16:34:04.558535+00
-11065	test123@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:55:33.408429+00	2017-08-08 16:55:33.408429+00
-11066	test12@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:01:04.455188+00	2017-08-08 17:01:04.455188+00
-11067	test12ghgh@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:06:48.676412+00	2017-08-08 17:06:48.676412+00
-11068	test1gh2ghgh@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:15:00.78017+00	2017-08-08 17:15:00.78017+00
-11069	test1gh9090h@test.in	bbd4ae7d10d1881050d251adb50c8e6d	Ahmad Dosani	Ahmad Dosani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 17:27:06.887883+00	2017-08-08 17:27:06.887883+00
 11070	needle@me.com	4bf84babe76dabda6c4da4d25354704d	Needle	Nitz	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 18:11:41.591073+00	2017-08-08 18:11:41.591073+00
 11078	Luiz@saborbr.com	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Cabello	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-09 18:24:06.038623+00	2017-08-09 18:24:06.038623+00
 11038	jacktruck1	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-04 10:53:54.072583+00	2017-08-04 10:53:54.072583+00
@@ -53,7 +45,6 @@ COPY users (id, username, password, first_name, last_name, role, territory_id, c
 11021	Fogo@thaitanicexpress.com	705eb2cad4537d7ace7fc73bb273f50d	Jimmy	Chu	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:25:51.747138+00	2017-07-10 17:25:51.747138+00
 11013	mg_admin	2c544a0fca5a8146c790a295e389bbd8	Matt	Guiger	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-20 23:33:15.004572+00	2017-06-27 17:10:50.642758+00
 11081	Churro@me.com	47b1ef10d0341c5bb08ad678bc33599b	Churro	Nation	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 15:52:54.977659+00	2017-08-10 15:52:54.977659+00
-11088	lou56	7338ada6c4f343a2798192c0cf1c20ba	Lou Jones	\N	DRIVER	1	\N	444-9998	\N	\N	\N	\N	\N	\N	en	2017-08-10 17:43:13.739367+00	2017-08-11 19:37:18.831625+00
 11031	bob56	90c4b084124e57b98082ce30f93e87dd	Bob	Ucker	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-03 20:31:33.175532+00	2017-08-03 20:31:33.175532+00
 11037	Jack@crazyjacks.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Crazy	Jack	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-04 10:53:46.640291+00	2017-08-04 10:53:46.640291+00
 11089	tacostruck1	dacedf41210444fe8547f5b1cf085a6c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 17:50:04.829749+00	2017-08-10 17:50:04.829749+00
@@ -62,15 +53,8 @@ COPY users (id, username, password, first_name, last_name, role, territory_id, c
 11079	luiztruck1	170f9a8f689fc69157ad6d3a62ecd92f	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-09 18:32:43.324813+00	2017-08-09 18:32:43.324813+00
 11020	manny@classycuban.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Lopez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:18:42.696392+00	2017-07-10 17:18:42.696392+00
 11094	daniel.berezintruck1	6862647f5d1bd8f99371e469bc7481fa	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-11 14:05:42.268431+00	2017-08-11 14:05:42.268431+00
-11054	madan_test1	d70cbdcb2bdf7e5af94791aeeb4ef335	test	\N	DRIVER	1	\N	3457394075	\N	\N	\N	\N	\N	\N	en	2017-08-08 06:40:51.151404+00	2017-08-11 19:41:10.826073+00
-11060	vklast	905fdcc0f57436658bc6fab3c3ddb288	vk2 vklast	\N	DRIVER	1	\N	65412333	\N	\N	\N	\N	\N	\N	en	2017-08-08 12:29:25.420575+00	2017-08-11 19:38:04.319075+00
-11058	vk@sh.com	f0c76d4c541cca93d7b506872309a163	vk	\N	DRIVER	1	\N	356345345	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:59:57.520108+00	2017-08-11 19:38:10.279287+00
-11059	vk1@sh.com	f0c76d4c541cca93d7b506872309a163	vk1	\N	DRIVER	1	\N	356345345	\N	\N	\N	\N	\N	\N	en	2017-08-08 12:00:16.049988+00	2017-08-11 19:38:12.318087+00
-11057	test123	cc03e747a6afbbcbf8be7668acfebee5	testfirstname	\N	DRIVER	1	\N	854666135	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:46:12.355217+00	2017-08-11 19:40:09.609404+00
-11061	tst123	d8b168f3003804d89da1092b8160f0f5	testing first testing last	\N	DRIVER	1	\N	56412233	\N	\N	\N	\N	\N	\N	en	2017-08-08 13:45:07.738799+00	2017-08-11 19:40:13.612668+00
 11022	Frank@bbq.com	26253c50741faa9c2e2b836773c69fe6	Frank	Smith	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-07-10 17:27:49.656958+00	2017-07-10 17:27:49.656958+00
 11086	Manny@cubanreuben.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Lopez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-10 16:50:07.93737+00	2017-08-10 16:50:07.93737+00
-11097	Mad	cf1ef61fbec0eb674a2ad96ddfe5256d	Mad Max	Max	DRIVER	3	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-11 20:02:57.293279+00	2017-08-11 20:02:57.293279+00
 11096	franktruck3	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-11 18:00:15.732535+00	2017-08-11 18:00:15.732535+00
 11095	marcy@me.com	0b468c9abf7ae8243eb9d850fbba615f	marcy	bond	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-11 16:29:02.090025+00	2017-08-11 16:29:02.090025+00
 \.
@@ -281,15 +265,9 @@ SELECT pg_catalog.setval('delivery_addresses_id_seq', 3, true);
 --
 
 COPY drivers (id, name, phone, available, unit_id, company_id, created_at, updated_at, user_id) FROM stdin;
-18	Bill	444-7777	t	2001	11004	2017-08-08 18:26:49.135928+00	2017-08-08 18:28:29.819965+00	11056
 21	Candy	999-5554	t	2001	11004	2017-08-08 18:29:28.449091+00	2017-08-08 18:29:31.497155+00	11048
-22	Dennis N	9996-59632	f	2001	11004	2017-08-08 18:30:42.960913+00	2017-08-08 18:31:18.348946+00	11077
-19	vk1	356345345	f	2001	11004	2017-08-08 18:26:59.320624+00	2017-08-08 18:31:19.312075+00	11059
-23	Lou Jones	444-9998	t	2006	11011	2017-08-10 17:43:13.732005+00	2017-08-10 17:43:37.304932+00	11088
 25	steve galaxy	555-6666	t	2001	11004	2017-08-10 19:37:54.772887+00	2017-08-10 19:38:01.547948+00	11092
 26	steve galaxy	555-6666	t	2010	11023	2017-08-10 23:14:36.840613+00	2017-08-10 23:14:42.157576+00	11092
-27	Bill	444-7777	t	2010	11023	2017-08-10 23:16:25.859667+00	2017-08-10 23:16:32.87343+00	11056
-28	Mad Max	1234567890	f	2018	11004	2017-08-11 20:02:57.28492+00	2017-08-11 20:02:57.28492+00	11097
 \.
 
 
@@ -407,9 +385,6 @@ COPY order_history (id, order_sys_order_id, amount, initiation_time, payment_tim
 4	1578622654200414965	R$36.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_paid": "2017-08-10T23:12:25.164Z", "order_accepted": "2017-08-10T23:11:45.493Z", "order_requested": "2017-08-10T23:10:21.237Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	26	\N	{"1578622656607945462": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-10 23:10:18.83125+00	2017-08-10 23:18:14.63106+00
 5	1578691732231422726	R$36.00	\N	\N	\N	2017-08-08 12:55:00+00	\N	{"order_declined": "2017-08-11T16:11:31.137Z", "order_requested": "2017-08-11T01:26:43.589Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1578691735142269703": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:26:41.034505+00	2017-08-11 16:11:31.027458+00
 10	1578750383742780187	R$9.00	\N	\N	\N	2017-08-11 12:20:00+00	\N	{"order_paid": "2017-08-11T04:04:15.961Z", "order_ready": "2017-08-11T16:16:07.998Z", "order_accepted": "2017-08-11T03:29:20.398Z", "order_requested": "2017-08-11T03:28:43.232Z"}	\N	1502424255727	f	f	\N	\N	\N	\N	\N	{"1578750385814766364": {"title": "Bacon and Eggs Whole Grain", "options": [], "quantity": 1, "selections": {"Bread": "Whole Grain"}}}	\N	Sally J	9003	2001	Frank's BBQ	11004	2017-08-11 03:28:40.646625+00	2017-08-11 16:16:07.933491+00
-9	1578706301968450322	R$36.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_paid": "2017-08-11T12:42:28.225Z", "order_ready": "2017-08-11T13:21:20.922Z", "order_cooking": "2017-08-11T13:21:17.400Z", "order_accepted": "2017-08-11T12:42:20.002Z", "order_requested": "2017-08-11T01:55:24.301Z"}	\N	1502455348891	f	t	2017-08-11 15:34:34+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	\N	\N	{"1578706304032047891": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:55:21.677246+00	2017-08-11 13:21:20.818698+00
-1	1578478935082009214	R$12.00	\N	\N	\N	2017-08-08 12:55:00+00	\N	{"order_paid": "2017-08-10T23:02:33.168Z", "order_cooking": "2017-08-10T23:04:27.703Z", "order_accepted": "2017-08-10T18:56:19.190Z", "order_requested": "2017-08-10T18:54:24.687Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	2	\N	27	\N	{"1578478941599957631": {"title": "Margherita pizza", "options": [], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-10 18:54:21.937281+00	2017-08-11 12:42:47.856246+00
-13	1579049801591292715	R$34.00	\N	\N	\N	2017-08-11 14:15:00+00	\N	{"order_paid": "2017-08-11T13:19:50.112Z", "order_accepted": "2017-08-11T13:19:42.563Z", "order_requested": "2017-08-11T13:17:12.582Z"}	\N	1502457591779	f	t	2017-08-11 14:30:00+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	27	\N	{"1579049803772330796": {"title": "Hot Wings", "options": [], "quantity": 2, "selections": {}}, "1579049805458441005": {"title": "Delivery Charge", "options": [], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 13:17:09.86498+00	2017-08-11 13:21:14.018471+00
 11	1579010841649349409	R$20.00	\N	\N	\N	2017-08-11 12:45:00+00	\N	{"order_paid": "2017-08-11T12:03:03.508Z", "order_ready": "2017-08-11T13:00:26.699Z", "order_accepted": "2017-08-11T12:02:54.870Z", "order_requested": "2017-08-11T12:00:50.128Z"}	\N	1502452984471	f	f	\N	\N	\N	\N	\N	{"1579010846556685090": {"title": "Bacon and Eggs Whole Grain", "options": [], "quantity": 1, "selections": {"Bread": "Whole Grain"}}, "1579010848418956067": {"title": "Breakfast Burrito", "options": ["Hash Browns"], "quantity": 1, "selections": {}}}	\N	Sally J	9003	2001	Frank's BBQ	11004	2017-08-11 12:00:46.804713+00	2017-08-11 13:00:26.613469+00
 7	1578702811720319758	R$36.00	\N	\N	\N	2017-08-11 15:34:34+00	\N	{"order_declined": "2017-08-11T16:11:08.253Z", "order_requested": "2017-08-11T01:48:10.923Z"}	\N	\N	f	f	\N	\N	\N	\N	\N	{"1578702814933156623": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:48:08.557446+00	2017-08-11 16:11:08.145749+00
 8	1578703986209325840	R$36.00	\N	\N	\N	2017-08-11 15:19:34+00	\N	{"order_accepted": "2017-08-11T13:45:11.325Z", "order_requested": "2017-08-11T01:50:56.585Z"}	\N	\N	f	t	2017-08-11 15:34:34+00	2	{"city": "Natal", "phone": "Bob / 555-9988", "state": "RN", "address1": "Av. Engenheiro Roberto Freire, 2610 - Ponta Negra, Natal - RN, 59090-000", "address2": null, "nickname": "Camarões"}	\N	\N	{"1578703988516193041": {"title": "Margherita pizza", "options": [], "quantity": 3, "selections": {}}}	\N	Sally J	9003	2010	Sabor Brasil	11023	2017-08-11 01:50:54.061341+00	2017-08-11 13:45:11.232434+00
