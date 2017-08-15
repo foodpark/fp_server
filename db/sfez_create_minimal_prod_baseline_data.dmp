@@ -31,7 +31,6 @@ COPY users (id, username, password, first_name, last_name, role, territory_id, c
 11092	steve@me.com	737bdf2c50995d2da864c4fea87bf90b	steve	galaxy	DRIVER	3	\N	555-6666	local	local	{}	\N	\N	\N	en	2017-08-10 19:34:47.915909+00	2017-08-10 19:34:47.915909+00
 11082	churrotruck1	47b1ef10d0341c5bb08ad678bc33599b	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-10 15:53:02.476864+00	2017-08-10 15:53:02.476864+00
 11026	franktruck1	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-08-01 14:19:26.57913+00	2017-08-01 14:19:26.57913+00
-11056	bill56	fe99a0dc54577e0d63fa4ee50f89b414	Bill	\N	DRIVER	3	\N	444-7777	\N	\N	\N	\N	\N	\N	en	2017-08-08 11:21:42.940407+00	2017-08-08 11:21:42.940407+00
 11093	daniel.berezin@sumup.com	6862647f5d1bd8f99371e469bc7481fa	Daniel	Berezin	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-11 14:05:34.879149+00	2017-08-11 14:05:34.879149+00
 11063	Low@me.com	bbd4ae7d10d1881050d251adb50c8e6d	Low	Down	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 16:20:12.383531+00	2017-08-08 16:20:12.383531+00
 11070	needle@me.com	4bf84babe76dabda6c4da4d25354704d	Needle	Nitz	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-08-08 18:11:41.591073+00	2017-08-08 18:11:41.591073+00
