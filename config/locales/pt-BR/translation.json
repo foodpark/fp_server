@@ -4,7 +4,7 @@
       "payFailed"        : "Pagamento Falhou - Pedido #{{orderNum}}",
       "payFailedMessage" : "{{custName}} pagamento falhou em {{time}}",
       "orderDeclined"    : "Pedido Recusado",
-      "orderDeclinedMessage" : "{{company}} não aceitou seu pedido neste momento. Tente novamente.",
+      "orderDeclinedMessage" : "Seu pagamento foi processado, mas {{company}} não é capaz de atender seu pedido. Você tem o opção de obter o seu dinheiro reembolsado ou receber um crédito do {{company}} onde você pode retirar seu pedido em um outro periodo.",
       "orderAccepted"    : "Pedido Aceito em",
       "orderAcceptedMessage" : "Pedido aceito em {{time}}",
       "orderQueued"      : "Pedido Na Fila",
