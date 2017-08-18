@@ -4,7 +4,7 @@
         "payFailed"        : "Payment Failed - Order #{{orderNum}}",
         "payFailedMessage" : "{{custName}} payment failed at {{time}}",
         "orderDeclined"    : "Order Declined",
-        "orderDeclinedMessage" : "{{company}} did not accept your order at this time. Please try again some other time.",
+        "orderDeclinedMessage" : "Your payment has been processed, but {{company}} is not able to service your order.  You have the option of either getting your money refunded or receiving a credit from {{company}} where you can pickup your order another time.",
         "orderAccepted"    : "Order Accepted",
         "orderAcceptedMessage" : "Order accepted at {{time}}",
         "orderQueued"      : "Order In Queue",
