@@ -625,11 +625,13 @@ function *afterUpdateOrderHistory(orderHistory) {
       }
       msgTarget.body = msgTarget.message;
       debug(msgTarget);
+      var msgTime = timestamp.now();
       var supplemental = {};
       supplemental.unit_id = ''+ orderHistory.unit_id;
       supplemental.company_id = ''+ orderHistory.company_id;
       supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
       supplemental.order_id = ''+ orderHistory.id;
+      supplemental.time_stamp = msgTime;
       msgTarget.data = supplemental;
       msgTarget.status = status
 
@@ -649,7 +651,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       debug('..returned from notifying');
 
       // record notification time
-      orderHistoryStatus[keys[i]] = timestamp.now();
+      orderHistoryStatus[keys[i]] = msgTime;
       debug(orderHistoryStatus)
       updated = true;
 
