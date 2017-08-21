@@ -21,6 +21,7 @@ var Unit = require('./models/unit.server.model');
 var Driver = require('./models/driver.server.model');
 var debug = require('debug')('rest_options');
 var logger = require('winston');
+var request = require('requestretry');
 var knex = require('../config/knex.js');
 
 const translator = new T();
@@ -415,7 +416,7 @@ function *afterCreateOrderHistory(orderHistory) {
     var deliverytime = orderHistory.desired_delivery_time.toISOString();
     title = translator.translate(lang,"orderRequested_delivery");
     msg = translator.translate(lang,"orderRequested_deliveryMessage", deliverytime, custName, orderDetail);
-  } else { 
+  } else {
     var pickuptime = orderHistory.desired_pickup_time.toISOString();
     title = translator.translate(lang,"orderRequested_pickup");
     msg = translator.translate(lang,"orderRequested_pickupMessage", pickuptime, custName, orderDetail);
@@ -494,6 +495,7 @@ function *afterUpdateOrderHistory(orderHistory) {
   var keys = Object.keys(orderHistoryStatus)
   debug("...number of entries= "+ keys.length)
   var updated = false
+  var orderAccepted;
   for (var i = 0; i < keys.length; i++) {
     debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
@@ -548,6 +550,10 @@ function *afterUpdateOrderHistory(orderHistory) {
         msgTarget.toId = unit.id
         msgTarget.gcmId = unit.gcm_id
         msgTarget.fcmId = unit.fcm_id
+        if (status == 'order_paid') {
+          logger.info('order paid status processing');
+          orderAccepted = yield afterOrderPaid(orderHistory, this.passport, user, customer, company, this.resteasy.knex);
+        }
       } else {
         debug('...status update from unit. Notify customer '+ orderHistory.customer_id);
         logger.info('Unit order update. Notify customer', meta);
@@ -697,6 +703,9 @@ function *afterUpdateOrderHistory(orderHistory) {
     }
   }
   if (updated) {
+    if (orderAccepted) {
+      orderHistoryStatus.order_accepted = orderAccepted;
+    }
     debug(orderHistoryStatus)
     this.resteasy.queries.push(
       this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
@@ -901,7 +910,7 @@ function *beforeSaveUnit() {
     debug(user);
     this.resteasy.object.unit_mgr_id = user.id;
     this.resteasy.object.company_id = parseInt(companyId);
-    
+
     //get the territory's currency
     var currency='';
     var currencyId='';
@@ -1052,7 +1061,7 @@ function *beforeSaveUnit() {
 
         try {
           drivers = (yield Driver.getDriversForUnit(this.params.id));
-         
+
           if(drivers.length > 0){
             drivers.forEach(function(value){
               if(value.user_id !== null)
@@ -1209,7 +1218,7 @@ function *beforeSaveDriver() {
       var driver={ role: 'DRIVER', first_name:this.resteasy.object.name, last_name:createUser.last_name, username:createUser.username, password:createUser.password, territory_id:createUser.territory_id, phone:createUser.phone };
       delete this.resteasy.object.user; //remove user object from the main objectbecause it's not a real domian field
       var newUser='';
-      try{  
+      try{
         newUser = (yield User.createOrUpdateUser(driver))[0];
       }
       catch (err) {
@@ -1431,6 +1440,85 @@ function *afterCreateLoyaltyUsed(loyaltyUsed) {
     logger.error('Unable to update loyalty points',{fn:'afterCreateLoyaltyUsed',priorBalance_id:priorBalance.id,updatedLoyalty:updateLoyalty});
     throw err;
   }
+}
+
+function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) {
+  debug('afterOrderPaid')
+  debugger;
+  var meta = {fn: 'afterOrderPaid', user_id: passport.user.id, role: passport.user.role}
+  meta.order_id = orderHistory.id;
+  meta.company_id = orderHistory.company_id;
+  meta.unit_id = orderHistory.unit_id;
+  meta.customer_id = orderHistory.customer_id;
+  var osoId = orderHistory.order_sys_order_id;
+  meta.order_sys_order_id = osoId;
+  meta.status = orderHistory.status;
+  var lang = passport.user.default_language;
+  meta.lang = lang;
+  logger.info('Post order paid processing starter for order '+ orderHistory.id, meta);
+  var deviceId = ''
+  var title = ''
+  var orderHistoryStatus = orderHistory.status
+  debug(orderHistoryStatus)
+  var keys = Object.keys(orderHistoryStatus)
+  debug("...number of entries= "+ keys.length)
+  var updated = false
+  var status = 'order_accepted';
+  logger.info('Notification not yet sent for status '+status+' for order '+ orderHistory.id, meta);
+  debug('...status '+ status)
+  debug(customer);
+  debug(user);
+  debug(company);
+  var msgTarget = { order_id : orderHistory.id }
+  debug('...status update from unit. Notify customer '+ orderHistory.customer_id);
+  logger.info('Unit order update. Notify customer', meta);
+  // get customer device id
+  debug('..Customer gcm id is '+ customer.gcm_id)
+  msgTarget.to = 'customer'
+  msgTarget.toId = customer.id
+  msgTarget.gcmId = customer.gcm_id
+  msgTarget.fcmId = customer.fcm_id
+  if (!msgTarget.gcmId && !msgTarget.fcmId){
+    var fge = meta;
+    fge.error = 'No fcm/gcm for '+ msgTarget.to;
+    logger.error('No fcm/gcm id for '+ msgTarget.to + ' ' + msgTarget.toId, fge);
+    throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to);
+  }
+  var orderNum = osoId;
+  orderNum = orderNum.substring(orderNum.length-4);
+  debug('..order number '+ orderNum);
+  var custName = user.first_name +' '+ user.last_name.charAt(0);
+  debug(custName);
+  debug(status);
+
+  msgTarget.title = translator.translate(lang, "orderAccepted");//"Order Accepted";
+  msgTarget.message =  translator.translate(lang, "orderAcceptedMessage", timestamp.now());//"Order accepted at "+ timestamp.now()
+  msgTarget.body = msgTarget.message;
+  logger.info('message', msgTarget)
+  debug(msgTarget);
+  var msgTime = timestamp.now();
+  var supplemental = {};
+  supplemental.unit_id = ''+ orderHistory.unit_id;
+  supplemental.company_id = ''+ orderHistory.company_id;
+  supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
+  supplemental.order_id = ''+ orderHistory.id;
+  supplemental.time_stamp = msgTime;
+  msgTarget.data = supplemental;
+  msgTarget.status = status
+
+  debug(msgTarget);
+  logger.info('message', msgTarget)
+  debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
+  logger.info('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
+  var mt = meta;
+  var updatedStatus = orderHistory.status;
+
+  updatedStatus.order_accepted = timestamp.now();
+  logger.info('updated Status : ', updatedStatus);
+  mt.message_payload = msgTarget.message;
+  yield push.notifyOrderUpdated(orderNum, msgTarget);
+  logger.info('Post order paid processing completed for order: ' + orderHistory.id, meta );
+  return updatedStatus.order_accepted;
 }
 
 function *afterUpdateReviewApproval(approval) {
@@ -1737,7 +1825,7 @@ module.exports = {
   },
 
   checkForSoftDelete: function (query) {
-    
+
     if (this.resteasy.operation == 'destroy') {
       if (softDeleteTables.indexOf(this.params.table.toLowerCase()) > -1){
         debug('Soft delete table: '+this.params.table);
@@ -1834,7 +1922,7 @@ module.exports = {
       }  else if (this.resteasy.table == 'territories' && context && (m = context.match(/countries\/(\d+)$/))) {
         debug('..country id '+ m[1]);
         return query.select('*').where('country_id', m[1]);
-      } 
+      }
     }
   },
 };
