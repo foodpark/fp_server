@@ -1665,7 +1665,13 @@ module.exports = {
               (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN'  && this.passport.user.role != 'UNITMGR')) {
             this.throw('Create Unauthorized - Unit Manager/Owners/Admin only',401);
           }
-          var valid = yield validUnitMgr(this.params, this.passport.user);
+          var valid = false;
+          if (this.passport.user.role == 'ADMIN'){
+            valid=true;
+          }
+          if (this.passport.user.role == 'UNITMGR'){
+            valid=yield validUnitMgr(this.params, this.passport.user);
+          }
           if (!valid) {
             this.throw('Update Unauthorized - incorrect Unit Manager',401);
           } // else continue
@@ -1736,7 +1742,13 @@ module.exports = {
              (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'UNITMGR')) {
             this.throw('Update/Delete Unauthorized - Unit Managers/Owners/Admin only',401);
           } else {
-            var valid = yield validUnitMgr(this.params, this.passport.user);
+            var valid = false;
+            if (this.passport.user.role == 'ADMIN'){
+              valid=true;
+            }
+            if (this.passport.user.role == 'UNITMGR'){
+              valid=yield validUnitMgr(this.params, this.passport.user);
+            }
             if (!valid) {
               this.throw('Update Unauthorized - incorrect Unit Manager',401);
             } // else continue
