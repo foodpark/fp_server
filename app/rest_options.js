@@ -1669,7 +1669,7 @@ module.exports = {
           if (this.passport.user.role == 'ADMIN'){
             valid=true;
           }
-          if (this.passport.user.role == 'UNITMGR'){
+          else{
             valid=yield validUnitMgr(this.params, this.passport.user);
           }
           if (!valid) {
@@ -1746,7 +1746,7 @@ module.exports = {
             if (this.passport.user.role == 'ADMIN'){
               valid=true;
             }
-            if (this.passport.user.role == 'UNITMGR'){
+            else{
               valid=yield validUnitMgr(this.params, this.passport.user);
             }
             if (!valid) {
