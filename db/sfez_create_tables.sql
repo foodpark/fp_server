@@ -233,7 +233,8 @@ CREATE TABLE drivers (
     company_id integer REFERENCES companies(id),
     created_at timestamptz DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz DEFAULT (now() at time zone 'utc'),
-    user_id integer REFERENCES users(id)
+    user_id integer REFERENCES users(id),
+    is_deleted boolean DEFAULT(false)
 );
 
 CREATE TABLE checkins (

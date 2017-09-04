@@ -26,7 +26,7 @@ var knex = require('../config/knex.js');
 
 const translator = new T();
 
-const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units','users'];
+const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units','users', 'drivers'];
 
 
 function *simplifyDetails(orderDetail) {
@@ -1665,7 +1665,13 @@ module.exports = {
               (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN'  && this.passport.user.role != 'UNITMGR')) {
             this.throw('Create Unauthorized - Unit Manager/Owners/Admin only',401);
           }
-          var valid = yield validUnitMgr(this.params, this.passport.user);
+          var valid = false;
+          if (this.passport.user.role == 'ADMIN'){
+            valid=true;
+          }
+          else{
+            valid=yield validUnitMgr(this.params, this.passport.user);
+          }
           if (!valid) {
             this.throw('Update Unauthorized - incorrect Unit Manager',401);
           } // else continue
@@ -1736,7 +1742,13 @@ module.exports = {
              (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'UNITMGR')) {
             this.throw('Update/Delete Unauthorized - Unit Managers/Owners/Admin only',401);
           } else {
-            var valid = yield validUnitMgr(this.params, this.passport.user);
+            var valid = false;
+            if (this.passport.user.role == 'ADMIN'){
+              valid=true;
+            }
+            else{
+              valid=yield validUnitMgr(this.params, this.passport.user);
+            }
             if (!valid) {
               this.throw('Update Unauthorized - incorrect Unit Manager',401);
             } // else continue
