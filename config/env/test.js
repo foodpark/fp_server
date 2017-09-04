@@ -27,5 +27,25 @@ module.exports = {
   FACEBOOK_CLIENT_ID: "1580240262270648",
   FACEBOOK_CLIENT_SECRET: "9262a21aa421194191a90298af79e509",
   facebook_app_id: "1580240262270648",
-  facebook_app_secret: "9262a21aa421194191a90298af79e509"
+  facebook_app_secret: "9262a21aa421194191a90298af79e509",
+    moltin: {
+    // BRAZIL
+    1: { 
+      client_id: "eDlPjoMabiu84tszlmr9gcpgm1YJXOJoSZxCBooYuW",
+      client_secret: "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3",
+      grant_type: "client_credentials"
+    },
+    // US
+    2: {
+      client_id: "",
+      client_secret: "",
+      grant_type: "client_credentials",
+    },
+    // UK
+    3: {
+      client_id: "OCQZ6BwRk8OMUk04C08DmJGWTgcnkXoO2TSaVyqJLa",
+      client_secret: "mkOFvvi3gJyuDU3ydONXFJbBzhO2Z4Npqg9CQjBRgw",
+      grant_type: "client_credentials",
+    }
+  },
 };
