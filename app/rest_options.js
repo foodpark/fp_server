@@ -1872,7 +1872,7 @@ module.exports = {
       return query
         .select(knex.raw('units.*, countries.moltin_client_id, countries.moltin_client_secret'))
         .innerJoin('territories','units.territory_id','territories.id')
-        .innerJoin('countries', 'territories.id', 'countries.id')
+        .innerJoin('countries', 'territories.country_id', 'countries.id')
         .where('units.id', this.params.id);
     }
 
