@@ -1864,6 +1864,18 @@ module.exports = {
     debug('context');
     if (!context) debug('..no context')
     else debug(context);
+
+    if(this.resteasy.operation == 'read' 
+      && this.resteasy.table == 'units' 
+      && context 
+      && (m = context.match(/companies\/(\d+)$/))){
+      return query
+        .select(knex.raw('units.*, countries.moltin_client_id, countries.moltin_client_secret'))
+        .innerJoin('territories','units.territory_id','territories.id')
+        .innerJoin('countries', 'territories.country_id', 'countries.id')
+        .where('units.id', this.params.id);
+    }
+
     if (this.resteasy.operation == 'index') {
       //soft deleted tables
        if (softDeleteTables.indexOf(this.resteasy.table.toLowerCase()) > -1){
