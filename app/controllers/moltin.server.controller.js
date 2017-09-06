@@ -48,14 +48,25 @@ var refreshBearerToken = function () {
   })
 }
 
-var oAuthMoltin = function *(next) {
+var oAuthMoltin = function *(country) {
   debug('oAuthMoltin');
+  var client_id;
+  var client_secret;
+
+  if(country) {
+    client_id = config.moltin[country].client_id;
+    client_secret = config.moltin[country].client_secret;
+  } else {
+    client_id = config.clientId;
+    client_secret = config.client_secret;
+  }
+
   return new Promise( function(resolve, reject) {
     request.post({
       url: config.moltinAuthUrl,
       form: {
-        'client_id': config.clientId,
-        'client_secret': config.client_secret,
+        'client_id': client_id,
+        'client_secret': client_secret,
         'grant_type': config.grant_type
       },
       maxAttempts: 3,
@@ -76,12 +87,12 @@ var oAuthMoltin = function *(next) {
   })
 }
 
-var getBearerToken = function *(next) {
+var getBearerToken = function *(country) {
   debug('getBearerToken');
   if (bearerToken=='') {
     debug('...get new bearer token')
     try {
-      bearerToken = yield oAuthMoltin();
+      bearerToken = yield oAuthMoltin(country);
     } catch (err) {
       console.error(err)
       throw (err)
@@ -94,7 +105,7 @@ var getBearerToken = function *(next) {
 var sendRequest = function *(url, method, data) {
   debug('sendRequest')
   try {
-    var token = yield getBearerToken()
+    var token = yield getBearerToken(data.country);
     debug('...token '+ token)
   } catch (err) {
     console.error(err);
@@ -178,7 +189,8 @@ exports.createCompany=function *(sfezCompany) {
   debug('createCompany')
   var data = {
     'name': sfezCompany.name,
-    'email': sfezCompany.email
+    'email': sfezCompany.email,
+    'country': sfezCompany.country_id
   }
   debug(data)
   try {
