@@ -102,10 +102,10 @@ var getBearerToken = function *(country) {
   return bearerToken
 };
 
-var sendRequest = function *(url, method, data, country) {
+var sendRequest = function *(url, method, data) {
   debug('sendRequest')
   try {
-    var token = yield getBearerToken(country);
+    var token = yield getBearerToken(data.country);
     debug('...token '+ token)
   } catch (err) {
     console.error(err);
@@ -189,7 +189,8 @@ exports.createCompany=function *(sfezCompany) {
   debug('createCompany')
   var data = {
     'name': sfezCompany.name,
-    'email': sfezCompany.email
+    'email': sfezCompany.email,
+    'country': sfezCompany.country_id
   }
   debug(data)
   try {

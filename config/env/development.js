@@ -32,20 +32,20 @@ module.exports = {
   moltin: {
     // BRAZIL
     1: { 
-      client_id: "eDlPjoMabiu84tszlmr9gcpgm1YJXOJoSZxCBooYuW",
-      client_secret: "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3",
+      client_id: "CJvCV3pZNWA87UbEP9LFjeHSkSrfLDArdbzVeaDTvC",
+      client_secret: "IqUvmewaPFoF6vVi6E4Su4qnkVzhD7IYHZXZgGkYv9",
       grant_type: "client_credentials"
     },
-    // US
+    // ES
     2: {
-      client_id: "",
-      client_secret: "",
+      client_id: "DXzEC6moQa4ISJvFZ1mpaMCRDTm6AIcdx9PuMJJIKb",
+      client_secret: "zuK90F5OF8fSK1z6uJ3huT5lMcvjtIDPjmLrNSUbL6",
       grant_type: "client_credentials",
     },
     // UK
     3: {
-      client_id: "OCQZ6BwRk8OMUk04C08DmJGWTgcnkXoO2TSaVyqJLa",
-      client_secret: "mkOFvvi3gJyuDU3ydONXFJbBzhO2Z4Npqg9CQjBRgw",
+      client_id: "eNsB34Kfsq5X6jjPToR23mmM2lR2JQe6vpmyegJhNY",
+      client_secret: "uUaxMehHbUaQHudcbuGTb7r3muiH5IYuXwqseSFfBn",
       grant_type: "client_credentials",
     }
   }
