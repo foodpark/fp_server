@@ -1870,9 +1870,39 @@ module.exports = {
       && context 
       && (m = context.match(/companies\/(\d+)$/))){
       return query
-        .select(knex.raw('units.*, countries.moltin_client_id, countries.moltin_client_secret'))
-        .innerJoin('territories','units.territory_id','territories.id')
-        .innerJoin('countries', 'territories.country_id', 'countries.id')
+        .select(knex.raw('units.id, '
+                        +'units.name, '
+                        +'units.number, '
+                        +'units.type, '
+                        +'units.customer_order_window, '
+                        +'units.prep_notice, '
+                        +'units.delivery, '
+                        +'units.delivery_time_offset, '
+                        +'units.delivery_chg_amount, '
+                        +'units.delivery_radius, '
+                        +'units.description, '
+                        +'units.username, '
+                        +'units.password, '
+                        +'units.qr_code, '
+                        +'units.phone, '
+                        +'units.apns_id, '
+                        +'units.fcm_id, '
+                        +'units.gcm_id, '
+                        +'units.device_type, '
+                        +'units.unit_order_sys_id, '
+                        +'units.territory_id, '
+                        +'units.company_id, '
+                        +'units.unit_mgr_id, '
+                        +'units.created_at, '
+                        +'units.updated_at, '
+                        +'units.payment, '
+                        +'units.is_deleted, '
+                        +'countries.currency_id, '
+                        +'countries.currency, '
+                        +'countries.moltin_client_id, '
+                        +'countries.moltin_client_secret'))
+        .innerJoin('companies','units.company_id','companies.id')
+        .innerJoin('countries', 'companies.country_id', 'countries.id')
         .where('units.id', this.params.id);
     }
 
