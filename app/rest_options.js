@@ -630,6 +630,7 @@ function *afterUpdateOrderHistory(orderHistory) {
             throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
       }
       msgTarget.body = msgTarget.message;
+      msgTarget.status = status
       debug(msgTarget);
       var msgTime = timestamp.now();
       var supplemental = {};
@@ -638,8 +639,8 @@ function *afterUpdateOrderHistory(orderHistory) {
       supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
       supplemental.order_id = ''+ orderHistory.id;
       supplemental.time_stamp = msgTime;
+      supplemental.android = yield addCloudPushSupport(msgTarget,supplemental);
       msgTarget.data = supplemental;
-      msgTarget.status = status
 
       debug(msgTarget);
       debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
@@ -1442,6 +1443,20 @@ function *afterCreateLoyaltyUsed(loyaltyUsed) {
   }
 }
 
+function *addCloudPushSupport (target, supp) {
+  var payload = {};
+  payload.alert = target.message;
+  payload.title= target.title;
+  payload.status = target.status,
+  payload.icon = "push",
+  payload.unit_id = supp.unit_id,
+  payload.company_id = supp.company_id,
+  payload.order_sys_order_id = supp.order_sys_order_id;
+  payload.order_id = supp.order_id;
+  payload.time_stamp = supp.time_stamp;
+  return payload;
+}
+
 function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) {
   debug('afterOrderPaid')
   debugger;
@@ -1494,6 +1509,7 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   msgTarget.title = translator.translate(lang, "orderAccepted");//"Order Accepted";
   msgTarget.message =  translator.translate(lang, "orderAcceptedMessage", timestamp.now());//"Order accepted at "+ timestamp.now()
   msgTarget.body = msgTarget.message;
+  msgTarget.status = status;
   logger.info('message', msgTarget)
   debug(msgTarget);
   var msgTime = timestamp.now();
@@ -1503,8 +1519,8 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
   supplemental.order_id = ''+ orderHistory.id;
   supplemental.time_stamp = msgTime;
+  supplemental.android = yield addCloudPushSupport(msgTarget,supplemental);
   msgTarget.data = supplemental;
-  msgTarget.status = status
 
   debug(msgTarget);
   logger.info('message', msgTarget)
