@@ -639,7 +639,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
       supplemental.order_id = ''+ orderHistory.id;
       supplemental.time_stamp = msgTime;
-      supplemental.android = yield addCloudPushSupport(msgTarget,supplemental);
+      supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
       msgTarget.data = supplemental;
 
       debug(msgTarget);
@@ -1444,16 +1444,17 @@ function *afterCreateLoyaltyUsed(loyaltyUsed) {
 }
 
 function *addCloudPushSupport (target, supp) {
-  var payload = {};
-  payload.alert = target.message;
-  payload.title= target.title;
-  payload.status = target.status,
-  payload.icon = "push",
-  payload.unit_id = supp.unit_id,
-  payload.company_id = supp.company_id,
-  payload.order_sys_order_id = supp.order_sys_order_id;
-  payload.order_id = supp.order_id;
-  payload.time_stamp = supp.time_stamp;
+  var elements = {};
+  elements.alert = target.message;
+  elements.title= target.title;
+  elements.status = target.status,
+  elements.icon = "push",
+  elements.unit_id = supp.unit_id,
+  elements.company_id = supp.company_id,
+  elements.order_sys_order_id = supp.order_sys_order_id;
+  elements.order_id = supp.order_id;
+  elements.time_stamp = supp.time_stamp;
+  var payload = { android: elements};
   return payload;
 }
 
@@ -1519,7 +1520,7 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
   supplemental.order_id = ''+ orderHistory.id;
   supplemental.time_stamp = msgTime;
-  supplemental.android = yield addCloudPushSupport(msgTarget,supplemental);
+  supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
   msgTarget.data = supplemental;
 
   debug(msgTarget);
