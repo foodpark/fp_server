@@ -17,46 +17,47 @@ Provides relationship services between customer and food truck company.
 
 ## Installation
 
-Dependencies: docker & docker-compose (see https://github.com/thehumaneffort/docker-infrastructure for instructions & help)
+Dependencies: 
+1. Postgres installed
+2. NodeJS installed
+3. SFEZ_server git repo cloned locally
 
 Start up the DB, and create the development database:
-```
-docker-compose up -d postgres
-docker-compose run pgadmin createdb sfez-development
-```
+From root of /opt/SFEZ_server:
 
-Migrate the DB:
-```
-docker-compose run app npm run migrate:latest
-```
+Install new schema
+
+    :~$ cd db
+    :~$ ./create_sfezdb.sh
+    
+Then install test data
+
+    :~$ psql -U postgres sfezdb < sfez_create_test_data.dmp
+
 
 Run the server (in development mode)
-```
-docker-compose up -d app
-docker-compose logs app
-```
 
-Now execute: `dinghy ip` (if you're using dinghy), or `echo
-$DOCKER_HOST`, and add that IP to your /etc/hosts file or use it in
-your browser:
+    :~$ export NODE_ENV=test
+    :~$ nodemon server.js
 
-And go to http://app.sfezserver.docker/api/v1/units (for Dinghy,
-without dinghy you may need to reconfigure things a bit).
+Specific files can be turned on for debug via
+
+    :~$ export DEBUG=auth,rest_options
+    
+See the debug file name in each file's requires block.
+
+Go to http://localhost:1337/auth/login to login and obtain a JWT
+Go to http://localhost:1337/api/v1/rel/companies (for example) to hit a specific endpoint. 
 
 ## API Reference
 
-GET/POST/PUT/DELETE:
-checkins
-companies
-customers
-favorites
-loyalty
-orders
-units
+See the Service Catalog for endpoint and payload documentation.
 
 ## Tests
 
-No tests built in. Consider Kakapo.js
+1. Install mocha
+2. Execute all tests from root of SFEZ_server: mocha
+3. Execute specific test suite example: mocha test/authentication.server.test.js
 
 ## Contributors
 
