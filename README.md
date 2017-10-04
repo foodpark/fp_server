@@ -44,9 +44,12 @@ Specific files can be turned on for debug via
 
     :~$ export DEBUG=auth,rest_options
     
-See the debug file name in each file's requires block.
+See the debug file name in each file's requires block. For example:
+
+    var debug   = require('debug')('auth');
 
 Go to http://localhost:1337/auth/login to login and obtain a JWT
+
 Go to http://localhost:1337/api/v1/rel/companies (for example) to hit a specific endpoint. 
 
 ## API Reference
