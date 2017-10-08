@@ -9,7 +9,8 @@ module.exports = function(app) {
     var router = new Router();
     var apiversion = '/api/'+ config.apiVersion + '/square';
 
-    router.post(apiversion + '/:userId', square.setupToken);
+    router.post(apiversion + '/:userId/token', square.setupToken);
+    router.put(apiversion + '/:userId/token', square.renewToken);
 
     router.param('userId', square.setUser);
 

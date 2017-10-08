@@ -22,6 +22,12 @@ exports.getByUser = function (userId) {
     return knex('square_user').select().where(USER_ID_FIELD, userId).returning("*");
 };
 
-exports.updateUserInfo = function(accessToken, expirationDate, merchantId) {
-    return knex('square_user').update()
+exports.updateUserInfo = function(userId, accessToken, expirationDate, merchantId) {
+    const map = {
+        access_token : accessToken,
+        expires_at : expirationDate,
+        merchant_id : merchantId
+    };
+    console.log(map);
+    return knex('square_user').update(map).where(USER_ID_FIELD, userId).returning("*");
 };
