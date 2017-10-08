@@ -1,4 +1,4 @@
-var passport = require('passport');
+ var passport = require('passport');
 var api = require('koa')();
 var config = require('../../config/config');
 var geo = require('../../app/controllers/geo.server.controller');

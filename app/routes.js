@@ -11,7 +11,7 @@ module.exports = function(app) {
   require('./routes/order.server.routes')(app);
   require('./routes/specials.server.routes')(app);
   require('./routes/orderstatus.server.routes')(app);
-
+  require('./routes/square.server.routes')(app);
 
   var apiversion = '/api/'+ config.apiVersion + '/rel';
   app.use(Mount(apiversion,require('./routes/api')));
