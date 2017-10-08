@@ -1,5 +1,11 @@
+/**
+ * DB handler for collection 'square_user'. This collection is responsible for storing user authorization data.
+ * @author Sávio Muniz
+ */
 var knex  = require('../../config/knex');
 var debug = require('debug')('squareuser.model');
+
+const SQUARE_USER_COLLECTION = "square_user";
 
 const USER_ID_FIELD = "user_id";
 
@@ -13,13 +19,8 @@ exports.createSquareUserRelationship = function(userId, accessToken, merchantId,
         }).returning('*');
 };
 
-
-exports.getAllSquare = function() {
-    return knex('square_user').select();
-};
-
 exports.getByUser = function (userId) {
-    return knex('square_user').select().where(USER_ID_FIELD, userId).returning("*");
+    return knex(SQUARE_USER_COLLECTION).select().where(USER_ID_FIELD, userId).returning("*");
 };
 
 exports.updateUserInfo = function(userId, accessToken, expirationDate, merchantId) {
@@ -28,6 +29,5 @@ exports.updateUserInfo = function(userId, accessToken, expirationDate, merchantI
         expires_at : expirationDate,
         merchant_id : merchantId
     };
-    console.log(map);
-    return knex('square_user').update(map).where(USER_ID_FIELD, userId).returning("*");
+    return knex(SQUARE_USER_COLLECTION).update(map).where(USER_ID_FIELD, userId).returning("*");
 };

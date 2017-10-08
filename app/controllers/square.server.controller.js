@@ -3,8 +3,6 @@
  */
 
 var debug = require('debug')('square');
-var fs = require('fs');
-var sts = require('./security.server.controller');
 var User = require('../models/user.server.model');
 var SquareUser = require('../models/squareuser.server.model');
 var config = require('../../config/config');
@@ -148,7 +146,7 @@ exports.renewToken = async function () {
         var renewedSquareInfo = await requestRenew(squareUserRel.access_token);
 
         if (renewedSquareInfo.access_token) {
-            this.body = await updateAccessToken(userId, renewedSquareInfo.access_token, new Date(renewedSquareInfo.expires_at), renewedSquareInfo.merchant_id);
+            this.body = await updateAccessTokenInfo(userId, renewedSquareInfo.access_token, new Date(renewedSquareInfo.expires_at), renewedSquareInfo.merchant_id);
         }
 
         else

@@ -1,3 +1,7 @@
+/**
+ * @author Sávio Muniz
+ */
+
 var square = require('../controllers/square.server.controller');
 var passport = require('koa-passport');
 var Router = require('koa-router');
@@ -10,6 +14,7 @@ module.exports = function(app) {
     var apiversion = '/api/'+ config.apiVersion + '/square';
 
     router.post(apiversion + '/:userId/token', square.setupToken);
+
     router.put(apiversion + '/:userId/token', square.renewToken);
 
     router.param('userId', square.setUser);
