@@ -4,7 +4,12 @@ var sts = require('./security.server.controller'),
 
 
 exports.generateToken = function(user) {
+  return jwt.sign(user, config.secret);
+};
+
+/* exports.generateToken = function(user) {
   return jwt.sign(user, config.secret, {
     expiresIn: 10080 // seconds
   });
 };
+*/
