@@ -15,7 +15,7 @@ var tests = "- Authentication Tests - ";
 // UNAUTHENTICATED ROUTES
 // Test create of company
 var ts = Date.now();
-var userId = '';
+var userId = '123';
 var companyId = '';
 var defaultCat = ''; 
 var dailySpecialCat = '';
@@ -24,6 +24,20 @@ var deliveryChargeItem = '';
 var authName = 'auth.test'+ ts;
 var companyName = 'Auth Test Co '+ ts;
 var countryId = 1;
+
+
+describe(tests + 'square stuff', function () {
+    it('should do nice stuff', function (done) {
+        chai.request(server)
+            .post('/api/v1/square/' + userId)
+            .send( {
+                authentication_code : "sq0cgp-lvfjxT5hkC3s-Ni6NIn-Lg" //this should be changed to a authentication code generated in real time
+            })
+            .end(function (err, res) {
+                done();
+            });
+    })
+});
 
 describe(tests +' POST /auth/register', function() {
   it('should register company and return JWT token', function(done) {
@@ -132,7 +146,9 @@ describe(tests +' POST /auth/register', function() {
   });
 });
 
+
 token = '';
+
 
 // Clean up
 describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and product for delivery charge', function() {

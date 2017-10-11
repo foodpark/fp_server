@@ -30,7 +30,7 @@ exports.getAllUsers = function() {
 };
 
 exports.getSingleUser = function(id) {
-  return knex('users').select().where('id', id)
+  return knex('users').select().where('id', id);
 };
 
 exports.createUser = function(hash) {
