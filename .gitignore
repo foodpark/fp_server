@@ -10,4 +10,4 @@ backup*
 # Log files #
 ####################
 *access.log
-*error.log 
+*error.log
