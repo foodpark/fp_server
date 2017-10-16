@@ -435,6 +435,8 @@ exports.register = function*(next, mapping) {
     if (mapping) {
       this.body = mapping;
     }
+
+    console.log(this.body);
     var first_name = this.body.first_name;
     var last_name = this.body.last_name;
     var company_name = this.body.company_name;

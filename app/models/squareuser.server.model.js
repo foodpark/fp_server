@@ -10,7 +10,7 @@ const SQUARE_USER_COLLECTION = "square_user";
 const USER_ID_FIELD = "user_id";
 
 exports.createSquareUserRelationship = function(userId, accessToken, merchantId, expiresAt) {
-    return knex('square_user').insert(
+    return knex(SQUARE_USER_COLLECTION).insert(
         {
             user_id : userId,
             access_token: accessToken,

@@ -25,20 +25,6 @@ var authName = 'auth.test'+ ts;
 var companyName = 'Auth Test Co '+ ts;
 var countryId = 1;
 
-
-describe(tests + 'square stuff', function () {
-    it('should do nice stuff', function (done) {
-        chai.request(server)
-            .post('/api/v1/square/' + userId)
-            .send( {
-                authentication_code : "sq0cgp-lvfjxT5hkC3s-Ni6NIn-Lg" //this should be changed to a authentication code generated in real time
-            })
-            .end(function (err, res) {
-                done();
-            });
-    })
-});
-
 describe(tests +' POST /auth/register', function() {
   it('should register company and return JWT token', function(done) {
     chai.request(server)

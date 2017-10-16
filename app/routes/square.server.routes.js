@@ -14,11 +14,10 @@ module.exports = function(app) {
     var apiversion = '/api/'+ config.apiVersion + '/square';
 
     router.post(apiversion + '/:userId/token', square.setupToken);
-
+    router.get(apiversion + '/:userId/token', square.getToken);
     router.put(apiversion + '/:userId/token', square.renewToken);
 
     router.get(apiversion + '/:userId/locations', square.getSquareLocations);
-
     router.post(apiversion + '/locations/:unitId', square.registerLocation);
 
     router.param('userId', square.setUser);

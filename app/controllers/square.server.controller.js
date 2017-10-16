@@ -208,6 +208,21 @@ exports.setupToken = async function (res) {
     }
 };
 
+function getUserSquareInfo(userId) {
+    try {
+        return SquareUser.getByUser(userId);
+    } catch (err) {
+        logger.error('Couldnt get square unit');
+        throw (err);
+    }
+}
+
+exports.getToken = function * () {
+    var response = yield getUserSquareInfo(this.user.id);
+
+    this.status = 200;
+    this.body = response;
+};
 
 exports.setUnit = function * (unitId, next) {
     var unit = yield Unit.getSingleUnit(unitId);
@@ -252,11 +267,20 @@ function getLocations(accessToken) {
  * @param userId
  * @param locationId
  */
-function * registerUnitLocation (userId, locationId) {
+function registerUnitLocation (userId, locationId) {
     try {
         return SquareUnit.createSquareUnitRelationship(userId, locationId);
     } catch (err) {
         logger.error('Error creating Square-Unit relationship');
+        throw (err);
+    }
+}
+
+function getSquareUnit (unitId) {
+    try {
+        return SquareUnit.getByUnit(unitId);
+    } catch (err) {
+        logger.error('Couldnt get square unit');
         throw (err);
     }
 }
@@ -288,6 +312,63 @@ exports.registerLocation = function * (next) {
     }
     yield next;
 };
+
+function getSquareOrder(locationId, orderId) {
+    var order_ids = [];
+    order_ids.push(orderId);
+    var form = {
+        'order_ids' : order_ids
+    };
+
+    return new Promise(function (resolve, reject) {
+        request.post({
+            url: config.square.orderUrl(locationId),
+            json: form,
+            headers: {
+                'Authorization': 'Bearer sq0atp-NnbqTtYYFud0GUrnWXKBPA'
+            },
+            maxAttempts: 3,
+            retryDelay: 150 // wait for 150 ms before trying again
+        })
+        .then(function (res) {
+            var data = res.body;
+            resolve(data.orders[0]); //retrieve only one order
+        })
+        .catch( function (err) {
+            console.error(err);
+            reject(err);
+        });
+    });
+}
+
+exports.getOrder = function * (locationId, orderId, next){
+    var response = yield getSquareOrder(locationId, orderId);
+    return response;
+};
+
+exports.getUnitSquareInfo = function * (unitId, next) {
+    var response = yield getSquareUnit(unitId);
+    return response;
+};
+
+exports.simplifySquareOrderDetails = function (order) {
+    var items = order.line_items;
+    var parsedOrder = {};
+    items.forEach(function (item) {
+        parsedOrder[item.catalog_object_id] = generateSingleItemJSON(item);
+    });
+    return parsedOrder;
+};
+
+function generateSingleItemJSON(item) {
+    var parsed = {options : []};
+    parsed.quantity = item.quantity;
+    parsed.title = item.name + (item.variation_name ? (" - " + item.variation_name) : "");
+    item.modifiers.forEach(function (modifier) {
+        parsed.options.push(modifier.name);
+    });
+    return parsed;
+}
 
 function isValidLocation(locationId) {
     return locationId && locationId !== '';

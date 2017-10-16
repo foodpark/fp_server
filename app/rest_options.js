@@ -12,6 +12,7 @@ var User = require('./models/user.server.model');
 var Territories = require('./models/territories.server.model');
 var config = require('../config/config');
 var msc = require('./controllers/moltin.server.controller');
+var Square = require('./controllers/square.server.controller');
 var payload = require('./utils/payload');
 var timestamp = require('./utils/timestamp');
 var T = require('./utils/translate');
@@ -19,6 +20,7 @@ var push = require('./controllers/push.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var Driver = require('./models/driver.server.model');
+var Format = require('./utils/formatutils')
 var debug = require('debug')('rest_options');
 var logger = require('winston');
 var request = require('requestretry');
@@ -27,7 +29,7 @@ var knex = require('../config/knex.js');
 const translator = new T();
 
 const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units','users', 'drivers'];
-
+const CENTS_IN_ONE = 100;
 
 function *simplifyDetails(orderDetail) {
   logger.info('Simplifying order details', {fn: 'simplifyDetails',
@@ -137,6 +139,10 @@ function * calculateDeliveryPickup(unitId, deliveryTime) {
   return pickup;
 }
 
+function getSquareMoneyValue(value) {
+    return value / CENTS_IN_ONE;
+}
+
 function *beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory');
   debug(this.resteasy.object);
@@ -230,30 +236,46 @@ function *beforeSaveOrderHistory() {
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId});
 
-    // get order details and streamline for display
-    var moltin_order_id = osoId
-    debug('..order sys order id: '+ moltin_order_id)
-    try {
-      var order = yield msc.findOrder(moltin_order_id)
-      var order_details = yield msc.getOrderDetail(moltin_order_id)
-      order_details = yield simplifyDetails.call(this, order_details)
-    } catch (err) {
-      logger.error('Error retrieving order items from ecommerce system ',
-        {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-        role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
-        error: err});
-      throw(err)
+    //Determine whether it is Square or Moltin API
+    var squareInfo = yield Square.getUnitSquareInfo(unitId);
+    if (squareInfo.location_id) {
+        var square_order_id = osoId;
+
+        var orderDetails = yield Square.getOrder(squareInfo.location_id, square_order_id);
+        var parsedOrderDetails = Square.simplifySquareOrderDetails(orderDetails);
+
+        this.resteasy.object.amount = Format.formatPrice(orderDetails.total_money.currency, getSquareMoneyValue(orderDetails.total_money.amount));
+        this.resteasy.object.order_detail = parsedOrderDetails;
+        delete this.resteasy.object.files;
     }
-    debug('...total amount '+ order.totals.formatted.total)
-    this.resteasy.object.amount = order.totals.formatted.total
-    debug('...order details ')
-    debug(order_details)
-    this.resteasy.object.order_detail = order_details
-    // Set the initial state
-    this.resteasy.object.status = {
-      order_requested : ''
+
+    else {
+      // get order details and streamline for display
+      var moltin_order_id = osoId;
+      var order_details = {};
+      debug('..order sys order id: '+ moltin_order_id)
+      try {
+        var order = yield msc.findOrder(moltin_order_id)
+        order_details = yield msc.getOrderDetail(moltin_order_id)
+        order_details = yield simplifyDetails.call(this, order_details)
+      } catch (err) {
+        logger.error('Error retrieving order items from ecommerce system ',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+          role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
+          error: err});
+        throw(err)
+      }
+      debug('...total amount '+ order.totals.formatted.total)
+      this.resteasy.object.amount = order.totals.formatted.total
+      debug('...order details ')
+      debug(order_details)
+      this.resteasy.object.order_detail = order_details;
+      // Set the initial state
+      this.resteasy.object.status = {
+        order_requested : ''
+      }
+      debug(this.resteasy.object);
     }
-    debug(this.resteasy.object)
 
     // Handle delivery details
     if (this.resteasy.object.for_delivery) {
@@ -308,7 +330,9 @@ function *beforeSaveOrderHistory() {
     }
 
     // Ready to save
-    debug(this.resteasy.object)
+    debug(this.resteasy.object);
+    console.log(this.resteasy.object);
+    console.log("ORDER BEING CREATED!!!!!!!!!!!!!!!!!!!!!");
     debug('...preprocessing complete. Ready to save')
   } else if (this.resteasy.operation == 'update') {
     debug('...update')
@@ -322,8 +346,8 @@ function *beforeSaveOrderHistory() {
         role: this.passport.user.role, order_id: this.params.id, error: err});
       throw(err)
     }
-    debug('..limited payload is..')
-    debug(this.resteasy.object)
+    debug('..limited payload is..');
+    debug(this.resteasy.object);
     if (this.resteasy.object.status) {
       var newStat = this.resteasy.object.status;
       debug('..status sent is '+ newStat)
@@ -1914,12 +1938,15 @@ module.exports = {
                         +'units.updated_at, '
                         +'units.payment, '
                         +'units.is_deleted, '
+                        +'companies.user_id AS "owner_id", '
                         +'countries.currency_id, '
                         +'countries.currency, '
                         +'countries.moltin_client_id, '
-                        +'countries.moltin_client_secret'))
-        .innerJoin('companies','units.company_id','companies.id')
-        .innerJoin('countries', 'companies.country_id', 'countries.id')
+                        +'countries.moltin_client_secret, '
+                        +'square_unit.location_id AS "square_location_id"'))
+          .innerJoin('companies','units.company_id','companies.id')
+          .innerJoin('countries', 'companies.country_id', 'countries.id')
+          .leftJoin('square_unit', 'units.id', 'square_unit.unit_id')
         .where('units.id', this.params.id);
     }
 

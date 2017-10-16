@@ -22,6 +22,8 @@ var properties = {
     },
     squareAuthUrl:"https://connect.squareup.com/oauth2/token",
     square: {
+        apiAddress:"https://connect.squareup.com/",
+        locationsUrl: "https://connect.squareup.com/v2/locations",
         clientId:"sq0idp-Y2wa0NUE74KRqxLr2VBMaA",
         clientSecret:"sq0csp-vVijIaxOAGPUC1LluWNOUN_cQB4aLh9dIyzQcauNfbk",
         redirectUrl:"https://www.streetfoodez.com/pb/"
@@ -38,7 +40,10 @@ var properties = {
     facebook_app_secret: "9262a21aa421194191a90298af79e509"
 };
 
-properties.squareRenewUrl = "https://connect.squareup.com/oauth2/clients/" + properties.square.clientId + "/access-token/renew";
+properties.squareRenewUrl = properties.square.apiAddress + "/oauth2/clients/" + properties.square.clientId + "/access-token/renew";
+properties.square.orderUrl = function (locationId) {
+    return properties.square.apiAddress + "v2/locations/" + locationId + "/orders/batch-retrieve"
+};
 
 module.exports = properties;
 
