@@ -1,13 +1,15 @@
 var storefront = require('../../app/controllers/storefront.server.controller');
+var foodpark = require('../../app/controllers/foodpark.server.controller');
 var auth = require('../../app/controllers/authentication.server.controller');
 var config = require('../../config/config');
 var passport = require('passport');
 var Router = require('koa-router');
 
-var ADMIN     = 'ADMIN',
-    OWNER     = 'OWNER',
-    UNITMGR   = 'UNITMGR',
-    CUSTOMER  = 'CUSTOMER';
+var ADMIN       = 'ADMIN',
+    OWNER       = 'OWNER',
+    UNITMGR     = 'UNITMGR',
+    CUSTOMER    = 'CUSTOMER',
+    FOODPARKMGR = 'FOODPARKMGR';
 
 var requireJWT = passport.authenticate('jwt', { session: false });
 
@@ -29,6 +31,9 @@ module.exports=function(app) {
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
 	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
+
+  /* Food Park Management */
+  router.get(apiversion + '/foodparks/:foodParkId/checkins', requireJWT, foodpark.getFoodParkCheckins)
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
   router.post(apiversion + '/companies/:companyId/featureddish',  requireJWT, storefront.uploadCompanyFeaturedDish)
@@ -57,6 +62,9 @@ module.exports=function(app) {
   router.param('menuItemId', storefront.getMenuItem);
   router.param('categoryId', storefront.getCategory);
   router.param('companyId', storefront.getCompany);
+
+  /* Food Park Management */
+  router.param('foodParkId', foodpark.getFoodParkCheckins);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

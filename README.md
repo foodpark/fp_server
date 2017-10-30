@@ -64,6 +64,10 @@ Go to http://localhost:1337/api/v1/rel/companies (for example) to hit a specific
 
 See the Service Catalog for endpoint and payload documentation.
 
+### GET /foodparks/:foodParkId/checkins
+
+List all units that have made checkin in a specific Food Park.
+
 ## Tests
 
 1. Install mocha

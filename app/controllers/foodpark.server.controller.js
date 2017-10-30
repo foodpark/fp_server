@@ -7,7 +7,6 @@ var debug = require('debug')('storefront');
 var _ = require('lodash');
 var logger = require('winston');
 
-
 const getErrorMessage = (err) => {
   let message = '';
   for (let errName in err.errors) {
@@ -17,7 +16,6 @@ const getErrorMessage = (err) => {
   return message;
 };
 
-
 const sendErrorResponse = (err, res, status) => {
   if (!status) status = 500
   return res.status(status).send({
@@ -25,15 +23,31 @@ const sendErrorResponse = (err, res, status) => {
   })
 };
 
-exports.listFoodParks = * (next) => {
-  let foodparks;
-  try {
-    foodparks = yield FoodPark.getAllFoodParks()
-  } catch (err) {
-    logger.error('[Error] - Get List of FoodParks')
-    throw (err)
+exports.getFoodParkCheckins = function * (id, next) {
+  var user = this.passport.user
+
+  if (!user || !user.role == 'FOODPARKMGR') {
+    this.status = 401
+    return
   }
-  debug(foodparks)
-  this.body = foodparks
+
+  debug('authorized...')
+  debug('getFoodParkCheckins')
+  debug('id ' + id)
+
+  if (!id || isNaN(id)) {
+    this.status = 400;
+    return
+  }
+
+  try {
+    var units = yield FoodPark.getFoodParkCheckins(id)
+    this.body = units.rows;
+  } catch (err) {
+    console.error('error getting foodpark checkins')
+    throw(err)
+  }
+
+  debug(units.rows)
   return;
 }
