@@ -418,8 +418,9 @@ COPY roles (id, type) FROM stdin;
 3	UNITMGR
 4	ADMIN
 5	DRIVER
+6	FOODPARKMGR
 \.
-SELECT pg_catalog.setval('roles_id_seq', 6, true);
+SELECT pg_catalog.setval('roles_id_seq', 7, true);
 
 COPY unit_types (id, type) FROM stdin;
 1	TRUCK
