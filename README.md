@@ -37,7 +37,7 @@ Install new schema
 
     :~$ cd db
     :~$ ./create_sfezdb.sh
-    
+
 Then install test data
 
     :~$ psql -U postgres sfezdb < sfez_create_test_data.dmp
@@ -51,14 +51,14 @@ Run the server (in development mode)
 Specific files can be turned on for debug via
 
     :~$ export DEBUG=auth,rest_options
-    
+
 See the debug file name in each file's requires block. For example:
 
     var debug   = require('debug')('auth');
 
 Go to http://localhost:1337/auth/login to login and obtain a JWT
 
-Go to http://localhost:1337/api/v1/rel/companies (for example) to hit a specific endpoint. 
+Go to http://localhost:1337/api/v1/rel/companies (for example) to hit a specific endpoint.
 
 ## API Reference
 
@@ -71,6 +71,18 @@ List all units that have made checkin in a specific Food Park.
 ### GET /foodparks/:foodParkId/units
 
 List all units managed by the Food Park specified.
+
+### POST /foodparks/:foodParkId/units
+
+Add a unit to a Food Park.
+
+JSON Body message
+
+```javascript
+{
+  "id_unit": 1
+}
+```
 
 ## Tests
 

@@ -12,6 +12,11 @@ exports.getFoodPark = function * (id, next) {
   yield next;
 }
 
+exports.getFoodParkUnitId = function * (id, next) {
+  this.foodpark.id_units = id;
+  yield next;
+}
+
 exports.getFoodParkCheckins = function * (next) {
   var user = this.passport.user
   var id = this.foodpark.id
@@ -71,3 +76,50 @@ exports.getFoodParkUnits = function * (id, next) {
   debug(units.rows)
   return;
 }
+
+exports.addFoodParkUnits = function * (id, next) {
+  var user = this.passport.user
+
+  if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
+    this.status = 401
+    return
+  }
+
+  if (!this.body) {
+    this.status = 400;
+    return
+  }
+
+  var id = this.foodpark.id
+  var id_unit = this.body.id_unit
+
+  if (!id || isNaN(id)) {
+    this.status = 400;
+    return
+  }
+
+  if (id_unit === undefined) {
+    this.status = 400;
+    return
+  }
+
+  debug('authorized...')
+  debug('addFoodParkUnits')
+  debug('id ' + id)
+
+  var b = {
+    id_unit: id_unit,
+    id_food_park: id
+  }
+
+  try {
+    yield FoodPark.addFoodParkUnits(b)
+  } catch (err) {
+    console.error('error adding foodpark units')
+    throw(err)
+  }
+
+  return
+}
+
+
