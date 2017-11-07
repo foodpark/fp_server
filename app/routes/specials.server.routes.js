@@ -13,5 +13,6 @@ module.exports=function(app) {
 	router.post(apiversion + '/specials', specials.getSpecials);
 
 	app.use(router.routes());
-  app.use(router.allowedMethods());
+    app.use(router.allowedMethods());
+
 };
