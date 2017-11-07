@@ -34,6 +34,7 @@ module.exports=function(app) {
 
   /* Food Park Management */
   router.get(apiversion + '/foodparks/:foodParkId/checkins', requireJWT, foodpark.getFoodParkCheckins)
+  router.get(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.getFoodParkUnits)
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
   router.post(apiversion + '/companies/:companyId/featureddish',  requireJWT, storefront.uploadCompanyFeaturedDish)
@@ -64,7 +65,7 @@ module.exports=function(app) {
   router.param('companyId', storefront.getCompany);
 
   /* Food Park Management */
-  router.param('foodParkId', foodpark.getFoodParkCheckins);
+  router.param('foodParkId', foodpark.getFoodPark);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

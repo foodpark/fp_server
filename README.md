@@ -68,6 +68,10 @@ See the Service Catalog for endpoint and payload documentation.
 
 List all units that have made checkin in a specific Food Park.
 
+### GET /foodparks/:foodParkId/units
+
+List all units managed by the Food Park specified.
+
 ## Tests
 
 1. Install mocha

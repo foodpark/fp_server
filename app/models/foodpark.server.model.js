@@ -14,3 +14,7 @@ exports.getFoodParkCheckins = function(id) {
     (select distinct unit_id from checkins where food_park_id = ${id}) as c
     on u.id = c.unit_id`);
 }
+
+exports.getFoodParkUnits = function(id) {
+  return knex('food_park_manegement').where('id_food_park', id);
+}
