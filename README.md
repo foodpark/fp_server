@@ -62,6 +62,10 @@ See the Service Catalog for endpoint and payload documentation.
 2. Execute all tests from root of SFEZ_server: mocha
 3. Execute specific test suite example: mocha test/authentication.server.test.js
 
+## Contribution
+
+* Setup editor: http://editorconfig.org/
+
 ## Contributors
 
 SFEZ CODERS ONLY!!
