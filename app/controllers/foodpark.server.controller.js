@@ -122,4 +122,40 @@ exports.addFoodParkUnits = function * (id, next) {
   return
 }
 
+exports.removeFoodParkUnits = function * (id, next) {
+  var user = this.passport.user
+  var id = this.foodpark.id
+  var id_units = this.foodpark.id_units
+
+  if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
+    this.status = 401
+    return
+  }
+
+  debug('authorized...')
+  debug('addFoodParkUnits')
+  debug('id ' + id)
+
+  if (!id || isNaN(id)) {
+    this.status = 400;
+    return
+  }
+
+  if (!id_units || isNaN(id_units)) {
+    this.status = 400;
+    return
+  }
+
+  try {
+    b = {'id_food_park': id, 'id_units': id_units}
+    yield FoodPark.removeFoodParkUnits(b)
+    this.body = {"message": "successfully deleted"};
+  } catch (err) {
+    console.error('error removing foodpark units')
+    throw(err)
+  }
+
+  return
+}
+
 

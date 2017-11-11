@@ -83,6 +83,9 @@ JSON Body message
   "id_unit": 1
 }
 ```
+### DELETE /foodparks/:foodParkId/units/:unitId
+
+Remove a specified unit from Food Park.
 
 ## Tests
 

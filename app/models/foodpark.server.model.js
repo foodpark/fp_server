@@ -23,4 +23,7 @@ exports.addFoodParkUnits = function(b) {
   return knex('food_park_manegement').insert(b);
 }
 
+exports.removeFoodParkUnits = function(b) {
+  return knex('food_park_manegement').where(b).delete();
+}
 
