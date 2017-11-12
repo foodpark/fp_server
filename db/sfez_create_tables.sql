@@ -412,6 +412,23 @@ CREATE TABLE order_state (
   callInfo text
 );
 
+CREATE TABLE public.food_park_manegement
+(
+    id SERIAL PRIMARY KEY,
+    id_food_park integer NOT NULL,
+    id_unit integer NOT NULL,
+    FOREIGN KEY (id_food_park)
+        REFERENCES public.food_parks (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (id_unit)
+        REFERENCES public.units (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+COMMENT ON TABLE public.food_park_manegement
+    IS 'This table represent the relationship that food parks are enable to see orders from units';
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
@@ -515,6 +532,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
 
 REVOKE ALL ON TABLE order_state FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_state TO sfez_rw;
+
+REVOKE ALL ON TABLE food_park_management FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_park_management TO sfez_rw;
 
 GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
