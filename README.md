@@ -72,6 +72,31 @@ List all units that have made checkin in a specific Food Park.
 
 List all units managed by the Food Park specified.
 
+### GET /foodparks/:foodParkId/units/actives_orders
+
+List all units with their actives orders.
+
+JSON Response Body
+```javascript
+[
+  {
+    "id": 2000
+    "name": "Classy Cuban Truck",
+    "type": "TRUCK",
+    "company_id": 110022,
+    "orders": [
+      {
+        "id", 123,
+        "amount": "R$35.00",
+        .
+        .
+        .
+      }
+    ]
+  }
+]
+```
+
 ### POST /foodparks/:foodParkId/units
 
 Add a unit to a Food Park.

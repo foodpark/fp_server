@@ -4,6 +4,7 @@ var auth = require('./authentication.server.controller');
 var msc = require('./moltin.server.controller');
 var config = require('../../config/config');
 var debug = require('debug')('storefront');
+var OrderHistory  = require('../models/orderhistory.server.model');
 var _ = require('lodash');
 var logger = require('winston');
 
@@ -18,6 +19,7 @@ exports.getFoodParkUnitId = function * (id, next) {
 }
 
 exports.getFoodParkCheckins = function * (next) {
+  console.log('aqui')
   var user = this.passport.user
   var id = this.foodpark.id
 
@@ -159,3 +161,42 @@ exports.removeFoodParkUnits = function * (id, next) {
 }
 
 
+exports.getUnitsActiveOrders = function * (next) {
+  var user = this.passport.user;
+  var food_park_id = this.params.foodParkId;
+
+  if (!user || !user.role == 'FOODPARKMGR') {
+    this.status = 401
+    return
+  }
+
+  debug('authorized...');
+  debug('getUnitsActiveOrders');
+
+  if (!food_park_id || isNaN(food_park_id)) {
+    this.status = 400;
+    return;
+  }
+
+  try {
+    debug('getActiveOrders');
+
+    var units = yield FoodPark.getFoodParkCheckins(food_park_id);
+    var response = [];
+    
+    logger.info(user);
+    
+    for (var i in units.rows) {
+      let unit = units.rows[i];
+      unit.orders = yield OrderHistory.getActiveOrders(unit.company_id, unit.id);
+      response.push(unit);
+    };
+    
+    this.body = response;
+  } catch (err) {
+    console.error('error getting foodpark active units orders');
+    throw(err);
+  }
+
+  return;
+};
