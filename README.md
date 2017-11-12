@@ -15,7 +15,15 @@ GET favorites/companies/{companyId}
 
 Provides relationship services between customer and food truck company.
 
+## Requirements
+
+- node: >= 7.0.0
+- docker: >= 1.13.0
+- docker-compose: >= 1.10
+
 ## Installation
+
+**Note: See docker section first**
 
 Dependencies: 
 1. Postgres installed
@@ -65,6 +73,87 @@ See the Service Catalog for endpoint and payload documentation.
 ## Contribution
 
 * Setup editor: http://editorconfig.org/
+
+## Docker
+
+If you want to use docker to up and running the service, follow the steps below.
+
+First you need to install docker and docker-compose in your machine, follow the resources
+to install:
+
+[Docke](https://docs.docker.com/engine/installation)
+[Docker Compose](https://docs.docker.com/engine/installation)
+
+With all the components installed follow the steps below:
+
+```bash
+$ cd docker/base-images
+$ docker-compose build
+```
+
+This will install all the docker base images necessary to run the project, when finish
+the download process, check the images:
+
+```bash
+$ docker images | grep sfez*
+sfez/postgres-client   9.5-stretch-slim
+sfez/node              8.9.1-slim
+sfez/postgres-server   9.5.6
+```
+Now is possible to create the services that we need to run the project, the first one
+and the main service is the database infrastructure. Follow the steps below:
+
+```bash
+$ cd docker/database
+$ docker-compose up -d
+```
+
+To check if the services are running, type:
+
+```bash
+$ docker ps -a | grep sfez*
+* * * * * * sfez-pgclient
+* * * * * * sfez-pgserver
+```
+
+Now is time to load data into database, type:
+
+```bash
+$ ./run
+```
+
+this will load all fake data into database:
+
+To test the database, type:
+
+```bash
+$ docker-compose exec sfez-pgclient pgcli -d sfezdb
+```
+
+and querying some data.
+
+After that we need to install our restapi and make some requests.
+
+```bash
+$ cd docker/webservice
+$ docke-compose up -d && docker-compose logs -f
+```
+
+To check if the rest api is running, type:
+
+```bash
+$ docker ps -a | grep
+* * * * * * sfez-webservice
+```
+
+with that you are able to change source code and make requests to the service.
+
+To stop the services change to the path where the docker-compose.yml file resides
+and type:
+
+```bash
+$ docker-compose down
+```
 
 ## Contributors
 
