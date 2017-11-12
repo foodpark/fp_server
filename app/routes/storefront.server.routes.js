@@ -36,7 +36,9 @@ module.exports=function(app) {
   router.get(apiversion + '/foodparks/:foodParkId/checkins', requireJWT, foodpark.getFoodParkCheckins)
   router.get(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.getFoodParkUnits)
   router.get(apiversion + '/foodparks/:foodParkId/units/actives_orders', requireJWT, foodpark.getUnitsActiveOrders)
+  router.get(apiversion + '/foodparks/:foodparkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.getDriverByOrder)
   router.post(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
+  router.post(apiversion + '/foodparks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.setDriverToOrder)
   router.delete(apiversion + '/foodparks/:foodParkId/units/:unitId', requireJWT, foodpark.removeFoodParkUnits)
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
@@ -70,6 +72,8 @@ module.exports=function(app) {
   /* Food Park Management */
   router.param('foodParkId', foodpark.getFoodPark);
   router.param('unitId', foodpark.getFoodParkUnitId);
+  router.param('orderId', foodpark.getDriverByOrder);
+  router.param('driverId', foodpark.getDriverByOrder);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

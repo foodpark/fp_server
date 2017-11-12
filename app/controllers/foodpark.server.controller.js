@@ -160,7 +160,6 @@ exports.removeFoodParkUnits = function * (id, next) {
   return
 }
 
-
 exports.getUnitsActiveOrders = function * (next) {
   var user = this.passport.user;
   var food_park_id = this.params.foodParkId;
@@ -195,6 +194,70 @@ exports.getUnitsActiveOrders = function * (next) {
     this.body = response;
   } catch (err) {
     console.error('error getting foodpark active units orders');
+    throw(err);
+  }
+
+  return;
+};
+
+exports.setDriverToOrder = function *(next) {
+  var user = this.passport.user;
+  var food_park_id = this.params.foodparkId;
+  var order_id = this.params.orderId;
+  var driver_id = this.params.driverId;
+
+  if (!user || !user.role == 'FOODPARKMGR') {
+    this.status = 401
+    return
+  }
+
+  if (driver_id === undefined || driver_id === null || isNaN(driver_id)) {
+    console.log('foi')
+    this.status = 400;
+    return;
+  }
+
+  console.log('foi')
+  try {
+    this.body = yield OrderHistory.updateOrder(order_id ,{'driver_id': driver_id});
+  } catch(err) {
+    console.error('error seting driver by foodpark manager');
+    throw(err);
+  }
+
+  return;
+};
+
+exports.getDriverByOrder = function *(next) {
+  var user = this.passport.user;
+  var food_park_id = this.params.foodparkId;
+  var order_id = this.params.orderId;
+  var driver_id = this.params.driverId;
+
+  if (!user || !user.role == 'FOODPARKMGR') {
+    this.status = 401
+    return
+  }
+
+  if (!food_park_id || isNaN(food_park_id)) {
+    this.status = 400;
+    return;
+  }
+
+  if (!order_id || isNaN(order_id)) {
+    this.status = 400;
+    return;
+  }
+
+  if (!driver_id || isNaN(driver_id)) {
+    this.status = 400;
+    return;
+  }
+
+  try {
+    this.body = yield OrderHistory.getDriverActiveOrders([parseInt(driver_id, 10)]);
+  } catch(err) {
+    console.error('error get driver by foodpark manager');
     throw(err);
   }
 
