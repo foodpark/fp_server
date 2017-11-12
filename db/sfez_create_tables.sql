@@ -1,5 +1,3 @@
-
-
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
@@ -14,8 +12,6 @@ SET search_path = public, pg_catalog;
 SET default_tablespace = '';
 
 SET default_with_oids = false;
-
-
 
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
@@ -155,7 +151,6 @@ CREATE TABLE companies (
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false)
 );
-
 
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
