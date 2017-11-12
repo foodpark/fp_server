@@ -7,7 +7,7 @@
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
+-- SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -20,13 +20,13 @@ SET search_path = public, pg_catalog;
 -- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY roles (id, type) FROM stdin;
-1	CUSTOMER
-2	OWNER
-3	UNITMGR
-4	ADMIN
-5	DRIVER
-\.
+-- COPY roles (id, type) FROM stdin;
+-- 1	CUSTOMER
+-- 2	OWNER
+-- 3	UNITMGR
+-- 4	ADMIN
+-- 5	DRIVER
+-- \.
 
 
 --
@@ -270,11 +270,11 @@ COPY food_parks (id, name, photo, territory_id, city, state, postal_code, countr
 -- Data for Name: unit_types; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY unit_types (id, type) FROM stdin;
-1	TRUCK
-2	CART
-3	RESTAURANT
-\.
+-- COPY unit_types (id, type) FROM stdin;
+-- 1	TRUCK
+-- 2	CART
+-- 3	RESTAURANT
+-- \.
 
 
 --
@@ -975,12 +975,12 @@ SELECT pg_catalog.setval('review_approvals_id_seq', 17, true);
 -- Data for Name: review_states; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY review_states (id, name, allowed_transitions) FROM stdin;
-1	New	{2,3,4}
-2	Approved	{3}
-3	Updated	{2,4}
-4	Disapproved	{3}
-\.
+-- COPY review_states (id, name, allowed_transitions) FROM stdin;
+-- 1	New	{2,3,4}
+-- 2	Approved	{3}
+-- 3	Updated	{2,4}
+-- 4	Disapproved	{3}
+-- \.
 
 
 --

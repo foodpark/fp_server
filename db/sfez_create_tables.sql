@@ -46,23 +46,6 @@ CREATE TABLE territories (
     is_deleted boolean DEFAULT(false)
 );
 
-CREATE TABLE food_parks (
-    id SERIAL PRIMARY KEY,
-    name text NOT NULL,
-    photo text,
-    territory_id integer REFERENCES territories(id),
-    city text,
-    state text,
-    postal_code text,
-    country text,
-    latitude float8,
-    longitude float8,
-    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    is_deleted boolean DEFAULT(false),
-    foodpark_mgr_id integer REFERENCES users(id)
-);
-
 CREATE TABLE locations (
   id SERIAL PRIMARY KEY,
   name text NOT NULL,
@@ -98,6 +81,23 @@ CREATE TABLE users (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false)
+);
+
+CREATE TABLE food_parks (
+    id SERIAL PRIMARY KEY,
+    name text NOT NULL,
+    photo text,
+    territory_id integer REFERENCES territories(id),
+    city text,
+    state text,
+    postal_code text,
+    country text,
+    latitude float8,
+    longitude float8,
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    is_deleted boolean DEFAULT(false),
+    foodpark_mgr_id integer REFERENCES users(id)
 );
 
 CREATE TABLE admins (
@@ -412,7 +412,7 @@ CREATE TABLE order_state (
   callInfo text
 );
 
-CREATE TABLE public.food_park_manegement
+CREATE TABLE public.food_park_management
 (
     id SERIAL PRIMARY KEY,
     id_food_park integer NOT NULL,
@@ -425,9 +425,9 @@ CREATE TABLE public.food_park_manegement
         REFERENCES public.units (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
-)
+);
 
-COMMENT ON TABLE public.food_park_manegement
+COMMENT ON TABLE public.food_park_management
     IS 'This table represent the relationship that food parks are enable to see orders from units';
 
 COPY roles (id, type) FROM stdin;
