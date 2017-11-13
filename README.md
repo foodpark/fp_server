@@ -97,6 +97,14 @@ JSON Response Body
 ]
 ```
 
+### GET /foodparks/:foodParkId/orders/:orderId/drivers/:driverId
+
+Get all orders that belongs to a driver
+
+JSON Response Body
+
+Array of objects
+
 ### POST /foodparks/:foodParkId/units
 
 Add a unit to a Food Park.
