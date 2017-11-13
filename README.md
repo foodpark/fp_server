@@ -72,7 +72,7 @@ List all units that have made checkin in a specific Food Park.
 
 List all units managed by the Food Park specified.
 
-### GET /foodparks/:foodParkId/units/actives_orders
+### GET /foodparks/:foodParkId/units/active_orders
 
 List all units with their actives orders.
 
@@ -137,7 +137,8 @@ If you want to use docker to up and running the service, follow the steps below.
 First you need to install docker and docker-compose in your machine, follow the resources
 to install:
 
-[Docke](https://docs.docker.com/engine/installation)
+[Docker](https://docs.docker.com/engine/installation)
+
 [Docker Compose](https://docs.docker.com/engine/installation)
 
 With all the components installed follow the steps below:

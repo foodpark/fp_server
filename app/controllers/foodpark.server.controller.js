@@ -212,12 +212,10 @@ exports.setDriverToOrder = function *(next) {
   }
 
   if (driver_id === undefined || driver_id === null || isNaN(driver_id)) {
-    console.log('foi')
     this.status = 400;
     return;
   }
 
-  console.log('foi')
   try {
     this.body = yield OrderHistory.updateOrder(order_id ,{'driver_id': driver_id});
   } catch(err) {
