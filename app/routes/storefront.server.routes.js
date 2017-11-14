@@ -38,7 +38,7 @@ module.exports=function(app) {
   router.get(apiversion + '/foodparks/:foodParkId/units/actives_orders', requireJWT, foodpark.getUnitsActiveOrders)
   router.get(apiversion + '/foodparks/:foodparkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.getDriverByOrder)
   router.post(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
-  router.post(apiversion + '/foodparks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.setDriverToOrder)
+  router.put(apiversion + '/foodparks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.setDriverToOrder)
   router.delete(apiversion + '/foodparks/:foodParkId/units/:unitId', requireJWT, foodpark.removeFoodParkUnits)
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
