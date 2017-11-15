@@ -10,7 +10,8 @@ module.exports = {
   client_secret: "K5M1sc3PZuBVU3gn5iMzymWGecDk1HT90ZrjWVra6P",
   grant_type: "client_credentials",
   defaultTaxBand: "1427064502431515521", // Brazil ICMS
-  deliveryCharge: "10",
+  deliveryRadius: ["2", "10", "15"],
+  deliveryCharge: ["0", "8", "10"],
   deliveryOffset: 15, // minutes
   sumup:{
     clientId:"com.sumup.apisampleapp",
