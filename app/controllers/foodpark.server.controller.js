@@ -205,7 +205,7 @@ exports.setDriverToOrder = function *(next) {
   var user = this.passport.user;
   var food_park_id = this.params.foodparkId;
   var order_id = this.params.orderId;
-  var driver_id = this.params.driverId;
+  var driver_id = this.body.driver_id;
 
   if (!user || !user.role == 'FOODPARKMGR') {
     this.status = 401
