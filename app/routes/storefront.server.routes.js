@@ -35,7 +35,7 @@ module.exports=function(app) {
   /* Food Park Management */
   router.get(apiversion + '/foodparks/:foodParkId/checkins', requireJWT, foodpark.getFoodParkCheckins)
   router.get(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.getFoodParkUnits)
-  router.get(apiversion + '/foodparks/:foodParkId/units/actives_orders', requireJWT, foodpark.getUnitsActiveOrders)
+  router.get(apiversion + '/foodparks/:foodParkId/units/active_orders', requireJWT, foodpark.getUnitsActiveOrders)
   router.get(apiversion + '/foodparks/:foodparkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.getDriverByOrder)
   router.post(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
   router.put(apiversion + '/foodparks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.setDriverToOrder)
