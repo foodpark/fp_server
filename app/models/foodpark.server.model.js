@@ -16,14 +16,14 @@ exports.getFoodParkCheckins = function(id) {
 }
 
 exports.getFoodParkUnits = function(id) {
-  return knex('food_park_manegement').where('id_food_park', id);
+  return knex('food_park_management').where('id_food_park', id);
 }
 
 exports.addFoodParkUnits = function(b) {
-  return knex('food_park_manegement').insert(b);
+  return knex('food_park_management').insert(b);
 }
 
 exports.removeFoodParkUnits = function(b) {
-  return knex('food_park_manegement').where(b).delete();
+  return knex('food_park_management').where(b).delete();
 }
 
