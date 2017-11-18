@@ -16,7 +16,7 @@ exports.getFoodParkCheckins = function(id) {
 }
 
 exports.getFoodParkUnits = function(id) {
-  return knex('food_park_management').where('id_food_park', id);
+  return knex('food_park_management').where('food_park_id', id);
 }
 
 exports.addFoodParkUnits = function(b) {

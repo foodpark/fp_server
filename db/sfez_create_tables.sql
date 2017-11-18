@@ -415,13 +415,13 @@ CREATE TABLE order_state (
 CREATE TABLE public.food_park_management
 (
     id SERIAL PRIMARY KEY,
-    id_food_park integer NOT NULL,
-    id_unit integer NOT NULL,
-    FOREIGN KEY (id_food_park)
+    food_park_id integer NOT NULL,
+    unit_id integer NOT NULL,
+    FOREIGN KEY (food_park_id)
         REFERENCES public.food_parks (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    FOREIGN KEY (id_unit)
+    FOREIGN KEY (unit_id)
         REFERENCES public.units (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE

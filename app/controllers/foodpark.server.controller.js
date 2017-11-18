@@ -14,12 +14,11 @@ exports.getFoodPark = function * (id, next) {
 }
 
 exports.getFoodParkUnitId = function * (id, next) {
-  this.foodpark.id_units = id;
+  this.foodpark.unit_id = id;
   yield next;
 }
 
 exports.getFoodParkCheckins = function * (next) {
-  console.log('aqui')
   var user = this.passport.user
   var id = this.foodpark.id
 
@@ -93,14 +92,14 @@ exports.addFoodParkUnits = function * (id, next) {
   }
 
   var id = this.foodpark.id
-  var id_unit = this.body.id_unit
+  var unit_id = this.body.unit_id
 
   if (!id || isNaN(id)) {
     this.status = 400;
     return
   }
 
-  if (id_unit === undefined) {
+  if (unit_id === undefined) {
     this.status = 400;
     return
   }
@@ -110,8 +109,8 @@ exports.addFoodParkUnits = function * (id, next) {
   debug('id ' + id)
 
   var b = {
-    id_unit: id_unit,
-    id_food_park: id
+    unit_id: unit_id,
+    food_park_id: id
   }
 
   try {
@@ -127,7 +126,7 @@ exports.addFoodParkUnits = function * (id, next) {
 exports.removeFoodParkUnits = function * (id, next) {
   var user = this.passport.user
   var id = this.foodpark.id
-  var id_unit = this.params.unitId
+  var unit_id = this.params.unitId
 
   if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
     this.status = 401
@@ -143,13 +142,13 @@ exports.removeFoodParkUnits = function * (id, next) {
     return
   }
 
-  if (!id_unit || isNaN(id_unit)) {
+  if (!unit_id || isNaN(unit_id)) {
     this.status = 400;
     return
   }
 
   try {
-    b = {'id_food_park': id, 'id_unit': id_unit}
+    b = {'food_park_id': id, 'unit_id': unit_id}
     console.log(b)
     let msg = yield FoodPark.removeFoodParkUnits(b)
     this.body = {"message": "successfully deleted"};
