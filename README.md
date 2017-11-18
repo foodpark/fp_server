@@ -72,6 +72,18 @@ List all units that have made checkin in a specific Food Park.
 
 List all units managed by the Food Park specified.
 
+### POST /foodparks/:foodParkId/units
+
+Add a unit to a Food Park.
+
+JSON Body message
+
+```javascript
+{
+  "unit_id": 1
+}
+```
+
 ### GET /foodparks/:foodParkId/units/active_orders
 
 List all units with their actives orders.
@@ -113,17 +125,6 @@ JSON Body Message
 
 ```javascript
 {"driver_id": 2000}
-```
-### PUT /foodparks/:foodParkId/units
-
-Add a unit to a Food Park.
-
-JSON Body message
-
-```javascript
-{
-  "unit_id": 1
-}
 ```
 ### DELETE /foodparks/:foodParkId/units/:unitId
 
