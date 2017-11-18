@@ -105,7 +105,7 @@ JSON Response Body
 
 Array of objects
 
-### POST /foodparks/:foodParkId/units
+### PUT /foodparks/:foodParkId/units
 
 Add a unit to a Food Park.
 
@@ -113,7 +113,7 @@ JSON Body message
 
 ```javascript
 {
-  "id_unit": 1
+  "unit_id": 1
 }
 ```
 ### DELETE /foodparks/:foodParkId/units/:unitId
