@@ -105,6 +105,15 @@ JSON Response Body
 
 Array of objects
 
+### PUT /foodparks/:foodParkId/orders/:orderId
+
+Add an order to a driver
+
+JSON Body Message
+
+```javascript
+{"driver_id": 2000}
+```
 ### PUT /foodparks/:foodParkId/units
 
 Add a unit to a Food Park.
