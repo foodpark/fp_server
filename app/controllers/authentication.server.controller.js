@@ -448,7 +448,7 @@ exports.register = function*(next, mapping) {
     var company_name = this.body.company_name;
     var email = this.body.email;
     var password = this.body.password;
-    var country_id = this.body.country_id;
+//    var country_id = this.body.country_id;
 
      var territory_id = this.body.territory_id;
     var phone = this.body.phone;
@@ -478,9 +478,9 @@ exports.register = function*(next, mapping) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!sentRole || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(sentRole.toUpperCase()) < 0) {
+    if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR'].indexOf(sentRole.toUpperCase()) < 0) {
       this.status = 422
-      this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
+      this.body = { error: 'Missing role: CUSTOMER / OWNER / ADMIN / FOODPARKMGR'}
       return;
     }
     const role = sentRole.toUpperCase(); 
@@ -614,6 +614,24 @@ exports.register = function*(next, mapping) {
       debug('...admin created with id '+ admin.id)
       userObject.admin_id = admin.id
 
+    } else if (role == 'FOODPARKMGR') {
+        /*
+        debug('register: creating food park manager with user id ' + userObject.id);
+
+        try {
+            var manager = (yield Manager.createManager(userObject.id))[0]
+        } catch (err) {
+            console.error('register: error creating food park manager');
+            console.error(err);
+            // clean up user
+            debug('deleting user ' + userObject.id);
+            yield removeUserOnFailure(userObject.id);
+            throw err;
+        }
+        debug('...food park manager created with id ' + manager.id)
+        debug(manager)
+        userObject.manager_id = manager.id
+        */
     }
 
     debug('register: completed. Authenticating user...')
