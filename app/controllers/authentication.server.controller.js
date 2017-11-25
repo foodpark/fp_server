@@ -14,7 +14,6 @@ var logger = require('winston');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var passport = require('passport');
 
-
 exports.CUSTOMER = 'CUSTOMER';
 exports.OWNER    = 'OWNER';
 exports.UNIT_MGR = 'UNITMGR';
@@ -480,7 +479,7 @@ exports.register = function*(next, mapping) {
     }
     if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR'].indexOf(sentRole.toUpperCase()) < 0) {
       this.status = 422
-      this.body = { error: 'Missing role: CUSTOMER / OWNER / ADMIN / FOODPARKMGR'}
+      this.body = { error: 'Missing role: CUSTOMER / OWNER / ADMIN / FOODPARKMGR'};
       return;
     }
     const role = sentRole.toUpperCase(); 
@@ -607,31 +606,12 @@ exports.register = function*(next, mapping) {
         console.error('register: error creating admin');
         console.error(err);
         // clean up user
-        debug('deleting user '+ userObject.id);
+        debug('deleting user ' + userObject.id);
         yield removeUserOnFailure(userObject.id);
         throw err;
       }
-      debug('...admin created with id '+ admin.id)
+      debug('...admin created with id ' + admin.id)
       userObject.admin_id = admin.id
-
-    } else if (role == 'FOODPARKMGR') {
-        /*
-        debug('register: creating food park manager with user id ' + userObject.id);
-
-        try {
-            var manager = (yield Manager.createManager(userObject.id))[0]
-        } catch (err) {
-            console.error('register: error creating food park manager');
-            console.error(err);
-            // clean up user
-            debug('deleting user ' + userObject.id);
-            yield removeUserOnFailure(userObject.id);
-            throw err;
-        }
-        debug('...food park manager created with id ' + manager.id)
-        debug(manager)
-        userObject.manager_id = manager.id
-        */
     }
 
     debug('register: completed. Authenticating user...')
