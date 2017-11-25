@@ -8,6 +8,7 @@ var Customer = require('../models/customer.server.model');
 var Driver = require('../models/driver.server.model');
 var Admin = require('../models/admin.server.model');
 var Unit = require('../models/unit.server.model');
+var FoodPark = require('../models/foodpark.server.model');
 var debug = require('debug')('auth');
 var _ = require('lodash');
 var logger = require('winston');
@@ -130,7 +131,7 @@ exports.login = function *(next) {
     }
     userInfo.drivers=drivers;
     meta.drivers = drivers;
-  } 
+  }
   debug('done')
   debug('userInfo: '+ userInfo)
   this.status = 200;
@@ -612,6 +613,14 @@ exports.register = function*(next, mapping) {
       }
       debug('...admin created with id ' + admin.id)
       userObject.admin_id = admin.id
+    } else if (role === 'FOODPARKMGR') {
+        try {
+            yield FoodPark.setManager(this.body.food_park_id, userObject.id);
+        } catch (err) {
+            console.error ('could not set manager on food park');
+            yield removeUserOnFailure(userObject.id);
+            throw err;
+        }
     }
 
     debug('register: completed. Authenticating user...')

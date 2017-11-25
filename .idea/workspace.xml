@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3d793df6-90c8-41b1-bb28-3e5fc4e6689c" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" afterPath="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/db/create_sfezdb.sh" afterPath="$PROJECT_DIR$/db/create_sfezdb.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" afterPath="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/foodpark.server.model.js" afterPath="$PROJECT_DIR$/app/models/foodpark.server.model.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/env/development.js" afterPath="$PROJECT_DIR$/config/env/development.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -20,11 +23,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="development.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="development.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/env/development.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="38" lean-forward="true" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
+            <state relative-caret-position="51">
+              <caret line="3" column="98" lean-forward="false" selection-start-line="3" selection-start-column="98" selection-end-line="3" selection-end-column="98" />
               <folding />
             </state>
           </provider>
@@ -33,8 +36,18 @@
       <file leaf-file-name="authentication.server.controller.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="50" lean-forward="false" selection-start-line="9" selection-start-column="50" selection-end-line="9" selection-end-column="50" />
+            <state relative-caret-position="586">
+              <caret line="618" column="23" lean-forward="true" selection-start-line="618" selection-start-column="23" selection-end-line="618" selection-end-column="23" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="foodpark.server.model.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="357">
+              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -70,31 +83,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="foodpark.server.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="foodpark.server.controller.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3893">
-              <caret line="229" column="10" lean-forward="false" selection-start-line="229" selection-start-column="6" selection-end-line="229" selection-end-column="10" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="storefront.server.routes.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/routes/storefront.server.routes.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="41" column="58" lean-forward="false" selection-start-line="41" selection-start-column="52" selection-end-line="41" selection-end-column="58" />
+            <state relative-caret-position="498">
+              <caret line="39" column="90" lean-forward="true" selection-start-line="39" selection-start-column="90" selection-end-line="39" selection-end-column="90" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="foodpark.server.controller.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="295">
+              <caret line="103" column="30" lean-forward="false" selection-start-line="103" selection-start-column="30" selection-end-line="103" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -103,7 +106,7 @@
       <file leaf-file-name="rest_options.server.test.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
+            <state relative-caret-position="-18">
               <caret line="70" column="43" lean-forward="false" selection-start-line="70" selection-start-column="43" selection-end-line="70" selection-end-column="43" />
               <folding />
             </state>
@@ -113,9 +116,27 @@
       <file leaf-file-name="rest_options.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/rest_options.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="312">
-              <caret line="1713" column="157" lean-forward="false" selection-start-line="1713" selection-start-column="150" selection-end-line="1713" selection-end-column="157" />
-              <folding />
+            <state relative-caret-position="-426">
+              <caret line="1713" column="157" lean-forward="false" selection-start-line="1713" selection-start-column="157" selection-end-line="1713" selection-end-column="157" />
+              <folding>
+                <marker date="1511644146202" expanded="true" signature="78311:78365" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="78311:82539" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="78411:82535" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="78517:78585" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="78706:78813" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="78988:79194" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="79363:79563" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="79645:80472" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="80087:80206" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="80224:80335" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="80351:80464" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="80576:80687" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="80794:80901" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="81011:81120" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="81429:81825" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="82014:82147" ph="{...}" />
+                <marker date="1511644146202" expanded="true" signature="82422:82529" ph="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -131,7 +152,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>this.resteasy.object</find>
       <find>resteasy.object.order_detail</find>
       <find>square</find>
       <find>getsquare</find>
@@ -157,10 +177,11 @@
       <find>unitmgr</find>
       <find>/</find>
       <find>/unit</find>
-      <find>/units</find>
       <find>UNITMGR</find>
       <find>sfez-pgserver</find>
+      <find>register</find>
       <find>foodparkmgr</find>
+      <find>/units</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -179,8 +200,9 @@
         <option value="$PROJECT_DIR$/config/env/production.js" />
         <option value="$PROJECT_DIR$/config/env/test.js" />
         <option value="$PROJECT_DIR$/config/env/development.js" />
-        <option value="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" />
         <option value="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" />
+        <option value="$PROJECT_DIR$/app/models/foodpark.server.model.js" />
+        <option value="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" />
       </list>
     </option>
   </component>
@@ -293,7 +315,7 @@
     <property name="nodejs_interpreter_path" value="/usr/bin/node" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
-    <property name="SearchEverywhereHistoryKey" value="AUTH&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;foodpark&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;r&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;square&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;rest&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;develo&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;moltin&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/moltin.server.controller.js&#10;authet&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/authentication.server.test.js&#10;squareuser&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;msc&#9;null&#9;null&#10;beforeorder&#9;null&#9;null&#10;squareuni&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;beforesaveorde&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="foodpark&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;AUTH&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;r&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;square&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;rest&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;develo&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;moltin&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/moltin.server.controller.js&#10;authet&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/authentication.server.test.js&#10;squareuser&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;msc&#9;null&#9;null&#10;beforeorder&#9;null&#9;null&#10;squareuni&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;beforesaveorde&#9;null&#9;null" />
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
   </component>
@@ -456,7 +478,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50870000" />
+    <option name="totallyTimeSpent" value="53857000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="332" y="46" width="1922" height="1092" extended-state="6" />
@@ -526,7 +548,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="17" column="42" lean-forward="true" selection-start-line="17" selection-start-column="42" selection-end-line="17" selection-end-column="42" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -534,7 +555,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="850">
           <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -560,7 +580,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1802">
           <caret line="106" column="10" lean-forward="false" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -595,7 +614,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1802">
           <caret line="106" column="10" lean-forward="false" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -679,7 +697,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1802">
           <caret line="106" column="10" lean-forward="false" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -697,7 +714,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="544">
           <caret line="32" column="0" lean-forward="false" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -705,21 +721,54 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
           <caret line="17" column="18" lean-forward="false" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js" />
     <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js" />
-    <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
+    <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3893">
-          <caret line="229" column="10" lean-forward="false" selection-start-line="229" selection-start-column="6" selection-end-line="229" selection-end-column="10" />
+        <state relative-caret-position="-18">
+          <caret line="70" column="43" lean-forward="false" selection-start-line="70" selection-start-column="43" selection-end-line="70" selection-end-column="43" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
+    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-426">
+          <caret line="1713" column="157" lean-forward="false" selection-start-line="1713" selection-start-column="157" selection-end-line="1713" selection-end-column="157" />
+          <folding>
+            <marker date="1511644146202" expanded="true" signature="78311:78365" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="78311:82539" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="78411:82535" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="78517:78585" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="78706:78813" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="78988:79194" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="79363:79563" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="79645:80472" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="80087:80206" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="80224:80335" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="80351:80464" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="80576:80687" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="80794:80901" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="81011:81120" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="81429:81825" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="82014:82147" ph="{...}" />
+            <marker date="1511644146202" expanded="true" signature="82422:82529" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/env/development.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="98" lean-forward="false" selection-start-line="3" selection-start-column="98" selection-end-line="3" selection-end-column="98" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/admin.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -735,14 +784,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/admin.server.model.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/models/user.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="533">
@@ -751,42 +792,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/routes/storefront.server.routes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="41" column="58" lean-forward="false" selection-start-line="41" selection-start-column="52" selection-end-line="41" selection-end-column="58" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="70" column="43" lean-forward="false" selection-start-line="70" selection-start-column="43" selection-end-line="70" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="312">
-          <caret line="1713" column="157" lean-forward="false" selection-start-line="1713" selection-start-column="150" selection-end-line="1713" selection-end-column="157" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="50" lean-forward="false" selection-start-line="9" selection-start-column="50" selection-end-line="9" selection-end-column="50" />
+        <state relative-caret-position="586">
+          <caret line="618" column="23" lean-forward="true" selection-start-line="618" selection-start-column="23" selection-end-line="618" selection-end-column="23" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config/env/development.js">
+    <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="38" lean-forward="true" selection-start-line="4" selection-start-column="38" selection-end-line="4" selection-end-column="38" />
+        <state relative-caret-position="357">
+          <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/storefront.server.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="498">
+          <caret line="39" column="90" lean-forward="true" selection-start-line="39" selection-start-column="90" selection-end-line="39" selection-end-column="90" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="295">
+          <caret line="103" column="30" lean-forward="false" selection-start-line="103" selection-start-column="30" selection-end-line="103" selection-end-column="30" />
           <folding />
         </state>
       </provider>

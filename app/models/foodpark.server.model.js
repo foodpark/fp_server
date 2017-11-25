@@ -27,3 +27,7 @@ exports.removeFoodParkUnits = function(b) {
   return knex('food_park_management').where(b).delete();
 }
 
+exports.setManager = function (foodParkId, userId) {
+  return knex('food_parks').where('id', foodParkId).update('foodpark_mgr', userId);
+}
+

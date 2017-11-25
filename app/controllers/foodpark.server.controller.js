@@ -81,7 +81,9 @@ exports.getFoodParkUnits = function * (id, next) {
 exports.addFoodParkUnits = function * (id, next) {
   var user = this.passport.user
 
+
   if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
+
     this.status = 401
     return
   }
@@ -112,6 +114,7 @@ exports.addFoodParkUnits = function * (id, next) {
     unit_id: unit_id,
     food_park_id: id
   }
+
 
   try {
     yield FoodPark.addFoodParkUnits(b)

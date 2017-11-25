@@ -1,7 +1,7 @@
 var port = 1337;
 module.exports = {
   port: port,
-  pg_connection_string: process.env.DATABASE_URL || "postgres://sfez_rw:sfez@sfez-pgserver:5432/sfezdb",
+  pg_connection_string: process.env.DATABASE_URL || "postgres://sfez_rw:sfez@localhost:5432/sfezdb",
   secret: "CorrectHorseBatteryStaple",
   apiVersion: "v1",
   moltinAuthUrl: "https://api.molt.in/oauth/access_token",
