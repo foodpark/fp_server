@@ -22,22 +22,22 @@ const RENEWAL_TOLERANCE_IN_DAYS = 14; //number of days till expiration date that
  * @param expiresAt
  * @returns {string}
  */
-function registerAccessToken(userId, accessToken, merchantId, expiresAt) {
-    var squareUserRelationship = '';
-
+function * registerAccessToken(userId, accessToken, merchantId, expiresAt) {
     try {
-        squareUserRelationship = yield SquareUser.createSquareUserRelationship(userId, accessToken, merchantId, expiresAt);
+        console.log('okok');
+        var squareUserRelationship = yield SquareUser.createSquareUserRelationship(userId, accessToken, merchantId, expiresAt);
+
+        debug('..Square-User relationship');
+        debug(squareUserRelationship);
+
+        this.body = squareUserRelationship;
+
+        yield next();
     } catch (err) {
         logger.error('Error creating Square-User relationship');
         throw (err);
     }
-    debug('..Square-User relationship');
-    debug(squareUserRelationship);
-    squareUserRelationship.then(function (data) {
-        console.log(data);
-    });
 
-    return squareUserRelationship;
 }
 
 /**
@@ -202,9 +202,13 @@ exports.setupToken = function * (next, res) {
          var expiresAt = result.expires_at;
          var merchantId = result.merchant_id;
 
+         console.log(accessToken);
+         console.log(expiresAt);
+         console.log(merchantId);
+
         logger.info("Getting user square access token");
 
-        registerAccessToken(this.user.id, accessToken, merchantId, expiresAt);
+        yield registerAccessToken(this.user.id, accessToken, merchantId, expiresAt);
     }
 };
 
@@ -313,25 +317,29 @@ exports.registerLocation = function * (next) {
     yield next;
 };
 
-function getSquareOrder(locationId, orderId) {
+function * getSquareOrder(locationId, orderId) {
     var order_ids = [];
     order_ids.push(orderId);
     var form = {
         'order_ids' : order_ids
     };
 
+    var squareInfo = yield SquareUnit.getAccessTokenByLocation(locationId);
+    var accessToken = squareInfo.rows[0].access_token;
+
     return new Promise(function (resolve, reject) {
         request.post({
             url: config.square.orderUrl(locationId),
             json: form,
             headers: {
-                'Authorization': 'Bearer sq0atp-NnbqTtYYFud0GUrnWXKBPA'
+                'Authorization': 'Bearer ' + accessToken
             },
             maxAttempts: 3,
             retryDelay: 150 // wait for 150 ms before trying again
         })
         .then(function (res) {
             var data = res.body;
+            console.log(data);
             resolve(data.orders[0]); //retrieve only one order
         })
         .catch( function (err) {

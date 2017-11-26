@@ -7,6 +7,7 @@
     <list default="true" id="3d793df6-90c8-41b1-bb28-3e5fc4e6689c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/square.server.controller.js" afterPath="$PROJECT_DIR$/app/controllers/square.server.controller.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/squareunit.server.model.js" afterPath="$PROJECT_DIR$/app/models/squareunit.server.model.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -28,51 +29,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="226">
               <caret line="624" column="9" lean-forward="false" selection-start-line="624" selection-start-column="9" selection-end-line="624" selection-end-column="9" />
-              <folding>
-                <marker date="1511732445560" expanded="true" signature="19614:19620" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="19614:19858" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="19614:19938" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="19971:22706" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="20374:22192" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="20537:20579" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="20589:20818" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="20684:20796" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="20910:21016" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="21207:21271" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="21284:21387" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="21521:21600" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="21613:21838" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="22200:22282" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="22512:22605" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="22741:22963" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="22994:25203" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="23390:24897" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="23816:24065" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="24075:24896" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="24293:24411" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="24956:25074" ph="[...]" />
-                <marker date="1511732445560" expanded="true" signature="25132:25196" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="25205:25384" ph="//..." />
-                <marker date="1511732445560" expanded="true" signature="25438:26008" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="25524:26006" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="25534:25627" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="25640:25753" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="25803:25863" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26057:26342" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26139:26312" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26218:26291" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26318:26340" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26380:26420" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26483:27472" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26611:27461" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26632:26675" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26690:27451" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26715:27369" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="26918:27353" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="27057:27335" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="27086:27274" ph="{...}" />
-                <marker date="1511732445560" expanded="true" signature="27386:27439" ph="{...}" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -80,7 +37,7 @@
       <file leaf-file-name="admin.server.model.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/models/admin.server.model.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-18">
+            <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
@@ -90,8 +47,8 @@
       <file leaf-file-name="customer.server.model.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/models/customer.server.model.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-18">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="34">
+              <caret line="2" column="32" lean-forward="true" selection-start-line="2" selection-start-column="32" selection-end-line="2" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -102,9 +59,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="271">
               <caret line="36" column="90" lean-forward="false" selection-start-line="36" selection-start-column="90" selection-end-line="36" selection-end-column="90" />
-              <folding>
-                <marker date="1511732445540" expanded="true" signature="6277:6346" ph="{...}" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -112,8 +67,8 @@
       <file leaf-file-name="rest_options.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/rest_options.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-29">
-              <caret line="1705" column="132" lean-forward="false" selection-start-line="1705" selection-start-column="132" selection-end-line="1705" selection-end-column="132" />
+            <state relative-caret-position="229">
+              <caret line="243" column="49" lean-forward="false" selection-start-line="243" selection-start-column="49" selection-end-line="243" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -122,7 +77,7 @@
       <file leaf-file-name="square.server.routes.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/routes/square.server.routes.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-18">
+            <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
@@ -132,8 +87,38 @@
       <file leaf-file-name="square.server.controller.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/controllers/square.server.controller.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="28" column="39" lean-forward="false" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
+            <state relative-caret-position="329">
+              <caret line="327" column="54" lean-forward="false" selection-start-line="327" selection-start-column="54" selection-end-line="327" selection-end-column="54" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="squareunit.server.model.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="374">
+              <caret line="22" column="110" lean-forward="false" selection-start-line="22" selection-start-column="110" selection-end-line="22" selection-end-column="110" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="foodpark.server.model.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="469">
+              <caret line="34" column="139" lean-forward="false" selection-start-line="34" selection-start-column="139" selection-end-line="34" selection-end-column="151" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="squareuser.server.model.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="391">
+              <caret line="23" column="2" lean-forward="true" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
               <folding />
             </state>
           </provider>
@@ -150,20 +135,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>/unit</find>
-      <find>UNITMGR</find>
-      <find>sfez-pgserver</find>
-      <find>foodparkmgr</find>
-      <find>/units</find>
-      <find>country_id</find>
-      <find>params</find>
-      <find>this.body = units.rows;</find>
-      <find>/drivers</find>
-      <find>register</find>
-      <find>.insert(</find>
-      <find>.delete</find>
-      <find>this.body = yield</find>
-      <find>delete</find>
       <find>togglecustomerfavorit</find>
       <find>getuser</find>
       <find>this.params</find>
@@ -176,10 +147,24 @@
       <find>DELETEDRIVER</find>
       <find>unit</find>
       <find>driver</find>
-      <find>exports.register</find>
       <find>food_parks</find>
-      <find>inner</find>
       <find>regi</find>
+      <find>registeracs</find>
+      <find>function *</find>
+      <find>yield next</find>
+      <find>setuptoken</find>
+      <find>location_id</find>
+      <find>getOrder</find>
+      <find>getusersquareinfo</find>
+      <find>locationid</find>
+      <find>inner</find>
+      <find>knex.raw</find>
+      <find>exports.register</find>
+      <find>getssquare</find>
+      <find>getacces</find>
+      <find>accesstoken</find>
+      <find>accessToken</find>
+      <find>getaccess</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -190,9 +175,7 @@
       <list>
         <option value="$PROJECT_DIR$/test/authentication.server.test.js" />
         <option value="$PROJECT_DIR$/app/models/squareuser.server.model.js" />
-        <option value="$PROJECT_DIR$/app/models/squareunit.server.model.js" />
         <option value="$PROJECT_DIR$/app/routes/square.server.routes.js" />
-        <option value="$PROJECT_DIR$/app/rest_options.js" />
         <option value="$PROJECT_DIR$/app/utils/formatutils.js" />
         <option value="$PROJECT_DIR$/config/env/production.js" />
         <option value="$PROJECT_DIR$/config/env/test.js" />
@@ -201,6 +184,8 @@
         <option value="$PROJECT_DIR$/app/routes/storefront.server.routes.js" />
         <option value="$PROJECT_DIR$/app/models/foodpark.server.model.js" />
         <option value="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" />
+        <option value="$PROJECT_DIR$/app/rest_options.js" />
+        <option value="$PROJECT_DIR$/app/models/squareunit.server.model.js" />
         <option value="$PROJECT_DIR$/app/controllers/square.server.controller.js" />
       </list>
     </option>
@@ -320,7 +305,7 @@
     <property name="nodejs_interpreter_path" value="/usr/bin/node" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
-    <property name="SearchEverywhereHistoryKey" value="store&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/routes/storefront.server.routes.js&#10;food&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;auth&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;rest&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/rest_options.server.test.js&#10;foodpar&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/foodpark.server.model.js&#10;restop&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;foodpark&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;AUTH&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;r&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;square&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;develo&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;moltin&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/moltin.server.controller.js&#10;authet&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/authentication.server.test.js&#10;squareuser&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;msc&#9;null&#9;null&#10;beforeorder&#9;null&#9;null&#10;squareuni&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;beforesaveorde&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="squareunit&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;store&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/routes/storefront.server.routes.js&#10;food&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;auth&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;rest&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/rest_options.server.test.js&#10;foodpar&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/foodpark.server.model.js&#10;restop&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;foodpark&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;AUTH&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;r&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;square&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;develo&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;moltin&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/moltin.server.controller.js&#10;authet&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/authentication.server.test.js&#10;squareuser&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;msc&#9;null&#9;null&#10;beforeorder&#9;null&#9;null&#10;squareuni&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;beforesaveorde&#9;null&#9;null" />
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
   </component>
@@ -483,12 +468,13 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69951000" />
+    <option name="totallyTimeSpent" value="74205000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="332" y="46" width="1922" height="1092" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17606747" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39895287" sideWeight="0.501845" order="7" side_tool="true" content_ui="tabs" />
@@ -547,7 +533,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/controllers/square.server.controller.js" />
     <entry file="file://$PROJECT_DIR$/config/env/production.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="289">
@@ -694,27 +679,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/routes/square.server.routes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-18">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/utils/timeutils.js" />
     <entry file="file://$PROJECT_DIR$/app/controllers/moltin.server.controller.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1802">
           <caret line="106" column="10" lean-forward="false" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/square.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" column="39" lean-forward="false" selection-start-line="28" selection-start-column="39" selection-end-line="28" selection-end-column="39" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -740,8 +709,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js" />
-    <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js" />
     <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="6">
@@ -753,6 +720,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
           <caret line="66" column="0" lean-forward="false" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -760,58 +728,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="12" column="4" lean-forward="false" selection-start-line="12" selection-start-column="4" selection-end-line="12" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="624" column="9" lean-forward="false" selection-start-line="624" selection-start-column="9" selection-end-line="624" selection-end-column="9" />
-          <folding>
-            <marker date="1511732445560" expanded="true" signature="19614:19620" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="19614:19858" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="19614:19938" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="19971:22706" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="20374:22192" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="20537:20579" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="20589:20818" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="20684:20796" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="20910:21016" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="21207:21271" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="21284:21387" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="21521:21600" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="21613:21838" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="22200:22282" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="22512:22605" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="22741:22963" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="22994:25203" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="23390:24897" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="23816:24065" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="24075:24896" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="24293:24411" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="24956:25074" ph="[...]" />
-            <marker date="1511732445560" expanded="true" signature="25132:25196" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="25205:25384" ph="//..." />
-            <marker date="1511732445560" expanded="true" signature="25438:26008" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="25524:26006" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="25534:25627" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="25640:25753" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="25803:25863" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26057:26342" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26139:26312" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26218:26291" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26318:26340" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26380:26420" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26483:27472" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26611:27461" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26632:26675" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26690:27451" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26715:27369" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="26918:27353" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="27057:27335" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="27086:27274" ph="{...}" />
-            <marker date="1511732445560" expanded="true" signature="27386:27439" ph="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -823,26 +740,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/admin.server.model.js">
+    <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-18">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/customer.server.model.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-18">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-29">
-          <caret line="1705" column="132" lean-forward="false" selection-start-line="1705" selection-start-column="132" selection-end-line="1705" selection-end-column="132" />
+        <state relative-caret-position="399">
+          <caret line="237" column="40" lean-forward="false" selection-start-line="237" selection-start-column="40" selection-end-line="237" selection-end-column="40" />
           <folding />
         </state>
       </provider>
@@ -851,24 +752,87 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="271">
           <caret line="36" column="90" lean-forward="false" selection-start-line="36" selection-start-column="90" selection-end-line="36" selection-end-column="90" />
-          <folding>
-            <marker date="1511732445540" expanded="true" signature="6277:6346" ph="{...}" />
-          </folding>
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/admin.server.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/square.server.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/firebase-admin/lib/index.d.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="309">
+          <caret line="121" column="4" lean-forward="false" selection-start-line="121" selection-start-column="4" selection-end-line="121" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="243" column="49" lean-forward="false" selection-start-line="243" selection-start-column="49" selection-end-line="243" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="624" column="9" lean-forward="false" selection-start-line="624" selection-start-column="9" selection-end-line="624" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="23" column="2" lean-forward="true" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/customer.server.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="32" lean-forward="true" selection-start-line="2" selection-start-column="32" selection-end-line="2" selection-end-column="32" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="465">
-          <caret line="34" column="47" lean-forward="false" selection-start-line="34" selection-start-column="47" selection-end-line="34" selection-end-column="47" />
+        <state relative-caret-position="469">
+          <caret line="34" column="139" lean-forward="false" selection-start-line="34" selection-start-column="139" selection-end-line="34" selection-end-column="151" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
+    <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="237" column="40" lean-forward="false" selection-start-line="237" selection-start-column="40" selection-end-line="237" selection-end-column="40" />
+        <state relative-caret-position="374">
+          <caret line="22" column="110" lean-forward="false" selection-start-line="22" selection-start-column="110" selection-end-line="22" selection-end-column="110" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/square.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="327" column="54" lean-forward="false" selection-start-line="327" selection-start-column="54" selection-end-line="327" selection-end-column="54" />
+          <folding />
         </state>
       </provider>
     </entry>
