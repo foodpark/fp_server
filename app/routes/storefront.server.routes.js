@@ -40,6 +40,9 @@ module.exports=function(app) {
   router.post(apiversion + '/foodparks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
   router.put(apiversion + '/foodparks/:foodParkId/orders/:orderId', requireJWT, foodpark.setDriverToOrder)
   router.delete(apiversion + '/foodparks/:foodParkId/units/:unitId', requireJWT, foodpark.removeFoodParkUnits)
+  router.get(apiversion + '/foodparks/:foodParkId/drivers', requireJWT, foodpark.getDrivers)
+  router.post(apiversion + '/foodparks/:foodParkId/drivers', requireJWT, foodpark.addDriver)
+  router.delete(apiversion + '/foodparks/:foodParkId/drivers/:userId', requireJWT, foodpark.deleteDriver)
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
   router.post(apiversion + '/companies/:companyId/featureddish',  requireJWT, storefront.uploadCompanyFeaturedDish)
@@ -75,6 +78,7 @@ module.exports=function(app) {
   router.param('orderId', foodpark.getDriverByOrder);
   router.param('orderId', foodpark.setDriverToOrder);
   router.param('driverId', foodpark.getDriverByOrder);
+  router.param('userId', foodpark.getUser);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

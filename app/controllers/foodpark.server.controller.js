@@ -229,6 +229,97 @@ exports.setDriverToOrder = function *(next) {
   return;
 };
 
+exports.getDrivers = function * (next) {
+    var foodParkId = this.params.foodParkId;
+    var user = this.passport.user;
+
+    if (!user || user.role !== 'FOODPARKMGR') {
+        this.status = 401;
+        return;
+    }
+
+    try {
+      var drivers = yield FoodPark.getAllDrivers(foodParkId);
+      this.body = drivers.rows;
+    } catch (err) {
+      console.error ('failed on getting drivers');
+      this.body = 'failed on getting drivers';
+      throw(err);
+    }
+};
+
+exports.addDriver = function * (next) {
+    var foodParkId = this.params.foodParkId;
+    var user = this.passport.user;
+
+    var driverId = this.body.user_id;
+
+    var driver = yield User.getSingleUser(driverId);
+
+    if (!user || user.role !== 'FOODPARKMGR') {
+        this.status = 401;
+        return;
+    }
+
+    if (!driver || driver[0].role !== 'DRIVER') {
+        this.status = 400;
+        this.body = {message : 'invalid driver'};
+        return;
+    }
+
+    try {
+        var foodpark_driver = {
+            user_id : driverId,
+            food_park_id : foodParkId
+        };
+
+        yield FoodPark.addDriver(foodpark_driver);
+        this.status = 200;
+        this.body = { message : 'driver-foodpark relationship created!', data : driver};
+
+    } catch (err) {
+        console.error('failed to create driver');
+        this.body = {message : 'failed to create driver'};
+        throw(err);
+    }
+}
+;
+
+exports.getUser = function * (id, next) {
+    this.user = {id: id};
+    yield next;
+};
+
+exports.deleteDriver = function * (next, req) {
+    var foodParkId = this.params.foodParkId;
+    var user = this.passport.user;
+
+    var driverId = this.params.userId;
+    var driver = yield User.getSingleUser(driverId);
+
+    if (!user || user.role !== 'FOODPARKMGR') {
+        this.status = 401;
+        return;
+    }
+
+    if (!driverId || driver[0].role !== 'DRIVER') {
+        this.status = 400;
+        this.body = {message : 'invalid driver'};
+        return;
+    }
+
+    try {
+        var deleteDriverRelationship = { food_park_id : foodParkId, user_id : driverId};
+        var deleted = yield FoodPark.deleteDriver(deleteDriverRelationship);
+        this.body = {message : 'deleted successfully'};
+        return;
+    } catch (err) {
+        console.error('failed to delete driver');
+        this.body = {message : 'failed to delete driver'};
+        throw(err);
+    }
+};
+
 exports.getDriverByOrder = function *(next) {
   var user = this.passport.user;
   var food_park_id = this.params.foodparkId;

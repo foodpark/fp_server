@@ -13,21 +13,35 @@ exports.getFoodParkCheckins = function(id) {
   return knex.raw(`select u.id, u.name, u.type, u.company_id from units as u inner join
     (select distinct unit_id from checkins where food_park_id = ${id}) as c
     on u.id = c.unit_id`);
-}
+};
 
 exports.getFoodParkUnits = function(id) {
   return knex('food_park_management').where('food_park_id', id);
-}
+};
 
 exports.addFoodParkUnits = function(b) {
   return knex('food_park_management').insert(b);
-}
+};
 
 exports.removeFoodParkUnits = function(b) {
   return knex('food_park_management').where(b).delete();
-}
+};
 
 exports.setManager = function (foodParkId, userId) {
   return knex('food_parks').where('id', foodParkId).update('foodpark_mgr', userId);
+};
+
+exports.getAllDrivers = function (foodParkId) {
+  return knex.raw(`select drivers.* from food_park_management f right join drivers on f.unit_id = drivers.unit_id where f.food_park_id = ${foodParkId};`);
+};
+
+exports.addDriver = function (driverFoodpark) {
+  console.log('adding driver');
+  return knex('drivers_foodpark').insert(driverFoodpark);
+};
+
+exports.deleteDriver = function (driverFoodpark) {
+  console.log('deleting driver');
+  return knex('drivers_foodpark').where(driverFoodpark).del();
 }
 
