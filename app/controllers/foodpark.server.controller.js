@@ -83,7 +83,6 @@ exports.addFoodParkUnits = function * (id, next) {
 
 
   if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
-
     this.status = 401
     return
   }
@@ -227,6 +226,36 @@ exports.setDriverToOrder = function *(next) {
   }
 
   return;
+};
+
+exports.setAvailable = function * (next) {
+    var user = this.passport.user;
+    var foodParkId = this.params.foodParkId;
+    var driverId = this.params.userId;
+
+    var driver = yield User.getSingleUser(driverId);
+
+    var available = this.body.available;
+
+    if (!user || !user.role === 'FOODPARKMGR') {
+      this.status = 401;
+      return;
+    }
+
+    if (!driver || driver[0].role !== 'DRIVER') {
+      this.status = 400;
+      this.body = {message : 'invalid driver'};
+      return;
+    }
+
+    try {
+      var drivers = yield FoodPark.setAvailable(foodParkId, driverId, available);
+      this.body = {message : 'update was successful'};
+    } catch (err) {
+      console.error ('failed on getting drivers');
+      this.body = 'failed on getting drivers';
+      throw(err);
+    }
 };
 
 exports.getDrivers = function * (next) {

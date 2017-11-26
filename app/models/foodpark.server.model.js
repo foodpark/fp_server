@@ -32,7 +32,12 @@ exports.setManager = function (foodParkId, userId) {
 };
 
 exports.getAllDrivers = function (foodParkId) {
-  return knex.raw(`select users.* from drivers_foodpark df right join users on df.user_id = users.id where df.food_park_id = ${foodParkId};`);
+  return knex.raw(`select users.*, df.available from drivers_foodpark df right join users on df.user_id = users.id where df.food_park_id = ${foodParkId};`);
+};
+
+exports.setAvailable = function (foodParkId, driverId, available) {
+  console.log('setting availability');
+  return knex('drivers_foodpark').update({available : available}).where({food_park_id : foodParkId, user_id : driverId });
 };
 
 exports.addDriver = function (driverFoodpark) {
