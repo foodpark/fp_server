@@ -120,10 +120,10 @@ function requestRenew(accessToken) {
  * @param merchantId
  * @returns {Promise.<*>}
  */
-async function updateAccessTokenInfo(userId, accessToken, expirationDate, merchantId) {
+function * updateAccessTokenInfo(next, userId, accessToken, expirationDate, merchantId) {
     var updatedSquareInfo;
     try {
-        updatedSquareInfo = await SquareUser.updateUserInfo(userId, accessToken, expirationDate, merchantId);
+        updatedSquareInfo = yield SquareUser.updateUserInfo(userId, accessToken, expirationDate, merchantId);
         return updatedSquareInfo;
     } catch (err) {
         logger.error('Error updating Square-User relationship');
@@ -135,19 +135,19 @@ async function updateAccessTokenInfo(userId, accessToken, expirationDate, mercha
  * Handles Square access token renewal workflow
  * @returns {Promise.<void>}
  */
-exports.renewToken = async function () {
+exports.renewToken = function * (next) {
     const userId = this.user.id;
-    var squareUserRelPromise = await SquareUser.getByUser(userId);
+    var squareUserRelPromise = yield SquareUser.getByUser(userId);
     var squareUserRel = squareUserRelPromise[0];
 
     var shouldRenew = isCloseToExpire(squareUserRel.expires_at);
 
     if (shouldRenew) {
         logger.info("Renewing token of client " + userId);
-        var renewedSquareInfo = await requestRenew(squareUserRel.access_token);
+        var renewedSquareInfo = yield requestRenew(squareUserRel.access_token);
 
         if (renewedSquareInfo.access_token) {
-            var updatedAcessInfo = await updateAccessTokenInfo(userId, renewedSquareInfo.access_token, new Date(renewedSquareInfo.expires_at), renewedSquareInfo.merchant_id);
+            var updatedAcessInfo = yield updateAccessTokenInfo(userId, renewedSquareInfo.access_token, new Date(renewedSquareInfo.expires_at), renewedSquareInfo.merchant_id);
             this.body = updatedAcessInfo[0];
         }
 
@@ -193,9 +193,9 @@ exports.setUser = function *(userId, next){
  * @param res
  * @returns {Promise.<void>}
  */
-exports.setupToken = async function (res) {
+exports.setupToken = function * (next, res) {
     var authenticationCode = this.body.authentication_code;
-    var result = await buildAccessToken(authenticationCode);
+    var result = yield buildAccessToken(authenticationCode);
 
     if (result.access_token) {
          var accessToken = result.access_token;
