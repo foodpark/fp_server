@@ -32,7 +32,7 @@ exports.setManager = function (foodParkId, userId) {
 };
 
 exports.getAllDrivers = function (foodParkId) {
-  return knex.raw(`select drivers.* from drivers_foodpark df right join drivers on df.user_id = users.id where f.food_park_id = ${foodParkId};`);
+  return knex.raw(`select users.* from drivers_foodpark df right join users on df.user_id = users.id where f.food_park_id = ${foodParkId};`);
 };
 
 exports.addDriver = function (driverFoodpark) {
