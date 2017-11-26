@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 # gitignore
 node_modules/*
 .DS_store
@@ -12,6 +11,4 @@ backup*
 ####################
 *access.log
 *error.log
-=======
 .idea/
->>>>>>> Stashed changes

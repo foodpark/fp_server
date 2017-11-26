@@ -8,12 +8,12 @@ var Customer = require('../models/customer.server.model');
 var Driver = require('../models/driver.server.model');
 var Admin = require('../models/admin.server.model');
 var Unit = require('../models/unit.server.model');
+var FoodPark = require('../models/foodpark.server.model');
 var debug = require('debug')('auth');
 var _ = require('lodash');
 var logger = require('winston');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var passport = require('passport');
-
 
 exports.CUSTOMER = 'CUSTOMER';
 exports.OWNER    = 'OWNER';
@@ -131,7 +131,7 @@ exports.login = function *(next) {
     }
     userInfo.drivers=drivers;
     meta.drivers = drivers;
-  } 
+  }
   debug('done')
   debug('userInfo: '+ userInfo)
   this.status = 200;
@@ -330,9 +330,11 @@ var createCompany = function *(company_name, email, country_id, userId) {
   logger.info('delivery charge category successfully created', meta);
 
   debug('..create delivery charge item');
-  var deliveryChgItem = '';
+  var deliveryChgItem = ['', '', ''];
   try {
-    deliveryChgItem = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
+    deliveryChgItem[0] = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
+    deliveryChgItem[1] = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
+    deliveryChgItem[2] = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
   } catch (err) {
     meta.error = err;
     logger.error('Error during Moltin delivery charge item creation', meta);
@@ -340,7 +342,13 @@ var createCompany = function *(company_name, email, country_id, userId) {
       yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
   }
-  meta.delivery_chg_item_id= deliveryChgItem.id;
+  
+  var deliveryChgItemIds = [
+    deliveryChgItem[0].id,
+    deliveryChgItem[1].id,
+    deliveryChgItem[2].id
+  ];
+  meta.delivery_chg_item_id = deliveryChgItemIds;
   logger.info('delivery charge item successfully created', meta);
 
   //get tax band from country
@@ -363,7 +371,7 @@ var createCompany = function *(company_name, email, country_id, userId) {
  var sfezCompany = '';
   try {
     sfezCompany = (yield Company.createCompany(company_name, email, userId, moltinCompany.id,
-      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
+      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItemIds, config.deliveryRadius, config.deliveryCharge,
       dailySpecialCat.id, country_id, taxband))[0];
   } catch (err) {
     meta.error = err;
@@ -444,7 +452,7 @@ exports.register = function*(next, mapping) {
     var password = this.body.password;
     var country_id = this.body.country_id;
 
-     var territory_id = this.body.territory_id;
+    var territory_id = this.body.territory_id;
     var phone = this.body.phone;
 
     const sentRole = this.body.role; //this is the value sent by the call; 
@@ -472,9 +480,9 @@ exports.register = function*(next, mapping) {
       this.body = {error: 'Please enter a password.'}
       return;
     }
-    if (!sentRole || ['OWNER','CUSTOMER','ADMIN','DRIVER'].indexOf(sentRole.toUpperCase()) < 0) {
+    if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR'].indexOf(sentRole.toUpperCase()) < 0) {
       this.status = 422
-      this.body = {error: 'Missing role: CUSTOMER / OWNER / ADMIN'}
+      this.body = { error: 'Missing role: CUSTOMER / OWNER / ADMIN / FOODPARKMGR'};
       return;
     }
     const role = sentRole.toUpperCase(); 
@@ -601,13 +609,20 @@ exports.register = function*(next, mapping) {
         console.error('register: error creating admin');
         console.error(err);
         // clean up user
-        debug('deleting user '+ userObject.id);
+        debug('deleting user ' + userObject.id);
         yield removeUserOnFailure(userObject.id);
         throw err;
       }
-      debug('...admin created with id '+ admin.id)
+      debug('...admin created with id ' + admin.id)
       userObject.admin_id = admin.id
-
+    } else if (role === 'FOODPARKMGR') {
+        try {
+            yield FoodPark.setManager(this.body.food_park_id, userObject.id);
+        } catch (err) {
+            console.error ('could not set manager on food park');
+            yield removeUserOnFailure(userObject.id);
+            throw err;
+        }
     }
 
     debug('register: completed. Authenticating user...')

@@ -37,6 +37,6 @@ echo "...done"
 ## TEST DATA INSERTION
 ## Uncomment psql line below
 
- echo "Creating test data..."
- psql sfezdb < sfez_create_test_data.dmp
- echo "...done"
+# echo "Creating test data..."
+# psql sfezdb < sfez_create_test_data.dmp
+# echo "...done"

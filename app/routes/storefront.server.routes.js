@@ -1,21 +1,38 @@
 var storefront = require('../../app/controllers/storefront.server.controller');
+var foodpark = require('../../app/controllers/foodpark.server.controller');
 var auth = require('../../app/controllers/authentication.server.controller');
 var config = require('../../config/config');
 var passport = require('passport');
 var Router = require('koa-router');
 
-var ADMIN     = 'ADMIN',
-    OWNER     = 'OWNER',
-    UNITMGR   = 'UNITMGR',
-    CUSTOMER  = 'CUSTOMER';
+var ADMIN       = 'ADMIN',
+    OWNER       = 'OWNER',
+    UNITMGR     = 'UNITMGR',
+    CUSTOMER    = 'CUSTOMER',
+    FOODPARKMGR = 'FOODPARKMGR';
 
 var requireJWT = passport.authenticate('jwt', { session: false });
 
 module.exports=function(app) {
 	var router = new Router();
+	var relApiversion = '/api/'+ config.apiVersion + '/rel';
 	var apiversion = '/api/'+ config.apiVersion + '/mol';
 
 	router.use(passport.authenticate(['jwt','anonymous'], {session:false}));
+
+  /* Food Park Management */
+  router.get(relApiversion + '/food_parks/:foodParkId/checkins', requireJWT, foodpark.getFoodParkCheckins)
+  router.get(relApiversion + '/food_parks/:foodParkId/units', requireJWT, foodpark.getFoodParkUnits)
+  router.get(relApiversion + '/food_parks/:foodParkId/units/active_orders', requireJWT, foodpark.getUnitsActiveOrders)
+  router.get(relApiversion + '/food_parks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.getDriverByOrder)
+  router.post(relApiversion + '/food_parks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
+  router.put(relApiversion + '/food_parks/:foodParkId/orders/:orderId', requireJWT, foodpark.setDriverToOrder)
+  router.delete(relApiversion + '/food_parks/:foodParkId/units/:unitId', requireJWT, foodpark.removeFoodParkUnits)
+  router.get(relApiversion + '/food_parks/:foodParkId/drivers', requireJWT, foodpark.getDrivers)
+  router.post(relApiversion + '/food_parks/:foodParkId/drivers', requireJWT, foodpark.addDriver)
+  router.delete(relApiversion + '/food_parks/:foodParkId/drivers/:userId', requireJWT, foodpark.deleteDriver)
+  router.put(relApiversion + '/food_parks/:foodParkId/drivers/:userId/', requireJWT, foodpark.setAvailable)
+
 
   router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems)
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
@@ -29,6 +46,7 @@ module.exports=function(app) {
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
 	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
+
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
   router.post(apiversion + '/companies/:companyId/featureddish',  requireJWT, storefront.uploadCompanyFeaturedDish)
@@ -57,6 +75,14 @@ module.exports=function(app) {
   router.param('menuItemId', storefront.getMenuItem);
   router.param('categoryId', storefront.getCategory);
   router.param('companyId', storefront.getCompany);
+
+  /* Food Park Management */
+  router.param('foodParkId', foodpark.getFoodPark);
+  router.param('unitId', foodpark.getFoodParkUnitId);
+  router.param('orderId', foodpark.getDriverByOrder);
+  router.param('orderId', foodpark.setDriverToOrder);
+  router.param('driverId', foodpark.getDriverByOrder);
+  router.param('userId', foodpark.getUser);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

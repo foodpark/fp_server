@@ -1,5 +1,3 @@
-
-
 SET statement_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
@@ -14,8 +12,6 @@ SET search_path = public, pg_catalog;
 SET default_tablespace = '';
 
 SET default_with_oids = false;
-
-
 
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
@@ -43,22 +39,6 @@ CREATE TABLE territories (
     country text,
     country_id integer REFERENCES countries(id),
     timezone text,
-    latitude float8,
-    longitude float8,
-    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    is_deleted boolean DEFAULT(false)
-);
-
-CREATE TABLE food_parks (
-    id SERIAL PRIMARY KEY,
-    name text NOT NULL,
-    photo text,
-    territory_id integer REFERENCES territories(id),
-    city text,
-    state text,
-    postal_code text,
-    country text,
     latitude float8,
     longitude float8,
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
@@ -101,6 +81,23 @@ CREATE TABLE users (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false)
+);
+
+CREATE TABLE food_parks (
+    id SERIAL PRIMARY KEY,
+    name text NOT NULL,
+    photo text,
+    territory_id integer REFERENCES territories(id),
+    city text,
+    state text,
+    postal_code text,
+    country text,
+    latitude float8,
+    longitude float8,
+    created_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
+    is_deleted boolean DEFAULT(false),
+    foodpark_mgr_id integer REFERENCES users(id)
 );
 
 CREATE TABLE admins (
@@ -155,7 +152,6 @@ CREATE TABLE companies (
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false)
 );
-
 
 CREATE TABLE customers (
     id SERIAL PRIMARY KEY,
@@ -416,6 +412,23 @@ CREATE TABLE order_state (
   callInfo text
 );
 
+CREATE TABLE public.food_park_management
+(
+    id SERIAL PRIMARY KEY,
+    food_park_id integer NOT NULL,
+    unit_id integer NOT NULL,
+    FOREIGN KEY (food_park_id)
+        REFERENCES public.food_parks (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (unit_id)
+        REFERENCES public.units (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+COMMENT ON TABLE public.food_park_management
+    IS 'This table represent the relationship that food parks are enable to see orders from units';
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
@@ -423,8 +436,9 @@ COPY roles (id, type) FROM stdin;
 3	UNITMGR
 4	ADMIN
 5	DRIVER
+6	FOODPARKMGR
 \.
-SELECT pg_catalog.setval('roles_id_seq', 6, true);
+SELECT pg_catalog.setval('roles_id_seq', 7, true);
 
 COPY unit_types (id, type) FROM stdin;
 1	TRUCK
@@ -518,6 +532,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
 
 REVOKE ALL ON TABLE order_state FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_state TO sfez_rw;
+
+REVOKE ALL ON TABLE food_park_management FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_park_management TO sfez_rw;
 
 GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
