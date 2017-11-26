@@ -448,9 +448,9 @@ exports.register = function*(next, mapping) {
     var company_name = this.body.company_name;
     var email = this.body.email;
     var password = this.body.password;
-//    var country_id = this.body.country_id;
+    var country_id = this.body.country_id;
 
-     var territory_id = this.body.territory_id;
+    var territory_id = this.body.territory_id;
     var phone = this.body.phone;
 
     const sentRole = this.body.role; //this is the value sent by the call; 
