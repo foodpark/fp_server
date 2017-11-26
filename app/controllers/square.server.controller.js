@@ -26,7 +26,7 @@ function registerAccessToken(userId, accessToken, merchantId, expiresAt) {
     var squareUserRelationship = '';
 
     try {
-        squareUserRelationship = SquareUser.createSquareUserRelationship(userId, accessToken, merchantId, expiresAt);
+        squareUserRelationship = yield SquareUser.createSquareUserRelationship(userId, accessToken, merchantId, expiresAt);
     } catch (err) {
         logger.error('Error creating Square-User relationship');
         throw (err);
