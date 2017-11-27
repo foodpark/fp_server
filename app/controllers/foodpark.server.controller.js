@@ -67,8 +67,8 @@ exports.getFoodParkUnits = function * (id, next) {
   }
 
   try {
-    var units = yield FoodPark.getFoodParkUnits(id)
-    this.body = units;
+    var units = yield FoodPark.getFoodParkUnits(id);
+    this.body = units.rows;
   } catch (err) {
     console.error('error getting foodpark units')
     throw(err)
@@ -183,7 +183,7 @@ exports.getUnitsActiveOrders = function * (next) {
   try {
     debug('getActiveOrders');
 
-    var units = yield FoodPark.getFoodParkCheckins(food_park_id);
+    var units = yield FoodPark.getFoodParkUnits(food_park_id);
     var response = [];
 
     logger.info(user);

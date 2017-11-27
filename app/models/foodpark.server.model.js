@@ -9,12 +9,8 @@ exports.getSingleFoodPar = function(id) {
   return knex('food_parks').select().where('id', id);
 };
 
-exports.getFoodParkCheckins = function(id) {
-  return knex.raw(`select units.* from food_park_management fm right join units on fm.unit_id = units.id where fm.food_park_id = ${id};`);
-};
-
 exports.getFoodParkUnits = function(id) {
-  return knex('food_park_management').where('food_park_id', id);
+  return knex.raw(`select units.* from food_park_management fm right join units on fm.unit_id = units.id where fm.food_park_id = ${id};`);
 };
 
 exports.addFoodParkUnits = function(b) {
