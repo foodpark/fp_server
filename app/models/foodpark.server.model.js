@@ -10,9 +10,7 @@ exports.getSingleFoodPar = function(id) {
 };
 
 exports.getFoodParkCheckins = function(id) {
-  return knex.raw(`select u.id, u.name, u.type, u.company_id from units as u inner join
-    (select distinct unit_id from checkins where food_park_id = ${id}) as c
-    on u.id = c.unit_id`);
+  return knex.raw(`select units.* from food_park_management fm right join units on fm.unit_id = units.id where fm.food_park_id = ${id};`);
 };
 
 exports.getFoodParkUnits = function(id) {

@@ -174,6 +174,7 @@ exports.getUnitsActiveOrders = function * (next) {
   debug('authorized...');
   debug('getUnitsActiveOrders');
 
+
   if (!food_park_id || isNaN(food_park_id)) {
     this.status = 400;
     return;
@@ -184,7 +185,7 @@ exports.getUnitsActiveOrders = function * (next) {
 
     var units = yield FoodPark.getFoodParkCheckins(food_park_id);
     var response = [];
-    
+
     logger.info(user);
     
     for (var i in units.rows) {
