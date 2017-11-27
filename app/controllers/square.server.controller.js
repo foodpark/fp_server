@@ -24,20 +24,16 @@ const RENEWAL_TOLERANCE_IN_DAYS = 14; //number of days till expiration date that
  */
 function * registerAccessToken(userId, accessToken, merchantId, expiresAt) {
     try {
-        console.log('okok');
         var squareUserRelationship = yield SquareUser.createSquareUserRelationship(userId, accessToken, merchantId, expiresAt);
 
         debug('..Square-User relationship');
         debug(squareUserRelationship);
 
         this.body = squareUserRelationship;
-
-        yield next();
     } catch (err) {
         logger.error('Error creating Square-User relationship');
         throw (err);
     }
-
 }
 
 /**
