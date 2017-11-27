@@ -68,7 +68,7 @@ exports.getFoodParkUnits = function * (id, next) {
 
   try {
     var units = yield FoodPark.getFoodParkUnits(id)
-    this.body = units.rows;
+    this.body = units;
   } catch (err) {
     console.error('error getting foodpark units')
     throw(err)
