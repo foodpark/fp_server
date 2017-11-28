@@ -12,8 +12,7 @@ var properties = {
     grant_type: "client_credentials",
     olddefaultTaxBand: "1278235843793780901", // Brazil ICMS
     defaultTaxBand: "1427064502431515521",
-    deliveryRadius: ["2", "10", "15"],
-    deliveryCharge: ["0", "8", "10"],
+    deliveryCharge: "10",
     deliveryOffset: 15,
     sumup:{
         clientId:"com.sumup.apisampleapp",

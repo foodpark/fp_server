@@ -330,11 +330,9 @@ var createCompany = function *(company_name, email, country_id, userId) {
   logger.info('delivery charge category successfully created', meta);
 
   debug('..create delivery charge item');
-  var deliveryChgItem = ['', '', ''];
+  var deliveryChgItem = '';
   try {
-    deliveryChgItem[0] = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
-    deliveryChgItem[1] = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
-    deliveryChgItem[2] = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
+    deliveryChgItem = yield createMoltinDeliveryChargeItem(company, deliveryChgCat.id);
   } catch (err) {
     meta.error = err;
     logger.error('Error during Moltin delivery charge item creation', meta);
@@ -342,13 +340,7 @@ var createCompany = function *(company_name, email, country_id, userId) {
       yield removeMoltinCompanyOnFailure(moltinCompany.id);
     throw (err);
   }
-  
-  var deliveryChgItemIds = [
-    deliveryChgItem[0].id,
-    deliveryChgItem[1].id,
-    deliveryChgItem[2].id
-  ];
-  meta.delivery_chg_item_id = deliveryChgItemIds;
+  meta.delivery_chg_item_id= deliveryChgItem.id;
   logger.info('delivery charge item successfully created', meta);
 
   //get tax band from country
@@ -371,7 +363,7 @@ var createCompany = function *(company_name, email, country_id, userId) {
  var sfezCompany = '';
   try {
     sfezCompany = (yield Company.createCompany(company_name, email, userId, moltinCompany.id,
-      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItemIds, config.deliveryRadius, config.deliveryCharge,
+      moltinCat.id, moltinCat.slug, deliveryChgCat.id, deliveryChgItem.id, config.deliveryCharge,
       dailySpecialCat.id, country_id, taxband))[0];
   } catch (err) {
     meta.error = err;

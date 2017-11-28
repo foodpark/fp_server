@@ -41,7 +41,7 @@ exports.verifyOwner = function(companyId, userId) {
 };
 
 exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, moltSlug, 
-  deliveryCat, deliveryItem, deliveryChgRadius, deliveryChgAmount,  dailySpecialCat, countryId, taxband) {
+  deliveryCat, deliveryItem, deliveryChgAmount, dailySpecialCat, countryId, taxband) {
   return knex('companies').insert(
     {
       name: name,
@@ -51,7 +51,6 @@ exports.createCompany = function(name, email, userId, moltCoId, moltDefCat, molt
       default_cat: moltDefCat,
       delivery_chg_cat_id: deliveryCat,
       delivery_chg_item_id: deliveryItem,
-      delivery_chg_radius: deliveryChgRadius,
       delivery_chg_amount: deliveryChgAmount,
       daily_special_cat_id: dailySpecialCat,
       base_slug: moltSlug,
