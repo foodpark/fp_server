@@ -143,7 +143,7 @@ function getSquareMoneyValue(value) {
     return value / CENTS_IN_ONE;
 }
 
-function *beforeSaveOrderHistory() {
+function * beforeSaveOrderHistory() {
   debug('beforeSaveOrderHistory');
   debug(this.resteasy.object);
   debug('..operation '+ this.resteasy.operation)
@@ -237,19 +237,20 @@ function *beforeSaveOrderHistory() {
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId});
 
     //Determine whether it is Square or Moltin API
-    var squareInfo = yield Square.getUnitSquareInfo(unitId);
-    if (squareInfo.location_id) {
-        var square_order_id = osoId;
+    // var squareInfo = yield Square.getUnitSquareInfo(unitId);
+    //
+    // if (squareInfo.location_id) {
+    //     var square_order_id = osoId;
+    //
+    //     var orderDetails = yield Square.getOrder(squareInfo.location_id, square_order_id);
+    //     var parsedOrderDetails = Square.simplifySquareOrderDetails(orderDetails);
+    //
+    //     this.resteasy.object.amount = Format.formatPrice(orderDetails.total_money.currency, getSquareMoneyValue(orderDetails.total_money.amount));
+    //     this.resteasy.object.order_detail = parsedOrderDetails;
+    //     delete this.resteasy.object.files;
+    // }
 
-        var orderDetails = yield Square.getOrder(squareInfo.location_id, square_order_id);
-        var parsedOrderDetails = Square.simplifySquareOrderDetails(orderDetails);
-
-        this.resteasy.object.amount = Format.formatPrice(orderDetails.total_money.currency, getSquareMoneyValue(orderDetails.total_money.amount));
-        this.resteasy.object.order_detail = parsedOrderDetails;
-        delete this.resteasy.object.files;
-    }
-
-    else {
+    // else {
       // get order details and streamline for display
       var moltin_order_id = osoId;
       var order_details = {};
@@ -275,7 +276,7 @@ function *beforeSaveOrderHistory() {
         order_requested : ''
       }
       debug(this.resteasy.object);
-    }
+    // }
 
     // Handle delivery details
     if (this.resteasy.object.for_delivery) {
