@@ -42,5 +42,10 @@ exports.addDriver = function (driverFoodpark) {
 exports.deleteDriver = function (driverFoodpark) {
   console.log('deleting driver');
   return knex('drivers_foodpark').where(driverFoodpark).del();
-}
+};
+
+exports.getManagedFoodPark = function (userId) {
+  console.log('retrieving foodpark managed');
+  return knex('food_parks').select().where({foodpark_mgr : userId});
+};
 

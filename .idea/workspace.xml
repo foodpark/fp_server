@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/app/models/foodpark.server.model.js" line="34" />
+    <bookmark url="file://$PROJECT_DIR$/app/models/foodpark.server.model.js" line="28" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d793df6-90c8-41b1-bb28-3e5fc4e6689c" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/square.server.controller.js" afterPath="$PROJECT_DIR$/app/controllers/square.server.controller.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/squareunit.server.model.js" afterPath="$PROJECT_DIR$/app/models/squareunit.server.model.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" afterPath="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/foodpark.server.model.js" afterPath="$PROJECT_DIR$/app/models/foodpark.server.model.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -24,81 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="authentication.server.controller.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="authentication.server.controller.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="226">
-              <caret line="624" column="9" lean-forward="false" selection-start-line="624" selection-start-column="9" selection-end-line="624" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="admin.server.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/admin.server.model.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="customer.server.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/customer.server.model.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="32" lean-forward="true" selection-start-line="2" selection-start-column="32" selection-end-line="2" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="storefront.server.routes.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/routes/storefront.server.routes.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="271">
-              <caret line="36" column="90" lean-forward="false" selection-start-line="36" selection-start-column="90" selection-end-line="36" selection-end-column="90" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="rest_options.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/rest_options.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="229">
-              <caret line="243" column="49" lean-forward="false" selection-start-line="243" selection-start-column="49" selection-end-line="243" selection-end-column="49" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="square.server.routes.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/routes/square.server.routes.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="square.server.controller.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/controllers/square.server.controller.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="327" column="54" lean-forward="false" selection-start-line="327" selection-start-column="54" selection-end-line="327" selection-end-column="54" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="squareunit.server.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="22" column="110" lean-forward="false" selection-start-line="22" selection-start-column="110" selection-end-line="22" selection-end-column="110" />
+            <state relative-caret-position="278">
+              <caret line="104" column="30" lean-forward="false" selection-start-line="104" selection-start-column="30" selection-end-line="104" selection-end-column="30" />
               <folding />
             </state>
           </provider>
@@ -107,18 +37,78 @@
       <file leaf-file-name="foodpark.server.model.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="469">
-              <caret line="34" column="139" lean-forward="false" selection-start-line="34" selection-start-column="139" selection-end-line="34" selection-end-column="151" />
+            <state relative-caret-position="720">
+              <caret line="48" column="65" lean-forward="false" selection-start-line="48" selection-start-column="65" selection-end-line="48" selection-end-column="65" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="squareuser.server.model.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js">
+      <file leaf-file-name="rest_options.server.test.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="23" column="2" lean-forward="true" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
+            <state relative-caret-position="258">
+              <caret line="67" column="5" lean-forward="false" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="driver.server.model.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/driver.server.model.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="51">
+              <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="rest_options.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/rest_options.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="17">
+              <caret line="1688" column="14" lean-forward="false" selection-start-line="1688" selection-start-column="7" selection-end-line="1688" selection-end-column="14" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="orderstatus.server.controller.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/orderstatus.server.controller.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="order.server.controller.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/order.server.controller.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="459">
+              <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="orderstatus.server.routes.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/routes/orderstatus.server.routes.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="order.server.routes.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/routes/order.server.routes.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -135,37 +125,40 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>togglecustomerfavorit</find>
-      <find>getuser</find>
-      <find>this.params</find>
-      <find>exports.getuser</find>
-      <find>foodparkid</find>
-      <find>foodpark.unit_id</find>
-      <find>foodparkUnitId</find>
-      <find>unitID</find>
-      <find>THIS.PARAMS</find>
-      <find>DELETEDRIVER</find>
-      <find>unit</find>
-      <find>driver</find>
-      <find>food_parks</find>
-      <find>regi</find>
-      <find>registeracs</find>
-      <find>function *</find>
-      <find>yield next</find>
-      <find>setuptoken</find>
-      <find>location_id</find>
-      <find>getOrder</find>
-      <find>getusersquareinfo</find>
-      <find>locationid</find>
-      <find>inner</find>
-      <find>knex.raw</find>
+      <find>orders</find>
+      <find>getactiveorders</find>
+      <find>console.log</find>
+      <find>getunits</find>
+      <find>createCompany</find>
+      <find>price entered</find>
+      <find>getfoodparkunits</find>
+      <find>SKU must be unique</find>
+      <find>1</find>
+      <find>createMoltinDeliveryChargeItem</find>
+      <find>deliverycharge</find>
+      <find>admin</find>
       <find>exports.register</find>
-      <find>getssquare</find>
-      <find>getacces</find>
-      <find>accesstoken</find>
-      <find>accessToken</find>
-      <find>getaccess</find>
+      <find>foodpark</find>
+      <find>getdriver</find>
+      <find>d</find>
+      <find>driver</find>
+      <find>Driver</find>
+      <find>Driver.</find>
+      <find>driver.</find>
+      <find>\n  it\(\'should create a new pickup order\'\, function\(done\) \{</find>
+      <find>order_history</find>
+      <find>square</find>
+      <find>.name</find>
+      <find>beforesaveorder</find>
+      <find>company_id</find>
+      <find>authenticate</find>
+      <find>authorize</find>
+      <find>exports</find>
+      <find>getmanager</find>
     </findStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$</dir>
+    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -180,13 +173,15 @@
         <option value="$PROJECT_DIR$/config/env/production.js" />
         <option value="$PROJECT_DIR$/config/env/test.js" />
         <option value="$PROJECT_DIR$/config/env/development.js" />
-        <option value="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" />
         <option value="$PROJECT_DIR$/app/routes/storefront.server.routes.js" />
-        <option value="$PROJECT_DIR$/app/models/foodpark.server.model.js" />
-        <option value="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" />
-        <option value="$PROJECT_DIR$/app/rest_options.js" />
         <option value="$PROJECT_DIR$/app/models/squareunit.server.model.js" />
+        <option value="$PROJECT_DIR$/app/models/orderhistory.server.model.js" />
+        <option value="$PROJECT_DIR$/app/controllers/foodpark.server.controller.js" />
+        <option value="$PROJECT_DIR$/app/controllers/moltin.server.controller.js" />
         <option value="$PROJECT_DIR$/app/controllers/square.server.controller.js" />
+        <option value="$PROJECT_DIR$/app/rest_options.js" />
+        <option value="$PROJECT_DIR$/app/models/foodpark.server.model.js" />
+        <option value="$PROJECT_DIR$/app/controllers/authentication.server.controller.js" />
       </list>
     </option>
   </component>
@@ -251,7 +246,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -297,7 +292,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -305,7 +300,7 @@
     <property name="nodejs_interpreter_path" value="/usr/bin/node" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
-    <property name="SearchEverywhereHistoryKey" value="squareunit&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;store&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/routes/storefront.server.routes.js&#10;food&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;auth&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;rest&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/rest_options.server.test.js&#10;foodpar&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/foodpark.server.model.js&#10;restop&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;foodpark&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;AUTH&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;r&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;square&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;develo&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;moltin&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/moltin.server.controller.js&#10;authet&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/authentication.server.test.js&#10;squareuser&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;msc&#9;null&#9;null&#10;beforeorder&#9;null&#9;null&#10;squareuni&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;beforesaveorde&#9;null&#9;null" />
+    <property name="SearchEverywhereHistoryKey" value="authe&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;rest_op&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;rest&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/rest_options.server.test.js&#10;develop&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;createMoltinDeliveryChargeItem&#9;null&#9;null&#10;foodpar&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/foodpark.server.model.js&#10;foodpark&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;squareunit&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;store&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/routes/storefront.server.routes.js&#10;food&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/foodpark.server.controller.js&#10;auth&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;restop&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/rest_options.js&#10;AUTH&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;r&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/authentication.server.controller.js&#10;square&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;develo&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/config/env/development.js&#10;moltin&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/controllers/moltin.server.controller.js&#10;authet&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/test/authentication.server.test.js&#10;squareuser&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareuser.server.model.js&#10;msc&#9;null&#9;null&#10;beforeorder&#9;null&#9;null&#10;squareuni&#9;FILE&#9;file:///home/saviomuniz/workspace/SFEZ/SFEZ_server/app/models/squareunit.server.model.js&#10;beforesaveorde&#9;null&#9;null" />
     <property name="nodejs.mocha.mocha_node_package_dir" value="$PROJECT_DIR$/node_modules/mocha" />
     <property name="settings.editor.selected.configurable" value="watcher.settings" />
   </component>
@@ -432,6 +427,8 @@
       <workItem from="1511184262044" duration="2625000" />
       <workItem from="1511265697170" duration="1122000" />
       <workItem from="1511642577042" duration="1461000" />
+      <workItem from="1511987913378" duration="2756000" />
+      <workItem from="1512035723665" duration="791000" />
     </task>
     <servers />
   </component>
@@ -468,28 +465,28 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="74205000" />
+    <option name="totallyTimeSpent" value="93318000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="332" y="46" width="1922" height="1092" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17606747" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39895287" sideWeight="0.501845" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="npm" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32879582" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32984293" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39895287" sideWeight="0.49815497" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39895287" sideWeight="0.49815497" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -533,44 +530,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/config/env/production.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="42" lean-forward="true" selection-start-line="17" selection-start-column="42" selection-end-line="17" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/env/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="850">
-          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js" />
-    <entry file="file://$PROJECT_DIR$/app/utils/formatutils.js" />
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32487">
-          <caret line="1911" column="51" lean-forward="false" selection-start-line="1911" selection-start-column="51" selection-end-line="1911" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/utils/timeutils.js" />
-    <entry file="file://$PROJECT_DIR$/app/controllers/moltin.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1802">
-          <caret line="106" column="10" lean-forward="false" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/config/env/development.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
@@ -658,13 +617,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/order.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1632">
-          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/EcmaScript6.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
@@ -680,13 +632,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/utils/timeutils.js" />
-    <entry file="file://$PROJECT_DIR$/app/controllers/moltin.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1802">
-          <caret line="106" column="10" lean-forward="false" selection-start-line="106" selection-start-column="6" selection-end-line="106" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/utils/formatutils.js" />
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
@@ -709,18 +654,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6">
-          <caret line="70" column="43" lean-forward="false" selection-start-line="70" selection-start-column="43" selection-end-line="70" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/models/user.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="291">
           <caret line="66" column="0" lean-forward="false" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -728,31 +665,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
           <caret line="12" column="4" lean-forward="false" selection-start-line="12" selection-start-column="4" selection-end-line="12" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/env/development.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="98" lean-forward="false" selection-start-line="3" selection-start-column="98" selection-end-line="3" selection-end-column="98" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="237" column="40" lean-forward="false" selection-start-line="237" selection-start-column="40" selection-end-line="237" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/routes/storefront.server.routes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="271">
-          <caret line="36" column="90" lean-forward="false" selection-start-line="36" selection-start-column="90" selection-end-line="36" selection-end-column="90" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -760,15 +672,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/routes/square.server.routes.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -776,30 +679,57 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="309">
           <caret line="121" column="4" lean-forward="false" selection-start-line="121" selection-start-column="4" selection-end-line="121" selection-end-column="4" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
+    <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="229">
-          <caret line="243" column="49" lean-forward="false" selection-start-line="243" selection-start-column="49" selection-end-line="243" selection-end-column="49" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="624" column="9" lean-forward="false" selection-start-line="624" selection-start-column="9" selection-end-line="624" selection-end-column="9" />
-          <folding />
+        <state relative-caret-position="374">
+          <caret line="22" column="110" lean-forward="false" selection-start-line="22" selection-start-column="110" selection-end-line="22" selection-end-column="110" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/models/squareuser.server.model.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="23" column="2" lean-forward="true" selection-start-line="23" selection-start-column="2" selection-end-line="23" selection-end-column="2" />
+        <state relative-caret-position="187">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/square.server.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/moltin.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="259" column="0" lean-forward="false" selection-start-line="259" selection-start-column="0" selection-end-line="259" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/env/development.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="24" lean-forward="false" selection-start-line="14" selection-start-column="24" selection-end-line="14" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/foodpark.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1173">
+          <caret line="69" column="52" lean-forward="false" selection-start-line="69" selection-start-column="52" selection-end-line="69" selection-end-column="52" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/storefront.server.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" column="106" lean-forward="false" selection-start-line="25" selection-start-column="106" selection-end-line="25" selection-end-column="106" />
           <folding />
         </state>
       </provider>
@@ -812,26 +742,113 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
+    <entry file="file://$PROJECT_DIR$/log/2017-11-28-error.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="34" column="139" lean-forward="false" selection-start-line="34" selection-start-column="139" selection-end-line="34" selection-end-column="151" />
+        <state relative-caret-position="272">
+          <caret line="16" column="106" lean-forward="false" selection-start-line="16" selection-start-column="105" selection-end-line="16" selection-end-column="106" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/models/squareunit.server.model.js">
+    <entry file="file://$PROJECT_DIR$/log/2017-10-11-access.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="22" column="110" lean-forward="false" selection-start-line="22" selection-start-column="110" selection-end-line="22" selection-end-column="110" />
+        <state relative-caret-position="221">
+          <caret line="13" column="7" lean-forward="false" selection-start-line="13" selection-start-column="7" selection-end-line="13" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" column="20" lean-forward="true" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/orderhistory.server.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="935">
+          <caret line="55" column="38" lean-forward="false" selection-start-line="55" selection-start-column="37" selection-end-line="55" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/driver.server.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="0" lean-forward="false" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/orderstatus.server.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes/order.server.routes.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/order.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/orderstatus.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/rest_options.server.test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="258">
+          <caret line="67" column="5" lean-forward="false" selection-start-line="67" selection-start-column="5" selection-end-line="67" selection-end-column="5" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/square.server.controller.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="327" column="54" lean-forward="false" selection-start-line="327" selection-start-column="54" selection-end-line="327" selection-end-column="54" />
+        <state relative-caret-position="6273">
+          <caret line="369" column="4" lean-forward="false" selection-start-line="369" selection-start-column="4" selection-end-line="369" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/rest_options.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1688" column="14" lean-forward="false" selection-start-line="1688" selection-start-column="7" selection-end-line="1688" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/models/foodpark.server.model.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="720">
+          <caret line="48" column="65" lean-forward="false" selection-start-line="48" selection-start-column="65" selection-end-line="48" selection-end-column="65" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/authentication.server.controller.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="278">
+          <caret line="104" column="30" lean-forward="false" selection-start-line="104" selection-start-column="30" selection-end-line="104" selection-end-column="30" />
           <folding />
         </state>
       </provider>

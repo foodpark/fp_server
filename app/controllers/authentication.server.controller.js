@@ -98,6 +98,18 @@ exports.login = function *(next) {
     }
     userInfo.customer_id = customer.id
     meta.customer_id = customer.id;
+  } else if (this.passport.user.role === 'FOODPARKMGR') {
+      var foodPark = {};
+      try {
+        foodPark = (yield FoodPark.getManagedFoodPark(this.passport.user.id))[0];
+        console.log(foodPark);
+      } catch (err) {
+        logger.error('Error retrieving customer role for user',
+          {fn: 'login', user_id: this.passport.user.id, error: err});
+        throw err;
+      }
+      userInfo.food_park_id = foodPark.id;
+      meta.customer_id = foodPark.id;
   } else if (this.passport.user.role == 'ADMIN') {
     var admin = '';
     try {
