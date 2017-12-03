@@ -335,8 +335,10 @@ function * getSquareOrder(locationId, orderId) {
         })
         .then(function (res) {
             var data = res.body;
-            console.log(data);
-            resolve(data.orders[0]); //retrieve only one order
+            if (data.orders)
+              resolve(data.orders[0]); //retrieve only one order
+            else
+              resolve({});
         })
         .catch( function (err) {
             console.error(err);
@@ -358,10 +360,13 @@ exports.getUnitSquareInfo = function * (unitId, next) {
 exports.simplifySquareOrderDetails = function (order) {
     var items = order.line_items;
     var parsedOrder = {};
-    items.forEach(function (item) {
+    if (items) {
+      items.forEach(function (item) {
         parsedOrder[item.catalog_object_id] = generateSingleItemJSON(item);
-    });
-    return parsedOrder;
+      });
+      return parsedOrder;
+    }
+    return {};
 };
 
 function generateSingleItemJSON(item) {

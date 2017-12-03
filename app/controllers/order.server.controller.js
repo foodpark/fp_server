@@ -355,19 +355,15 @@ exports.getDriverActiveOrders = function * (next) {
   var user = this.passport.user;
   var driverUserId=this.params.userId;
   meta.driver_user_id=driverUserId;
-  if (user.role == 'DRIVER' && user.id == driverUserId ||
-      user.role == 'ADMIN') {
+  if (user.role === 'DRIVER' && user.id === driverUserId ||
+      user.role === 'ADMIN') {
     debug('..authorized');
     try {
       //get list of driver ids
-      var drivers = yield Driver.getDriversByUser(driverUserId);
-      var driverIds = [];
-      drivers.forEach(function(element) {
-        driverIds.push(element.id);
-      }, this);
-      meta.driver_ids=driverIds;
-      var orders = driverIds != null && driverIds.length > 0 ? yield orderhistory.getDriverActiveOrders(driverIds) : [];
-      if (typeof orders != 'undefined' && orders != null && orders.length > 0) {
+      console.log(driverUserId);
+      meta.driver_id=driverUserId;
+      var orders = driverUserId ? yield orderhistory.getDriverActiveOrders(driverUserId) : [];
+      if (orders && orders.length > 0) {
         for (i = 0; i < orders.length; i++) {
           logger.info("Order unitId: " + orders[i].unit_id);
           orders[i].unit_manager_fbid = (yield User.getUserIdForUnitMgrByUnitId(orders[i].unit_id))[0].fbid;
