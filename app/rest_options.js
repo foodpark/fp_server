@@ -1989,7 +1989,8 @@ module.exports = {
         debug('..query drivers');
         debug('..company id '+ m[1]);
         debug('..unit id '+ n[1]);
-        return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
+        return knex('users').select(knex.raw('users.*')).leftJoin('drivers', 'drivers.user_id', 'users.id').where({'drivers.company_id' : m[1], 'drivers.unit_id' : n[1]});
+        // return query.select('*').where('company_id',m[1]).andWhere('unit_id',n[1]);
       } else if (this.resteasy.table == 'favorites' || this.resteasy.table == 'reviews') {
         debug('..read favorites / reviews');
         var coId = '';
