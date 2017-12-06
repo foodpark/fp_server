@@ -553,6 +553,7 @@ exports.register = function*(next, mapping) {
       password: password,
       role: role,
       territory_id: territory_id,
+      country_id: country_id,
       phone: phone,
       provider: 'local',
       provider_id: 'local',
