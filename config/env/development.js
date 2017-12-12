@@ -7,8 +7,8 @@ var properties = {
     apiVersion: "v1",
     moltinAuthUrl: "https://api.molt.in/oauth/access_token",
     moltinStoreUrl: "https://api.molt.in/v1",
-    clientId: "QtDrN2fxN3JGsKQvNgtahF5jz1MPP6kVV4wZTavq15",
-    client_secret: "K5M1sc3PZuBVU3gn5iMzymWGecDk1HT90ZrjWVra6P",
+    clientId: "eDlPjoMabiu84tszlmr9gcpgm1YJXOJoSZxCBooYuW",
+    client_secret: "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3",
     grant_type: "client_credentials",
     olddefaultTaxBand: "1278235843793780901", // Brazil ICMS
     defaultTaxBand: "1427064502431515521",
