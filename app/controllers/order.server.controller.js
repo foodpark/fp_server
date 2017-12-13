@@ -355,7 +355,9 @@ exports.getDriverActiveOrders = function * (next) {
   var user = this.passport.user;
   var driverUserId=this.params.userId;
   meta.driver_user_id=driverUserId;
-  if (user.role === 'DRIVER' && user.id === driverUserId ||
+
+
+  if (user.role === 'DRIVER' && user.id == driverUserId ||
       user.role === 'ADMIN') {
     debug('..authorized');
     try {
