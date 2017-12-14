@@ -859,3 +859,4 @@ COPY loyalty_rewards (id, company_id, gold_reward_item, silver_reward_item, bron
 \.
 SELECT pg_catalog.setval('loyalty_rewards_id_seq', 4, true);
 
+

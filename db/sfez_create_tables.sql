@@ -27,8 +27,16 @@ CREATE TABLE countries (
   name text,
   is_enabled boolean DEFAULT(false),
   tax_band text,
+  moltin_client_id text,
+  moltin_client_secret text,
   currency_id text DEFAULT('1554615357396746864'),
   currency text DEFAULT('BRL')
+);
+
+CREATE TABLE drivers_foodpark (
+  available boolean DEFAULT false,
+  food_park_id integer,
+  user_id integer
 );
 
 CREATE TABLE territories (
@@ -97,7 +105,19 @@ CREATE TABLE food_parks (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false),
-    foodpark_mgr_id integer REFERENCES users(id)
+    foodpark_mgr integer REFERENCES users(id)
+);
+
+CREATE TABLE square_unit (
+    unit_id integer,
+    location_id text
+);
+
+CREATE TABLE square_user (
+  merchant_id text,
+  expires_at date,
+  access_token text,
+  user_id integer
 );
 
 CREATE TABLE admins (
@@ -412,23 +432,23 @@ CREATE TABLE order_state (
   callInfo text
 );
 
-CREATE TABLE public.food_park_management
+CREATE TABLE food_park_management
 (
     id SERIAL PRIMARY KEY,
     food_park_id integer NOT NULL,
     unit_id integer NOT NULL,
     FOREIGN KEY (food_park_id)
-        REFERENCES public.food_parks (id) MATCH SIMPLE
+        REFERENCES food_parks (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     FOREIGN KEY (unit_id)
-        REFERENCES public.units (id) MATCH SIMPLE
+        REFERENCES units (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 
-COMMENT ON TABLE public.food_park_management
-    IS 'This table represent the relationship that food parks are enable to see orders from units';
+COMMENT ON TABLE food_park_management
+    IS 'This table represents the relationship that food parks are enable to see orders from units';
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
@@ -457,6 +477,8 @@ SELECT pg_catalog.setval('review_states_id_seq', 5, true);
 
 
 GRANT ALL ON SCHEMA public TO postgres;
+
+GRANT ALL privileges ON ALL SEQUENCES IN SCHEMA public to sfez_rw;
 
 REVOKE ALL ON TABLE admins FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE admins TO sfez_rw;
@@ -536,9 +558,17 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_state TO sfez_rw;
 REVOKE ALL ON TABLE food_park_management FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_park_management TO sfez_rw;
 
+REVOKE ALL ON TABLE square_unit FROM PUBLIC;
+GRANT ALL ON square_unit TO sfez_rw;
+
+REVOKE ALL ON TABLE drivers_foodpark FROM PUBLIC;
+GRANT ALL ON drivers_foodpark TO sfez_rw;
+
+REVOKE ALL ON TABLE square_user FROM PUBLIC;
+GRANT ALL ON square_user TO sfez_rw;
+
+
 GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.table_constraints TO sfez_rw;
 GRANT SELECT ON TABLE pg_catalog.pg_constraint TO sfez_rw;
-
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to sfez_rw;
