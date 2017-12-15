@@ -65,7 +65,7 @@ exports.createOrUpdateUser = function(hash) {
 }
 
 exports.deleteUser = function(id) {
-  return knex('users').where('id', id).del()
+  return knex('users').where('id', id).del();
 }
 
 exports.authenticate = function(md5password, password) {

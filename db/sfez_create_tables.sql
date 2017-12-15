@@ -105,7 +105,7 @@ CREATE TABLE food_parks (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false),
-    foodpark_mgr integer REFERENCES users(id)
+    foodpark_mgr integer REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE TABLE square_unit (
