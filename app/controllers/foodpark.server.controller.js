@@ -357,7 +357,7 @@ exports.getDriverByOrder = function *(next) {
   var driver_id = this.params.driverId;
 
   if (!user || !user.role == 'FOODPARKMGR') {
-    this.status = 401
+    this.status = 401;
     return
   }
 
