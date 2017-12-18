@@ -17,14 +17,29 @@ var testCase = 'Food park management - ';
 
 var token = undefined;
 var userId = undefined;
+var driver = undefined;
 
 function getFoodParkUrl() {
     return '/api/v1/rel/food_parks/' + FOOD_PARK_ID + '/'
 }
 
 after(function (done) {
-  utils.cleanData('users', {'id' : userId}, done);
-  utils.cleanData('food_park_management', {'unit_id' : UNIT_ID, 'food_park_id' : FOOD_PARK_ID}, done);
+  var sqlPromises = [
+    {
+      table : 'users',
+      query : {'id' : userId}
+    },
+    {
+      table : 'food_park_management',
+      query : {'unit_id' : UNIT_ID, 'food_park_id' : FOOD_PARK_ID}
+    },
+    {
+      table : 'users',
+      query : {'id' : driver.id}
+    }
+  ];
+
+  utils.cleanData(sqlPromises, done);
 });
 
 describe(testCase + 'Food park manager auth/register', function () {
@@ -92,7 +107,6 @@ describe(testCase + 'Food park unit management', function () {
 });
 
 describe(testCase + 'Food park driver management', function () {
-  var driver = undefined;
   it('should add a new driver to a food park', function (done) {
     chaiServer
       .post('/auth/register')
@@ -160,6 +174,9 @@ describe(testCase + 'Food park driver management', function () {
       })
   })
   it('should delete a driver', function (done) {
+    console.log('okokkokokok');
+    console.log(driver.id);
+    console.log(token);
     chaiServer
       .delete(getFoodParkUrl() + 'drivers/' + driver.id)
       .set('Authorization', token)
@@ -171,7 +188,7 @@ describe(testCase + 'Food park driver management', function () {
           .end(function (err, res) {
             var assignedDrivers = res.body;
             assignedDrivers.length.should.equal(0);
-            utils.cleanData('users', {id : driver.id}, done);
+            done();
           });
       })
   })

@@ -4,6 +4,8 @@ var chai = require('chai');
 var should = chai.should();
 var chaiHttp = require('chai-http');
 var server = require('../server');
+var utils = require('./utils');
+
 
 chai.use(chaiHttp);
 
@@ -133,7 +135,7 @@ describe(tests +' POST /auth/register', function() {
 });
 
 
-token = '';
+var token = '';
 
 
 // Clean up
@@ -209,16 +211,28 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
   });
   it('should delete SFEZ user', function(done) {
     chai.request(server)
-    .delete('/api/v1/rel/users/' + userId)
-    .set('Authorization', token)
-    .end(function(err, res) {
-        res.should.have.status(200);
-        res.should.be.json;
-        res.body.should.be.a('object');
-        res.body.should.have.property('success');
-        res.body.success.should.equal(true);
-        done();
-    });
+      .post('/auth/login')
+      .send({
+          'username' : utils.adminCredentials.username,
+          'password' : utils.adminCredentials.password
+      })
+      .end(function (err, res) {
+          token = res.body.token;
+          console.log(token);
+
+          chai.request(server)
+          .delete('/api/v1/rel/users/' + userId)
+          .set('Authorization', token)
+          .end(function(err, res) {
+            res.should.have.status(200);
+            res.should.be.json;
+            res.body.should.be.a('object');
+            res.body.is_deleted.should.equal(true);
+            done();
+          });
+      });
+
+
   });
 });
   

@@ -67,6 +67,14 @@ exports.addGuest = function * (next) {
     return;
   }
 
+  var guests = yield getSingleGuest(user.id);
+
+  if (guests.rows[0]) {
+    this.status = 400;
+    this.body = {error: 'The user is already a guest'};
+    return;
+  }
+
   yield addGuest(user.id, event.id);
   this.status = 201;
   this.body = {message : 'guest added'};
@@ -86,8 +94,45 @@ exports.getGuests = function *(next) {
   this.body = guests.rows;
 };
 
+exports.getNearby = function * (next) {
+  var latitude = this.query.latitude;
+  var longitude = this.query.longitude;
+  var range = this.query.distance;
+
+  if (!latitude || !longitude || !range) {
+    this.status = 415;
+    this.body = {error: 'You must provide a latitude, longitude and distance'};
+    return;
+  }
+
+  var events = yield getNearbyEvents(latitude, longitude, range);
+  this.status = 200;
+  this.body = events;
+  return;
+};
+
 function isValidSchedule(schedule, interval) {
   return schedule.length === 1 || schedule.length === interval;
+}
+
+function getSingleGuest(guest) {
+  try {
+    return Events.getSingleGuest(guest);
+  } catch (err) {
+    logger.error('Error while retrieving single guest');
+    debug('Error while retrieving single guest');
+    throw (err);
+  }
+}
+
+function getNearbyEvents(latitude, longitude, range) {
+  try {
+    return Events.getNearbyEvents(latitude,longitude,range);
+  } catch (err) {
+    logger.error('Error while retrieving nerby events');
+    debug('Error while retrieving nerby events');
+    throw (err);
+  }
 }
 
 function getGuests(event) {

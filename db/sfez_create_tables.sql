@@ -447,6 +447,49 @@ CREATE TABLE food_park_management
         ON DELETE CASCADE
 );
 
+CREATE TABLE events (
+    id serial PRIMARY KEY,
+    name text NOT NULL,
+    ticketed boolean DEFAULT FALSE,
+    start_date date NOT NULL,
+    end_date date NOT NULL,
+    schedule json[],
+    manager integer REFERENCES USERS NOT NULL,
+    social_media json,
+    latitude float4,
+    longitude float4,
+    image text,
+    sponsors json[]
+);
+
+CREATE TABLE event_guests (
+    guest integer REFERENCES users NOT NULL,
+    event integer REFERENCES events NOT NULL,
+    UNIQUE (guest,event)
+);
+
+CREATE OR REPLACE FUNCTION calc_earth_dist (lat1 NUMERIC, lng1 NUMERIC, lat2 NUMERIC, lng2 NUMERIC)
+RETURNS NUMERIC AS $$
+DECLARE
+	delta_lat NUMERIC;
+	delta_lng NUMERIC;
+	a NUMERIC;
+	c NUMERIC;
+	d NUMERIC;
+	earth_radius NUMERIC;
+BEGIN
+	delta_lat = radians(lat1) - radians(lat2);
+	delta_lng = radians(lng1) - radians(lng2);
+	earth_radius = 6371;
+
+	a = sin(delta_lat/2)^2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(delta_lng/2)^2;
+	c = 2 * atan2(sqrt(a), sqrt(1 - a));
+	d = earth_radius * c;
+
+	return d;
+END;
+$$ language plpgsql;
+
 COMMENT ON TABLE food_park_management
     IS 'This table represents the relationship that food parks are enable to see orders from units';
 
@@ -479,6 +522,14 @@ SELECT pg_catalog.setval('review_states_id_seq', 5, true);
 GRANT ALL ON SCHEMA public TO postgres;
 
 GRANT ALL privileges ON ALL SEQUENCES IN SCHEMA public to sfez_rw;
+
+GRANT ALL PRIVILEGES ON FUNCTION calc_earth_dist(numeric,numeric,numeric,numeric) TO sfez_rw;
+
+REVOKE ALL ON TABLE events FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE events TO sfez_rw;
+
+REVOKE ALL ON TABLE event_guests FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE event_guests TO sfez_rw;
 
 REVOKE ALL ON TABLE admins FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE admins TO sfez_rw;

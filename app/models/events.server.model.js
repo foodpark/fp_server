@@ -23,3 +23,11 @@ exports.addGuest = function (guestId, eventId) {
 exports.getGuests = function (eventId) {
     return knex.raw(`select users.* from event_guests eg right join users on eg.guest = users.id where eg.event = ${eventId}`);
 };
+
+exports.getSingleGuest = function (guestId) {
+    return knex.raw(`select users.* from event_guests eg right join users on eg.guest = users.id where eg.guest = ${guestId}`);
+};
+
+exports.getNearbyEvents = function (latitude, longitude, distance) {
+    return knex(EVENT_TABLE).select().whereRaw(`calc_earth_dist(cast (events.latitude as numeric), cast(events.longitude as numeric), ${latitude}, ${longitude}) <= ${distance}`);
+};

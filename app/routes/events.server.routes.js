@@ -15,6 +15,7 @@ module.exports = function (app) {
     router.get(apiPath + ':eventId/manager', events.getManager);
     router.post(apiPath + ':eventId/guests', events.addGuest);
     router.get(apiPath + ':eventId/guests', events.getGuests);
+    router.get(apiPath + 'mapSearch', events.getNearby);
 
     app.use(router.routes());
     app.use(router.allowedMethods());
