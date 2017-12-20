@@ -92,4 +92,8 @@ exports.updateFB = function(id, fbid, fb_token) {
 exports.findByFB = function(fbid) {
   logger.info(fbid);
   return knex('users').select('*').where('fbid', fbid);
+};
+
+exports.getByCustomId = function (jsonQuery) {
+  return knex('users').select('*').whereRaw(jsonQuery);
 }
