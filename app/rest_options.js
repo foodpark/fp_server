@@ -1782,10 +1782,11 @@ module.exports = {
           if (!customer && this.passport.user.role !== 'FOODPARKMGR' && this.passport.user.role !== 'UNIT_MGR') {
             this.throw('Unauthorized - no such customer',401);
           } // else continue
-          if(!this.resteasy.object.customer_id)
+          if(!this.resteasy.object.customer_id) {
             if (this.passport.user.role === 'FOODPARKMGR' || this.passport.user.role === 'UNITMGR')
               throw new Error('You must provide a customer id',422);
             this.resteasy.object.customer_id = customer.id;
+          }
           console.log('..authorized')
         } else if (this.params.table == 'loyalty') {
           this.throw('Create Unauthorized', 401); // loyalty create is only allowed in-code when order state is 'order_paid'
