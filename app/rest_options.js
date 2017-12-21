@@ -21,6 +21,7 @@ var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var Driver = require('./models/driver.server.model');
 var Format = require('./utils/formatutils')
+var ContextHandler = require('./utils/contexthandler');
 var debug = require('debug')('rest_options');
 var logger = require('winston');
 var request = require('requestretry');
@@ -152,16 +153,17 @@ function * beforeSaveOrderHistory() {
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role :
     this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id});
 
-
+  console.log(this.resteasy.object);
 
   if (this.resteasy.operation == 'create') {
-    if (this.passport.user.role != 'CUSTOMER' || this.passport.user.role !== 'FOODPARKMGR' || this.passport.user.role !== "UNITMGR") {
+    if (this.passport.user.role != 'CUSTOMER' && this.passport.user.role !== 'FOODPARKMGR' && this.passport.user.role !== "UNITMGR") {
       logger.error('User unauthorized',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
           role: this.passport.user.role, error: 'User unauthorized'});
       throw new Error('User unauthorized', 401);
     }
     var osoId = this.resteasy.object.order_sys_order_id;
+    console.log('okok');
     if (! this.resteasy.object.order_sys_order_id) { // is required
       logger.error('No order id provided for e-commerce system',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
@@ -173,9 +175,29 @@ function * beforeSaveOrderHistory() {
     try {
       debug('..user ')
       debug(this.passport.user)
-      var user = this.passport.user
-      var customer = (yield Customer.getForUser(user.id))[0]
-      debug('..customer')
+
+      var customer = undefined;
+      var user = undefined;
+      if (this.resteasy.object.customer_id) {
+        customer = yield Customer.getSingleCustomer(this.resteasy.object.customer_id);
+        customer = customer[0];
+
+        if (!customer.user_id)
+          throw new Error('Invalid customer id', 422);
+
+        user = yield User.getSingleUser(customer.user_id);
+        user = user[0];
+      }
+      else {
+        user = this.passport.user;
+        customer = (yield Customer.getForUser(user.id))[0];
+      }
+
+      var customStatus = undefined;
+      if(this.resteasy.object.context)
+        customStatus = ContextHandler(this.resteasy.object.context, user);
+
+      debug('..customer');
       debug(customer)
     } catch (err) {
       logger.error('Error getting customer',
@@ -183,7 +205,7 @@ function * beforeSaveOrderHistory() {
           role: this.passport.user.role, order_sys_order_id: osoId, error: err});
       throw err;
     }
-    var customerName = user.first_name + " " + user.last_name.charAt(0)
+    var customerName = user.first_name + " " + user.last_name.charAt(0);
     debug("..customer name is "+ customerName);
     this.resteasy.object.customer_name = customerName;
     this.resteasy.object.customer_id = customer.id;
@@ -264,6 +286,7 @@ function * beforeSaveOrderHistory() {
       debug('..order sys order id: ' + moltin_order_id)
       try {
         var order = yield msc.findOrder(moltin_order_id)
+        var order = yield msc.findOrder(moltin_order_id)
         order_details = yield msc.getOrderDetail(moltin_order_id)
         order_details = yield simplifyDetails.call(this, order_details)
       } catch (err) {
@@ -283,7 +306,21 @@ function * beforeSaveOrderHistory() {
       // Set the initial state
       this.resteasy.object.status = {
         order_requested: ''
+      };
+
+      if (this.passport.user.role !== 'CUSTOMER')
+        this.resteasy.object.status.created_by = this.passport.user.id;
+
+      if (customStatus) {
+        var customStatusKeys = Object.keys(customStatus);
+        var savingContext = this;
+
+        customStatusKeys.forEach(function (key) {
+          savingContext.resteasy.object.status[key] = customStatus[key];
+        });
       }
+
+      console.log('------------------------------->');
       debug(this.resteasy.object);
       // }
 
@@ -1737,16 +1774,17 @@ module.exports = {
         } else if (this.params.table == 'delivery_addresses' || this.params.table == 'favorites' ||
                    this.params.table == 'reviews' || this.params.table == 'order_history' || this.params.table == 'loyalty_used') {
           debug('..checking POST '+ this.params.table)
-          if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'CUSTOMER') {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'CUSTOMER' && this.passport.user.role != 'FOODPARKMGR' &&  this.passport.user.role != 'UNITMGR')) {
             this.throw('Create Unauthorized - Customers only',401);
           } // else continue
           debug('..get customer id for user')
           var customer = (yield Customer.getForUser(this.passport.user.id))[0]
           debug(customer)
-          if (!customer) {
+          if (!customer && this.passport.user.role !== 'FOODPARKMGR' && this.passport.user.role !== 'UNIT_MGR') {
             this.throw('Unauthorized - no such customer',401);
           } // else continue
-          this.resteasy.object.customer_id = customer.id;
+          if(!this.resteasy.object.customer_id)
+            this.resteasy.object.customer_id = customer.id;
           console.log('..authorized')
         } else if (this.params.table == 'loyalty') {
           this.throw('Create Unauthorized', 401); // loyalty create is only allowed in-code when order state is 'order_paid'
