@@ -163,7 +163,6 @@ function * beforeSaveOrderHistory() {
       throw new Error('User unauthorized', 401);
     }
     var osoId = this.resteasy.object.order_sys_order_id;
-    console.log('okok');
     if (! this.resteasy.object.order_sys_order_id) { // is required
       logger.error('No order id provided for e-commerce system',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
@@ -178,6 +177,7 @@ function * beforeSaveOrderHistory() {
 
       var customer = undefined;
       var user = undefined;
+
       if (this.resteasy.object.customer_id) {
         customer = yield Customer.getSingleCustomer(this.resteasy.object.customer_id);
         customer = customer[0];
@@ -320,7 +320,6 @@ function * beforeSaveOrderHistory() {
         });
       }
 
-      console.log('------------------------------->');
       debug(this.resteasy.object);
       // }
 
@@ -1784,6 +1783,8 @@ module.exports = {
             this.throw('Unauthorized - no such customer',401);
           } // else continue
           if(!this.resteasy.object.customer_id)
+            if (this.passport.user.role === 'FOODPARKMGR' || this.passport.user.role === 'UNITMGR')
+              throw new Error('You must provide a customer id',422);
             this.resteasy.object.customer_id = customer.id;
           console.log('..authorized')
         } else if (this.params.table == 'loyalty') {
