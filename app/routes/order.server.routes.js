@@ -11,6 +11,7 @@ module.exports=function(app) {
 	var router = new Router();
 	var apiversion = '/api/'+ config.apiVersion + '/ord';
 
+	router.get(apiversion + '/hotel', orders.getHotelContextOrders);
 	router.get(apiversion + '/companies/:companyId/units/:unitId/active_orders', requireJWT, orders.getActiveOrders);
 	router.get(apiversion + '/companies/:companyId/units/:unitId/closed_orders', requireJWT, orders.getClosedOrders);
 	router.get(apiversion + '/companies/:companyId/units/:unitId/requested_orders', requireJWT, orders.getRequestedOrders);

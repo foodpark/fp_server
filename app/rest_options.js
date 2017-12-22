@@ -434,6 +434,8 @@ function * beforeSaveOrderHistory() {
         role: this.passport.user.role, order_sys_order_id: osoId});
     }
   }
+  console.log('==========================>');
+  console.log(this.resteasy.object);
   logger.info('Pre-flight for order save completed '+ unitId,
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
     role: this.passport.user.role, order_sys_order_id: osoId});
@@ -532,6 +534,17 @@ function *afterCreateOrderHistory(orderHistory) {
       order_requested: timestamp.now()
     }
   }
+
+  var orderKeys = Object.keys(orderHistory.status);
+  if (orderKeys.length > 1) {
+    orderKeys.forEach(function (key) {
+        if (key !== 'order_requested')
+          hash.status[key] = orderHistory.status[key];
+    });
+  }
+
+  console.log(hash);
+
   this.resteasy.queries.push(
     this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update(hash)
   );
@@ -1994,6 +2007,7 @@ module.exports = {
                         +'units.created_at, '
                         +'units.updated_at, '
                         +'units.payment, '
+                        +'units.room_service, '
                         +'units.is_deleted, '
                         +'companies.user_id AS "owner_id", '
                         +'countries.currency_id, '

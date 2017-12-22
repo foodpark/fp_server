@@ -5,6 +5,7 @@ var Customer = require ('../models/customer.server.model');
 var User = require('../models/user.server.model');
 var moltin  = require('./moltin.server.controller');
 var orderhistory  = require('../models/orderhistory.server.model');
+var TimeHelper = require('../utils/timeutils');
 var Unit    = require ('../models/unit.server.model');
 var Driver = require ('../models/driver.server.model');
 var debug   = require('debug')('orders');
@@ -34,6 +35,28 @@ exports.getOrders = function*(next){
   this.body = orders;
 }
 
+exports.getHotelContextOrders = function * (next) {
+  if (!this.query.start || !this.query.end || !this.query.room_number) {
+    this.body = {
+      error : 'Correct endpoint format: /hotel?room_number={room number}&start={ISODate start}&end={ISODate end}'
+    };
+    this.status = 412;
+    return;
+  }
+
+
+  var start = new Date(this.query.start);
+  var end = new Date(this.query.end);
+  var roomNumber = this.query.room_number;
+
+
+  end = TimeHelper.getEndOfDay(end);
+
+  var orders = yield orderhistory.getRoomServiceOrders(roomNumber, start, end);
+
+  this.body = orders;
+  this.status = 200;
+};
 
 
 exports.getActiveOrders = function * (next) {

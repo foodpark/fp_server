@@ -39,6 +39,11 @@ const TIME_UNIT = {
     }
 };
 
+exports.getEndOfDay = function (date) {
+  var newDate = date;
+  newDate.setHours(23,59,59,999);
+  return newDate;
+};
 exports.calculateInterval = function (timeUnit, start, end) {
     return (end - start)/TIME_UNIT[timeUnit].inMillis(1);
 };

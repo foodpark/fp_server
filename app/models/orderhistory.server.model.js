@@ -3,10 +3,15 @@ var debug = require('debug')('orders.model');
 
 exports.getStatus = function(id) {
   return knex('order_history').select('status').where('id', id);
-}
+};
 
 exports.updateOrder = function(id, hash) {
   return knex('order_history').update(hash).where('id',id).returning('*');
+};
+
+exports.getRoomServiceOrders = function (roomNumber, start, end) {
+  //and created_at > '${start.toISOString()}' and created_at > '${end.toISOString()}'
+  return knex('order_history').select('*').whereRaw(`status #> '{bill_to_room}' = '${roomNumber}' and created_at > '${start.toISOString()}' and created_at < '${end.toISOString()}'`);
 };
 
 exports.getActiveOrders = function(companyId, unitId) {
