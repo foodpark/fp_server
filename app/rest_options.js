@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Queries = require('../koa-resteasy').Queries;
 var Company = require('./models/company.server.model');
 var Customer = require('./models/customer.server.model');
+var FoodPark = require('./models/foodpark.server.model');
 var DeliveryAddress = require('./models/deliveryaddress.server.model');
 var Favorites = require('./models/favorites.server.model');
 var Loyalty = require('./models/loyalty.server.model');
@@ -1832,9 +1833,20 @@ module.exports = {
           }
         }
          else if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
-          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'FOODPARKMGR')) {
             this.throw('Update/Delete Unauthorized - Owners/Admin only',401);
           } else {
+            if (this.passport.user.role == 'FOODPARKMGR') {
+              var unitId = this.params.id;
+              var managedUnits = (yield FoodPark.getManagedUnits(this.passport.user.id)).rows;
+
+              var valid = managedUnits.some(function (unit) {
+                return unitId == unit.id;
+              });
+              
+              if (!valid)
+                this.throw('Update/Delete Unauthorized - FPM does not manage this unit',401);
+            }
             if (this.passport.user.role == 'OWNER') {
               // verify user is modifying the correct company
               var coId = this.params.id
