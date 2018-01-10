@@ -7,6 +7,10 @@ const User = require('../models/user.server.model');
 function handle(context, user) {
   if (context === 'hotel')
     return handleHotel(user);
+  else if (context === 'cod')
+    return null;
+  else
+    throw new Error('Invalid context', 422);
 }
 
 function handleHotel(user) {
@@ -19,6 +23,5 @@ function handleHotel(user) {
 
   return {bill_to_room : roomNumber};
 }
-
 
 module.exports = handle;
