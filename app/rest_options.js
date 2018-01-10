@@ -2020,6 +2020,7 @@ module.exports = {
                         +'units.updated_at, '
                         +'units.payment, '
                         +'units.room_service, '
+                        +'units.cash_on_delivery, '
                         +'units.is_deleted, '
                         +'companies.user_id AS "owner_id", '
                         +'countries.currency_id, '
