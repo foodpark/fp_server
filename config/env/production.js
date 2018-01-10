@@ -11,7 +11,7 @@ var properties = {
     client_secret: "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3",
     grant_type: "client_credentials",
     olddefaultTaxBand: "1278235843793780901", // Brazil ICMS
-    defaultTaxBand: "1427064502431515521",
+    defaultTaxBand: "1554615357396746864",
     deliveryCharge: "10",
     deliveryOffset: 15,
     sumup:{
