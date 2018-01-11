@@ -25,6 +25,10 @@ exports.setManager = function (foodParkId, userId) {
   return knex('food_parks').where('id', foodParkId).update('foodpark_mgr', userId);
 };
 
+exports.getFoodParkManagedUnits = function (foodParkId) {
+  return knex('food_park_management').select('unit_id').where({food_park_id: foodParkId});
+};
+
 exports.getAllDrivers = function (foodParkId) {
   return knex.raw(`select users.*, df.available from drivers_foodpark df right join users on df.user_id = users.id where df.food_park_id = ${foodParkId};`);
 };

@@ -2,7 +2,6 @@
  * @author Sávio Muniz
  */
 
-
 var ParseUtils = require('../parseutils');
 
 exports.generateSumStats = generateSumStats;

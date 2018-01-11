@@ -2,40 +2,101 @@
  * @author Sávio Muniz
  */
 
-var StatsHelper = require('../utils/stats-helper');
+var StatsHelper = require('../utils/stats/stats-helper');
 
-exports.getVendorOrderCount = function * () {
+function getPerspectiveObj(params) {
+  var id = undefined;
+  var perspective = "";
+
+  if (params.companyId) {
+    id = params.companyId;
+    perspective = 'vendor';
+  }
+
+  else if (params.foodParkId) {
+    id = params.foodParkId;
+    perspective = 'foodpark';
+  }
+
+  else {
+    perspective = 'support';
+  }
+
+  return {
+    id : id,
+    perspective : perspective
+  };
+}
+
+exports.getUnitSumStats = function * () {
     try {
-      this.body = yield StatsHelper.getStats('vendor', 'sum', this.query.start, this.query.end, this.params.companyId);
+      var perspectiveObj = getPerspectiveObj(this.params);
+
+      this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'unit', 'sum', this.query.start, this.query.end, perspectiveObj.id);
     } catch (err) {
       throwDefaultError(err);
     }
 };
 
-exports.getSupportOrderCount = function * () {
+exports.getUnitPercentageStats = function * () {
   try {
-    this.body = yield StatsHelper.getStats('support', 'sum', this.query.start, this.query.end);
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'unit', 'percentage', this.query.start, this.query.end, perspectiveObj.id);
   } catch (err) {
     throwDefaultError(err);
   }
 };
 
-exports.getVendorOrderPercentage = function * () {
+exports.getItemSumStats = function * () {
   try {
-    this.body = yield StatsHelper.getStats('vendor', 'percentage', this.query.start, this.query.end, this.params.companyId);
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'item', 'sum', this.query.start, this.query.end, perspectiveObj.id);
   } catch (err) {
     throwDefaultError(err);
   }
 };
 
-exports.getSupportOrderPercentage = function * () {
+exports.getItemPercentageStats = function * () {
   try {
-    this.body = yield StatsHelper.getStats('support', 'percentage', this.query.start, this.query.end);
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'item', 'percentage', this.query.start, this.query.end, perspectiveObj.id);
   } catch (err) {
     throwDefaultError(err);
   }
 };
 
+exports.getCustomerSumStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'customer', 'sum', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
+
+exports.getCustomerPercentageStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'customer', 'percentage', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
+
+exports.getTotalSumStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'total', 'sum', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
 
 function throwDefaultError(err) {
   console.error('error generating stats');
