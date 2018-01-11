@@ -1,6 +1,9 @@
 var knex  = require('../../config/knex');
 var debug = require('debug')('orders.model');
 
+exports.customQuery = function (query) {
+  return knex('order_history').select('*').whereRaw(query);
+};
 exports.getStatus = function(id) {
   return knex('order_history').select('status').where('id', id);
 };

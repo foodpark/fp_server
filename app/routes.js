@@ -14,6 +14,7 @@ module.exports = function(app) {
   require('./routes/square.server.routes')(app);
   require('./routes/events.server.routes')(app);
   require('./routes/users.server.routes')(app);
+  require('./routes/stats.server.routes')(app);
 
   var apiversion = '/api/'+ config.apiVersion + '/rel';
   app.use(Mount(apiversion,require('./routes/api')));
