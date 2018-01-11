@@ -2,22 +2,19 @@
  * @author Sávio Muniz
  */
 
-var OrderHistory = require('../models/orderhistory.server.model');
-var ParseUtils = require('../utils/parseutils')
+var ParseUtils = require('../parseutils');
 
-const PERSPECTIVE_QUERY_BUILDER = {
-  vendor : function (start, end, id) {
-    return `company_id=${id} and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
-  },
-  support : function (start, end) {
-    return `created_at between to_timestamp(${start}) and to_timestamp(${end})`;
-  }
-};
+exports.generateSumStats = generateSumStats;
 
-const CATEGORY_HANDLER = {
-  sum : generateSumStats,
-  percentage : generatePercentageStats
-};
+function generateSumStats (orderInput) {
+  return formatSumStatsResponse(getRawSumStats(orderInput));
+}
+
+exports.generatePercentageStats = generatePercentageStats;
+
+function generatePercentageStats (orderInput) {
+  return formatPercentageStatsResponse(generateSumStats(orderInput));
+}
 
 function getRawSumStats(orderInput) {
   var rawStats = {};
@@ -46,13 +43,6 @@ function getRawSumStats(orderInput) {
   return rawStats
 }
 
-function generateSumStats(orderInput) {
-  return formatSumStatsResponse(getRawSumStats(orderInput));
-}
-
-function generatePercentageStats(orderInput) {
-  return formatPercentageStatsResponse(generateSumStats(orderInput));
-}
 
 function formatPercentageStatsResponse(sumStats) {
   var countTotal = 0;
@@ -67,21 +57,18 @@ function formatPercentageStatsResponse(sumStats) {
     var companyCountSum = sumStats[companyIndex].count;
     var companyAmountSum = sumStats[companyIndex].amount;
 
-    sumStats[companyIndex].count = getPercentage(companyCountSum,countTotal);
-    sumStats[companyIndex].amount = getPercentage(companyAmountSum,amountTotal);
+    sumStats[companyIndex].count = ParseUtils.getPercentage(companyCountSum,countTotal);
+    sumStats[companyIndex].amount = ParseUtils.getPercentage(companyAmountSum,amountTotal);
 
     company.units.forEach(function (unit, unitIndex) {
-        sumStats[companyIndex].units[unitIndex].count = getPercentage(sumStats[companyIndex].units[unitIndex].count, companyCountSum);
-        sumStats[companyIndex].units[unitIndex].amount = getPercentage(sumStats[companyIndex].units[unitIndex].amount, companyAmountSum);
+      sumStats[companyIndex].units[unitIndex].count = ParseUtils.getPercentage(sumStats[companyIndex].units[unitIndex].count, companyCountSum);
+      sumStats[companyIndex].units[unitIndex].amount = ParseUtils.getPercentage(sumStats[companyIndex].units[unitIndex].amount, companyAmountSum);
     });
   });
 
   return sumStats;
 }
 
-function getPercentage(part, total) {
-  return (part / total) * 100;
-}
 
 function formatSumStatsResponse(rawStats) {
   var statsResponse = [];
@@ -92,9 +79,9 @@ function formatSumStatsResponse(rawStats) {
       company.count += rawStats[company_id][unit_id].count;
       company.amount += rawStats[company_id][unit_id].amount;
       company.units.push({
-          unit_id : unit_id,
-          count : rawStats[company_id][unit_id].count,
-          amount : rawStats[company_id][unit_id].amount
+        unit_id : unit_id,
+        count : rawStats[company_id][unit_id].count,
+        amount : rawStats[company_id][unit_id].amount
       });
     });
 
@@ -103,16 +90,3 @@ function formatSumStatsResponse(rawStats) {
 
   return statsResponse;
 }
-
-exports.getStats = function * (perspective, category, start, end, id) {
-  var orderInput = yield getInputOrders(perspective, start, end, id);
-
-  return CATEGORY_HANDLER[category](orderInput);
-};
-
-function getInputOrders(perspective, start, end, id) {
-  return OrderHistory.customQuery(PERSPECTIVE_QUERY_BUILDER[perspective](start, end, id));
-}
-
-
-

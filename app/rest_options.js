@@ -1759,7 +1759,7 @@ module.exports = {
       console.log(this.resteasy.table);
 
       if (operation == 'create') {
-        if (this.params.table == 'companies' || this.params.table == 'food_parks' || this.params.table == 'roles' ||
+        if (this.params.table == 'companies' || this.params.table == 'roles' ||
             this.params.table == 'order_status_audit' || this.params.table == 'territories' || this.params.table == 'countries') {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Create Unauthorized - Admin only',401);
