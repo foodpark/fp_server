@@ -7,6 +7,7 @@ var FoodPark = require('../../models/foodpark.server.model');
 var UnitStatsHelper = require('./unit-stats-builder');
 var ItemStatsHelper = require('./item-stats-builder');
 var CustomerStatsHelper = require('./customer-stats-builder');
+var BillingStatsHelper = require('./billing-stats-builder');
 var ParseUtils = require('../parseutils');
 
 
@@ -34,7 +35,11 @@ const CATEGORY_HANDLER = {
   customer : {
     sum : CustomerStatsHelper.generateSumStats,
     percentage : CustomerStatsHelper.generatePercentageStats
-  }, 
+  },
+  billing : {
+    sum : BillingStatsHelper.generateSumStats,
+    percentage : BillingStatsHelper.generatePercentageStats
+  },
   total : {
     sum : generateTotalSumStats
   }

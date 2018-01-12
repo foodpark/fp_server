@@ -98,6 +98,26 @@ exports.getTotalSumStats = function * () {
   }
 };
 
+exports.getBillingSumStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'billing', 'sum', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
+
+exports.getBillingPercentageStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'billing', 'percentage', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
+
 function throwDefaultError(err) {
   console.error('error generating stats');
   throw(err);

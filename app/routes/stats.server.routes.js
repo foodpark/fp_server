@@ -41,6 +41,15 @@ module.exports=function(app) {
   router.get(STATS_ENDPOINT + 'foodpark/:foodParkId/customer/percentage', stats.getCustomerPercentageStats);
   router.get(STATS_ENDPOINT + 'support/customer/percentage', stats.getCustomerPercentageStats);
 
+  //BILLING
+  router.get(STATS_ENDPOINT + 'company/:companyId/billing/sum', stats.getBillingSumStats);
+  router.get(STATS_ENDPOINT + 'foodpark/:foodParkId/billing/sum', stats.getBillingSumStats);
+  router.get(STATS_ENDPOINT + 'support/billing/sum', stats.getBillingSumStats);
+
+  router.get(STATS_ENDPOINT + 'company/:companyId/billing/percentage', stats.getBillingPercentageStats);
+  router.get(STATS_ENDPOINT + 'foodpark/:foodParkId/billing/percentage', stats.getBillingPercentageStats);
+  router.get(STATS_ENDPOINT + 'support/billing/percentage', stats.getBillingPercentageStats);
+
   //TOTAL
   router.get(STATS_ENDPOINT + 'company/:companyId/total/sum', stats.getTotalSumStats);
   router.get(STATS_ENDPOINT + 'foodpark/:foodParkId/total/sum', stats.getTotalSumStats);
