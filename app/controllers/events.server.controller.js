@@ -12,7 +12,7 @@ exports.createEvent = function * (next) {
   var startDate = new Date(event.start_date);
   var endDate = new Date(event.end_date);
 
-  var daysInterval = TimeUtils.calculateInterval('day', startDate.getTime(), endDate.getTime());
+  var daysInterval = TimeUtils.calculateInterval('day', startDate.getTime(), endDate.getTime()) + 1;
 
   if (!isValidSchedule(event.schedule, daysInterval)) {
     this.status = 415;
