@@ -6,13 +6,13 @@ var ParseUtils = require('../parseutils');
 
 exports.generateSumStats = generateSumStats;
 
-function generateSumStats (orderInput) {
+function * generateSumStats (orderInput) {
   return formatSumStatsResponse(getRawSumStats(orderInput));
 }
 
 exports.generatePercentageStats = generatePercentageStats;
 
-function generatePercentageStats (orderInput) {
+function * generatePercentageStats (orderInput) {
   return formatPercentageStatsResponse(generateSumStats(orderInput));
 }
 

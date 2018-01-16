@@ -194,6 +194,14 @@ function * beforeSaveOrderHistory() {
         customer = (yield Customer.getForUser(user.id))[0];
       }
 
+      if(!this.resteasy.object.commission_type) {
+        logger.error('No commission type provided for e-commerce system',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: 'Missing e-commerce commission type (commission_type)'});
+
+        throw new Error('commission_type is required', 422);
+      }
+
       var customStatus = undefined;
       if(this.resteasy.object.context)
         customStatus = ContextHandler(this.resteasy.object.context, user);

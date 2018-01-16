@@ -118,6 +118,26 @@ exports.getBillingPercentageStats = function * () {
   }
 };
 
+exports.getCommissionDetailedStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'commission', 'detailed', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
+
+exports.getCommissionSumStats = function * () {
+  try {
+    var perspectiveObj = getPerspectiveObj(this.params);
+
+    this.body = yield StatsHelper.getStats(perspectiveObj.perspective, 'commission', 'sum', this.query.start, this.query.end, perspectiveObj.id);
+  } catch (err) {
+    throwDefaultError(err);
+  }
+};
+
 function throwDefaultError(err) {
   console.error('error generating stats');
   throw(err);

@@ -8,6 +8,7 @@ var UnitStatsHelper = require('./unit-stats-builder');
 var ItemStatsHelper = require('./item-stats-builder');
 var CustomerStatsHelper = require('./customer-stats-builder');
 var BillingStatsHelper = require('./billing-stats-builder');
+var CommissionStatsHelper = require('./commission-stats-builder');
 var ParseUtils = require('../parseutils');
 
 
@@ -40,6 +41,10 @@ const CATEGORY_HANDLER = {
     sum : BillingStatsHelper.generateSumStats,
     percentage : BillingStatsHelper.generatePercentageStats
   },
+  commission : {
+    detailed : CommissionStatsHelper.generateDetailedStats,
+    sum : CommissionStatsHelper.generateSumStats
+  },
   total : {
     sum : generateTotalSumStats
   }
@@ -65,7 +70,7 @@ exports.getStats = function * (perspective, category, operation, start, end, id)
 
   var orderInput = yield getInputOrders(perspective, start, end, id);
 
-  return CATEGORY_HANDLER[category][operation](orderInput);
+  return (yield CATEGORY_HANDLER[category][operation](orderInput));
 };
 
 function * getInputOrders(perspective, start, end, id) {
