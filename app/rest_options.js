@@ -443,8 +443,6 @@ function * beforeSaveOrderHistory() {
         role: this.passport.user.role, order_sys_order_id: osoId});
     }
   }
-  console.log('==========================>');
-  console.log(this.resteasy.object);
   logger.info('Pre-flight for order save completed '+ unitId,
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
     role: this.passport.user.role, order_sys_order_id: osoId});
@@ -522,6 +520,12 @@ function *afterCreateOrderHistory(orderHistory) {
     body : msg,
     status : "order_requested"
   }
+
+  if (unit.apns_id)
+    msgTarget.os = 'ios';
+  else
+    msgTarget.os = 'android';
+
 
   debug('sending notification to unit '+ unit.id);
   debug(meta);
@@ -647,6 +651,12 @@ function *afterUpdateOrderHistory(orderHistory) {
         debug('..Unit gcm id is '+ unit.gcm_id)
         msgTarget.to = 'unit'
         msgTarget.toId = unit.id
+
+        if (unit.apns_id)
+          msgTarget.os = 'ios';
+        else
+          msgTarget.os = 'android';
+
         msgTarget.gcmId = unit.gcm_id
         msgTarget.fcmId = unit.fcm_id
         if (status == 'order_paid') {
@@ -658,10 +668,18 @@ function *afterUpdateOrderHistory(orderHistory) {
         logger.info('Unit order update. Notify customer', meta);
         // get customer device id
         debug('..Customer gcm id is '+ customer.gcm_id)
-        msgTarget.to = 'customer'
-        msgTarget.toId = customer.id
-        msgTarget.gcmId = customer.gcm_id
-        msgTarget.fcmId = customer.fcm_id
+        msgTarget.to = 'customer';
+        msgTarget.toId = customer.id;
+
+        if (customer.apns_id)
+          msgTarget.os = 'ios';
+        else
+          msgTarget.os = 'android';
+        console.log('======================================>');
+        console.log(msgTarget);
+
+        msgTarget.gcmId = customer.gcm_id;
+        msgTarget.fcmId = customer.fcm_id;
       }
       if (!msgTarget.gcmId && !msgTarget.fcmId){
         var fge = meta;
@@ -946,6 +964,28 @@ function *beforeSaveCustomer(){
     }
   }
   logger.info('Ready to save Customer', meta);
+}
+
+function * beforeSaveFoodpark() {
+  logger.info('Starting update of existing Foodpark', meta);
+  debug('..starting update of existing Foodpark');
+
+  if (this.resteasy.object.apns_id) {
+    meta.apns_id = this.resteasy.object.apns_id;
+    var gcmId = '';
+    try {
+      gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
+    } catch (err) {
+      meta.error = err;
+      logger.error('Error sending APNS token to GCM', meta);
+      throw err;
+    }
+    this.resteasy.object.gcm_id = gcmId;
+    meta.gcm_id = gcmId;
+    logger.info('Foodpark\'s GCM mapped', meta);
+  }
+
+  logger.info('Ready to update Foodpark', meta);
 }
 
 function *beforeSaveUnit() {
@@ -1553,7 +1593,10 @@ function *addCloudPushSupport (target, supp) {
   elements.order_sys_order_id = supp.order_sys_order_id;
   elements.order_id = supp.order_id;
   elements.time_stamp = supp.time_stamp;
-  var payload = { android: elements};
+  if (target.os === 'ios')
+    var payload = { aps: elements};
+  else
+    var payload = { android: elements};
   return payload;
 }
 
@@ -1593,6 +1636,12 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   msgTarget.toId = customer.id
   msgTarget.gcmId = customer.gcm_id
   msgTarget.fcmId = customer.fcm_id
+
+  if (customer.apns_id)
+    msgTarget.os = 'ios';
+  else
+    msgTarget.os = 'android';
+
   if (!msgTarget.gcmId && !msgTarget.fcmId){
     var fge = meta;
     fge.error = 'No fcm/gcm for '+ msgTarget.to;
@@ -1918,13 +1967,16 @@ module.exports = {
       } else if (this.resteasy.table == 'loyalty_rewards') {
         debug('saving loyalty rewards')
         yield beforeSaveLoyaltyRewards.call(this);
+      } else if (this.resteasy.table == 'food_parks') {
+        debug('saving food_parks')
+        yield beforeSaveFoodpark.call(this);
       } else if (this.resteasy.table == 'companies') {
         debug('saving companies')
         yield beforeSaveCompanies.call(this);
       } else if (this.resteasy.table == 'customers') {
         debug('saving customers')
         yield beforeSaveCustomer.call(this);
-      }else if (this.resteasy.table == 'order_history') {
+      } else if (this.resteasy.table == 'order_history') {
         debug('saving order_history')
         yield beforeSaveOrderHistory.call(this);
         debug('saving order_history to repository')
