@@ -10,3 +10,10 @@ exports.parseBalance = function (currencyString) {
 exports.getPercentage = function(part, total) {
   return (part / total) * 100;
 };
+
+exports.getRandomNumber = function (digits) {
+  var max = 10 ** digits - 1;
+  var min = 10 ** (digits - 1);
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};

@@ -154,8 +154,6 @@ function * beforeSaveOrderHistory() {
     {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id, role :
     this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id});
 
-  console.log(this.resteasy.object);
-
   if (this.resteasy.operation == 'create') {
     if (this.passport.user.role != 'CUSTOMER' && this.passport.user.role !== 'FOODPARKMGR' && this.passport.user.role !== "UNITMGR") {
       logger.error('User unauthorized',
