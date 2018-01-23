@@ -49,7 +49,7 @@ function * getRawDetailedStats(orderInput) {
     orderOutput.company_id = order.company_id;
     orderOutput.unit_id = order.unit_id;
     orderOutput.customer_id = order.customer_id;
-    orderOutput.amount = order.amount;
+    orderOutput.amount = ParseUtils.parseBalance(order.amount);
     orderOutput.date = order.created_at;
     orderOutput.order_details = order.order_detail;
     orderOutput.type = getType(order);
