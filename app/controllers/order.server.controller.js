@@ -36,7 +36,7 @@ exports.getOrders = function*(next){
 }
 
 exports.getHotelContextOrders = function * (next) {
-  if (!this.query.start || !this.query.end || !this.query.room_number) {
+  if (!this.query.room_number) {
     this.body = {
       error : 'Correct endpoint format: /hotel?room_number={room number}&start={ISODate start}&end={ISODate end}'
     };
@@ -44,9 +44,8 @@ exports.getHotelContextOrders = function * (next) {
     return;
   }
 
-
-  var start = new Date(this.query.start);
-  var end = new Date(this.query.end);
+  var start = new Date(this.query.start ? Number(this.query.start) : 0);
+  var end = this.query.end ? new Date(Number(this.query.end)) : new Date();
   var roomNumber = this.query.room_number;
 
 
