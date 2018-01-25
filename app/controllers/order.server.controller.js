@@ -51,7 +51,7 @@ exports.getHotelContextOrders = function * (next) {
 
   end = TimeHelper.getEndOfDay(end);
 
-  var orders = yield orderhistory.getRoomServiceOrders(roomNumber, start, end);
+  var orders = (yield orderhistory.getRoomServiceOrders(roomNumber, start, end)).rows;
 
   this.body = orders;
   this.status = 200;

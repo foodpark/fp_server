@@ -14,7 +14,7 @@ exports.updateOrder = function(id, hash) {
 
 exports.getRoomServiceOrders = function (roomNumber, start, end) {
   //and created_at > '${start.toISOString()}' and created_at > '${end.toISOString()}'
-  return knex('order_history').select('*').whereRaw(`status #> '{bill_to_room}' = '${roomNumber}' and created_at > '${start.toISOString()}' and created_at < '${end.toISOString()}'`);
+  return knex.raw(`select order_history.*, units.name as unit_name from order_history left join units on order_history.unit_id = units.id where status #> '{bill_to_room}' = '${roomNumber}' and order_history.created_at > '${start.toISOString()}' and order_history.created_at < '${end.toISOString()}'`);
 };
 
 exports.getActiveOrders = function(companyId, unitId) {
