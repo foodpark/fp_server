@@ -5,7 +5,8 @@
 var ParseUtils = require('../parseutils');
 
 const CONTEXT_NAMES = {
-  creditcard : 'Credit/Debit',
+  creditcardpick : 'Credit/Debit Pick-Up',
+  creditcarddelivery : 'Credit/Debit Delivery',
   prepay : 'Pre-Pay',
   hotel : 'Room-Service',
   cod : 'Cash on Delivery'
@@ -37,7 +38,11 @@ function getRawSumStats(orderInput) {
       count : 0,
       amount : 0
     },
-    creditcard : {
+    creditcardpick : {
+      count : 0,
+      amount : 0
+    },
+    creditcarddelivery : {
       count : 0,
       amount : 0
     }
@@ -48,8 +53,15 @@ function getRawSumStats(orderInput) {
     var amount = ParseUtils.parseBalance(order.amount);
 
     if (!context) {
-      rawStats.creditcard.count++;
-      rawStats.creditcard.amount += amount
+      if (!order.for_delivery) {
+        rawStats.creditcardpick.count++;
+        rawStats.creditcardpick.amount += amount
+      }
+      else {
+        rawStats.creditcarddelivery.count++;
+        rawStats.creditcarddelivery.amount += amount
+      }
+
     } else {
       rawStats[context].count++;
       rawStats[context].amount += amount;
