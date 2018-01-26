@@ -9,6 +9,8 @@ function handle(context, user) {
     return handleHotel(user);
   else if (context === 'cod')
     return null;
+  else if (context === 'prepay')
+    return null;
   else
     throw new Error('Invalid context', 422);
 }
