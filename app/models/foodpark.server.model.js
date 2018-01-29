@@ -10,8 +10,8 @@ exports.getSingleFoodPar = function(id) {
 };
 
 exports.getFoodParkUnits = function(id) {
-  return knex.raw(`select units.*, companies.user_id, countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
-                  countries.currency_id as "owner_id", checkins.check_in, checkins.check_out from food_park_management fm right join units on fm.unit_id = units.id 
+  return knex.raw(`select units.*, companies.user_id  as "owner_id", countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
+                  countries.currency_id, checkins.check_in, checkins.check_out from food_park_management fm right join units on fm.unit_id = units.id 
                   inner join companies on units.company_id = companies.id inner join countries on companies.country_id = countries.id left outer join checkins on 
                   checkins.unit_id = units.id and checkins.food_park_id=${id} and checkins.check_in = (select max ("check_in") from checkins where checkins.unit_id = units.id 
                   and checkins.food_park_id = ${id}) where fm.food_park_id = ${id};`);
