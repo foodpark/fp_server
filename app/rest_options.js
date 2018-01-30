@@ -404,8 +404,8 @@ function * beforeSaveOrderHistory() {
 
       var paymentOption = this.resteasy.object.cod_payment_option;
 
-      if (paymentOption !== 'cash' && paymentOption !== 'creditcard') {
-        throw new Error("Valid payment options are 'cash' and 'creditcard'");
+      if (paymentOption !== 'cash' && paymentOption !== 'credit') {
+        throw new Error("Valid payment options are 'cash' and 'credit'");
       }
       this.resteasy.object.cod_payment_option = undefined;
 
