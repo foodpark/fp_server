@@ -27,7 +27,7 @@ module.exports=function(app) {
   router.get(relApiversion + '/food_parks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.getDriverByOrder)
   router.post(relApiversion + '/food_parks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
   router.put(relApiversion + '/food_parks/:foodParkId/orders/:orderId', requireJWT, foodpark.setDriverToOrder)
-  router.delete(relApiversion + '/food_parks/:foodParkId/units/:unitId', requireJWT, foodpark.removeFoodParkUnits)
+  router.delete(relApiversion + '/food_parks/:foodParkId/units/:fpUnitId', requireJWT, foodpark.removeFoodParkUnits)
   router.get(relApiversion + '/food_parks/:foodParkId/drivers', requireJWT, foodpark.getDrivers)
   router.post(relApiversion + '/food_parks/:foodParkId/drivers', requireJWT, foodpark.addDriver)
   router.delete(relApiversion + '/food_parks/:foodParkId/drivers/:userId', requireJWT, foodpark.deleteDriver)
@@ -46,6 +46,8 @@ module.exports=function(app) {
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
 	router.get(apiversion + '/companies/:companyId', storefront.readCompany)
+
+  router.get(relApiversion + '/companies/:companyId/units/:unitId', storefront.getCompanyUnit);
 
 
   router.post(apiversion + '/companies/:companyId/images',  requireJWT, storefront.uploadCompanyPhoto)
@@ -78,7 +80,7 @@ module.exports=function(app) {
 
   /* Food Park Management */
   router.param('foodParkId', foodpark.getFoodPark);
-  router.param('unitId', foodpark.getFoodParkUnitId);
+  router.param('fpUnitId', foodpark.getFoodParkUnitId);
   router.param('orderId', foodpark.getDriverByOrder);
   router.param('orderId', foodpark.setDriverToOrder);
   router.param('driverId', foodpark.getDriverByOrder);

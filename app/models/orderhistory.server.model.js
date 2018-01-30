@@ -4,6 +4,11 @@ var debug = require('debug')('orders.model');
 exports.customQuery = function (query) {
   return knex('order_history').select('*').whereRaw(query);
 };
+
+exports.getSingle = function (id) {
+  return knex('order_history').select('*').where('id', id).first();
+};
+
 exports.getStatus = function(id) {
   return knex('order_history').select('status').where('id', id);
 };

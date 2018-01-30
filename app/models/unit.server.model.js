@@ -32,6 +32,18 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
   [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).andWhere('units.is_deleted',false).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');
 };
 
+exports.getCompanyUnit = function (unitId) {
+  return knex.raw(`select units.*,
+                  companies.user_id as "owner_id", countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
+                  countries.currency_id, square_unit.location_id as "square_location_id", checkins.check_in, checkins.check_out from units 
+                  inner join companies on units.company_id = companies.id inner join countries on companies.country_id = countries.id 
+                  left join square_unit on units.id = square_unit.unit_id
+                  left outer join checkins on
+                  checkins.check_in = (select max ("check_in") from checkins where checkins.unit_id = ${unitId}) and 
+                  checkins.check_out = (select max ("check_out") from checkins where checkins.unit_id = ${unitId})
+                  where units.id = ${unitId};`);
+};
+
 exports.findByLatLonBox = function(lat1, lon1, lat2, lon2, callback) {
   if (lat1 < lat2) {
     var minlat = lat1;

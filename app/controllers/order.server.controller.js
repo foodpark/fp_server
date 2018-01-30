@@ -390,6 +390,7 @@ exports.getDriverActiveOrders = function * (next) {
       if (orders && orders.length > 0) {
         for (i = 0; i < orders.length; i++) {
           logger.info("Order unitId: " + orders[i].unit_id);
+          orders[i].order_type = orders[i].context === 'hotel' ? 'room' : (orders[i].context === 'cod' ? 'cod' : 'normal');
           orders[i].unit_manager_fbid = (yield User.getUserIdForUnitMgrByUnitId(orders[i].unit_id))[0].fbid;
           orders[i].customer_fbid = (yield User.getFBID(orders[i].customer_id))[0].fbid;
         }

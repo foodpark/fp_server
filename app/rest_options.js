@@ -395,6 +395,26 @@ function * beforeSaveOrderHistory() {
       debug('...preprocessing complete. Ready to save');
     }
   } else if (this.resteasy.operation == 'update') {
+    if (this.resteasy.object.cod_payment_option) {
+      var order = yield OrderHistory.getSingle(this.params.id);
+
+      if (order.context !== 'cod'){
+        throw new Error('Order is not in cod context');
+      }
+
+      var paymentOption = this.resteasy.object.cod_payment_option;
+
+      if (paymentOption !== 'cash' && paymentOption !== 'creditcard') {
+        throw new Error("Valid payment options are 'cash' and 'creditcard'");
+      }
+      this.resteasy.object.cod_payment_option = undefined;
+
+      var currentStatus = order.status;
+      currentStatus.cod_payment_option = paymentOption;
+
+      this.resteasy.object.status = currentStatus;
+    }
+
     debug('...update')
     debug('...limit payload elements')
     try {
@@ -408,7 +428,7 @@ function * beforeSaveOrderHistory() {
     }
     debug('..limited payload is..');
     debug(this.resteasy.object);
-    if (this.resteasy.object.status) {
+    if (this.resteasy.object.status && typeof(this.resteasy.object.status) !== 'object') { //meaning it's a processed update on the status, no extra work is required
       var newStat = this.resteasy.object.status;
       debug('..status sent is '+ newStat)
       logger.info('PUT includes a status update ',
@@ -439,6 +459,7 @@ function * beforeSaveOrderHistory() {
       logger.info('PUT does not involve a status update '+ unitId,
         {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
         role: this.passport.user.role, order_sys_order_id: osoId});
+      console.log(this.resteasy.object.status);
     }
   }
   logger.info('Pre-flight for order save completed '+ unitId,
@@ -691,6 +712,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       var custName = user.first_name +' '+ user.last_name.charAt(0);
       debug(custName);
       debug(status);
+      var notify = true;
       switch(status) {
           // From Customer
           case 'order_paid':
@@ -739,42 +761,53 @@ function *afterUpdateOrderHistory(orderHistory) {
               msgTarget.message = translator.translate(lang, "orderDeliveredMessage", orderNum);//"Your order #"+ orderNum +" was delivered. Thanks again!";
               break;
           default:
-            var eso = meta;
-            eso.error = 'Unknown status for order ';
-            logger.error('Unknown status for order ', fge);
-            throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
+            console.log(status);
+            if (status !== 'cod_payment_option') {
+              var eso = meta;
+              eso.error = 'Unknown status for order ';
+              logger.error('Unknown status for order ', fge);
+              throw new Error ('Unknown status '+ status +' for order #'+ orderHistory.id)
+            }
+            else {
+              notify = false;
+            }
+
       }
-      msgTarget.body = msgTarget.message;
-      msgTarget.status = status
-      debug(msgTarget);
-      var msgTime = timestamp.now();
-      var supplemental = {};
-      supplemental.unit_id = ''+ orderHistory.unit_id;
-      supplemental.company_id = ''+ orderHistory.company_id;
-      supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
-      supplemental.order_id = ''+ orderHistory.id;
-      supplemental.time_stamp = msgTime;
-      supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
-      msgTarget.data = supplemental;
 
-      debug(msgTarget);
-      debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
+      if (notify) {
+        msgTarget.body = msgTarget.message;
+        msgTarget.status = status
+        debug(msgTarget);
+        var msgTime = timestamp.now();
+        var supplemental = {};
+        supplemental.unit_id = ''+ orderHistory.unit_id;
+        supplemental.company_id = ''+ orderHistory.company_id;
+        supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
+        supplemental.order_id = ''+ orderHistory.id;
+        supplemental.time_stamp = msgTime;
+        supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
+        msgTarget.data = supplemental;
+
+        debug(msgTarget);
+        debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
 
 
-      var mt = meta;
-      mt.message_payload = msgTarget.message;
+        var mt = meta;
+        mt.message_payload = msgTarget.message;
 
-      logger.info('sending notification to unit '+ orderHistory.unit_id, mt);
+        logger.info('sending notification to unit '+ orderHistory.unit_id, mt);
 
-      yield push.notifyOrderUpdated(orderNum, msgTarget);
+        yield push.notifyOrderUpdated(orderNum, msgTarget);
 
-      logger.info(msgTarget.to +' notified of order '+ orderHistory.id, meta);
+        logger.info(msgTarget.to +' notified of order '+ orderHistory.id, meta);
 
-      debug('..returned from notifying');
+        debug('..returned from notifying');
 
-      // record notification time
-      orderHistoryStatus[keys[i]] = msgTime;
-      debug(orderHistoryStatus)
+        // record notification time
+        orderHistoryStatus[keys[i]] = msgTime;
+        debug(orderHistoryStatus);
+      }
+
       updated = true;
 
       // grant loyalty points
@@ -2045,52 +2078,6 @@ module.exports = {
     debug('context');
     if (!context) debug('..no context')
     else debug(context);
-
-    if(this.resteasy.operation == 'read' 
-      && this.resteasy.table == 'units' 
-      && context 
-      && (m = context.match(/companies\/(\d+)$/))){
-      return query
-        .select(knex.raw('units.id, '
-                        +'units.name, '
-                        +'units.number, '
-                        +'units.type, '
-                        +'units.customer_order_window, '
-                        +'units.prep_notice, '
-                        +'units.delivery, '
-                        +'units.delivery_time_offset, '
-                        +'units.delivery_chg_amount, '
-                        +'units.delivery_radius, '
-                        +'units.description, '
-                        +'units.username, '
-                        +'units.password, '
-                        +'units.qr_code, '
-                        +'units.phone, '
-                        +'units.apns_id, '
-                        +'units.fcm_id, '
-                        +'units.gcm_id, '
-                        +'units.device_type, '
-                        +'units.unit_order_sys_id, '
-                        +'units.territory_id, '
-                        +'units.company_id, '
-                        +'units.unit_mgr_id, '
-                        +'units.created_at, '
-                        +'units.updated_at, '
-                        +'units.payment, '
-                        +'units.room_service, '
-                        +'units.cash_on_delivery, '
-                        +'units.is_deleted, '
-                        +'companies.user_id AS "owner_id", '
-                        +'countries.currency_id, '
-                        +'countries.currency, '
-                        +'countries.moltin_client_id, '
-                        +'countries.moltin_client_secret, '
-                        +'square_unit.location_id AS "square_location_id"'))
-          .innerJoin('companies','units.company_id','companies.id')
-          .innerJoin('countries', 'companies.country_id', 'countries.id')
-          .leftJoin('square_unit', 'units.id', 'square_unit.unit_id')
-        .where('units.id', this.params.id);
-    }
 
     if (this.resteasy.operation == 'index') {
       //soft deleted tables

@@ -8,6 +8,7 @@ var config = require('../../config/config');
 var debug = require('debug')('storefront');
 var _ = require('lodash');
 var logger = require('winston');
+var Units = require('../models/unit.server.model');
 
 
 var getErrorMessage = function(err) {
@@ -27,6 +28,10 @@ var sendErrorResponse = function(err, res, status) {
 exports.readCompany=function *(next) {
 	this.body = this.company
 }
+
+exports.getCompanyUnit = function *() {
+  this.body = (yield Units.getCompanyUnit(this.params.unitId)).rows[0];
+};
 
 exports.getCompany=function *(id, next) {
   debug('getCompany')
