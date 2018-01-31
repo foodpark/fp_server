@@ -394,7 +394,7 @@ exports.getDriverActiveOrders = function * (next) {
           orders[i].order_type = orders[i].context === 'hotel' ? 'room' : (orders[i].context === 'cod' ? 'cod' : 'normal');
 
           if (orders[i].order_type === 'room') {
-            orders[i].room = orders[i].status.bill_to_room;
+            orders[i].room_number = orders[i].status.bill_to_room;
           }
 
           orders[i].unit_manager_fbid = (yield User.getUserIdForUnitMgrByUnitId(orders[i].unit_id))[0].fbid;
