@@ -387,12 +387,13 @@ exports.getDriverActiveOrders = function * (next) {
       console.log(driverUserId);
       meta.driver_id=driverUserId;
       var orders = driverUserId ? yield orderhistory.getDriverActiveOrders(driverUserId) : [];
+      console.log(orders);
       if (orders && orders.length > 0) {
         for (i = 0; i < orders.length; i++) {
           logger.info("Order unitId: " + orders[i].unit_id);
           orders[i].order_type = orders[i].context === 'hotel' ? 'room' : (orders[i].context === 'cod' ? 'cod' : 'normal');
 
-          if (orders[i].order_type === 'hotel') {
+          if (orders[i].order_type === 'room') {
             orders[i].room = orders[i].status.bill_to_room;
           }
 
