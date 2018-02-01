@@ -72,7 +72,8 @@ describe(tests +' Create a new order', function() {
     .set('Authorization', custToken)
     .send( {
         "order_sys_order_id": orderSysOrderId,
-        "desired_pickup_time": "6/6/2017, 8:11:56 PM"
+        "desired_pickup_time": "6/6/2017, 8:11:56 PM",
+        "commission_type": 'hotel'
     })
     .end(function(err, res) {
       console.log(err);

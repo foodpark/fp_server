@@ -127,9 +127,6 @@ describe(testCase + 'Event creation', function () {
           {
             "start": "08:00-03:00",
             "end": "10:00-03:00"
-          },{
-            "start": "08:00-03:00",
-            "end": "10:00-03:00"
           }
         ],
         "manager": MANAGER_ID

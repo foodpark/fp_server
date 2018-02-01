@@ -70,7 +70,7 @@ exports.getStats = function * (perspective, category, operation, start, end, id)
 
   var orderInput = yield getInputOrders(perspective, start, end, id);
 
-  return (yield CATEGORY_HANDLER[category][operation](orderInput));
+  return (yield CATEGORY_HANDLER[category][operation](orderInput, perspective, id, start, end));
 };
 
 function * getInputOrders(perspective, start, end, id) {

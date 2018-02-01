@@ -5,6 +5,7 @@
 var ParseUtils = require('../utils/parseutils');
 
 var Packages = require('../models/packages.server.model');
+var PrePay = require('../controllers/prepay.server.controller');
 var Users = require('../models/user.server.model');
 
 exports.createPackage = createPackage;
@@ -42,7 +43,6 @@ function * updatePackage() {
     }
 
     if (yield Packages.getActivePackageById(itemPackage)) {
-      console.log("HEEEEEERE");
       yield Packages.updatePackage({available : false}, itemPackage);
       var formerPackage = yield(Packages.getPackage(itemPackage));
 
@@ -109,13 +109,17 @@ function * createPackage() {
 }
 
 function * givePackage() {
+  console.log('okok');
   var giftedQuantity = this.body.quantity;
   var itemPackage = this.params.packageId;
   var giftedUser = this.params.userId;
   var creatorRole = this.passport.user.role;
 
+  console.log(creatorRole);
+
   if (creatorRole !== 'FOODPARKMGR' && creatorRole !== 'OWNER' && creatorRole !== 'UNITMGR') {
     this.status = 401;
+    this.body = {error : "Not an fpm/owner/unitmgr"};
     return;
   }
 
@@ -204,6 +208,8 @@ function * redeemPackage() {
   this.status = 200;
   this.body = { message : "Package successfully redeemed"};
   this.body.data = givenPackage;
+
+  yield PrePay.registerPrepayTransaction(givenPackage.id, 'package');
 }
 
 function * getUserGiftedPackages() {

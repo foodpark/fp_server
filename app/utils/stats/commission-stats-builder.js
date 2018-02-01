@@ -7,17 +7,18 @@ var Commissions = require('../../models/commission.server.model');
 var Companies = require('../../models/company.server.model');
 var Customers = require('../../models/customer.server.model');
 var Units = require('../../models/unit.server.model');
+var Prepay = require('../../models/prepay.server.model');
 
 exports.generateDetailedStats = generateDetailedStats;
 
-function * generateDetailedStats (orderInput) {
-  return yield getRawDetailedStats(orderInput);
+function * generateDetailedStats (orderInput, perspective, id, start, end) {
+  return yield getRawDetailedStats(orderInput, perspective, id, start, end);
 }
 
 exports.generateSumStats = generateSumStats;
 
-function * generateSumStats(orderInput) {
-  return yield formatSumStats(orderInput);
+function * generateSumStats(orderInput, perspective, id, start, end) {
+  return yield formatSumStats(orderInput, perspective, id, start, end);
 }
 
 function * formatSumStats(orderInput) {
@@ -32,7 +33,7 @@ function * formatSumStats(orderInput) {
   return {total_commission : commissionTotal.toFixed(2)};
 }
 
-function * getRawDetailedStats(orderInput) {
+function * getRawDetailedStats(orderInput, perspective, id, start, end) {
   var rawStats = [];
 
   var commissions = yield getCommissions();
@@ -56,6 +57,31 @@ function * getRawDetailedStats(orderInput) {
     orderOutput.commission = (ParseUtils.parseBalance(order.amount) * commissions[order.commission_type]).toFixed(2);
 
     rawStats.push(orderOutput);
+  });
+
+  var prepayRecharges = (yield Prepay.getPrepayRecharges(perspective,id, start, end)).rows;
+
+  prepayRecharges.forEach(function (recharge) {
+    var rechargeOutput = {};
+
+    companyPromises.push(Companies.getSingleCompany(recharge.company_id));
+    customerPromises.push(Customers.getUser(recharge.customer_id));
+    unitPromises.push(Units.getSingleUnit(recharge.unit_id));
+    rechargeOutput.company_id = recharge.company_id;
+    rechargeOutput.unit_id = recharge.unit_id;
+    rechargeOutput.customer_id = recharge.customer_id;
+    rechargeOutput.amount = recharge.amount;
+    rechargeOutput.date = recharge.date;
+    rechargeOutput.order_details = {
+        '0' : {
+          title : "Recharge",
+          quantity : 1
+        }
+    };
+    rechargeOutput.type = "Pre-Pay Recharge";
+    rechargeOutput.commission = (recharge.amount * commissions['prepay']).toFixed(2);
+
+    rawStats.push(rechargeOutput);
   });
 
   var rawStatsCompanies = Promise.all(companyPromises).then(function (companies) {
