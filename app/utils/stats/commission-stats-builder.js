@@ -21,8 +21,8 @@ function * generateSumStats(orderInput, perspective, id, start, end) {
   return yield formatSumStats(orderInput, perspective, id, start, end);
 }
 
-function * formatSumStats(orderInput) {
-  var detailedStats = yield getRawDetailedStats(orderInput);
+function * formatSumStats(orderInput, perspective, id, start, end) {
+  var detailedStats = yield getRawDetailedStats(orderInput, perspective, id, start, end);
 
   var commissionTotal = 0;
 
