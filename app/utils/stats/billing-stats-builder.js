@@ -21,7 +21,7 @@ function * generateSumStats (orderInput) {
 exports.generatePercentageStats = generatePercentageStats;
 
 function * generatePercentageStats (orderInput) {
-  return formatPercentageStatsResponse(generateSumStats(orderInput));
+  return formatPercentageStatsResponse(yield generateSumStats(orderInput));
 }
 
 function getRawSumStats(orderInput) {

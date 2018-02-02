@@ -109,13 +109,10 @@ function * createPackage() {
 }
 
 function * givePackage() {
-  console.log('okok');
   var giftedQuantity = this.body.quantity;
   var itemPackage = this.params.packageId;
   var giftedUser = this.params.userId;
   var creatorRole = this.passport.user.role;
-
-  console.log(creatorRole);
 
   if (creatorRole !== 'FOODPARKMGR' && creatorRole !== 'OWNER' && creatorRole !== 'UNITMGR') {
     this.status = 401;
