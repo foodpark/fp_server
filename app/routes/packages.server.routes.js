@@ -23,6 +23,7 @@ module.exports = function (app) {
 
   router.post(apiPackageGiven, requireJWT, packages.givePackage);
   router.get(apiPackageGiven + '/redeem', requireJWT, packages.redeemPackage);
+  router.post(apiPath + 'redeem/multiple', requireJWT, packages.redeemMultiplePackages);
   router.get(apiUserPackages, requireJWT, packages.getUserGiftedPackages);
   router.get(apiPath + ':qrcode/redeem', requireJWT, packages.redeemPackage);
 

@@ -7,6 +7,7 @@ var Prepay = require('../models/prepay.server.model');
 
 exports.recharge = recharge;
 exports.registerPrepayTransaction = registerPrepayTransaction;
+exports.getPrepayTransactionPromise = getPrepayTransactionPromise;
 
 function * recharge() {
   try {
@@ -29,17 +30,21 @@ function * recharge() {
 
 function * registerPrepayTransaction(id, type) {
   try {
-    var transaction = {
-      type : type,
-      transaction_id : id,
-      date : new Date()
-    };
-
-    var createdTransaction = (yield Prepay.registerTransaction(transaction));
+    var createdTransaction = yield getPrepayTransactionPromise(id,type);
     console.log('Transaction successfully registered!');
     console.log(createdTransaction);
   } catch (err) {
     console.error('could not register transaction to history');
     throw err;
   }
+}
+
+function getPrepayTransactionPromise(id, type) {
+  var transaction = {
+    type : type,
+    transaction_id : id,
+    date : new Date()
+  };
+
+  return Prepay.registerTransaction(transaction);
 }

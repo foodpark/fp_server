@@ -13,11 +13,96 @@ exports.getPackage = getPackage;
 exports.getCompanyPackages = getCompanyPackages;
 exports.givePackage = givePackage;
 exports.redeemPackage = redeemPackage;
+exports.redeemMultiplePackages = redeemMultiplePackages;
 exports.getUserGiftedPackages = getUserGiftedPackages;
 exports.updatePackage = updatePackage;
 
 const PACKAGE_NUMBER_OF_DIGITS = 15;
 
+function * redeemMultiplePackages() {
+  try {
+    var packageCodes = this.body.package_codes;
+
+    if (!packageCodes) {
+      this.status = 400;
+      this.body = { error : "You must provide a 'package_codes' field"};
+    }
+
+    if (!packageCodes.forEach) {
+      this.status = 400;
+      this.body = { error : "Input for 'package_codes' must be an array"};
+    }
+
+    var retrievePackagePromises = [];
+    var packagesGiven = [];
+
+    packageCodes.forEach(function (qrcode) {
+      retrievePackagePromises.push(Packages.getQRCodeGivenPackage(qrcode));
+    });
+
+    var resolvePromises = Promise.all(retrievePackagePromises).then(function (retrievedPackages) {
+      packagesGiven = retrievedPackages;
+
+      return packagesGiven;
+    });
+
+    yield resolvePromises;
+
+    var itResult = {
+      success : true
+    };
+
+    var updatePromises = [];
+    var transactionPromises = [];
+
+    packagesGiven.some(function (packageGiven, index) {
+      if (!packageGiven) {
+        itResult.success = false;
+        itResult.status = 404;
+        itResult.body = { error : `Package '${packageCodes[index]}' does not exist`};
+        return true;
+      }
+
+      else if (packageGiven.quantity < 1) {
+        itResult.success = false;
+        itResult.status = 404;
+        itResult.body = { error : `Package '${packageCodes[index]}' is not available for this user anymore (quantity < 1)`};
+        return true;
+      }
+
+      else {
+        packageGiven.quantity--;
+
+        updatePromises.push(Packages.updateGivenPackage(packageGiven.gifted_user, packageGiven.package, packageGiven.quantity));
+        transactionPromises.push(PrePay.getPrepayTransactionPromise(packageGiven.id, 'package'));
+      }
+    });
+
+    if (!itResult.success) {
+      this.status = itResult.status;
+      this.body = itResult.body;
+      return;
+    }    
+    
+    resolvePromises = Promise.all(updatePromises).then(function (updates) {
+      return updates;
+    });
+
+    yield resolvePromises;
+
+    resolvePromises = Promise.all(transactionPromises).then(function (transactions) {
+      return transactions;
+    });
+
+    yield resolvePromises;
+
+    this.status = 200;
+    this.body = { message : "Packages were successfully redeemed"};
+  } catch (err) {
+    console.error("Error while updating multiple packages");
+    throw err;
+  }
+}
 
 function * getCompanyPackages() {
   try {
@@ -187,12 +272,6 @@ function * redeemPackage() {
     return;
   }
 
-  if (givenPackage.gifted_user !== user.id) {
-    this.status = 401;
-    this.body = { error : "Not the right user"};
-    return;
-  }
-
   if (givenPackage.quantity < 1) {
     this.status = 400;
     this.body = { error : "Package not available, quantity is 0"};
@@ -210,7 +289,14 @@ function * redeemPackage() {
 }
 
 function * getUserGiftedPackages() {
-  var giftedUser = this.params.userId;
+  var giftedUser = Number(this.params.userId);
+  var loggedUser = this.passport.user;
+
+  if (loggedUser.id !== giftedUser) {
+    this.status = 401;
+    this.body = { error : "User queried does not match authorization"};
+    return;
+  }
 
   var givenPackages = yield Packages.getUserGiftedPackages(giftedUser);
 
