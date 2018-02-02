@@ -218,7 +218,7 @@ function * getUserGiftedPackages() {
   var givenPackages = yield Packages.getUserGiftedPackages(giftedUser);
 
   this.status = 200;
-  this.body = givenPackages;
+  this.body = givenPackages.rows;
 }
 
 

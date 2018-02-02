@@ -51,7 +51,10 @@ exports.updateGivenPackage = function (giftedUser, itemPackage, quantity) {
 };
 
 exports.getUserGiftedPackages = function (giftedUser) {
-  return knex(PACKAGE_GIVEN_TABLE).select().whereRaw(`gifted_user = ${giftedUser} and quantity > 0`);
+  return knex.raw(`select package_given.package as "package_id", package_given.quantity, package_given.gifted_user, 
+                  packages.name as "package_name", packages.company as "company_id", packages.items as "package_items"
+                  from package_given join packages on package_given.package = packages.id where gifted_user=${giftedUser}
+                  and quantity > 0;`);
 };
 
 
