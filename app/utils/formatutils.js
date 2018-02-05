@@ -12,16 +12,19 @@ const CURRENCY_INFO = {
         locale : "de-DE"
     },
     default : {
-        symbol : "$",
-        locale : "en-US"
+        symbol : "R$",
+        locale : "de-DE"
     }
 };
 
-exports.formatPrice = function (currency, value) {
+exports.formatPrice = function (value, currency) {
     var formatter = CURRENCY_INFO[currency] || CURRENCY_INFO["default"] ;
 
     var symbol = formatter.symbol;
     var locale = formatter.locale;
 
-    return symbol + value.toLocaleString(locale);
+    return symbol + value.toLocaleString(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
 };

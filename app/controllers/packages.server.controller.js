@@ -8,6 +8,10 @@ var Packages = require('../models/packages.server.model');
 var PrePay = require('../controllers/prepay.server.controller');
 var Users = require('../models/user.server.model');
 
+var Companies = require('../models/company.server.model');
+var Units = require('../models/unit.server.model');
+var Foodpark = require('../models/foodpark.server.model');
+
 exports.createPackage = createPackage;
 exports.getPackage = getPackage;
 exports.getCompanyPackages = getCompanyPackages;
@@ -16,6 +20,7 @@ exports.redeemPackage = redeemPackage;
 exports.redeemMultiplePackages = redeemMultiplePackages;
 exports.getUserGiftedPackages = getUserGiftedPackages;
 exports.updatePackage = updatePackage;
+exports.deletePackageGiven = deletePackageGiven;
 
 const PACKAGE_NUMBER_OF_DIGITS = 15;
 
@@ -41,7 +46,9 @@ function * redeemMultiplePackages() {
     });
 
     var resolvePromises = Promise.all(retrievePackagePromises).then(function (retrievedPackages) {
-      packagesGiven = retrievedPackages;
+      retrievedPackages.forEach(function (result) {
+        packagesGiven.push(result.rows[0])
+      });
 
       return packagesGiven;
     });
@@ -73,10 +80,17 @@ function * redeemMultiplePackages() {
       else {
         packageGiven.quantity--;
 
-        updatePromises.push(Packages.updateGivenPackage(packageGiven.gifted_user, packageGiven.package, packageGiven.quantity));
+        updatePromises.push(Packages.updateGivenPackage(packageGiven.gifted_user, packageGiven.package_id, packageGiven.quantity));
         transactionPromises.push(PrePay.getPrepayTransactionPromise(packageGiven.id, 'package'));
       }
     });
+
+
+    if (!(yield checkCompanyMatch(packagesGiven, this.passport.user))) {
+      itResult.success = false;
+      itResult.status = 401;
+      itResult.body = { error : 'One or more packages does not match company'};
+    }
 
     if (!itResult.success) {
       this.status = itResult.status;
@@ -97,11 +111,46 @@ function * redeemMultiplePackages() {
     yield resolvePromises;
 
     this.status = 200;
-    this.body = { message : "Packages were successfully redeemed"};
+    this.body = { message : "Packages were successfully redeemed", data : packagesGiven};
   } catch (err) {
     console.error("Error while updating multiple packages");
     throw err;
   }
+}
+
+function * checkCompanyMatch(packagesGiven, user) {
+  var possibleCompanyMatches = [];
+
+  var result = null;
+
+  if (user.role === 'OWNER') {
+    result = Companies.companyForUser(user.id).then(function (company) {
+      possibleCompanyMatches.push(company[0].id);
+    });
+    yield result;
+  }
+
+  else if (user.role === 'UNITMGR') {
+    result = Units.getForUser(user.id).then(function (unit) {
+      possibleCompanyMatches.push(unit[0].company_id);
+    });
+
+    yield result;
+  }
+  
+  else {
+    result = Foodpark.getManagedUnits(user.id).then(function (units) {
+      units.rows.forEach(function (unit) {
+        possibleCompanyMatches.push((unit.company_id));
+      });
+    });
+
+    yield result;
+  }
+  
+  return packagesGiven.every(function (packageGiven) {
+    return possibleCompanyMatches.indexOf(packageGiven.company_id) !== -1;
+  });
 }
 
 function * getCompanyPackages() {
@@ -247,7 +296,7 @@ function * givePackage() {
 }
 
 function * checkQRCodeExistence(qrcode) {
-  var packageGifted = yield Packages.getQRCodeGivenPackage(qrcode);
+  var packageGifted = (yield Packages.getQRCodeGivenPackage(qrcode)).rows[0];
   return packageGifted !== undefined ;
 }
 
@@ -256,7 +305,7 @@ function * redeemPackage() {
   var givenPackage = undefined;
 
   if (this.params.qrcode) {
-    givenPackage = yield Packages.getQRCodeGivenPackage(this.params.qrcode);
+    givenPackage = (yield Packages.getQRCodeGivenPackage(this.params.qrcode)).rows[0];
   }
 
   else {
@@ -280,9 +329,9 @@ function * redeemPackage() {
 
   givenPackage.quantity--;
 
-  var packageUpdated = yield Packages.updateGivenPackage(givenPackage.gifted_user, givenPackage.package, givenPackage.quantity);
+  var packageUpdated = yield Packages.updateGivenPackage(givenPackage.gifted_user, givenPackage.package_id, givenPackage.quantity);
   this.status = 200;
-  this.body = { message : "Package successfully redeemed"};
+  this.body = { message : "Package successfully redeemed", data : givenPackage};
   this.body.data = givenPackage;
 
   yield PrePay.registerPrepayTransaction(givenPackage.id, 'package');
@@ -304,5 +353,25 @@ function * getUserGiftedPackages() {
   this.body = givenPackages.rows;
 }
 
+function * deletePackageGiven() {
+  var giftedUser = this.params.userId;
+  var packageId = this.params.packageId;
+  var userRole = this.passport.user.role;
+
+  if (userRole !== 'FOODPARKMGR' && userRole !== 'OWNER' && userRole !== 'UNITMGR') {
+    this.status = 401;
+    this.body = {
+      error : "Only fpm/owner/unitmgr can delete a package given to a user"
+    };
+    return;
+  }
+
+  var deletedPackage = yield Packages.deletePackageGiven(giftedUser, packageId);
+
+  this.status = 202;
+  this.body = {
+    success : "Deleted package " + packageId + " activation for user " + giftedUser
+  };
+}
 
 

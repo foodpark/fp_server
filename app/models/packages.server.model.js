@@ -35,9 +35,14 @@ exports.getActivePackageById = function (itemPackage) {
 };
 
 exports.getQRCodeGivenPackage = function (qrcode) {
-  return knex(PACKAGE_GIVEN_TABLE).select().where({'qr_code' :  qrcode}).first();
+  return knex.raw(`select package_given.package as "package_id", package_given.quantity, package_given.gifted_user, package_given.qr_code, 
+                  packages.name as "package_name", packages.company as "company_id", packages.items as "package_items"
+                  from package_given join packages on package_given.package = packages.id where qr_code='${qrcode}'`);
 };
 
+exports.deletePackageGiven = function (giftedUser, itemPackage) {
+  return knex(PACKAGE_GIVEN_TABLE).where({gifted_user : giftedUser, package : itemPackage}).del();
+};
 exports.createGivenPackage = function (giftedUser, itemPackage, quantity, qrcode) {
   if (!quantity)
     quantity = 1;

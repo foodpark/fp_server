@@ -155,6 +155,9 @@ function * beforeSaveOrderHistory() {
     this.passport.user.role, order_sys_order_id: this.resteasy.object.order_sys_order_id});
 
   if (this.resteasy.operation == 'create') {
+
+    var eCommerce = true; //is an ecommerce system being used to place this order?
+
     if (this.passport.user.role != 'CUSTOMER' && this.passport.user.role !== 'FOODPARKMGR' && this.passport.user.role !== "UNITMGR") {
       logger.error('User unauthorized',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
@@ -162,11 +165,27 @@ function * beforeSaveOrderHistory() {
       throw new Error('User unauthorized', 401);
     }
     var osoId = this.resteasy.object.order_sys_order_id;
-    if (! this.resteasy.object.order_sys_order_id) { // is required
-      logger.error('No order id provided for e-commerce system',
+    if (! this.resteasy.object.order_sys_order_id) {
+      if (this.resteasy.object.context === 'prepay') {
+        eCommerce = false;
+
+        this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
+        this.resteasy.object.order_detail = { 0 :
+          {
+            "title" : "Pre-pay Debit",
+            "quantity" : 1
+          }
+        };
+
+        delete this.resteasy.object.currency;
+      }
+      else {
+        logger.error('No order id provided for e-commerce system',
           {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-          role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
-      throw new Error('order_sys_order_id is required', 422);
+            role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
+        throw new Error('order_sys_order_id is required', 422);
+      }
+
     }
       debug('...create')
     debug('..getting customer name')
@@ -265,10 +284,12 @@ function * beforeSaveOrderHistory() {
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId});
 
-    //Determine whether it is Square or Moltin API
-    var squareInfo = yield Square.getUnitSquareInfo(unitId);
 
-    if (squareInfo && squareInfo.location_id) {
+    if (eCommerce) {
+      //Determine whether it is Square or Moltin API
+      var squareInfo = yield Square.getUnitSquareInfo(unitId);
+
+      if (squareInfo && squareInfo.location_id) {
         logger.info('Square order');
         var square_order_id = osoId;
 
@@ -276,124 +297,125 @@ function * beforeSaveOrderHistory() {
         var parsedOrderDetails = Square.simplifySquareOrderDetails(orderDetails);
 
         if (Object.keys(parsedOrderDetails).length === 0) {
-            logger.error('Invalid square order id');
-            throw new Error('Invalid square order id', 422);
+          logger.error('Invalid square order id');
+          throw new Error('Invalid square order id', 422);
         }
 
         this.resteasy.object.amount = Format.formatPrice(orderDetails.total_money.currency, getSquareMoneyValue(orderDetails.total_money.amount));
         this.resteasy.object.order_detail = parsedOrderDetails;
         delete this.resteasy.object.files;
-    }
-
-    else {
-      // get order details and streamline for display
-      var moltin_order_id = osoId;
-      var order_details = {};
-      logger.info('Moltin order');
-      debug('..order sys order id: ' + moltin_order_id)
-      try {
-        var order = yield msc.findOrder(moltin_order_id)
-        var order = yield msc.findOrder(moltin_order_id)
-        order_details = yield msc.getOrderDetail(moltin_order_id)
-        order_details = yield simplifyDetails.call(this, order_details)
-      } catch (err) {
-        logger.error('Error retrieving order items from ecommerce system ',
-          {
-            fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-            role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
-            error: err
-          });
-        throw(err)
-      }
-      debug('...total amount ' + order.totals.formatted.total)
-      this.resteasy.object.amount = order.totals.formatted.total
-      debug('...order details ')
-      debug(order_details)
-      this.resteasy.object.order_detail = order_details;
-      // Set the initial state
-      this.resteasy.object.status = {
-        order_requested: ''
-      };
-
-      if (this.passport.user.role !== 'CUSTOMER')
-        this.resteasy.object.status.created_by = this.passport.user.id;
-
-      if (customStatus) {
-        var customStatusKeys = Object.keys(customStatus);
-        var savingContext = this;
-
-        customStatusKeys.forEach(function (key) {
-          savingContext.resteasy.object.status[key] = customStatus[key];
-        });
       }
 
-      debug(this.resteasy.object);
-      // }
-
-      // Handle delivery details
-      if (this.resteasy.object.for_delivery) {
-        debug('..delivery order')
-        if (!this.resteasy.object.delivery_address_id) {
-          logger.error('No delivery address provided',
-            {
-              fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-              role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
-              error: 'No delivery address provided'
-            });
-          throw new Error('No delivery address provided', 422);
-        }
-        // Get and streamline address for display
-        var addrDetails = '';
+      else {
+        // get order details and streamline for display
+        var moltin_order_id = osoId;
+        var order_details = {};
+        logger.info('Moltin order');
+        debug('..order sys order id: ' + moltin_order_id)
         try {
-          addrDetails = (yield DeliveryAddress.getSingleAddress(this.resteasy.object.delivery_address_id))[0];
+          var order = yield msc.findOrder(moltin_order_id)
+          var order = yield msc.findOrder(moltin_order_id)
+          order_details = yield msc.getOrderDetail(moltin_order_id)
+          order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
-          logger.error('Error getting delivery address',
+          logger.error('Error retrieving order items from ecommerce system ',
             {
               fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
               role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
-              delivery_address_id: this.resteasy.object.delivery_address_id, error: err
+              error: err
             });
           throw(err)
         }
-        debug(addrDetails);
-        var details = {
-          nickname: addrDetails.nickname,
-          address1: addrDetails.address1,
-          address2: addrDetails.address2,
-          city: addrDetails.city,
-          state: addrDetails.state,
-          phone: addrDetails.phone
+        debug('...total amount ' + order.totals.formatted.total)
+        this.resteasy.object.amount = order.totals.formatted.total
+        debug('...order details ')
+        debug(order_details)
+        this.resteasy.object.order_detail = order_details;
+        // Set the initial state
+        this.resteasy.object.status = {
+          order_requested: ''
         };
-        debug(details);
-        this.resteasy.object.delivery_address_details = details;
 
-        // Set time to pickup up by delivery driver
-        var deliveryTime = this.resteasy.object.desired_delivery_time;
-        if (deliveryTime) {
-          var pickup = '';
-          try {
-            pickup = yield calculateDeliveryPickup.call(this, this.resteasy.object.unit_id,
-              this.resteasy.object.desired_delivery_time);
-          } catch (err) {
-            logger.error('Error calculating delivery pickup time',
+        if (this.passport.user.role !== 'CUSTOMER')
+          this.resteasy.object.status.created_by = this.passport.user.id;
+
+        if (customStatus) {
+          var customStatusKeys = Object.keys(customStatus);
+          var savingContext = this;
+
+          customStatusKeys.forEach(function (key) {
+            savingContext.resteasy.object.status[key] = customStatus[key];
+          });
+        }
+
+        debug(this.resteasy.object);
+        // }
+
+        // Handle delivery details
+        if (this.resteasy.object.for_delivery) {
+          debug('..delivery order')
+          if (!this.resteasy.object.delivery_address_id) {
+            logger.error('No delivery address provided',
               {
                 fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
                 role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
-                delivery_address_id: this.resteasy.object.delivery_address_id,
-                delivery_time: deliveryTime, error: err
+                error: 'No delivery address provided'
               });
-            throw (err);
+            throw new Error('No delivery address provided', 422);
           }
-          this.resteasy.object.desired_pickup_time = pickup;
+          // Get and streamline address for display
+          var addrDetails = '';
+          try {
+            addrDetails = (yield DeliveryAddress.getSingleAddress(this.resteasy.object.delivery_address_id))[0];
+          } catch (err) {
+            logger.error('Error getting delivery address',
+              {
+                fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+                role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
+                delivery_address_id: this.resteasy.object.delivery_address_id, error: err
+              });
+            throw(err)
+          }
+          debug(addrDetails);
+          var details = {
+            nickname: addrDetails.nickname,
+            address1: addrDetails.address1,
+            address2: addrDetails.address2,
+            city: addrDetails.city,
+            state: addrDetails.state,
+            phone: addrDetails.phone
+          };
+          debug(details);
+          this.resteasy.object.delivery_address_details = details;
+
+          // Set time to pickup up by delivery driver
+          var deliveryTime = this.resteasy.object.desired_delivery_time;
+          if (deliveryTime) {
+            var pickup = '';
+            try {
+              pickup = yield calculateDeliveryPickup.call(this, this.resteasy.object.unit_id,
+                this.resteasy.object.desired_delivery_time);
+            } catch (err) {
+              logger.error('Error calculating delivery pickup time',
+                {
+                  fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+                  role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId,
+                  delivery_address_id: this.resteasy.object.delivery_address_id,
+                  delivery_time: deliveryTime, error: err
+                });
+              throw (err);
+            }
+            this.resteasy.object.desired_pickup_time = pickup;
+          }
         }
       }
 
       // Ready to save
       debug(this.resteasy.object);
       console.log(this.resteasy.object);
-      console.log("ORDER BEING CREATED!!!!!!!!!!!!!!!!!!!!!");
       debug('...preprocessing complete. Ready to save');
     }
+
   } else if (this.resteasy.operation == 'update') {
     if (this.resteasy.object.cod_payment_option) {
       var order = yield OrderHistory.getSingle(this.params.id);
@@ -468,8 +490,15 @@ function * beforeSaveOrderHistory() {
   debug('returning from beforeSaveOrderHistory');
 }
 
+function shouldNotify(orderHistory) {
+  return orderHistory.context !== 'prepay';
+}
 
 function *afterCreateOrderHistory(orderHistory) {
+  if (!shouldNotify(orderHistory)) {
+    return;
+  }
+
   debug('afterCreateOrderHistory')
   debug(orderHistory);
   logger.info('afterCreateOrderHistory');

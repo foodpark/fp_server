@@ -49,7 +49,6 @@ exports.setAvailable = function (foodParkId, driverId, available) {
 };
 
 exports.getManagedUnits = function (userId) {
-  console.log('okokokok');
   return knex.raw(`select units.* from food_park_management fm right join units on fm.unit_id = units.id left join food_parks on fm.food_park_id = food_parks.id where foodpark_mgr = ${userId};`)
 };
 
