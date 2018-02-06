@@ -125,12 +125,15 @@ exports.login = function *(next) {
     var unit = '';
     try {
       unit = (yield Unit.getForUser(this.passport.user.id))[0];
+      company = (yield Company.getSingleCompany(unit.company_id))[0]
     } catch (err) {
       logger.error('Error retrieving unit for unit manager',
         {fn: 'login', user_id: this.passport.user.id, error: err});
       throw err;
     }
-    userInfo.unit_id = unit.id
+    userInfo.unit_id = unit.id;
+    userInfo.company_id =  company.id;
+    userInfo.owner_id = company.user_id;
     meta.unit_id = unit.id;
   }else if (this.passport.user.role == 'DRIVER') {
     var drivers = '';
