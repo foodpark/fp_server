@@ -18,6 +18,7 @@ var payload = require('./utils/payload');
 var timestamp = require('./utils/timestamp');
 var T = require('./utils/translate');
 var push = require('./controllers/push.server.controller');
+var Prepay = require('./controllers/prepay.server.controller');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var Driver = require('./models/driver.server.model');
@@ -164,29 +165,7 @@ function * beforeSaveOrderHistory() {
           role: this.passport.user.role, error: 'User unauthorized'});
       throw new Error('User unauthorized', 401);
     }
-    var osoId = this.resteasy.object.order_sys_order_id;
-    if (! this.resteasy.object.order_sys_order_id) {
-      if (this.resteasy.object.context === 'prepay') {
-        eCommerce = false;
 
-        this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
-        this.resteasy.object.order_detail = { 0 :
-          {
-            "title" : "Pre-pay Debit",
-            "quantity" : 1
-          }
-        };
-
-        delete this.resteasy.object.currency;
-      }
-      else {
-        logger.error('No order id provided for e-commerce system',
-          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
-            role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
-        throw new Error('order_sys_order_id is required', 422);
-      }
-
-    }
       debug('...create')
     debug('..getting customer name')
     try {
@@ -284,6 +263,31 @@ function * beforeSaveOrderHistory() {
       {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
       role: this.passport.user.role, order_sys_order_id: osoId, company_id: coId, unit_id: unitId});
 
+    var osoId = this.resteasy.object.order_sys_order_id;
+    if (! this.resteasy.object.order_sys_order_id) {
+      if (this.resteasy.object.context === 'prepay') {
+        eCommerce = false;
+
+        yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+
+        this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
+        this.resteasy.object.order_detail = { 0 :
+          {
+            "title" : "Pre-pay Debit",
+            "quantity" : 1
+          }
+        };
+
+        delete this.resteasy.object.currency;
+      }
+      else {
+        logger.error('No order id provided for e-commerce system',
+          {fn: 'beforeSaveOrderHistory', user_id: this.passport.user.id,
+            role: this.passport.user.role, error: 'Missing e-commerce (order_sys) order id'});
+        throw new Error('order_sys_order_id is required', 422);
+      }
+
+    }
 
     if (eCommerce) {
       //Determine whether it is Square or Moltin API

@@ -14,6 +14,16 @@ var properties = {
     defaultTaxBand: "1427064502431515521",
     deliveryCharge: "10",
     deliveryOffset: 15,
+    granuo : {
+      token : '6db0c521-20b5-40d7-b02f-25c6b2d06450',
+      urls : {
+        registerUser : 'https://api.granuo.com.br/api/cadastroUsuario',
+        getRecharge : 'https://api.granuo.com.br/api/recargasUsuario?id=',
+        debit: 'https://api.granuo.com.br/api/debitarRecarga',
+        recharge: 'https://api.granuo.com.br/api/insereRecargaQRCode',
+        redeemRecharge : 'https://api.granuo.com.br/api/resgatarRecarga'
+      }
+    },
     sumup:{
         clientId:"com.sumup.apisampleapp",
         client_secret:"6332ad54-eb47-4b41-8390-074f062da085",

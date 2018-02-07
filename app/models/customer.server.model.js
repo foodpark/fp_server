@@ -21,8 +21,8 @@ exports.verifyUser = function(customerId, userId) {
 };
 
 exports.getUser = function (customerId) {
-  return knex.raw(`select * from users left join customers on customers.user_id = users.id where customers.id=${customerId}`);
-}
+  return knex.raw(`select users.* from users left outer join customers on customers.user_id = users.id where customers.id=${customerId}`);
+};
 
 exports.getCustomerIdForUser = function(userId) {
   logger.info('getting customer for id: ' + userId);

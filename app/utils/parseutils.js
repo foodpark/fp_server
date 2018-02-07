@@ -17,3 +17,13 @@ exports.getRandomNumber = function (digits) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+exports.generateCharDigitCode = function (length) {
+  var code = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < length; i++)
+    code += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return code;
+};
