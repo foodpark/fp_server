@@ -22,11 +22,17 @@ module.exports = function (app) {
   router.put(apiPath + ':packageId', requireJWT, packages.updatePackage);
 
   router.post(apiPackageGiven, requireJWT, packages.givePackage);
+  router.get(apiUserPackages, requireJWT, packages.getUserGiftedPackages);
+  router.get(apiCompanyPath + ':companyId/packages/gifted', requireJWT, packages.getCompanyGiftedPackages);
+  router.delete(apiPackageGiven, requireJWT, packages.deletePackageGiven);
+
+  router.get(apiPath + ':qrcode/redeem', requireJWT, packages.redeemPackage);
   router.get(apiPackageGiven + '/redeem', requireJWT, packages.redeemPackage);
   router.post(apiPath + 'redeem/multiple', requireJWT, packages.redeemMultiplePackages);
-  router.get(apiUserPackages, requireJWT, packages.getUserGiftedPackages);
-  router.get(apiPath + ':qrcode/redeem', requireJWT, packages.redeemPackage);
-  router.delete(apiPackageGiven, requireJWT, packages.deletePackageGiven);
+  router.post(apiUserPackages + 'redeem/code', requireJWT, packages.registerManualRedeem);
+
+
+  router.post(apiPath + 'redeem/manual', requireJWT, packages.manualRedeemPackage);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

@@ -9,6 +9,7 @@ var ParseUtils = require('../utils/parseutils');
 
 const PACKAGES_TABLE = "packages";
 const PACKAGE_GIVEN_TABLE = "package_given";
+const MANUAL_REDEEM_TABLE = "manual_redeem_packages";
 
 exports.createPackage = function (itemPackage) {
   return knex(PACKAGES_TABLE).insert(itemPackage).returning('*');
@@ -60,6 +61,24 @@ exports.getUserGiftedPackages = function (giftedUser) {
                   packages.name as "package_name", packages.company as "company_id", packages.items as "package_items"
                   from package_given join packages on package_given.package = packages.id where gifted_user=${giftedUser}
                   and quantity > 0;`);
+};
+
+exports.getGiftedPackages = function (company) {
+  return knex.raw(`select packages.id, package_given.gifted_user, package_given.quantity, packages.name as "name", packages.description as "description", 
+                  packages.company as "company_id", packages.items as "package_items" from package_given 
+                  join packages on package_given.package = packages.id where packages.company=${company} and quantity > 0 order by packages.id asc;`)
+};
+
+exports.registerManualRedeem = function (redeemObj) {
+  return knex(MANUAL_REDEEM_TABLE).insert(redeemObj).returning('*');
+};
+
+exports.getManualRedeemPackages = function (code) {
+  return knex(MANUAL_REDEEM_TABLE).select().where({redeem_code : code}).first();
+};
+
+exports.getMultipleQRCodeGivenPackage = function (qrcode) {
+  return knex(PACKAGE_GIVEN_TABLE).select().whereRaw()
 };
 
 
