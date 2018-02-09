@@ -127,8 +127,8 @@ exports.addFoodParkUnits = function * (id, next) {
 
 exports.removeFoodParkUnits = function * (id, next) {
   var user = this.passport.user
-  var id = this.foodpark.id
-  var unit_id = this.params.unitId
+  var foodParkId = this.params.foodParkId;
+  var unit_id = this.params.fpUnitId;
 
   if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
     this.status = 401
@@ -137,20 +137,24 @@ exports.removeFoodParkUnits = function * (id, next) {
 
   debug('authorized...')
   debug('addFoodParkUnits')
-  debug('id ' + id)
+  debug('id ' + foodParkId)
 
-  if (!id || isNaN(id)) {
+  if (!foodParkId || isNaN(foodParkId)) {
     this.status = 400;
+    console.log('ERRRROOOOOOOR');
     return
   }
 
+  console.log(unit_id);
+
   if (!unit_id || isNaN(unit_id)) {
     this.status = 400;
+    console.log('ERRRROOOOOOOR');
     return
   }
 
   try {
-    b = {'food_park_id': id, 'unit_id': unit_id}
+    b = {'food_park_id': foodParkId, 'unit_id': unit_id}
     console.log(b)
     let msg = yield FoodPark.removeFoodParkUnits(b)
     this.body = {"message": "successfully deleted"};

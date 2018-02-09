@@ -21,7 +21,8 @@ var properties = {
         getRecharge : 'https://api.granuo.com.br/api/recargasUsuario?id=',
         debit: 'https://api.granuo.com.br/api/debitarRecarga',
         recharge: 'https://api.granuo.com.br/api/insereRecargaQRCode',
-        redeemRecharge : 'https://api.granuo.com.br/api/resgatarRecarga'
+        redeemRecharge : 'https://api.granuo.com.br/api/resgatarRecarga',
+        registerEstablishment : 'https://api.granuo.com.br/api/cadastroEstabelecimento'
       }
     },
     sumup:{

@@ -29,20 +29,19 @@ function * recharge() {
     var owner = (yield Users.getSingleUser(company.user_id))[0];
     var amount = this.body.amount;
 
-    if (!customer.custom_id.granuo_user_id) {
-      yield registerGranuoUser(customer);
-    }
-
-    if (!owner.custom_id.granuo_establishment_id) {
-      throw new Error ('This company is not currently registered in granuo', 401);
-    }
-
     var customerId = customer.custom_id.granuo_user_id;
     var companyId = owner.custom_id.granuo_establishment_id;
 
-    var granuoCode = yield loadRecharge(customerId, companyId, amount);
+    if (!customerId) {
+      customerId = yield registerGranuoUser(customer);
+    }
 
-    recharge.granuo_transaction_id = granuoCode;
+    if (!companyId) {
+      var ownerGranuoId = yield registerGranuoUser(owner);
+      companyId = yield registerEstablishment(ownerGranuoId, company, owner);
+    }
+
+    recharge.granuo_transaction_id = yield loadRecharge(customerId, companyId, amount);;
 
     var createdRecharge = (yield Prepay.createRecharge(recharge))[0];
 
@@ -58,6 +57,67 @@ function * recharge() {
     console.error('could not create recharge');
     throw err;
   }
+}
+
+function * registerEstablishment(ownerGranuoId, company, user) {
+  try {
+    var granuoEstablishment = {
+      "idusuario" : ownerGranuoId,
+      "documento" : String(ParseUtils.generateCharDigitCode(14)),
+      "cep" : "",
+      "endereco" : "",
+      "bairro" : "",
+      "cidade" : "",
+      "estado" : "",
+      "nome" : company.name,
+      "telefone" : "",
+      "site" : "",
+      "facebook" : "",
+      "instagram" : "",
+      "foto" : ""
+    };
+
+    var granuoEstablishmentId = null;
+
+    var granuoRegisterPromise = new Promise( function (resolve, reject) {
+      request.post({
+        url: config.granuo.urls.registerEstablishment,
+        headers: {
+          'Authorization': 'Token ' + config.granuo.token,
+          'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify(granuoEstablishment),
+        maxAttempts: 3,
+        retryDelay: 150 // wait for 150 ms before trying again
+      })
+        .then(function (res) {
+          var granuoEstablishment = JSON.parse(res.body);
+          granuoEstablishmentId = granuoEstablishment.id;
+          resolve(granuoEstablishment);
+        })
+        .catch( function (err) {
+          console.error(err);
+          reject(err);
+        });
+    });
+  } catch (err) {
+    console.error(err);
+    throw new Error('Debit failed on granuo api', 400);
+  }
+
+  yield granuoRegisterPromise;
+
+  var updatedCustomId = user.custom_id;
+
+  updatedCustomId.granuo_establishment_id = granuoEstablishmentId;
+
+  var updateObj = {
+    "custom_id" : updatedCustomId
+  };
+
+  yield Users.updateUser(user.id, updateObj);
+
+  return granuoEstablishmentId;
 }
 
 function * loadRecharge (customerId, companyId, amount) {
@@ -173,9 +233,6 @@ function * debitAmount(amount, rechargeId, userId) {
 
     var remainingBalance = null;
 
-    console.log(config.granuo.urls.debit);
-    console.log(debitBody);
-
     var debitPromise = new Promise( function (resolve, reject) {
       request.post({
         url: config.granuo.urls.debit,
@@ -287,6 +344,8 @@ function * registerGranuoUser(user) {
   };
 
   yield Users.updateUser(user.id, updateObj);
+
+  return granuoUserId;
 }
 
 function * registerPrepayTransaction(id, type) {
