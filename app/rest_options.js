@@ -19,6 +19,7 @@ var timestamp = require('./utils/timestamp');
 var T = require('./utils/translate');
 var push = require('./controllers/push.server.controller');
 var Prepay = require('./controllers/prepay.server.controller');
+var ParseUtils = require('./utils/parseutils');
 var User = require('./models/user.server.model');
 var Unit = require('./models/unit.server.model');
 var Driver = require('./models/driver.server.model');
@@ -277,6 +278,8 @@ function * beforeSaveOrderHistory() {
             "quantity" : 1
           }
         };
+
+        this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
 
         delete this.resteasy.object.currency;
       }

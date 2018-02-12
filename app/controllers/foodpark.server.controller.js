@@ -141,7 +141,6 @@ exports.removeFoodParkUnits = function * (id, next) {
 
   if (!foodParkId || isNaN(foodParkId)) {
     this.status = 400;
-    console.log('ERRRROOOOOOOR');
     return
   }
 
@@ -149,7 +148,6 @@ exports.removeFoodParkUnits = function * (id, next) {
 
   if (!unit_id || isNaN(unit_id)) {
     this.status = 400;
-    console.log('ERRRROOOOOOOR');
     return
   }
 
