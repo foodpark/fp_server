@@ -5,8 +5,8 @@
 var ParseUtils = require('../parseutils');
 
 const CONTEXT_NAMES = {
-  creditcardpick : 'Credit/Debit Pick-Up',
-  creditcarddelivery : 'Credit/Debit Delivery',
+  creditcardpick : 'CC Pick-Up',
+  creditcarddelivery : 'CC Delivery',
   prepay : 'Pre-Pay',
   hotel : 'Room-Service',
   cod : 'Cash on Delivery'
