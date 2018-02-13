@@ -54,8 +54,7 @@ function * recharge() {
     this.body = response;
     this.status = 201;
 
-    if (!refund)
-      yield registerPrepayTransaction(createdRecharge.id, 'recharge');
+    yield registerPrepayTransaction(createdRecharge.id, refund ? 'refund' : 'recharge');
   } catch (err) {
     console.error('could not create recharge');
     throw err;
