@@ -45,6 +45,7 @@ function * getRawDetailedStats(orderInput, perspective, id, start, end) {
   orderInput.forEach(function (order) {
     if (order.commission_type === 'none')
       return;
+
     var orderOutput = {};
     companyPromises.push(Companies.getSingleCompany(order.company_id));
     customerPromises.push(Customers.getUser(order.customer_id));

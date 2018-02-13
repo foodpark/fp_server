@@ -22,6 +22,8 @@ const DEFAULT_GRANUO_VALUE = "123";
 function * recharge() {
   try {
     var recharge = this.body;
+    var refund = this.body.refund;
+    delete this.body.refund;
 
     var customer = (yield Users.getSingleUser(this.body.user_id))[0];
     var unit = (yield Units.getSingleUnit(this.body.unit_id))[0];
@@ -52,7 +54,8 @@ function * recharge() {
     this.body = response;
     this.status = 201;
 
-    yield registerPrepayTransaction(createdRecharge.id, 'recharge');
+    if (!refund)
+      yield registerPrepayTransaction(createdRecharge.id, 'recharge');
   } catch (err) {
     console.error('could not create recharge');
     throw err;
