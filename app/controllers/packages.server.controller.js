@@ -186,7 +186,7 @@ function * updatePackage() {
       return;
     }
 
-    if (yield Packages.getActivePackageById(itemPackage) || !(body.hasOwnProperty('available') && body.available === false)) { //operation is already setting availability to false
+    if (yield Packages.getActivePackageById(itemPackage) && !(body.hasOwnProperty('available') && body.available === false)) { //operation is already setting availability to false
       yield Packages.updatePackage({available : false}, itemPackage);
       var formerPackage = yield(Packages.getPackage(itemPackage));
 
