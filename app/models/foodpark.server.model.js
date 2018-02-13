@@ -23,6 +23,10 @@ exports.getFoodParkUnits = function(id) {
                   where fm.food_park_id = ${id};`);
 };
 
+exports.getFoodParkCompanies = function (id) {
+  return knex.raw(`select companies.* from food_park_management fp join units on fp.unit_id = units.id join companies on companies.id = units.company_id where fp.food_park_id = ${id} group by companies.id `);
+};
+
 exports.addFoodParkUnits = function(b) {
   return knex('food_park_management').insert(b);
 };

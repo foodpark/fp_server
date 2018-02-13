@@ -78,6 +78,31 @@ exports.getFoodParkUnits = function * (id, next) {
   return;
 }
 
+exports.getFoodParkCompanies = function * (next) {
+  var user = this.passport.user
+  var foodParkId = this.params.foodParkId;
+
+  if (!user || !user.role === 'FOODPARKMGR') {
+    this.status = 401;
+    return
+  }
+
+  if (!foodParkId || isNaN(foodParkId)) {
+    this.status = 400;
+    return
+  }
+
+  try {
+    var companies = yield FoodPark.getFoodParkCompanies(foodParkId);
+    this.body = companies.rows;
+  } catch (err) {
+    console.error('error getting foodpark companies');
+    throw(err)
+  }
+
+  debug(companies.rows);
+};
+
 exports.addFoodParkUnits = function * (id, next) {
   var user = this.passport.user
 

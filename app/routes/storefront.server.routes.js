@@ -23,6 +23,7 @@ module.exports=function(app) {
   /* Food Park Management */
   router.get(relApiversion + '/food_parks/:foodParkId/checkins', requireJWT, foodpark.getFoodParkCheckins)
   router.get(relApiversion + '/food_parks/:foodParkId/units', requireJWT, foodpark.getFoodParkUnits)
+  router.get(relApiversion + '/food_parks/:foodParkId/companies', requireJWT, foodpark.getFoodParkCompanies);
   router.get(relApiversion + '/food_parks/:foodParkId/units/active_orders', requireJWT, foodpark.getUnitsActiveOrders)
   router.get(relApiversion + '/food_parks/:foodParkId/orders/:orderId/drivers/:driverId', requireJWT, foodpark.getDriverByOrder)
   router.post(relApiversion + '/food_parks/:foodParkId/units', requireJWT, foodpark.addFoodParkUnits)
