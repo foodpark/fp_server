@@ -531,9 +531,10 @@ function *afterCreateOrderHistory(orderHistory) {
   }
   debug(unit);
   if (!unit.gcm_id && !unit.fcm_id) {
-    meta.error = 'No fcm/gcm for unit';
-    logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, meta);
-    throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
+    return;
+    // meta.error = 'No fcm/gcm for unit';
+    // logger.error('No fcm/gcm id for unit ', orderHistory.unit_id, meta);
+    // throw new Error ('No fcm/gcm id for unit '+ unit.name +' ('+ unit.id +'). Cannot notify')
   }
 
   var customer = '';
