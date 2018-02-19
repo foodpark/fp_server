@@ -200,8 +200,10 @@ function * beforeSaveOrderHistory() {
       }
 
       var customStatus = undefined;
-      if(this.resteasy.object.context)
+      if(this.resteasy.object.context) {
         customStatus = ContextHandler(this.resteasy.object.context, user);
+      }
+
 
       debug('..customer');
       debug(customer)
@@ -339,9 +341,20 @@ function * beforeSaveOrderHistory() {
         debug(order_details)
         this.resteasy.object.order_detail = order_details;
         // Set the initial state
-        this.resteasy.object.status = {
-          order_requested: ''
-        };
+
+        if (this.resteasy.object.context) {
+          this.resteasy.object.status = {
+            order_requested: new Date(),
+            order_paid: new Date()
+          };
+        } else {
+          this.resteasy.object.status = {
+            order_requested : ''
+          }
+        }
+
+
+
 
         if (this.passport.user.role !== 'CUSTOMER')
           this.resteasy.object.status.created_by = this.passport.user.id;
