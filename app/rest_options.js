@@ -345,7 +345,8 @@ function * beforeSaveOrderHistory() {
         if (this.resteasy.object.context) {
           this.resteasy.object.status = {
             order_requested: new Date(),
-            order_paid: new Date()
+            order_paid: new Date(),
+            order_accepted: new Date()
           };
         } else {
           this.resteasy.object.status = {
