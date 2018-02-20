@@ -348,6 +348,8 @@ function * beforeSaveOrderHistory() {
             order_paid: new Date(),
             order_accepted: new Date()
           };
+
+          this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
         } else {
           this.resteasy.object.status = {
             order_requested : ''
