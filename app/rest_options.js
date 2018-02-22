@@ -323,8 +323,8 @@ function * beforeSaveOrderHistory() {
         debug('..order sys order id: ' + moltin_order_id);
 
         try {
-          if (!this.resteasy.object.moltin_item_data)
-            throw new Error('moltin_item_data field missing');
+          if (!this.resteasy.object.menu_items_data)
+            throw new Error('menu_items_data field missing');
           order_details = this.resteasy.object.menu_items_data;
 
           order_details = yield simplifyDetails.call(this, order_details)
@@ -1908,7 +1908,7 @@ module.exports = {
             this.throw('Create Unauthorized - Admin only',401);
           } // else continue
         } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
-          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && (this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'ADMIN')) {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
         } else if (this.params.table == 'drivers') {
