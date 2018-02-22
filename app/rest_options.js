@@ -320,10 +320,13 @@ function * beforeSaveOrderHistory() {
         var moltin_order_id = osoId;
         var order_details = {};
         logger.info('Moltin order');
-        debug('..order sys order id: ' + moltin_order_id)
+        debug('..order sys order id: ' + moltin_order_id);
+
         try {
-          var order = yield msc.findOrder(moltin_order_id)
-          order_details = yield msc.getOrderDetail(moltin_order_id)
+          if (!this.resteasy.object.moltin_item_data)
+            throw new Error('moltin_item_data field missing');
+          order_details = this.resteasy.object.menu_items_data;
+
           order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
           logger.error('Error retrieving order items from ecommerce system ',
@@ -1905,7 +1908,7 @@ module.exports = {
             this.throw('Create Unauthorized - Admin only',401);
           } // else continue
         } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
-          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && (this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
         } else if (this.params.table == 'drivers') {
