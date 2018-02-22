@@ -326,6 +326,7 @@ function * beforeSaveOrderHistory() {
           if (!this.resteasy.object.menu_items_data)
             throw new Error('menu_items_data field missing');
           order_details = this.resteasy.object.menu_items_data;
+          delete this.resteasy.object.menu_items_data;
 
           order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
