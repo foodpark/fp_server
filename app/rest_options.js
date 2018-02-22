@@ -323,7 +323,6 @@ function * beforeSaveOrderHistory() {
         debug('..order sys order id: ' + moltin_order_id)
         try {
           var order = yield msc.findOrder(moltin_order_id)
-          var order = yield msc.findOrder(moltin_order_id)
           order_details = yield msc.getOrderDetail(moltin_order_id)
           order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
