@@ -141,5 +141,5 @@ function getType(order) {
   else if (order.context === null && order.for_delivery)
     return "Delivery";
   else if (order.context === null && !order.for_delivery)
-    return "Pick up";
+    return "Pickup";
 }
