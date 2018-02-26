@@ -558,7 +558,6 @@ exports.register = function*(next, mapping) {
       territory_id: territory_id,
       country_id: country_id,
       phone: phone,
-      custom_id : {},
       provider: 'local',
       provider_id: 'local',
       provider_data: '{}'
