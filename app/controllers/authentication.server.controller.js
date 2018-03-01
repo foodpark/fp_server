@@ -620,8 +620,7 @@ exports.register = function*(next, mapping) {
       debug('register: creating admin');
 
       try {
-        return;
-        //var admin = (yield Admin.createAdmin(userObject.id))[0]
+        var admin = (yield Admin.createAdmin(userObject.id))[0];
       } catch (err) {
         console.error('register: error creating admin');
         console.error(err);
