@@ -549,6 +549,14 @@ exports.register = function*(next, mapping) {
 
     }
 
+    if (role === 'ADMIN') {
+       if (!this.body.admin_register_code || this.body.admin_register_code !== process.env.ADMIN_REGISTER_CODE) {
+         this.status = 401;
+         this.body = {error: 'You may not register an admin (wrong or absent code).'};
+         return;
+       }
+    }
+
     var user = {
       first_name: first_name,
       last_name: last_name,
@@ -612,7 +620,8 @@ exports.register = function*(next, mapping) {
       debug('register: creating admin');
 
       try {
-        var admin = (yield Admin.createAdmin(userObject.id))[0]
+        return;
+        //var admin = (yield Admin.createAdmin(userObject.id))[0]
       } catch (err) {
         console.error('register: error creating admin');
         console.error(err);
