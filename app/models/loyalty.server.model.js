@@ -13,3 +13,11 @@ exports.createNew = function(customerId, companyId, initBalance) {
   var initBal = parseInt(initBalance);
   return knex('loyalty').insert({company_id: coId, customer_id: custId, balance: initBal});
 };
+
+exports.updateLoyalty = function (customer, company, updatedLoyalty) {
+  return knex('loyalty').where({'company_id' : company, 'customer_id' : customer}).update(updatedLoyalty);
+};
+
+exports.getTierPackage = function (company, tier) {
+  return knex('loyalty_packages').select('*').where({company_id : company, tier : tier}).first();
+};
