@@ -21,3 +21,10 @@ exports.updateLoyalty = function (customer, company, updatedLoyalty) {
 exports.getTierPackage = function (company, tier) {
   return knex('loyalty_packages').select('*').where({company_id : company, tier : tier}).first();
 };
+
+exports.getLoyaltyInfo = function (customer, company) {
+  return knex.raw(`select packages.name as "prize_name", packages.items as "prize_items", packages.description as "prize_description", 
+                  loyalty.balance, loyalty.company_id, loyalty_packages.tier, loyalty.customer_id from loyalty_packages join loyalty on 
+                  loyalty_packages.company_id = loyalty.company_id join packages on packages.id = loyalty_packages.package_id where 
+                  loyalty_packages.company_id = ${company} and loyalty.customer_id = ${customer};`)
+};

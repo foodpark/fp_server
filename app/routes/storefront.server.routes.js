@@ -75,7 +75,8 @@ module.exports=function(app) {
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.deleteOptionCategory);
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT,  storefront.deleteOptionItem);
 
-  router.post(relApiversion + '/loyalty/redeem', requireJWT, storefront.redeemLoyalty)
+  router.post(relApiversion + '/loyalty/redeem', requireJWT, storefront.redeemLoyalty);
+  router.get(relApiversion + '/companies/:companyId/customer/:customerId/loyalty', requireJWT, storefront.getLoyaltyInfo);
 
   router.param('menuItemId', storefront.getMenuItem);
   router.param('categoryId', storefront.getCategory);

@@ -1018,8 +1018,6 @@ exports.redeemLoyalty=function* (next) {
 
   var customerLoyalty = (yield Loyalty.getPointBalance(customer, company))[0];
 
-  console.log(customerLoyalty);
-
   if (customerLoyalty.balance < points) {
     this.status = 401;
     this.body = {error : 'Not enough points'};
@@ -1057,4 +1055,14 @@ exports.redeemLoyalty=function* (next) {
       success : "QR code generated",
       qr_code : packageGiven.qr_code
   }
+};
+
+exports.getLoyaltyInfo = function *() {
+  var company = this.params.companyId;
+  var customer = this.params.customerId;
+
+  var data = yield Loyalty.getLoyaltyInfo(customer, company);
+
+  this.status = 200;
+  this.body = data.rows;
 };
