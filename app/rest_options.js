@@ -1909,11 +1909,11 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Create Unauthorized - Admin only',401);
           } // else continue
-        } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
+        } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards' || this.params.table === 'loyalty_packages') {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
-        } else if (this.params.table == 'drivers' || this.params.table === 'loyalty_packages') {
+        } else if (this.params.table == 'drivers') {
           if(!this.isAuthenticated() || !this.passport.user ||
               (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'FOODPARKMGR'  && this.passport.user.role != 'UNITMGR')) {
             this.throw('Create Unauthorized - Unit Manager/Owners/Admin/Food Park Manager only',401);
