@@ -1031,9 +1031,9 @@ exports.redeemLoyalty=function* (next) {
   var isEligible_fifteen = false;
 
   if (newBal >= 5) {
-    isEligible_five = true;
-  }
-  if (newBal >= 10) {
+      isEligible_five = true;
+    }
+    if (newBal >= 10) {
     isEligible_ten = true;
   }
   if (newBal >= 15) {
@@ -1062,6 +1062,15 @@ exports.getLoyaltyInfo = function *() {
   var customer = this.params.customerId;
 
   var data = yield Loyalty.getLoyaltyInfo(customer, company);
+
+  this.status = 200;
+  this.body = data.rows;
+};
+
+exports.getCompanyLoyaltyInfo = function *() {
+  var company = this.params.companyId;
+
+  var data = yield Loyalty.getCompanyLoyaltyInfo(company);
 
   this.status = 200;
   this.body = data.rows;

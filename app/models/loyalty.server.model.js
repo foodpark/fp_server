@@ -28,3 +28,10 @@ exports.getLoyaltyInfo = function (customer, company) {
                   loyalty_packages.company_id = loyalty.company_id join packages on packages.id = loyalty_packages.package_id where 
                   loyalty_packages.company_id = ${company} and loyalty.customer_id = ${customer};`)
 };
+
+exports.getCompanyLoyaltyInfo = function (customer, company) {
+  return knex.raw(`select packages.name as "prize_name", packages.items as "prize_items", packages.description as "prize_description", 
+                  loyalty_packages.company_id, loyalty_packages.tier from loyalty_packages join packages 
+                  on packages.id = loyalty_packages.package_id where 
+                  loyalty_packages.company_id = ${company}`)
+};
