@@ -285,7 +285,7 @@ function * givePackageAux(quantity, itemPackage, giftedUser) {
         qrcode = undefined;
     }
 
-    return yield Packages.createGivenPackage(giftedUser.id, itemPackage.id, giftedQuantity, qrcode);
+    return yield Packages.createGivenPackage(giftedUser.id, itemPackage.id, quantity, qrcode);
   }
 
   givenPackage.quantity += quantity;
