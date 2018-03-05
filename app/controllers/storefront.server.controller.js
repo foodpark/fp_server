@@ -9,6 +9,9 @@ var debug = require('debug')('storefront');
 var _ = require('lodash');
 var logger = require('winston');
 var Units = require('../models/unit.server.model');
+var Packages = require('../controllers/packages.server.controller');
+var PackageModel = require('../models/packages.server.model');
+var Loyalty = require('../models/loyalty.server.model');
 
 
 var getErrorMessage = function(err) {
@@ -999,3 +1002,67 @@ exports.deleteOptionCategory=function *(next) {
     return;
   }
 }
+
+exports.redeemLoyalty=function* (next) {
+  var company = this.body.company_id;
+  var customer = this.body.customer_id;
+  var tier = this.body.tier;
+  var points = tier === 'gold' ? 15 : (tier === 'silver' ? 10 : 5);
+
+  var userCustomer = (yield Customer.getUser(customer)).rows[0];
+
+  var tierPackage = yield Loyalty.getTierPackage(company,tier);
+
+  yield Packages.givePackageAux(1, tierPackage.package_id, userCustomer.id);
+  var packageGiven = (yield PackageModel.getGivenPackage(userCustomer.id, tierPackage.package_id));
+
+  var customerLoyalty = (yield Loyalty.getPointBalance(customer, company))[0];
+
+  if (customerLoyalty.balance < points) {
+    this.status = 401;
+    this.body = {error : 'Not enough points'};
+    return;
+  }
+
+  var newBal = customerLoyalty.balance - points;
+
+  var isEligible_five = false;
+  var isEligible_ten = false;
+  var isEligible_fifteen = false;
+
+  if (newBal >= 5) {
+    isEligible_five = true;
+  }
+  if (newBal >= 10) {
+    isEligible_ten = true;
+  }
+  if (newBal >= 15) {
+    isEligible_fifteen = true;
+  }
+
+  var updatedLoyalty = {
+    balance: newBal,
+    eligible_five: isEligible_five,
+    eligible_ten: isEligible_ten,
+    eligible_fifteen: isEligible_fifteen,
+    updated_at: new Date()
+  };
+
+  yield Loyalty.updateLoyalty(customer, company, updatedLoyalty);
+
+  this.status = 200;
+  this.body = {
+      success : "QR code generated",
+      qr_code : packageGiven.qr_code
+  }
+};
+
+exports.getLoyaltyInfo = function *() {
+  var company = this.params.companyId;
+  var customer = this.params.customerId;
+
+  var data = yield Loyalty.getLoyaltyInfo(customer, company);
+
+  this.status = 200;
+  this.body = data.rows;
+};

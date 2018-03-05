@@ -1913,7 +1913,7 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
-        } else if (this.params.table == 'drivers') {
+        } else if (this.params.table == 'drivers' || this.params.table === 'loyalty_packages') {
           if(!this.isAuthenticated() || !this.passport.user ||
               (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'FOODPARKMGR'  && this.passport.user.role != 'UNITMGR')) {
             this.throw('Create Unauthorized - Unit Manager/Owners/Admin/Food Park Manager only',401);

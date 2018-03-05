@@ -24,6 +24,7 @@ exports.deletePackageGiven = deletePackageGiven;
 exports.getCompanyGiftedPackages = getCompanyGiftedPackages;
 exports.registerManualRedeem = registerManualRedeem;
 exports.manualRedeemPackage = manualRedeemPackage;
+exports.givePackageAux = givePackageAux;
 
 const PACKAGE_NUMBER_OF_DIGITS = 15;
 
@@ -252,34 +253,28 @@ function * createPackage() {
   }
 }
 
-function * givePackage() {
-  var giftedQuantity = this.body.quantity;
-  var itemPackage = this.params.packageId;
-  var giftedUser = this.params.userId;
-  var creatorRole = this.passport.user.role;
-
-  if (creatorRole !== 'FOODPARKMGR' && creatorRole !== 'OWNER' && creatorRole !== 'UNITMGR') {
-    this.status = 401;
-    this.body = {error : "Not an fpm/owner/unitmgr"};
-    return;
-  }
-
+function * givePackageAux(quantity, itemPackage, giftedUser) {
   giftedUser = (yield Users.getSingleUser(giftedUser))[0];
   itemPackage = yield Packages.getPackage(itemPackage);
 
   if (giftedUser.role !== 'CUSTOMER') {
     this.status = 406;
-    this.body = {error : "You can only give packages to a CUSTOMER user"};
+    this.body = {error: "You can only give packages to a CUSTOMER user"};
     return;
   }
 
   if (!itemPackage) {
     this.status = 404;
-    this.body = {error : "No such package"};
+    this.body = {error: "No such package"};
     return;
   }
 
-  var givenPackage = yield (Packages.getGivenPackage(giftedUser.id, itemPackage.id));
+  console.log(giftedUser)
+  console.log(itemPackage)
+
+  var givenPackage = yield Packages.getGivenPackage(giftedUser.id, itemPackage.id);
+
+  console.log(givenPackage)
 
   if (!givenPackage) {
     var qrcode = undefined;
@@ -290,16 +285,26 @@ function * givePackage() {
         qrcode = undefined;
     }
 
-    var packageCreated = yield Packages.createGivenPackage(giftedUser.id, itemPackage.id, giftedQuantity, qrcode);
-    this.status = 200;
-    this.body = { message : "Package was given to user"};
-    this.body.data = packageCreated;
+    return yield Packages.createGivenPackage(giftedUser.id, itemPackage.id, giftedQuantity, qrcode);
+  }
+
+  givenPackage.quantity += quantity;
+
+  return yield Packages.updateGivenPackage(giftedUser.id, itemPackage.id, givenPackage.quantity);
+}
+function * givePackage() {
+  var giftedQuantity = this.body.quantity;
+  var itemPackage = this.params.packageId;
+  var giftedUser = this.params.userId;
+  var creatorRole = this.passport.user.role;
+
+  if (creatorRole !== 'FOODPARKMGR' && creatorRole !== 'OWNER' && creatorRole !== 'UNITMGR') {
+    this.status = 401;
+    this.body = {error: "Not an fpm/owner/unitmgr"};
     return;
   }
 
-  givenPackage.quantity += giftedQuantity;
-
-  var packageUpdated = yield Packages.updateGivenPackage(giftedUser.id, itemPackage.id, givenPackage.quantity);
+  var givenPackage = yield givePackageAux(giftedQuantity, itemPackage, giftedUser);
   this.status = 200;
   this.body = { message : "Package was given to user" };
   this.body.data = givenPackage;
