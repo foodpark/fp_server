@@ -328,7 +328,6 @@ function * beforeSaveOrderHistory() {
           order_details = this.resteasy.object.menu_items_data;
           delete this.resteasy.object.menu_items_data;
 
-          var order = yield msc.findOrder(moltin_order_id)
           order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
           logger.error('Error retrieving order items from ecommerce system ',
@@ -339,8 +338,7 @@ function * beforeSaveOrderHistory() {
             });
           throw(err)
         }
-        debug('...total amount ' + order.totals.formatted.total)
-        this.resteasy.object.amount = order.totals.formatted.total
+        debug('...total amount ' + this.resteasy.object.amount)
         debug('...order details ')
         debug(order_details)
         this.resteasy.object.order_detail = order_details;
