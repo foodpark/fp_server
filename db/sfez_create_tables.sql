@@ -116,11 +116,6 @@ CREATE TABLE drivers_foodpark (
   user_id integer REFERENCES users(id)
 );
 
-CREATE TABLE square_unit (
-    unit_id integer REFERENCES units(id),
-    location_id text
-);
-
 CREATE TABLE square_user (
   merchant_id text,
   expires_at date,
@@ -250,6 +245,10 @@ CREATE TABLE units (
     cash_on_delivery boolean DEFAULT false,
     prepay boolean DEFAULT false
 );
+
+CREATE TABLE square_unit (
+    unit_id integer REFERENCES units(id),
+    location_id text
 );
 
 CREATE TABLE drivers (
