@@ -34,6 +34,17 @@ var testCase = 'Events management - ';
 
 const EVENTS_URL = '/api/v1/rel/events/';
 
+before(function (done) {
+  var sqlPromises = [
+    {
+      table : 'event_guests',
+      query : {'guest' : GUEST_ID}
+    }
+  ];
+  console.log('Cleaning data');
+  utils.cleanData(sqlPromises, done);
+});
+
 after(function (done) {
   var sqlPromises = [
     {
@@ -45,7 +56,7 @@ after(function (done) {
       query : {'id' : eventId}
     }
   ];
-
+  console.log('Cleaning data');
   utils.cleanData(sqlPromises, done);
 });
 
@@ -221,7 +232,8 @@ describe(testCase + 'Nearby events', function () {
       .end(function (err, res) {
         res.status.should.equal(200);
         res.body.length.should.not.equal(0);
-        res.body[0].id.should.equal(eventId);
+        var len = res.body.length;
+        res.body[len-1].id.should.equal(eventId);
         done();
       });
   });

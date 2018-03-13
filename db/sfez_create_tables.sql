@@ -30,13 +30,8 @@ CREATE TABLE countries (
   moltin_client_id text,
   moltin_client_secret text,
   currency_id text DEFAULT('1554615357396746864'),
-  currency text DEFAULT('BRL')
-);
-
-CREATE TABLE drivers_foodpark (
-  available boolean DEFAULT false,
-  food_park_id integer,
-  user_id integer
+  currency text DEFAULT('BRL'),
+  default_payment text
 );
 
 CREATE TABLE territories (
@@ -76,8 +71,8 @@ CREATE TABLE users (
     first_name text,
     last_name text,
     role text REFERENCES roles(type),
-    territory_id integer,
-    country_id integer,
+    territory_id integer REFERENCES territories(id),
+    country_id integer REFERENCES countries(id),
     phone text,
     provider text,
     provider_id text,
@@ -88,7 +83,12 @@ CREATE TABLE users (
     default_language text DEFAULT 'en',
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    is_deleted boolean DEFAULT(false)
+    is_deleted boolean DEFAULT(false),
+    custom_id jsonb DEFAULT '{}'
+);
+
+CREATE TABLE food_park_types (
+    name text
 );
 
 CREATE TABLE food_parks (
@@ -105,11 +105,19 @@ CREATE TABLE food_parks (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
     is_deleted boolean DEFAULT(false),
-    foodpark_mgr integer REFERENCES users(id) ON DELETE SET NULL
+    foodpark_mgr integer REFERENCES users(id) ON DELETE SET NULL,
+    foodpark_mgr_id integer,
+    type text
+);
+
+CREATE TABLE drivers_foodpark (
+  available boolean DEFAULT false,
+  food_park_id integer REFERENCES food_parks(id),
+  user_id integer REFERENCES users(id)
 );
 
 CREATE TABLE square_unit (
-    unit_id integer,
+    unit_id integer REFERENCES units(id),
     location_id text
 );
 
@@ -117,7 +125,7 @@ CREATE TABLE square_user (
   merchant_id text,
   expires_at date,
   access_token text,
-  user_id integer
+  user_id integer REFERENCES users(id)
 );
 
 CREATE TABLE admins (
@@ -133,7 +141,6 @@ CREATE TABLE admins (
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
-
 
 CREATE TABLE companies (
     id SERIAL PRIMARY KEY,
@@ -170,7 +177,8 @@ CREATE TABLE companies (
     default_unit integer, --// circular reference if REFERENCES is used.  Temporary fix until customer update can be modified properly
     created_at timestamptz  DEFAULT (now() at time zone 'utc'),
     updated_at timestamptz  DEFAULT (now() at time zone 'utc'),
-    is_deleted boolean DEFAULT(false)
+    is_deleted boolean DEFAULT(false),
+    veritas_id text
 );
 
 CREATE TABLE customers (
@@ -237,7 +245,11 @@ CREATE TABLE units (
     currency_id text DEFAULT('1554615357396746864'),
     currency text DEFAULT ('BRL'),
     payment text DEFAULT ('SumUp'),
-    is_deleted boolean DEFAULT(false)
+    is_deleted boolean DEFAULT(false),
+    room_service boolean DEFAULT false,
+    cash_on_delivery boolean DEFAULT false,
+    prepay boolean DEFAULT false
+);
 );
 
 CREATE TABLE drivers (
@@ -289,6 +301,10 @@ CREATE TABLE checkin_history (
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
+CREATE TABLE commissions (
+    name text NOT NULL,
+    value double precision NOT NULL
+);
 
 CREATE TABLE favorites (
   customer_id integer REFERENCES customers(id),
@@ -324,6 +340,8 @@ CREATE TABLE order_history (
   unit_id integer REFERENCES units(id),
   company_name text,
   company_id integer REFERENCES companies(id),
+  context text,
+  commission_type text,
   created_at timestamptz  DEFAULT (now() at time zone 'utc'),
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
@@ -340,6 +358,22 @@ CREATE TABLE loyalty (
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
+CREATE TABLE packages (
+    id SERIAL PRIMARY KEY,
+    name text,
+    items jsonb[] NOT NULL,
+    company integer REFERENCES companies(id),
+    available boolean DEFAULT true,
+    description text
+);
+
+CREATE TABLE loyalty_packages (
+    company_id integer REFERENCES companies(id),
+    tier text NOT NULL,
+    package_id integer REFERENCES packages(id),
+    id SERIAL PRIMARY KEY
+);
+
 CREATE TABLE loyalty_rewards (
   id SERIAL PRIMARY KEY,
   company_id integer REFERENCES companies(id),
@@ -350,13 +384,39 @@ CREATE TABLE loyalty_rewards (
   updated_at timestamptz  DEFAULT (now() at time zone 'utc')
 );
 
-
 CREATE TABLE loyalty_used (
   id SERIAL PRIMARY KEY,
   amount_redeemed integer,
   customer_id integer REFERENCES customers(id),
   company_id integer REFERENCES companies(id),
   created_at timestamptz  DEFAULT (now() at time zone 'utc')
+);
+
+CREATE TABLE manual_redeem_packages (
+    redeem_code text,
+    package_codes text[] NOT NULL
+);
+
+CREATE TABLE package_given (
+    gifted_user integer REFERENCES users(id),
+    package integer NOT NULL,
+    quantity integer NOT NULL,
+    qr_code text,
+    id SERIAL PRIMARY KEY
+);
+
+CREATE TABLE prepay_history (
+    date timestamp without time zone NOT NULL,
+    transaction_id integer,
+    type text
+);
+
+CREATE TABLE prepay_recharges (
+    id SERIAL PRIMARY KEY,
+    user_id integer REFERENCES users(id),
+    unit_id integer REFERENCES units(id),
+    amount double precision NOT NULL,
+    granuo_transaction_id text
 );
 
 CREATE TABLE review_states (
@@ -459,7 +519,12 @@ CREATE TABLE events (
     latitude float4,
     longitude float4,
     image text,
-    sponsors json[]
+    sponsors json[],
+    description text,
+    count integer,
+    venue_name text,
+    ticket_price double precision,
+    ticket_items jsonb[]
 );
 
 CREATE TABLE event_guests (
@@ -491,7 +556,7 @@ END;
 $$ language plpgsql;
 
 COMMENT ON TABLE food_park_management
-    IS 'This table represents the relationship that food parks are enable to see orders from units';
+    IS 'This table represents the relationship that enable food parks to see orders from units';
 
 COPY roles (id, type) FROM stdin;
 1	CUSTOMER
@@ -503,12 +568,30 @@ COPY roles (id, type) FROM stdin;
 \.
 SELECT pg_catalog.setval('roles_id_seq', 7, true);
 
+COPY food_park_types (name) FROM stdin;
+MALL
+EVENT
+HOTEL
+FOODPARK
+FARMER
+\.
+
 COPY unit_types (id, type) FROM stdin;
 1	TRUCK
 2	CART
 3	RESTAURANT
+4	BEER
+5	SPA
+6	GIFT
+7	BAR
+8	CAFE
+9	WINE
+10	PIZZA
+11	RETAIL
+12	FITNESS
+13	FARMERS
 \.
-SELECT pg_catalog.setval('unit_types_id_seq', 4, true);
+SELECT pg_catalog.setval('unit_types_id_seq', 13, true);
 
 COPY review_states (id, name, allowed_transitions) FROM stdin;
 1	New	{2,3,4}
@@ -525,12 +608,6 @@ GRANT ALL privileges ON ALL SEQUENCES IN SCHEMA public to sfez_rw;
 
 GRANT ALL PRIVILEGES ON FUNCTION calc_earth_dist(numeric,numeric,numeric,numeric) TO sfez_rw;
 
-REVOKE ALL ON TABLE events FROM PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE events TO sfez_rw;
-
-REVOKE ALL ON TABLE event_guests FROM PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE event_guests TO sfez_rw;
-
 REVOKE ALL ON TABLE admins FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE admins TO sfez_rw;
 
@@ -539,6 +616,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE checkins TO sfez_rw;
 
 REVOKE ALL ON TABLE checkin_history FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE checkin_history TO sfez_rw;
+
+REVOKE ALL ON TABLE commissions FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE commissions TO sfez_rw;
 
 REVOKE ALL ON TABLE companies FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE companies TO sfez_rw;
@@ -555,11 +635,29 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE delivery_addresses TO sfez_rw;
 REVOKE ALL ON TABLE drivers FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE drivers TO sfez_rw;
 
+REVOKE ALL ON TABLE drivers_foodpark FROM PUBLIC;
+GRANT ALL ON drivers_foodpark TO sfez_rw;
+
+REVOKE ALL ON TABLE events FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE events TO sfez_rw;
+
+REVOKE ALL ON TABLE event_guests FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE event_guests TO sfez_rw;
+
 REVOKE ALL ON TABLE favorites FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE favorites TO sfez_rw;
 
 REVOKE ALL ON TABLE food_parks FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_parks TO sfez_rw;
+
+REVOKE ALL ON TABLE food_park_management FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_park_management TO sfez_rw;
+
+REVOKE ALL ON TABLE food_park_types FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_park_types TO sfez_rw;
+
+REVOKE ALL ON TABLE gen_state FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE gen_state TO sfez_rw;
 
 REVOKE ALL ON TABLE locations FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE locations TO sfez_rw;
@@ -567,14 +665,35 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE locations TO sfez_rw;
 REVOKE ALL ON TABLE loyalty FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty TO sfez_rw;
 
+REVOKE ALL ON TABLE loyalty_packages FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_packages TO sfez_rw;
+
 REVOKE ALL ON TABLE loyalty_rewards FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_rewards TO sfez_rw;
 
 REVOKE ALL ON TABLE loyalty_used FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE loyalty_used TO sfez_rw;
 
+REVOKE ALL ON TABLE manual_redeem_packages FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE manual_redeem_packages TO sfez_rw;
+
 REVOKE ALL ON TABLE order_history FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_history TO sfez_rw;
+
+REVOKE ALL ON TABLE order_state FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_state TO sfez_rw;
+
+REVOKE ALL ON TABLE package_given FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE package_given TO sfez_rw;
+
+REVOKE ALL ON TABLE packages FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE packages TO sfez_rw;
+
+REVOKE ALL ON TABLE prepay_history FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE prepay_history TO sfez_rw;
+
+REVOKE ALL ON TABLE prepay_recharges FROM PUBLIC;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE prepay_recharges TO sfez_rw;
 
 REVOKE ALL ON TABLE review_approvals FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE review_approvals TO sfez_rw;
@@ -591,6 +710,12 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE roles TO sfez_rw;
 REVOKE ALL ON TABLE search_preferences FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE search_preferences TO sfez_rw;
 
+REVOKE ALL ON TABLE square_unit FROM PUBLIC;
+GRANT ALL ON square_unit TO sfez_rw;
+
+REVOKE ALL ON TABLE square_user FROM PUBLIC;
+GRANT ALL ON square_user TO sfez_rw;
+
 REVOKE ALL ON TABLE territories FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE territories TO sfez_rw;
 
@@ -602,21 +727,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE units TO sfez_rw;
 
 REVOKE ALL ON TABLE users FROM PUBLIC;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE users TO sfez_rw;
-
-REVOKE ALL ON TABLE order_state FROM PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE order_state TO sfez_rw;
-
-REVOKE ALL ON TABLE food_park_management FROM PUBLIC;
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE food_park_management TO sfez_rw;
-
-REVOKE ALL ON TABLE square_unit FROM PUBLIC;
-GRANT ALL ON square_unit TO sfez_rw;
-
-REVOKE ALL ON TABLE drivers_foodpark FROM PUBLIC;
-GRANT ALL ON drivers_foodpark TO sfez_rw;
-
-REVOKE ALL ON TABLE square_user FROM PUBLIC;
-GRANT ALL ON square_user TO sfez_rw;
 
 
 GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
