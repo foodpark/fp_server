@@ -23,7 +23,7 @@ echo "Create app user role and database, and grant permissions..."
 psql -U postgres  -c "CREATE USER sfez_rw WITH PASSWORD 'sfez';"
 
 psql -U postgres  -c "CREATE DATABASE sfezdbtest WITH OWNER = postgres ENCODING = 'UTF8' TABLESPACE = pg_default \
-LC_COLLATE = 'pt_BR.UTF-8' LC_CTYPE = 'pt_BR.UTF-8' CONNECTION LIMIT = -1;"
+LC_COLLATE = 'pt_BR.UTF-8' LC_CTYPE = 'pt_BR.UTF-8' CONNECTION LIMIT = -1 TEMPLATE = 'template0' ;"
 
 psql -U postgres  -c "GRANT CONNECT ON DATABASE sfezdb TO sfez_rw;"
 echo "...done"

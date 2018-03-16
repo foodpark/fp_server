@@ -3,7 +3,7 @@
  */
 
 var knex = require('../../config/knex');
-var debug = require('debug')('events.model');
+var debug = require('debug')('commissions.model');
 
 const COMMISSION_TABLE = "commissions";
 

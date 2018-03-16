@@ -6,8 +6,8 @@ var knex = require('../config/knex');
 chai.use(chaiHttp);
 
 var testAdmin = {
-  username : 'admin',
-  password : 'admin'
+  username : 'dn10@gmail.com',
+  password : 'dn10'
 };
 
 exports.resolveSequencePromises = function (promises) {
