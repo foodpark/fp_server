@@ -269,21 +269,29 @@ function * beforeSaveOrderHistory() {
     var osoId = this.resteasy.object.order_sys_order_id;
     if (! this.resteasy.object.order_sys_order_id) {
       if (this.resteasy.object.context === 'prepay') {
-        eCommerce = false;
+        if (!this.resteasy.object.menu_items_data) {
+            eCommerce = false;
 
-        yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+            yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
 
-        this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
-        this.resteasy.object.order_detail = { 0 :
-          {
-            "title" : "Pre-pay Debit",
-            "quantity" : 1
-          }
-        };
+            this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
+            this.resteasy.object.order_detail = { 0 :
+              {
+                "title" : "Pre-pay Debit",
+                "quantity" : 1
+              }
+            };
 
-        this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+            this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
 
-        delete this.resteasy.object.currency;
+            delete this.resteasy.object.currency;
+        }
+
+        else {
+          yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+          this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+        }
+
       }
       else {
         logger.error('No order id provided for e-commerce system',
