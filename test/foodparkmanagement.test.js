@@ -19,6 +19,9 @@ var token = undefined;
 var userId = undefined;
 var driver = undefined;
 
+var ts = Date.now();
+var fpmname = 'fpm'+ ts;
+
 function getFoodParkUrl() {
     return '/api/v1/rel/food_parks/' + FOOD_PARK_ID + '/'
 }
@@ -49,8 +52,8 @@ describe(testCase + 'Food park manager auth/register', function () {
           .send({
               "first_name": "Test",
               "last_name": "FoodParkMgr",
-              "email": "fpm@fpm.com",
-              "password": "123",
+              "email": fpmname + "@fpm.com",
+              "password": fpmname,
               "company_name": "FoodParkMgr",
               "country_id": "1",
               "territory_id": "3",
@@ -58,6 +61,7 @@ describe(testCase + 'Food park manager auth/register', function () {
               "role" : "FOODPARKMGR"
           })
           .end(function (err, res) {
+            console.log(err);
             var user = res.body.user;
             user.role.should.equal('FOODPARKMGR');
             userId = user.id;
@@ -68,8 +72,8 @@ describe(testCase + 'Food park manager auth/register', function () {
       chaiServer
         .post('/auth/login')
         .send({
-          "username" : 'fpm@fpm.com',
-          'password': '123'
+          "username" : fpmname + "@fpm.com",
+          'password': fpmname
         })
         .end(function (err, res) {
           var user = res.body.user;
@@ -99,6 +103,7 @@ describe(testCase + 'Food park unit management', function () {
       .get(getFoodParkUrl() + 'units')
       .set('Authorization', token)
       .end(function (err, res) {
+        console.log(err);
         var units = res.body;
         units[0].id.should.equal(UNIT_ID);
         done();

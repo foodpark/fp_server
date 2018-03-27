@@ -269,21 +269,29 @@ function * beforeSaveOrderHistory() {
     var osoId = this.resteasy.object.order_sys_order_id;
     if (! this.resteasy.object.order_sys_order_id) {
       if (this.resteasy.object.context === 'prepay') {
-        eCommerce = false;
+        if (!this.resteasy.object.menu_items_data) {
+            eCommerce = false;
 
-        yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+            yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
 
-        this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
-        this.resteasy.object.order_detail = { 0 :
-          {
-            "title" : "Pre-pay Debit",
-            "quantity" : 1
-          }
-        };
+            this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
+            this.resteasy.object.order_detail = { 0 :
+              {
+                "title" : "Pre-pay Debit",
+                "quantity" : 1
+              }
+            };
 
-        this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+            this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
 
-        delete this.resteasy.object.currency;
+            delete this.resteasy.object.currency;
+        }
+
+        else {
+          yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+          this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+        }
+
       }
       else {
         logger.error('No order id provided for e-commerce system',
@@ -328,7 +336,6 @@ function * beforeSaveOrderHistory() {
           order_details = this.resteasy.object.menu_items_data;
           delete this.resteasy.object.menu_items_data;
 
-          var order = yield msc.findOrder(moltin_order_id)
           order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
           logger.error('Error retrieving order items from ecommerce system ',
@@ -339,8 +346,7 @@ function * beforeSaveOrderHistory() {
             });
           throw(err)
         }
-        debug('...total amount ' + order.totals.formatted.total)
-        this.resteasy.object.amount = order.totals.formatted.total
+        debug('...total amount ' + this.resteasy.object.amount)
         debug('...order details ')
         debug(order_details)
         this.resteasy.object.order_detail = order_details;
