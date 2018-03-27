@@ -842,6 +842,8 @@ function *afterUpdateOrderHistory(orderHistory) {
         supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
         supplemental.order_id = ''+ orderHistory.id;
         supplemental.time_stamp = msgTime;
+        supplemental.status = status;
+
         supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
         msgTarget.data = supplemental;
 
@@ -1674,13 +1676,7 @@ function *addCloudPushSupport (target, supp) {
   var elements = {};
   elements.alert = target.message;
   elements.title= target.title;
-  elements.status = target.status,
-  elements.icon = "push",
-  elements.unit_id = supp.unit_id,
-  elements.company_id = supp.company_id,
-  elements.order_sys_order_id = supp.order_sys_order_id;
-  elements.order_id = supp.order_id;
-  elements.time_stamp = supp.time_stamp;
+  elements.icon = "push";
   if (target.os === 'ios')
     var payload = { aps: elements};
   else
@@ -1756,6 +1752,8 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
   supplemental.order_id = ''+ orderHistory.id;
   supplemental.time_stamp = msgTime;
+  supplemental.status = status;
+  
   supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
   msgTarget.data = supplemental;
 
