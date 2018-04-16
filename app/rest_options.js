@@ -284,7 +284,44 @@ function * beforeSaveOrderHistory() {
 
             this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
 
-            delete this.resteasy.object.currency;
+          var priorBalance = (yield Loyalty.getPointBalance(this.resteasy.object.customer_id, coId))[0];
+          if (!priorBalance) {
+            logger.info('creating new loyalty points record for customer ' + this.resteasy.object.customer_id + ' at company ' + coId);
+            var initBalance = '1';
+            var newLoyalty = (yield Loyalty.createNew(this.resteasy.object.customer_id, coId, initBalance))[0];
+            debug(newLoyalty);
+          } else {
+            debug(priorBalance);
+            logger.info('incrementing loyalty points for customer ' + this.resteasy.object.customer_id + ' at company ' + coId);
+
+            var priorBalValue = parseInt(priorBalance.balance);
+            var updatedBalValue = priorBalValue + 1;
+            var isEligible_five = false;
+            var isEligible_ten = false;
+            var isEligible_fifteen = false;
+            if (updatedBalValue >= 5) {
+              isEligible_five = true;
+            }
+            if (updatedBalValue >= 10) {
+              isEligible_ten = true;
+            }
+            if (updatedBalValue >= 15) {
+              isEligible_fifteen = true;
+            }
+            var incrementedLoyalty = {
+              balance: updatedBalValue,
+              eligible_five: isEligible_five,
+              eligible_ten: isEligible_ten,
+              eligible_fifteen: isEligible_fifteen,
+              updated_at: this.resteasy.knex.fn.now()
+            };
+
+            this.resteasy.queries.push(
+              this.resteasy.transaction.table('loyalty').where('loyalty.id', priorBalance.id).update(incrementedLoyalty)
+            );
+          }
+
+          delete this.resteasy.object.currency;
         }
 
         else {
