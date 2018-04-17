@@ -130,6 +130,19 @@ JSON Body Message
 
 Remove a specified unit from Food Park.
 
+### GET /requests/:request_id
+
+List all offers related to a request by request id
+
+### GET /customers/:customer_id/requests
+
+List all offers related to a customer by customer id
+
+### POST /requests/create
+
+Create Request
+params: customer_id, request_name, request_photo, category_id, latitude, longitude 
+
 ## Tests
 
 1. Install mocha
