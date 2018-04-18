@@ -143,6 +143,25 @@ List all offers related to a customer by customer id
 Create Request
 params: customer_id, request_name, request_photo, category_id, latitude, longitude 
 
+### GET /requests/all
+
+List all requests and their corressponsding offers
+
+## DELETE requests/:request_id
+
+Deletes a single request for the request_id passed
+
+## PUT requests/:request_id
+
+Updates a single request for the request_id passed
+request.customer_id ,request.request_name ,request.request_photo ,request.category_id , request.latitude ,request.longitude,request.description ,request.condition ,request.buy_back_term
+
+Pass the params to be updated for the request
+
+## GET companies/:company_id/offers
+
+List all offers along with request according to the company id passed
+
 ## Tests
 
 1. Install mocha
