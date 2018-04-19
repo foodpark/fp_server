@@ -162,6 +162,70 @@ Pass the params to be updated for the request
 
 List all offers along with request according to the company id passed
 
+## POST /offers
+Create an offer
+Required Params:  request_id, request_name, company_id, pawn_poc, unit_id, cash_offer
+Optional Params: pawn_name, pawn_address, pawn_phone, buy_back_amount, tax_amount, offer_term, offer_accepted
+                  total_redemptionm, maturity_date, interest_rate, rating, distance
+
+{
+    "message": "request created",
+    "data": [
+        {
+            "id": 5,
+            "request_id": 4,
+            "request_name": "Test Name 1",
+            "company_id": 1005,
+            "pawn_poc": "Test ",
+            "pawn_name": null,
+            "pawn_address": null,
+            "pawn_phone": null,
+            "unit_id": 1,
+            "cash_offer": "123.5600",
+            "buy_back_amount": "123.5600",
+            "tax_amount": "0.0000",
+            "offer_term": null,
+            "offer_accepted": false,
+            "total_redemption": "143.3450",
+            "maturity_date": null,
+            "interest_rate": "0.0000",
+            "rating": "0.0000",
+            "distance": "0.0000",
+            "created_at": "2018-04-19T04:13:49.739Z",
+            "modified_at": "2018-04-19T04:13:49.739Z",
+            "is_deleted": false
+        }
+    ]
+}
+
+## PUT offers/:offer_id
+Update an offer
+request_id, request_name, company_id, pawn_poc, unit_id, cash_offer, pawn_name, pawn_address, 
+pawn_phone, buy_back_amount, tax_amount, offer_term, offer_accepted, total_redemptionm, maturity_date, interest_rate, rating, distance
+
+## DELETE /offers/:offer_id
+Delete an Offer
+
+{
+    "success": true
+}
+
+## GET companies/:company_id/units/:unit_id/offers
+Get Offers By Company Id & Unit ID
+
+## GET contracts/:contract_id
+Get Contract Details By contract id
+
+## GET customers/:customer_id/contracts
+Get Contract Details By Customer id
+
+## GET companies/:company_id/contracts?offer_approved=true
+=> offer_approved : optional parameter to reterive all contracts with offer_approved flag true
+Get Contract Details By Company id
+
+## DELETE contracts/:contract_id
+Delete a contract, only if offer_accepted flag for the contract is false
+
 ## Tests
 
 1. Install mocha

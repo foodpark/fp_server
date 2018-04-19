@@ -18,7 +18,15 @@ module.exports = function (app) {
   router.put(apiPath + 'requests/:request_id', pawnshop.updateRequest)
 
   router.get(apiPath + 'companies/:company_id/offers', pawnshop.getOffersByCompany);
-  // router.post(apiPath + 'offers', pawnshop.createOffer);
+  router.post(apiPath + 'offers', pawnshop.createOffer);
+  router.put(apiPath + 'offers/:offer_id', pawnshop.updateOffer)
+  router.delete(apiPath + 'offers/:offer_id', pawnshop.deleteOffer)
+  router.get(apiPath + 'companies/:company_id/units/:unit_id/offers', pawnshop.getOffersByUnit)
+
+  router.get(apiPath + 'contracts/:contract_id', pawnshop.getContractsById);
+  router.get(apiPath + 'customers/:customer_id/contracts', pawnshop.getContractsByCustomerId);
+  router.get(apiPath + 'companies/:company_id/contracts', pawnshop.getContractsByCompanyId);
+  router.delete(apiPath + 'contracts/:contract_id', pawnshop.deleteContract);
 
   app.use(router.routes());	
   app.use(router.allowedMethods());
