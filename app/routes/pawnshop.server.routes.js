@@ -1,6 +1,6 @@
 /**
  * @author Sávio Muniz
- */
+**/
 var pawnshop = require('../controllers/pawnshop.server.controller');
 var passport = require('koa-passport');
 var Router = require('koa-router');
@@ -27,6 +27,9 @@ module.exports = function (app) {
   router.get(apiPath + 'customers/:customer_id/contracts', pawnshop.getContractsByCustomerId);
   router.get(apiPath + 'companies/:company_id/contracts', pawnshop.getContractsByCompanyId);
   router.delete(apiPath + 'contracts/:contract_id', pawnshop.deleteContract);
+
+  router.get(apiPath + 'count/*', pawnshop.getCountByContext);
+  router.get(apiPath + 'mapsearch/pawnshops', pawnshop.getPawnshopsByTerritory);
 
   app.use(router.routes());	
   app.use(router.allowedMethods());

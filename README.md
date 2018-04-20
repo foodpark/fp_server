@@ -141,7 +141,7 @@ List all offers related to a customer by customer id
 ### POST /requests/create
 
 Create Request
-params: customer_id, request_name, request_photo, category_id, latitude, longitude 
+params: customer_id, request_name, request_photo, category_id, latitude, longitude, country, state, territory
 
 ### GET /requests/all
 
@@ -225,6 +225,14 @@ Get Contract Details By Company id
 
 ## DELETE contracts/:contract_id
 Delete a contract, only if offer_accepted flag for the contract is false
+
+## GET count/*
+Get Count for the cotext passed
+/count/requests/{id}/offers
+/count/customers/{id}/contracts
+
+## GET /mapsearch/pawnshops?latitude=-20.777182&longitude=-35.200323&distance=10
+Get Pawnshop List within the distance radius of the lat. and long. passed
 
 ## Tests
 

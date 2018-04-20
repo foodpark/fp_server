@@ -59,9 +59,12 @@ exports.createRequest = function * (next) {
         this.body = {error : 'All Fields are Required'};
         return;
     }else{
-        param_array[6] = request.description;
+        param_array[6] = request.request_description;
         param_array[7] = request.condition;
         param_array[8] = request.buy_back_term;
+        param_array[9] = request.country;
+        param_array[10] = request.state;
+        param_array[11] = request.territory;
         var errors = [];
         var regex = /^[-+]?\d+(\.\d+)?$/;
 
@@ -106,8 +109,8 @@ exports.updateRequest = function * (next){
     }
 
     var request = this.body;
-    var param_array = [request.customer_id ,request.request_name ,request.request_photo ,request.category_id , request.latitude ,request.longitude,request.description ,request.condition ,request.buy_back_term ];
-    var keys_array = [ "customer_id", "request_name", "request_photo", "category_id", "latitude", "longitude", "description", "condition", "buy_back_term"];
+    var param_array = [request.customer_id ,request.request_name ,request.request_photo ,request.category_id , request.latitude ,request.longitude,request.request_description ,request.condition ,request.buy_back_term ];
+    var keys_array = [ "customer_id", "request_name", "request_photo", "category_id", "latitude", "longitude", "request_description", "condition", "buy_back_term"];
     var errors = [];
     var regex = /^[-+]?\d+(\.\d+)?$/;
     var checkArr = [undefined,null,''];
@@ -470,6 +473,54 @@ exports.deleteContract = function * (next) {
     this.status = 200;
     this.body = (yield Pawnshop.deleteSingleContract(this.params.contract_id));
     return;
+}
+
+exports.getPawnshopsByTerritory = function * (next){
+    var latitude = parseFloat(this.query.latitude);
+    var longitude = parseFloat(this.query.longitude);
+    var distance = parseFloat(this.query.distance);
+
+    if(!distance){
+        distance = 0;
+    }
+
+    if(!latitude || !longitude) {
+        this.status = 404;
+        this.body = {error : 'Required Parameters Missing'};
+        return;
+    }
+
+    var latRange = [latitude + distance, -(latitude + distance)];
+    var longRange = [longitude + distance, -(longitude + distance)];
+
+    this.status = 200;
+    this.body = (yield getPawnshopsListByTerritory(latRange, longRange));
+    return;
+}
+
+exports.getCountByContext = function * (next) {
+    var params = this.params[0];    
+    var param_array = params.split('/');
+    
+    if(param_array.length != 3){
+        this.status = 404;
+        this.body = {error : 'Invalid Context Passed'};
+        return;
+    }
+
+    this.state = 200;
+    this.body = (yield Pawnshop.getCountByContext(param_array));
+    return;
+}
+
+function getPawnshopsListByTerritory(latRange, longRange) {
+    try{
+        return Pawnshop.getPawnshopsListByTerritory(latRange, longRange);
+    }catch(err){
+        logger.error('Error Getting Pawnshops');
+        debug('Error Getting Pawnshops');
+        throw(err);
+    }
 }
 
 function checkContractOfferFlag(id){

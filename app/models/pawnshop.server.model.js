@@ -6,6 +6,7 @@ const OFFER_TABLE = "offers";
 const CUSTOMER_TABLE = "customers";
 const COMPANY_TABLE = "companies";
 const CONTRACT_TABLE = "contracts";
+const TERRITORY_TABLE = "territories";
 
 exports.getOffersByRequestId = function(id) {
 	return knex(OFFER_TABLE).select().where('request_id', id);
@@ -23,9 +24,12 @@ exports.createRequest = function (request) {
 					category_id: request[3],
 					latitude: request[4],
 					longitude: request[5],
-					description: request[6],
+					request_description: request[6],
 					condition: request[7],
-					buy_back_term: request[8]
+					buy_back_term: request[8],
+					country: request[9],
+					state: request[10],
+					territory: request[11]
 				};
     return knex(REQUEST_TABLE).insert(params).returning('*');
 };
@@ -151,4 +155,21 @@ exports.checkContractOfferFlag = function(id) {
 
 exports.deleteSingleContract = function(id) {
 	return knex(CONTRACT_TABLE).where('id', '=', id).update({is_deleted: true});
+}
+ 
+exports.getPawnshopsListByTerritory = function * (lat, long) {
+	var result = knex(COMPANY_TABLE)
+				.select('companies.*')
+				.join(TERRITORY_TABLE, 'territories.id', 'companies.territory_id')
+				.where('territories.latitude', '<=', lat[0])
+				.andWhere('territories.longitude', '<=', long[0])
+				.orWhere('territories.latitude', '>=', lat[1])
+				.andWhere('territories.longitude', '>=', long[1]);
+	// var result = knex.raw("select companies.* from companies left join territories on territories.id = companies.territory_id where territories.latitude <= "+lat[0]+" and territories.longitude <= "+long[0]+" or territories.latitude >= "+lat[1]+" and territories.longitude >= "+long[1]);
+	return result;
+}
+
+exports.getCountByContext = function(params) {
+    var splitId = params[0].substring(0, params[0].length-1) + "_id";
+	return knex(params[2]).count(params[2]+'.id').join(params[0], params[0]+'.id', params[2]+"."+splitId).where(params[0]+".id", params[1]);
 }
