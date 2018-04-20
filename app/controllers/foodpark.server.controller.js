@@ -290,7 +290,7 @@ exports.getDrivers = function * (next) {
     var foodParkId = this.params.foodParkId;
     var user = this.passport.user;
 
-    if (!user || user.role !== 'FOODPARKMGR') {
+    if (!user || user.role !== 'FOODPARKMGR' && user.role !== 'ADMIN') {
         this.status = 401;
         return;
     }
@@ -313,7 +313,7 @@ exports.addDriver = function * (next) {
 
     var driver = yield User.getSingleUser(driverId);
 
-    if (!user || user.role !== 'FOODPARKMGR') {
+    if (!user || user.role !== 'FOODPARKMGR' && user.role !== 'ADMIN') {
         this.status = 401;
         return;
     }

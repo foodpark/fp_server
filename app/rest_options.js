@@ -269,21 +269,66 @@ function * beforeSaveOrderHistory() {
     var osoId = this.resteasy.object.order_sys_order_id;
     if (! this.resteasy.object.order_sys_order_id) {
       if (this.resteasy.object.context === 'prepay') {
-        eCommerce = false;
+        if (!this.resteasy.object.menu_items_data) {
+            eCommerce = false;
 
-        yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+            yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
 
-        this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
-        this.resteasy.object.order_detail = { 0 :
-          {
-            "title" : "Pre-pay Debit",
-            "quantity" : 1
+            this.resteasy.object.amount = Format.formatPrice(this.resteasy.object.amount, this.resteasy.object.currency);
+            this.resteasy.object.order_detail = { 0 :
+              {
+                "title" : "Pre-pay Debit",
+                "quantity" : 1
+              }
+            };
+
+            this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+
+          var priorBalance = (yield Loyalty.getPointBalance(this.resteasy.object.customer_id, coId))[0];
+          if (!priorBalance) {
+            logger.info('creating new loyalty points record for customer ' + this.resteasy.object.customer_id + ' at company ' + coId);
+            var initBalance = '1';
+            var newLoyalty = (yield Loyalty.createNew(this.resteasy.object.customer_id, coId, initBalance))[0];
+            debug(newLoyalty);
+          } else {
+            debug(priorBalance);
+            logger.info('incrementing loyalty points for customer ' + this.resteasy.object.customer_id + ' at company ' + coId);
+
+            var priorBalValue = parseInt(priorBalance.balance);
+            var updatedBalValue = priorBalValue + 1;
+            var isEligible_five = false;
+            var isEligible_ten = false;
+            var isEligible_fifteen = false;
+            if (updatedBalValue >= 5) {
+              isEligible_five = true;
+            }
+            if (updatedBalValue >= 10) {
+              isEligible_ten = true;
+            }
+            if (updatedBalValue >= 15) {
+              isEligible_fifteen = true;
+            }
+            var incrementedLoyalty = {
+              balance: updatedBalValue,
+              eligible_five: isEligible_five,
+              eligible_ten: isEligible_ten,
+              eligible_fifteen: isEligible_fifteen,
+              updated_at: this.resteasy.knex.fn.now()
+            };
+
+            this.resteasy.queries.push(
+              this.resteasy.transaction.table('loyalty').where('loyalty.id', priorBalance.id).update(incrementedLoyalty)
+            );
           }
-        };
 
-        this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+          delete this.resteasy.object.currency;
+        }
 
-        delete this.resteasy.object.currency;
+        else {
+          yield Prepay.registerGranuoDebit(this.resteasy.object.amount, this.resteasy.object.company_id, this.resteasy.object.customer_id);
+          this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
+        }
+
       }
       else {
         logger.error('No order id provided for e-commerce system',
@@ -320,11 +365,14 @@ function * beforeSaveOrderHistory() {
         var moltin_order_id = osoId;
         var order_details = {};
         logger.info('Moltin order');
-        debug('..order sys order id: ' + moltin_order_id)
+        debug('..order sys order id: ' + moltin_order_id);
+
         try {
-          var order = yield msc.findOrder(moltin_order_id)
-          var order = yield msc.findOrder(moltin_order_id)
-          order_details = yield msc.getOrderDetail(moltin_order_id)
+          if (!this.resteasy.object.menu_items_data)
+            throw new Error('menu_items_data field missing');
+          order_details = this.resteasy.object.menu_items_data;
+          delete this.resteasy.object.menu_items_data;
+
           order_details = yield simplifyDetails.call(this, order_details)
         } catch (err) {
           logger.error('Error retrieving order items from ecommerce system ',
@@ -335,8 +383,7 @@ function * beforeSaveOrderHistory() {
             });
           throw(err)
         }
-        debug('...total amount ' + order.totals.formatted.total)
-        this.resteasy.object.amount = order.totals.formatted.total
+        debug('...total amount ' + this.resteasy.object.amount)
         debug('...order details ')
         debug(order_details)
         this.resteasy.object.order_detail = order_details;
@@ -348,6 +395,8 @@ function * beforeSaveOrderHistory() {
             order_paid: new Date(),
             order_accepted: new Date()
           };
+
+          this.resteasy.object.qr_code = ParseUtils.getRandomNumber(15);
         } else {
           this.resteasy.object.status = {
             order_requested : ''
@@ -836,6 +885,8 @@ function *afterUpdateOrderHistory(orderHistory) {
         supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
         supplemental.order_id = ''+ orderHistory.id;
         supplemental.time_stamp = msgTime;
+        supplemental.status = status;
+
         supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
         msgTarget.data = supplemental;
 
@@ -1668,13 +1719,7 @@ function *addCloudPushSupport (target, supp) {
   var elements = {};
   elements.alert = target.message;
   elements.title= target.title;
-  elements.status = target.status,
-  elements.icon = "push",
-  elements.unit_id = supp.unit_id,
-  elements.company_id = supp.company_id,
-  elements.order_sys_order_id = supp.order_sys_order_id;
-  elements.order_id = supp.order_id;
-  elements.time_stamp = supp.time_stamp;
+  elements.icon = "push";
   if (target.os === 'ios')
     var payload = { aps: elements};
   else
@@ -1750,6 +1795,8 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   supplemental.order_sys_order_id = orderHistory.order_sys_order_id;
   supplemental.order_id = ''+ orderHistory.id;
   supplemental.time_stamp = msgTime;
+  supplemental.status = status;
+  
   supplemental.payload = yield addCloudPushSupport(msgTarget,supplemental);
   msgTarget.data = supplemental;
 
@@ -1903,8 +1950,8 @@ module.exports = {
           if(!this.isAuthenticated() || !this.passport.user || this.passport.user.role != 'ADMIN') {
             this.throw('Create Unauthorized - Admin only',401);
           } // else continue
-        } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
-          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN')) {
+        } else if (this.params.table == 'units' || this.params.table == 'loyalty_rewards' || this.params.table === 'loyalty_packages') {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'ADMIN')) {
             this.throw('Create Unauthorized - Owners/Admin only',401);
           } // else continue          }
         } else if (this.params.table == 'drivers') {

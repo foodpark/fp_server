@@ -11,6 +11,7 @@ module.exports = function (app) {
   var apiPath = '/api/'+ config.apiVersion + '/rel/users/';
 
   router.get(apiPath + 'custom_id/', users.getUsersByCustomId);
+  router.get(apiPath + ':userId', users.getUser);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

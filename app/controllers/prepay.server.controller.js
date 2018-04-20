@@ -31,8 +31,11 @@ function * recharge() {
     var owner = (yield Users.getSingleUser(company.user_id))[0];
     var amount = this.body.amount;
 
-    var customerId = customer.custom_id.granuo_user_id;
-    var companyId = owner.custom_id.granuo_establishment_id;
+    if (customer.custom_id)
+      var customerId = customer.custom_id.granuo_user_id;
+
+    if (owner.custom_id)
+      var companyId = owner.custom_id.granuo_establishment_id;
 
     if (!customerId) {
       customerId = yield registerGranuoUser(customer);
@@ -42,6 +45,7 @@ function * recharge() {
       var ownerGranuoId = yield registerGranuoUser(owner);
       companyId = yield registerEstablishment(ownerGranuoId, company, owner);
     }
+
 
     recharge.granuo_transaction_id = yield loadRecharge(customerId, companyId, amount);;
 
