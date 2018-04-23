@@ -2,7 +2,7 @@ var port = 1337;
 
 var properties = {
     port: port,
-    pg_connection_string: process.env.DATABASE_URL || "postgres://sfez_rw:sfez@localhost:5432/sfezdb",
+    pg_connection_string: process.env.DATABASE_URL || "postgres://sfez_rw:sfez@localhost:5432/sfezdbtest",
     secret: "CorrectHorseBatteryStaple",
     apiVersion: "v1",
     moltinAuthUrl: "https://api.molt.in/oauth/access_token",
