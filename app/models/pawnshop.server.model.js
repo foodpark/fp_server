@@ -58,6 +58,23 @@ exports.createOffer = function (request) {
 	return knex(OFFER_TABLE).insert(params).returning('*');
 }
 
+exports.createContract = function (request) {
+	var params = {
+					company_id: request[0],
+					unit_id: request[1],
+					customer_id: request[2],
+					offer_id: request[3],
+					request_name: request[4],
+					request_photo: request[5],
+					cash_offer: request[6],
+					buy_back_amount: request[7],
+					tax_amount: request[8],
+					term_months: request[9],
+					qr_code: request[10]
+				};
+	return knex(CONTRACT_TABLE).insert(params).returning('*');
+}
+
 exports.getAllOffers = function (request) {
 	var returnArr = [];
 	var offersArr = [];
@@ -140,6 +157,10 @@ exports.getSingleContractId = function(id) {
 	return knex(CONTRACT_TABLE).select('id').where('id', id);
 }
 
+exports.getSingleContractByQrCode = function(qr_code) {
+	return knex(CONTRACT_TABLE).select('*').where('qr_code', qr_code);
+}
+
 exports.getContractsByCustomer = function(id) {
 	return knex(CONTRACT_TABLE).select('*').where('customer_id', id);
 }
@@ -173,3 +194,7 @@ exports.getCountByContext = function(params) {
     var splitId = params[0].substring(0, params[0].length-1) + "_id";
 	return knex(params[2]).count(params[2]+'.id').join(params[0], params[0]+'.id', params[2]+"."+splitId).where(params[0]+".id", params[1]);
 }
+
+exports.getQRCode = function (qrcode) {
+  	return knex(CONTRACT_TABLE).select('id').where('qr_code', qrcode);
+};

@@ -5,6 +5,7 @@ var auth = require('./authentication.server.controller');
 var Pawnshop = require('../models/pawnshop.server.model');
 var QueryHelper = require('../utils/query-helper')
 var debug   = require('debug')('auth');
+var ParseUtils = require('../utils/parseutils');
 
 exports.getAllRequests = function * (next) {
     var allRequests = (yield Pawnshop.getAllRequests());
@@ -423,6 +424,20 @@ exports.getContractsById = function * (next) {
     return;
 }
 
+exports.getContractsByQrCode = function * (next) {
+    var contract = yield getSingleContractByQrCode(this.params.qr_code);
+
+    if(contract.length == 0) {
+        this.status = 404;
+        this.body = {error : 'Invalid QR Code'};
+        return;
+    }
+
+    this.status = 200;
+    this.body = contract;
+    return;
+}
+
 exports.getContractsByCustomerId = function * (next){
     var customer = yield getCustomer(this.params.customer_id);
 
@@ -513,6 +528,98 @@ exports.getCountByContext = function * (next) {
     return;
 }
 
+exports.createContract = function * (next) {
+    var request = this.body;
+    var company = yield getSingleCompany(request.company_id);
+
+    if(!company){
+        this.status = 404;
+        this.body = {error: 'Invalid Company id'};
+        return;
+    }
+
+    var checkArr = [undefined,null,'',""];
+    var param_array = [ request.company_id,
+                        request.unit_id,
+                        request.customer_id,
+                        request.offer_id,
+                        request.request_name,
+                        request.request_photo,
+                      ];
+
+    if ( param_array.includes(undefined) || param_array.includes(null) || param_array.includes('') ) {          
+        this.status = 415;
+        this.body = {error : 'Missing Required Fields'};
+        return;
+    }else{
+        param_array[6] = request.cash_offer;
+        param_array[7] = request.buy_back_amount;
+        param_array[8] = request.tax_amount;
+        param_array[9] = request.term_months;
+
+        var errors = [];
+        var regex = /^[-+]?\d+(\.\d+)?$/;
+
+        if(checkArr.includes(param_array[0]) || !regex.test(param_array[0])){
+            errors.push({ "field": "company_id", "error": "Invalid Company ID Provided"});
+        }
+        if(checkArr.includes(param_array[1]) || !regex.test(param_array[1])){
+            errors.push({ "field": "unit_id", "error": "Invalid Unit ID Provided"});
+        }
+        if(checkArr.includes(param_array[2]) || !regex.test(param_array[2])){
+            errors.push({ "field": "customer_id", "error": "Invalid Customer ID Provided"});
+        }
+        if(checkArr.includes(param_array[3]) || !regex.test(param_array[3])){
+            errors.push({ "field": "offer_id", "error": "Invalid Offer ID Provided"});
+        }
+        if(checkArr.includes(param_array[4])){
+            errors.push({ "field": "request_name", "error": "Invalid Request Name Provided"});
+        }
+        if(checkArr.includes(param_array[5])){
+            errors.push({ "field": "request_photo", "error": "Invalid Request Photo Provided"});
+        }
+
+        if((!checkArr.includes(param_array[6]) && !regex.test(param_array[6])) || param_array[9] == "" ){
+            errors.push({ "field": "cash_offer", "error": "Invalid Cash Offer Provided"});
+        }
+        if((!checkArr.includes(param_array[7]) && !regex.test(param_array[7])) || param_array[10] == "" ){
+            errors.push({ "field": "buy_back_amount", "error": "Invalid Buy Back Amount Provided"});
+        }
+        if((!checkArr.includes(param_array[8]) && !regex.test(param_array[8])) || param_array[13] == "" ){
+            errors.push({ "field": "tax_amount", "error": "Invalid Tax Amount Provided"});
+        }
+        if((!checkArr.includes(param_array[9]) && !regex.test(param_array[9])) || param_array[14] == "" ){
+            errors.push({ "field": "term_months", "error": "Invalid Term Months Provided"});
+        }
+
+        if(errors.length > 0){
+            this.status = 415;
+            this.body = {status: false, error : errors};
+            return;
+        }
+
+        var qrcode = undefined;
+
+        while (!qrcode) {
+          qrcode = ParseUtils.getRandomNumber(15);
+          if (qrcode.length > 0)
+            qrcode = undefined;
+        }
+
+        param_array[10] = qrcode;
+
+        var response = yield saveContract(param_array);
+        this.status = 201;
+        this.body = {message : 'contract created', data : response};
+        return;
+    }
+}
+
+function * checkQRCodeExistence(qrcode) {
+  var qrCode = (yield Pawnshop.getQRCode(qrcode));
+  return qrCode;
+}
+
 function getPawnshopsListByTerritory(latRange, longRange) {
     try{
         return Pawnshop.getPawnshopsListByTerritory(latRange, longRange);
@@ -573,6 +680,16 @@ function saveOffer(request) {
   }
 }
 
+function saveContract(request) {
+  try {
+      return Pawnshop.createContract(request);
+  } catch (err) {
+      logger.error('Error saving contract');
+      debug('Error saving contract');
+      throw (err);
+  }
+}
+
 function saveRequest(request) {
   try {
       return Pawnshop.createRequest(request);
@@ -625,9 +742,19 @@ function getCompanyByUnit(company_id, unit_id) {
    } 
 }
 
-function getSingleContractId(id) {
+function getSingleContractId(qr_code) {
     try{
-        return Pawnshop.getSingleContractId(id);
+        return Pawnshop.getSingleContractId(qr_code);
+    }catch(err){
+        logger.error('Error while retrieving contract');
+        debug('Error while retrieving contract');
+        throw(err);
+    }
+}
+
+function getSingleContractByQrCode(id) {
+    try{
+        return Pawnshop.getSingleContractByQrCode(id);
     }catch(err){
         logger.error('Error while retrieving contract');
         debug('Error while retrieving contract');

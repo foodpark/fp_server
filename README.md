@@ -234,6 +234,14 @@ Get Count for the cotext passed
 ## GET /mapsearch/pawnshops?latitude=-20.777182&longitude=-35.200323&distance=10
 Get Pawnshop List within the distance radius of the lat. and long. passed
 
+## POST /contracts
+Create Contract
+Required Param: company_id, unit_id, customer_id, offer_id, request_name, request_photo
+Optional : cash_offer, buy_back_amount, tax_amount, term_months
+
+## GET contracts/qrcode/:qr_code
+Get Contract Details by QR Code
+
 ## Tests
 
 1. Install mocha

@@ -27,6 +27,8 @@ module.exports = function (app) {
   router.get(apiPath + 'customers/:customer_id/contracts', pawnshop.getContractsByCustomerId);
   router.get(apiPath + 'companies/:company_id/contracts', pawnshop.getContractsByCompanyId);
   router.delete(apiPath + 'contracts/:contract_id', pawnshop.deleteContract);
+  router.post(apiPath + 'contracts', pawnshop.createContract);
+  router.get(apiPath + 'contracts/qrcode/:qr_code', pawnshop.getContractsByQrCode);
 
   router.get(apiPath + 'count/*', pawnshop.getCountByContext);
   router.get(apiPath + 'mapsearch/pawnshops', pawnshop.getPawnshopsByTerritory);
