@@ -732,3 +732,279 @@ GRANT SELECT ON TABLE information_schema.constraint_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.key_column_usage TO sfez_rw;
 GRANT SELECT ON TABLE information_schema.table_constraints TO sfez_rw;
 GRANT SELECT ON TABLE pg_catalog.pg_constraint TO sfez_rw;
+
+-- ADDED WITH ONLINE COMMIT
+--
+-- Name: requests; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.requests (
+    id integer NOT NULL,
+    customer_id integer,
+    request_name text,
+    request_photo text,
+    category_id integer,
+    latitude numeric(8,4),
+    longitude numeric(8,4),
+    created_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    modified_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    is_deleted boolean DEFAULT false,
+    request_description text,
+    condition character varying(100),
+    buy_back_term character varying(225),
+    country character varying(100),
+    state character varying(100),
+    territory character varying(100)
+);
+
+
+ALTER TABLE public.requests OWNER TO postgres;
+
+--
+-- Name: requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.requests_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.requests_id_seq OWNER TO postgres;
+
+--
+-- Name: requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.requests_id_seq OWNED BY public.requests.id;
+
+ALTER TABLE ONLY public.requests ALTER COLUMN id SET DEFAULT nextval('public.requests_id_seq'::regclass);
+
+--
+-- Name: requests_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.requests_id_seq', 8, true);
+
+--
+-- Name: requests requests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_pkey PRIMARY KEY (id);
+
+--
+-- Name: requests requests_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+--
+-- Name: categories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.categories (
+    id integer NOT NULL,
+    category character varying(125)
+);
+
+
+ALTER TABLE public.categories OWNER TO postgres;
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.categories_id_seq OWNER TO postgres;
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.categories_id_seq OWNED BY public.categories.id;
+
+--
+-- Name: categories id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories ALTER COLUMN id SET DEFAULT nextval('public.categories_id_seq'::regclass);
+--
+-- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories
+    ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+
+
+--
+-- Name: offers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.offers (
+    id integer NOT NULL,
+    request_id integer,
+    request_name character varying(225),
+    company_id integer,
+    pawn_poc character varying(225),
+    pawn_name character varying(225),
+    pawn_address text,
+    pawn_phone character varying(15),
+    unit_id integer,
+    cash_offer numeric(10,4) DEFAULT '0'::numeric,
+    buy_back_amount numeric(10,4) DEFAULT '0'::numeric,
+    tax_amount numeric(10,4) DEFAULT '0'::numeric,
+    offer_term integer,
+    offer_accepted boolean DEFAULT false,
+    total_redemption numeric(10,4) DEFAULT '0'::numeric,
+    maturity_date timestamp without time zone,
+    interest_rate numeric(6,4) DEFAULT '0'::numeric,
+    rating numeric(6,4) DEFAULT '0'::numeric,
+    distance numeric(6,4) DEFAULT '0'::numeric,
+    created_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    modified_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.offers OWNER TO postgres;
+
+--
+-- Name: offers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.offers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.offers_id_seq OWNER TO postgres;
+
+--
+-- Name: offers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.offers_id_seq OWNED BY public.offers.id;
+
+--
+-- Name: offers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.offers ALTER COLUMN id SET DEFAULT nextval('public.offers_id_seq'::regclass);
+
+--
+-- Name: offers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.offers_id_seq', 5, true);
+
+--
+-- Name: offers offers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.offers
+    ADD CONSTRAINT offers_pkey PRIMARY KEY (id);
+
+
+
+--
+-- Name: contracts; Type: TABLE; Schema: public; Owner: sfez_rw
+--
+
+CREATE TABLE public.contracts (
+    id integer NOT NULL,
+    company_id integer,
+    unit_id integer,
+    customer_id integer,
+    offer_id integer,
+    request_name character varying(225),
+    request_photo text,
+    cash_offer numeric(8,4),
+    buy_back_amount numeric(8,4),
+    tax_amount numeric(8,4),
+    term_months integer,
+    qr_code character varying(225),
+    offer_approved boolean DEFAULT true,
+    status boolean DEFAULT true,
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.contracts OWNER TO sfez_rw;
+
+--
+-- Name: contracts_id_seq; Type: SEQUENCE; Schema: public; Owner: sfez_rw
+--
+
+CREATE SEQUENCE public.contracts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.contracts_id_seq OWNER TO sfez_rw;
+
+--
+-- Name: contracts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sfez_rw
+--
+
+ALTER SEQUENCE public.contracts_id_seq OWNED BY public.contracts.id;
+
+
+--
+-- Name: countries; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.countries (
+    id integer NOT NULL,
+    name text,
+    is_enabled boolean DEFAULT false,
+    tax_band text,
+    moltin_client_id text,
+    moltin_client_secret text,
+    currency_id text DEFAULT '1554615357396746864'::text,
+    currency text DEFAULT 'BRL'::text
+);
+
+
+ALTER TABLE public.countries OWNER TO postgres;
+
+--
+-- Name: contracts id; Type: DEFAULT; Schema: public; Owner: sfez_rw
+--
+
+ALTER TABLE ONLY public.contracts ALTER COLUMN id SET DEFAULT nextval('public.contracts_id_seq'::regclass);
+
+--
+-- Name: contracts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sfez_rw
+--
+
+SELECT pg_catalog.setval('public.contracts_id_seq', 3, true);
+
+--
+-- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: public; Owner: sfez_rw
+--
+
+ALTER TABLE ONLY public.contracts
+    ADD CONSTRAINT contracts_pkey PRIMARY KEY (id);
