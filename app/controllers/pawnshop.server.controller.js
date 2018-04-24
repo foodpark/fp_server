@@ -116,7 +116,7 @@ exports.updateRequest = function * (next){
     var regex = /^[-+]?\d+(\.\d+)?$/;
     var checkArr = [undefined,null,''];
 
-    if(!checkArr.includes(param_array[3]) && !Number.isInteger(param_array[3])){
+    if(!checkArr.includes(param_array[3]) && !regex.test(param_array[3])){
         errors.push({ "field": "category_id", "error": "Invalid Category Id Provided"});
     }
     if(!checkArr.includes(param_array[4]) && !regex.test(param_array[4]) ){
@@ -263,9 +263,9 @@ exports.createOffer = function * (next) {
         if((!checkArr.includes(param_array[13]) && !regex.test(param_array[13])) || param_array[13] == "" ){
             errors.push({ "field": "total_redemption", "error": "Invalid Total Redemption Provided"});
         }
-        if((!checkArr.includes(param_array[14]) && !regex.test(param_array[14])) || param_array[14] == "" ){
-            errors.push({ "field": "maturity_date", "error": "Invalid Maturity Date Provided"});
-        }
+        // if((!checkArr.includes(param_array[14]) && !regex.test(param_array[14])) || param_array[14] == "" ){
+        //     errors.push({ "field": "maturity_date", "error": "Invalid Maturity Date Provided"});
+        // }
         if((!checkArr.includes(param_array[15]) && !regex.test(param_array[15])) || param_array[15] == "" ){
             errors.push({ "field": "interest_rate", "error": "Invalid Interest Rate Provided"});
         }
