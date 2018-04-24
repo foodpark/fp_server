@@ -7,6 +7,7 @@ const CUSTOMER_TABLE = "customers";
 const COMPANY_TABLE = "companies";
 const CONTRACT_TABLE = "contracts";
 const TERRITORY_TABLE = "territories";
+const UNITS_TABLE = "units";
 
 exports.getOffersByRequestId = function(id) {
 	return knex(OFFER_TABLE).select().where('request_id', id);
@@ -117,7 +118,12 @@ exports.getSingleCustomer = function(id) {
 }
 
 exports.getSingleCompany = function(id){
-	return knex(COMPANY_TABLE).select('id').where('id', id).first();
+	return knex(COMPANY_TABLE).select('*').where('id', id).first();
+}
+
+exports.getPawnPoc = function(unit_id){
+	return knex(UNITS_TABLE).select('username').where('id', unit_id).first();
+	// return {"id":0};
 }
 
 exports.getRequestsByCompany = function(id){

@@ -155,7 +155,7 @@ Deletes a single request for the request_id passed
 ## PUT request/:request_id
 
 Updates a single request for the request_id passed
-request.customer_id ,request.request_name ,request.request_photo ,request.category_id , request.latitude ,request.longitude,request.description ,request.condition ,request.buy_back_term
+customer_id ,request_name ,request_photo ,category_id , latitude ,longitude,description ,condition ,buy_back_term
 
 Pass the params to be updated for the request
 
@@ -166,7 +166,7 @@ List all offers along with request according to the company id passed
 ## POST /Offers
 Create an offer
 Required Params:  request_id, request_name, company_id, pawn_poc, unit_id, cash_offer
-Optional Params: pawn_name, pawn_address, pawn_phone, buy_back_amount, tax_amount, offer_term, offer_accepted
+Optional Params:  buy_back_amount, tax_amount, offer_term, offer_accepted
                   total_redemptionm, maturity_date, interest_rate, rating, distance
 
 {
