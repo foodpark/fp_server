@@ -130,7 +130,7 @@ JSON Body Message
 
 Remove a specified unit from Food Park.
 
-### GET /requests/:request_id
+### GET /request/:request_id
 
 List all offers related to a request by request id
 
@@ -138,20 +138,21 @@ List all offers related to a request by request id
 
 List all offers related to a customer by customer id
 
-### POST /requests/create
+### POST /requests
 
 Create Request
-params: customer_id, request_name, request_photo, category_id, latitude, longitude, country, state, territory
+params: customer_id, request_name, request_photo, category_id, latitude, longitude, country, state, territory, request_description
+condition, buy_back_term
 
-### GET /requests/all
+### GET /requests
 
 List all requests and their corressponsding offers
 
-## DELETE requests/:request_id
+## DELETE request/:request_id
 
 Deletes a single request for the request_id passed
 
-## PUT requests/:request_id
+## PUT request/:request_id
 
 Updates a single request for the request_id passed
 request.customer_id ,request.request_name ,request.request_photo ,request.category_id , request.latitude ,request.longitude,request.description ,request.condition ,request.buy_back_term
@@ -162,7 +163,7 @@ Pass the params to be updated for the request
 
 List all offers along with request according to the company id passed
 
-## POST /offers
+## POST /Offers
 Create an offer
 Required Params:  request_id, request_name, company_id, pawn_poc, unit_id, cash_offer
 Optional Params: pawn_name, pawn_address, pawn_phone, buy_back_amount, tax_amount, offer_term, offer_accepted
@@ -170,7 +171,7 @@ Optional Params: pawn_name, pawn_address, pawn_phone, buy_back_amount, tax_amoun
 
 {
     "message": "request created",
-    "data": [
+    "data": [   
         {
             "id": 5,
             "request_id": 4,
@@ -210,7 +211,7 @@ Delete an Offer
     "success": true
 }
 
-## GET companies/:company_id/units/:unit_id/offers
+## GET companies/:company_id/units/:unit_id/Offers
 Get Offers By Company Id & Unit ID
 
 ## GET contracts/:contract_id
@@ -228,7 +229,7 @@ Delete a contract, only if offer_accepted flag for the contract is false
 
 ## GET count/*
 Get Count for the cotext passed
-/count/requests/{id}/offers
+/count/requests/{id}/offers 
 /count/customers/{id}/contracts
 
 ## GET /mapsearch/pawnshops?latitude=-20.777182&longitude=-35.200323&distance=10
