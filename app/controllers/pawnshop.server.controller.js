@@ -53,7 +53,14 @@ exports.createRequest = function * (next) {
     }
 
     var checkArr = [undefined,null,''];
-    var param_array = [request.customer_id ,request.request_name ,request.request_photo ,request.category_id , request.latitude ,request.longitude ];
+    var param_array = [
+                        request.customer_id ,
+                        request.request_name ,
+                        request.request_photo ,
+                        request.category_id , 
+                        request.latitude ,
+                        request.longitude 
+                    ];
        
     if ( param_array.includes(undefined) || param_array.includes(null) || param_array.includes('') ) {          
         this.status = 415;
@@ -75,7 +82,7 @@ exports.createRequest = function * (next) {
         if(checkArr.includes(param_array[2])){
             errors.push({ "field": "request_photo", "error": "Invalid Request Photo Provided"});
         }
-        if(checkArr.includes(param_array[3]) || Number.isInteger(param_array[3])){
+        if(checkArr.includes(param_array[3]) || !regex.test(param_array[3])){
             errors.push({ "field": "category_id", "error": "Invalid Category Id Provided"});
         }
         if(checkArr.includes(param_array[4]) || !regex.test(param_array[4]) ){
@@ -248,11 +255,6 @@ exports.createOffer = function * (next) {
             var newDate = new Date(date.setTime( date.getTime() + total_days * 86400000 ));
             param_array[14] = newDate;
         }
-        
-        // param_array[14] = request.maturity_date;
-        param_array[15] = request.interest_rate;
-        param_array[16] = request.rating;
-        param_array[17] = request.distance;
 
         if(checkArr.includes(param_array[0]) || !regex.test(param_array[0])){
             errors.push({ "field": "request_id", "error": "Invalid Request ID Provided"});
@@ -285,9 +287,27 @@ exports.createOffer = function * (next) {
         // if((!checkArr.includes(param_array[14]) && !regex.test(param_array[14])) || param_array[14] == "" ){
         //     errors.push({ "field": "maturity_date", "error": "Invalid Maturity Date Provided"});
         // }
-        if((!checkArr.includes(param_array[15]) && !regex.test(param_array[15])) || param_array[15] == "" ){
-            errors.push({ "field": "interest_rate", "error": "Invalid Interest Rate Provided"});
+        // if((!checkArr.includes(param_array[15]) && !regex.test(param_array[15])) || param_array[15] == "" ){
+        //     errors.push({ "field": "interest_rate", "error": "Invalid Interest Rate Provided"});
+        // }
+
+        if(param_array[5] && param_array[9] && param_array[11]){
+            var cash_offer = param_array[5];
+            var buy_back_amount = param_array[9];
+            var buy_back_term = param_array[11];
+
+            if(buy_back_amount > cash_offer){
+                var interest_rate = (1/buy_back_term)*(buy_back_amount/cash_offer - 1);
+                interest_rate = interest_rate*100;
+                param_array[15] = interest_rate;
+            }else{
+                errors.push({ "field": "value_mismatch", "error": "Cash Offer Should be less than buy back Amount"});
+            }
         }
+
+        param_array[16] = request.rating;
+        param_array[17] = request.distance;
+
         if((!checkArr.includes(param_array[16]) && !regex.test(param_array[16])) || param_array[16] == "" ){
             errors.push({ "field": "rating", "error": "Invalid Rating Provided"});
         }

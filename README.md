@@ -165,9 +165,9 @@ List all offers along with request according to the company id passed
 
 ## POST /Offers
 Create an offer
-Required Params:  request_id, request_name, company_id, pawn_poc, unit_id, cash_offer
+Required Params:  request_id, request_name, company_id, unit_id, cash_offer
 Optional Params:  buy_back_amount, tax_amount, offer_term, offer_accepted
-                  total_redemptionm, maturity_date, interest_rate, rating, distance
+                  total_redemptionm, rating, distance
 
 {
     "message": "request created",
