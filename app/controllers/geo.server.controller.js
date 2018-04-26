@@ -67,7 +67,7 @@ exports.searchUnits=function *(next) {
     result.forEach(function (user, index) {
       if (user) {
         resultUnits[index].venue_fbid = user[0].fbid;
-        resultUnits[index].venue_fb_handle = user[0].fb_handle;
+        resultUnits[index].venue_fb_handle = user[0].provider_data;
       }
       else {
         resultUnits[index].venue_fbid = null;
