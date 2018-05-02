@@ -735,6 +735,7 @@ function *afterUpdateOrderHistory(orderHistory) {
   if (!customer.gcmId && !customer.fcmId){
     notify = false;
     updated = true;
+    console.log("=====================********************")
   }
 
   for (var i = 0; i < keys.length; i++) {
@@ -959,6 +960,7 @@ function *afterUpdateOrderHistory(orderHistory) {
       orderHistoryStatus.order_accepted = orderAccepted;
     }
     debug(orderHistoryStatus)
+    console.log('=========================+>UPDATING STATUS')
     this.resteasy.queries.push(
       this.resteasy.transaction.table('order_history').where('order_history.id', orderHistory.id).update({ status: orderHistoryStatus})
     );
