@@ -730,7 +730,7 @@ function *afterUpdateOrderHistory(orderHistory) {
   }
   debug(customer);
 
-  if (!customer.gcmId && !customer.fcmId){
+  if (!customer.gcmId || !customer.fcmId){
     return;
   }
 
