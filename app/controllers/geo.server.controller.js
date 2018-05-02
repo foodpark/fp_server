@@ -1,5 +1,6 @@
 var Unit = require ('../models/unit.server.model');
 var FoodParks = require ('../models/foodpark.server.model');
+var Users = require('../models/user.server.model');
 var debug = require('debug')('geo.server.controller');
 var logger = require('winston');
 
@@ -39,19 +40,44 @@ exports.searchUnits=function *(next) {
       }
   });
 
-	var response = Promise.all(promises).then(function (result) {
+	var userPromises = [];
+	console.log(promises.length);
+
+	var venueTypeResponse = Promise.all(promises).then(function (result) {
     result.forEach(function (foodPark, index) {
-      if (foodPark)
+      if (foodPark) {
         resultUnits[index].venue_type = foodPark[0].type;
-      else
+        userPromises.push(Users.getSingleUser(foodPark[0].foodpark_mgr));
+      }
+      else {
         resultUnits[index].venue_type = null;
+        userPromises.push(undefined);
+      }
     });
 
     return resultUnits
   });
 
-  this.body = yield response;
+	resultUnits = yield venueTypeResponse;
 
+	var managerResponse = Promise.all(userPromises).then(function (result) {
+    result.forEach(function (user, index) {
+      if (user) {
+        resultUnits[index].venue_fbid = user[0].fbid;
+        resultUnits[index].venue_fb_handle = user[0].provider_data;
+      }
+      else {
+        resultUnits[index].venue_fbid = null;
+        resultUnits[index].venue_fb_handle = null;
+      }
+    });
+
+    return resultUnits
+  });
+
+	resultUnits = yield managerResponse;
+
+  this.body = resultUnits;
 };
 
 exports.searchPostal=function *(next) {

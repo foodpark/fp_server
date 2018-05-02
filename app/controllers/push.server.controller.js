@@ -116,9 +116,17 @@ exports.importAPNS = function *( apns ) {
 }
 
 
-var setOrderStatusMessage = function(orderId, title, status, message, body, data) {
-	var note = '';
+var setOrderStatusMessage = function(orderId, msgTarget) {
 
+	var title = msgTarget.title;
+	var status = msgTarget.status;
+	var message = msgTarget.message;
+	var body = msgTarget.body;
+	var data = msgTarget.data; 
+	var os = msgTarget.os;
+
+	// Removing the below notification format (Titanium/GCM/FCM)
+	/*
 	if (!data) data = {};
 	data.message = message;
 	data.title = title;
@@ -140,9 +148,71 @@ var setOrderStatusMessage = function(orderId, title, status, message, body, data
 			},
 			"data" : data
 		}
-	};
+	}; 
+	*/ 
+
+	var note = '';
+	
+	if (msgTarget.os == 'ios') {
+
+		note = {
+			aps: {
+				alert: message,
+				badge: "+2",
+				sound: "door_bell"
+			},
+			title: title,
+			icon: "little_star",
+			vibrate: true,
+			status: status
+
+		};
+
+	} else { // assume android so that something will go out
+
+		// desired format
+		/*
+		note = {
+			payload: {
+				message: message,
+				title: title,
+				company_id: XXXX, // not available
+				order_sys_order_id: YYYY, // not availabe here
+				order_id: IIII, // not available here
+				time_stamp: TTT,
+				android: {
+					alert: message,
+					title: title,
+					icon: "push",
+					status: ZZZZ,
+					company_id: XXXX, // not available here
+					order_sys_order_id: YYYY, // not available here
+					order_id: IIII, // not available here
+					time_stamp: TTT
+				}
+			}
+		}
+		*/
+		// Format using existing data in msgTarget
+		var ts = timestamp.now();
+		note = {
+			payload: {
+				message: message,
+				title: title,
+				time_stamp: ts,
+				android: {
+					alert: message,
+					title: title,
+					icon: "push",
+					status: status,
+					time_stamp: ts
+				}
+			}
+		};
+	}
+
 	return note;
-}
+};
 
 var sendFCMNotification = function (message) {
 	// Send a message to the device corresponding to the provided
@@ -204,8 +274,7 @@ var sendGCMNotification = function (message){
 
 exports.notifyOrderUpdated = function *(orderId, msgTarget){
 	debug('notifyOrderUpdated');
-	var msg = setOrderStatusMessage(orderId, msgTarget.title, 
-	          msgTarget.status, msgTarget.message, msgTarget.body, msgTarget.data);
+	var msg = setOrderStatusMessage(orderId, msgTarget);
 	debug(msg);
 	debug('..sending notification..');
 	var notified = {};

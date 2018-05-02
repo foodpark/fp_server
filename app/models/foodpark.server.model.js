@@ -14,7 +14,7 @@ exports.getFoodParkUnits = function(id) {
                   companies.daily_special_item_id, companies.delivery_chg_cat_id, companies.delivery_chg_item_id, companies.delivery_chg_amount, companies.description, 
                   companies.email, companies.phone, companies.facebook, companies.twitter, companies.instagram, companies.featured_dish, companies.hours, companies.schedule, 
                   companies.business_address, companies.city, companies.state, companies.country, companies.country_id, companies.taxband, companies.tags, companies.stub, companies.calculated_rating, companies.show_vendor_setup,
-                  companies.user_id as "owner_id", countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
+                  companies.user_id as "owner_id", companies.veritas_id, countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
                   countries.currency_id, checkins.check_in, checkins.check_out from food_park_management fm right join units on fm.unit_id = units.id 
                   inner join companies on units.company_id = companies.id inner join countries on companies.country_id = countries.id left outer join checkins on 
                   checkins.unit_id = units.id and checkins.food_park_id=${id} and 

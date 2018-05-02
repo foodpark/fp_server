@@ -34,7 +34,7 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
 
 exports.getCompanyUnit = function (unitId) {
   return knex.raw(`select units.*,
-                  companies.user_id as "owner_id", countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
+                  companies.user_id as "owner_id", companies.veritas_id, countries.moltin_client_id, countries.moltin_client_id, countries.moltin_client_secret, countries.currency, 
                   countries.currency_id, square_unit.location_id as "square_location_id", checkins.check_in, checkins.check_out from units 
                   inner join companies on units.company_id = companies.id inner join countries on companies.country_id = countries.id 
                   left join square_unit on units.id = square_unit.unit_id

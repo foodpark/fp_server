@@ -16,164 +16,1718 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
-COPY public.roles (id, type) FROM stdin;
-1	CUSTOMER
-2	OWNER
-3	UNITMGR
-4	ADMIN
-5	DRIVER
-6	FOODPARKMGR
-\.
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
-COPY public.users (id, username, password, first_name, last_name, role, territory_id, country_id, phone, provider, provider_id, provider_data, fbid, fb_token, fb_login, default_language, created_at, updated_at, is_deleted) FROM stdin;
-11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 05:01:43.131352+05:30	2017-02-03 14:55:30.279083+05:30	f
-11002	mp27	defc72a96803a619a6735cd7e7e69e1b	Jonathan	Jones	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:31:03.622149+05:30	2017-02-03 15:24:22.527595+05:30	f
-11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:33:07.177813+05:30	2017-02-01 05:02:49.172208+05:30	f
-11005	mp5@gmail.com	146eb1afa89654aca443976646460ef4	Bob	Smith	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:35:04.914807+05:30	2017-02-01 05:02:49.172208+05:30	f
-11006	mp6@gmail.com	5ce4c4a0a26e6df0fdbb380d78f4fab2	Cindy	Clark	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:42:10.112015+05:30	2017-02-01 05:02:49.172208+05:30	f
-11007	mptruck61	6cf9be93694189e06c66faa49a6cbc93	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-30 02:24:42.540882+05:30	2017-02-01 05:02:49.172208+05:30	f
-11008	mptruck64	5db0aeb457f45ddb90c35b39569c1348	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-31 02:42:08.717913+05:30	2017-02-01 05:02:49.172208+05:30	f
-11009	mptruck64five	dda2549944250c6c038797b463e7de99	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-31 02:52:22.983667+05:30	2017-02-01 05:02:49.172208+05:30	f
-11010	trucker1	2c914a017cf7354e6c6319afe0b664b2	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-09-07 05:27:26.291924+05:30	2017-02-01 05:02:49.172208+05:30	f
-11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-21 05:03:15.004572+05:30	2017-02-01 05:02:49.172208+05:30	f
-11012	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	Luiz	Cobello	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-23 00:12:04.179585+05:30	2017-02-01 05:02:49.172208+05:30	f
-11013	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	Marcos	Hirano	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-23 00:11:25.721489+05:30	2017-02-01 05:02:49.172208+05:30	f
-11017	jack@crazysubs.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Jack	Crazy	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-01 16:51:51.951081+05:30	2017-02-01 16:51:51.951081+05:30	f
-11018	crazy56	33b0a180f307ca68ba2c2dfa55f6ff4c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-01 17:16:50.778073+05:30	2017-02-01 17:16:50.778073+05:30	f
-11020	Mo@totino.com	27c9d5187cd283f8d160ec1ed2b5ac89	Mo	Totino	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-02 12:34:17.433015+05:30	2017-02-02 12:34:17.433015+05:30	f
-11021	moe56	276fbf86abd87a184df2b737328b6973	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-02 13:17:24.105698+05:30	2017-02-02 13:17:24.105698+05:30	f
-11024	Bangkok@cafe.com	bangkok	Bangkok	Cafe	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-02 14:13:47.94126+05:30	2017-02-02 14:39:32.202801+05:30	f
-11003	mp4	28dafd4a8cb5f33065e93cbc83862563	Marco and Inez	Pena	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:31:50.563872+05:30	2017-02-02 15:05:54.217743+05:30	f
-11025	Grilla@grillacheez.com	82edd3141a6270a3ac5e93323c07a7e1	Grilla	Cheez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-03 02:44:48.007795+05:30	2017-02-03 02:44:48.007795+05:30	f
-11026	grilla56	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-03 02:55:02.499941+05:30	2017-02-03 02:55:02.499941+05:30	f
-11068	mg26@gmail.com	22c7b568334f78f0a122ee388557660e	mg2	spy	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-04 00:37:56.71264+05:30	2017-02-04 00:37:56.71264+05:30	f
-11165	suren@aryvart.com	b6c231fc212b1a67d4965d0b1527358c	Surendiran	Parasuraman	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-06 11:14:09.338925+05:30	2017-02-06 11:14:09.338925+05:30	f
-11168	grilla56@gmail.com	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-06 12:31:15.7952+05:30	2017-02-06 12:31:15.7952+05:30	f
-11169	Jack	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-06 12:41:55.254344+05:30	2017-02-06 12:41:55.254344+05:30	f
-11174	grilla26	3ee0410d3f0f9cf2d1b2f07c2d74604d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-06 15:21:07.21648+05:30	2017-02-06 15:21:07.21648+05:30	f
-11190	testetcus@gmail.com	e10adc3949ba59abbe56e057f20f883e	Tester	Customer	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-08 07:07:49.206449+05:30	2017-02-08 07:07:49.206449+05:30	f
-11192	chunky@monkey.com	90ead2a2940e7f354c310900a950043a	Chunky	Monkey	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-08 12:52:17.334042+05:30	2017-02-08 12:52:17.334042+05:30	f
-11193	chunkytruck1	90ead2a2940e7f354c310900a950043a	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-08 12:52:22.781745+05:30	2017-02-08 12:52:22.781745+05:30	f
-11195	bob56	90c4b084124e57b98082ce30f93e87dd	Bob	Smith	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-05 08:59:28.312808+05:30	2017-03-05 08:59:28.312808+05:30	f
-11216	j56	ab75a542f5cf2bb17bf700ea393b4326	Jimmy	Chow	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-07 01:08:15.612023+05:30	2017-03-07 01:08:15.612023+05:30	f
-11217	vinaybhavsar@cdnsol.com	704da6e1589cfc6fe1cd2ac59addfec8	Vinay	Bhavsar	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-22 17:19:33.173004+05:30	2017-03-22 17:19:33.173004+05:30	f
-11218	vinaybhavsartruck1	704da6e1589cfc6fe1cd2ac59addfec8	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-22 17:19:39.954103+05:30	2017-03-22 17:19:39.954103+05:30	f
-11219	firminoata@gmail.com	e9da82f4c252e7f1745ae88f2624fc07	Joao	Firmino	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-23 06:15:38.618878+05:30	2017-03-23 06:15:38.618878+05:30	f
-11220	Jimmy@konfusion.com	c2fe677a63ffd5b7ffd8facbf327dad0	Jimmy	Chu	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-24 00:52:51.062785+05:30	2017-03-24 00:52:51.062785+05:30	f
-11221	Jimmytruck1	c2fe677a63ffd5b7ffd8facbf327dad0	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-24 02:01:57.029208+05:30	2017-03-24 02:01:57.029208+05:30	f
-11222	chutruck1	cbcefaf71b4677cb8bcc006e0aeaa34a	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-24 02:30:11.570319+05:30	2017-03-24 02:30:11.570319+05:30	f
-11223	Fogo@thaitanicxpress.com	705eb2cad4537d7ace7fc73bb273f50d	Fogo	Ho	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-24 21:23:41.496447+05:30	2017-03-24 21:23:41.496447+05:30	f
-11224	fogotruck1	705eb2cad4537d7ace7fc73bb273f50d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-24 21:24:11.306417+05:30	2017-03-24 21:24:11.306417+05:30	f
-11225	nuvo@me.com	4bd71661de7274e452bc735e1b9bb7ed	nuvo	goody	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-25 18:34:00.221987+05:30	2017-03-25 18:34:00.221987+05:30	f
-11226	nuvotruck1	4bd71661de7274e452bc735e1b9bb7ed	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-25 18:34:06.793619+05:30	2017-03-25 18:34:06.793619+05:30	f
-11227	Manny@classycuban.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Cuba	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-27 07:52:27.156454+05:30	2017-03-27 07:52:27.156454+05:30	f
-11228	mannytruck1	8fe78ac0eaabf2f474b0de3a968e165e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-27 07:52:34.961865+05:30	2017-03-27 07:52:34.961865+05:30	f
-11229	Frank@bbq.com	26253c50741faa9c2e2b836773c69fe6	Frank	Hill	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-29 00:42:04.676928+05:30	2017-03-29 00:42:04.676928+05:30	f
-11230	franktruck1	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-29 00:42:11.624981+05:30	2017-03-29 00:42:11.624981+05:30	f
-11231	Bob@bbq.com	9f9d51bc70ef21ca5c14f307980a29d8	Bob	Jones	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-29 00:46:44.00305+05:30	2017-03-29 00:46:44.00305+05:30	f
-11232	bobtruck1	9f9d51bc70ef21ca5c14f307980a29d8	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-29 00:46:50.683263+05:30	2017-03-29 00:46:50.683263+05:30	f
-11233	Jimmy@MyFood.com	c2fe677a63ffd5b7ffd8facbf327dad0	Jimmy	Chow	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-31 23:19:39.128683+05:30	2017-03-31 23:19:39.128683+05:30	f
-11234	Dummy@me.com	275876e34cf609db118f3d84b799a790	Dummy	Dumb	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-01 23:53:01.697481+05:30	2017-04-01 23:53:01.697481+05:30	f
-11235	dummytruck1	275876e34cf609db118f3d84b799a790	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-01 23:53:08.986062+05:30	2017-04-01 23:53:08.986062+05:30	f
-11236	dfdsf@gmail.com	a1fa59e79bba1a38bb0684d3298c9ddd	dsfdsf	dsfdf	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-02 00:55:53.606803+05:30	2017-04-02 00:55:53.606803+05:30	f
-11237	dfdsftruck1	a1fa59e79bba1a38bb0684d3298c9ddd	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-02 00:55:59.79044+05:30	2017-04-02 00:55:59.79044+05:30	f
-11238	jon.kazarian@gmail.com	16d7a4fca7442dda3ad93c9a726597e4	j	k	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-02 01:40:59.253743+05:30	2017-04-02 01:40:59.253743+05:30	f
-11239	jon.kazariantruck1	16d7a4fca7442dda3ad93c9a726597e4	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-02 01:41:06.027822+05:30	2017-04-02 01:41:06.027822+05:30	f
-11240	Billy@me.com	89c246298be2b6113fb10ba80f3c6956	Billy	Bob	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-03 04:34:22.597168+05:30	2017-04-03 04:34:22.597168+05:30	f
-11241	billytruck1	89c246298be2b6113fb10ba80f3c6956	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-03 04:34:30.660808+05:30	2017-04-03 04:34:30.660808+05:30	f
-11242	dnick66@gmail.com	416a88b9efa03e0f809958793624cea5	Dennis	Nichols	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-04 17:31:13.741651+05:30	2017-04-04 17:31:13.741651+05:30	f
-11243	dnick66truck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 17:31:20.506246+05:30	2017-04-04 17:31:20.506246+05:30	f
-11244	Dennis@streetfoodEZ.com	416a88b9efa03e0f809958793624cea5	Dennis	Nichols	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-04 17:45:19.781387+05:30	2017-04-04 17:45:19.781387+05:30	f
-11245	dennistruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 17:45:26.401626+05:30	2017-04-04 17:45:26.401626+05:30	f
-11246	Gen1Living@gmail.com	416a88b9efa03e0f809958793624cea5	Dennis	Nichols	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-04 22:03:29.250527+05:30	2017-04-04 22:03:29.250527+05:30	f
-11247	gen1livingtruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 22:03:36.725433+05:30	2017-04-04 22:03:36.725433+05:30	f
-11248	Gen1Living	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 22:37:04.584469+05:30	2017-04-04 22:37:04.584469+05:30	f
-11249	gen1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 22:37:42.249866+05:30	2017-04-04 22:37:42.249866+05:30	f
-11250	root	aa95959e46a8f9c9580ad338a5c0542b	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-05 15:34:45.91599+05:30	2017-04-05 15:34:45.91599+05:30	f
-11251	matt.guiger@gmail.com	ce86d7d02a229acfaca4b63f01a1171b	Matt	Guiger	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-05 19:44:22.988427+05:30	2017-04-05 19:44:22.988427+05:30	f
-11252	chunkytruck2	90ead2a2940e7f354c310900a950043a	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-07 17:29:50.670266+05:30	2017-04-07 17:29:50.670266+05:30	f
-11253	usernameqwwqwqw	1a1dc91c907325c69271ddf0c944bc72	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 09:26:54.01191+05:30	2017-04-08 09:26:54.01191+05:30	f
-11254	asdsad	a8f5f167f44f4964e6c998dee827110c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:03:08.231996+05:30	2017-04-08 10:03:08.231996+05:30	f
-11255	asd	a8f5f167f44f4964e6c998dee827110c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:04:02.296302+05:30	2017-04-08 10:04:02.296302+05:30	f
-11256	yog	cef468eeda569cc1b16b45fd53200b9c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:04:49.133773+05:30	2017-04-08 10:04:49.133773+05:30	f
-11257	sdfsdf	979d472a84804b9f647bc185a877a8b5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:12:15.84034+05:30	2017-04-08 10:12:15.84034+05:30	f
-11258	retert	e3e84538a1b02b1cc11bf71fe3169958	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:13:11.916678+05:30	2017-04-08 10:13:11.916678+05:30	f
-11259	asdasd	7815696ecbf1c96e6894b779456d330e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:22:48.718835+05:30	2017-04-08 10:22:48.718835+05:30	f
-11261	qweqw	006d2143154327a64d86a264aea225f3	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:23:24.23281+05:30	2017-04-08 10:23:24.23281+05:30	f
-11263	ashishsebastian@cdnsol.com	704da6e1589cfc6fe1cd2ac59addfec8	allwyn	alvin	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-08 15:59:29.066162+05:30	2017-04-08 15:59:29.066162+05:30	f
-11260	chunky56	2ea461d364cd78ffc364ceedbb12da91	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:23:07.853728+05:30	2017-04-08 10:23:07.853728+05:30	f
-11264	fogo56	7639294f3d74108e5c0d029ffa05200e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:13:54.335992+05:30	2017-04-08 21:13:54.335992+05:30	f
-11265	fogo26	7a24aff8b46ffd92b002f6e1054c67ba	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:14:39.917619+05:30	2017-04-08 21:14:39.917619+05:30	f
-11266	fogo76	d571ebb8956cf5e642a983f6caa797ca	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:16:18.687364+05:30	2017-04-08 21:16:18.687364+05:30	f
-11268	manny56	a809b284f8106a91d89df25e18f2c668	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:46:49.111114+05:30	2017-04-08 21:46:49.111114+05:30	f
-11269	manny26	d841d99d6c33f479181431373ae5bb71	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:48:36.70971+05:30	2017-04-08 21:48:36.70971+05:30	f
-11270	Joe@mightjoes.com	8ff32489f92f33416694be8fdc2d4c22	Mighty	Joe	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-08 21:52:51.569562+05:30	2017-04-08 21:52:51.569562+05:30	f
-11271	joetruck1	8ff32489f92f33416694be8fdc2d4c22	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:52:59.351554+05:30	2017-04-08 21:52:59.351554+05:30	f
-11272	joe56	0a920d52b15f92c35393a0d4480f0767	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 22:00:09.638072+05:30	2017-04-08 22:00:09.638072+05:30	f
-11273	tango56	b72deb0db6864258c12eeeae3ee2895f	tango56	tango56	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-09 05:05:01.728961+05:30	2017-04-09 05:05:01.728961+05:30	f
-11274	fogo16	f79c422cd62e5006292cb49cbc5f693d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 03:52:49.775635+05:30	2017-04-10 03:52:49.775635+05:30	f
-11275	fogo46	f32fa5f81b6a0d4cdc9662d74bb122f9	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 03:55:13.761133+05:30	2017-04-10 03:55:13.761133+05:30	f
-11267	fogo106	686036a8d37e73b887b437eae0bee3c7	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:45:25.144058+05:30	2017-04-10 05:39:45.955109+05:30	f
-11276	fogo116	1da69897d917a8f348baff61b9daf3ec	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 05:42:05.84375+05:30	2017-04-10 05:42:05.84375+05:30	f
-11277	yogesh	202cb962ac59075b964b07152d234b70	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:20:44.73999+05:30	2017-04-10 09:20:44.73999+05:30	f
-11279	test	d5d8982b86cf8b0c34727c6eea13c053	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:26:42.461772+05:30	2017-04-10 09:26:42.461772+05:30	f
-11280	qwerty	d8578edf8458ce06fbc5bb76a58c5ca4	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:32:41.882991+05:30	2017-04-10 09:32:41.882991+05:30	f
-11281	raskstn@gmail.com	751420e2457e6ccc7971358d5d8a8215	raskin	stans	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 17:10:43.095535+05:30	2017-04-10 17:10:43.095535+05:30	f
-11282	testmngr@tester.com	cc03e747a6afbbcbf8be7668acfebee5	testmngr	testmngr	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:05:27.210568+05:30	2017-04-10 19:05:27.210568+05:30	f
-11283	sam@grant.vom	56fafa8964024efa410773781a5f9e93	sam	Garnant	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:07:26.48264+05:30	2017-04-10 19:07:26.48264+05:30	f
-11284	test@tester.com	704da6e1589cfc6fe1cd2ac59addfec8	stanins	bartheion	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:13:53.449113+05:30	2017-04-10 19:13:53.449113+05:30	f
-11285	test5@sfez.com	289d9c456f886cc8876392260e103ff2	stanins	bartheion	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:15:19.277613+05:30	2017-04-10 19:15:19.277613+05:30	f
-11262	sfsdfas	115ad9fa3a50d87327ac757c61ff8528	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:24:57.563275+05:30	2017-04-08 10:24:57.563275+05:30	f
-11278	testera	07862e6794a39c150aef26ee61538797	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:24:54.971092+05:30	2017-04-10 09:24:54.971092+05:30	f
-11286	Crazy@crazysubs.com	297aae72cc4d0d068f46a9158469e34d	Crazy	One	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-12 17:31:57.013755+05:30	2017-04-12 17:31:57.013755+05:30	f
-11287	crazytruck1	297aae72cc4d0d068f46a9158469e34d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-12 17:32:04.711554+05:30	2017-04-12 17:32:04.711554+05:30	f
-11288	tester@qr.com	19f6d71f70c2c2eb05e7579dfd234e8b	testerqr	qrcode	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-12 18:55:25.762646+05:30	2017-04-12 18:55:25.762646+05:30	f
-11293	tacos@pacostacos.com	dacedf41210444fe8547f5b1cf085a6c	Paco	Rodriguez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-13 14:40:13.108285+05:30	2017-04-13 14:40:13.108285+05:30	f
-11294	tacostruck1	dacedf41210444fe8547f5b1cf085a6c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-13 14:40:19.816691+05:30	2017-04-13 14:40:19.816691+05:30	f
-11295	rajan.rajan977@gmail.com	e10adc3949ba59abbe56e057f20f883e	rajan	ramani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-13 16:37:32.709035+05:30	2017-04-13 16:37:32.709035+05:30	f
-11296	rajan.rajan977truck1	e10adc3949ba59abbe56e057f20f883e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-13 16:37:39.789052+05:30	2017-04-13 16:37:39.789052+05:30	f
-11297	classy56	a26bf6439c7b17fab1c6cd0ae43b7512	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-16 20:03:07.043751+05:30	2017-04-16 20:03:07.043751+05:30	f
-11298	m56	1500036860c8afd328309fa3af15e933	Marcy	Jones	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-16 20:24:44.284436+05:30	2017-04-16 20:24:44.284436+05:30	f
-11299	d56	ad71b715717f7e4757565373c1a88e1f	Dirk	Nowitzki	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-17 00:47:03.953835+05:30	2017-04-17 00:47:03.953835+05:30	f
-11300	health@gen1living.com	416a88b9efa03e0f809958793624cea5	d	n	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-24 22:30:57.093372+05:30	2017-04-24 22:30:57.093372+05:30	f
-11301	destructoden@gmail.com	416a88b9efa03e0f809958793624cea5	D	N	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-25 00:44:59.113433+05:30	2017-04-25 00:44:59.113433+05:30	f
-11302	destructodentruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-25 00:45:07.486618+05:30	2017-04-25 00:45:07.486618+05:30	f
-11303	manager2	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-25 00:59:23.383457+05:30	2017-04-25 00:59:23.383457+05:30	f
-11304	destructodentruck3	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-25 17:44:38.315145+05:30	2017-04-25 17:44:38.315145+05:30	f
-11305	Luiz.cambao@gmail.com	80e408ff350752abc908fb59bdd94fe8	Luiz	Claudio	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-27 21:28:32.282696+05:30	2017-04-27 21:28:32.282696+05:30	f
-11306	lui_cla@hotmail.com	170f9a8f689fc69157ad6d3a62ecd92f	luiz	Claudio	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-30 19:54:27.607111+05:30	2017-04-30 19:54:27.607111+05:30	f
-11307	ramonswiz@gmail.com	6a557ed1005dddd940595b8fc6ed47b2	ramon	siwzki	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 18:47:50.158416+05:30	2017-05-01 18:47:50.158416+05:30	f
-11308	regist@gmail.com	5c769a1e38d1af34a22a4fdf3e334409	registertest	test	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 18:51:57.102972+05:30	2017-05-01 18:51:57.102972+05:30	f
-11309	samtag@gmail.com	56fafa8964024efa410773781a5f9e93	samule	tagore	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 19:05:44.954441+05:30	2017-05-01 19:05:44.954441+05:30	f
-11310	louepark@gmail.com	e759345b7ed1cedf9c5bf757ec0189b5	louis	parker	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 19:27:42.925882+05:30	2017-05-01 19:27:42.925882+05:30	f
-11311	solm@gmail.com	d0b8291c599616ebebd69629aa5fc077	standley	solomon	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 20:42:37.59943+05:30	2017-05-01 20:42:37.59943+05:30	f
-11312	silvia@gmail.com	ecb22d57339b946f66817e43583e51ce	silvia	drozen	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 21:02:06.524032+05:30	2017-05-01 21:02:06.524032+05:30	f
-11313	Jose@empanada.com	662eaa47199461d01a623884080934ab	Jose	Empanada	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-10 23:12:14.962606+05:30	2017-05-10 23:12:14.962606+05:30	f
-11314	josetruck1	662eaa47199461d01a623884080934ab	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-10 23:12:22.22021+05:30	2017-05-10 23:12:22.22021+05:30	f
-11315	Churros@me.com	42cb478d1eb3855929cc3187c10aebec	Churros	Factory	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 00:17:44.490878+05:30	2017-05-11 00:17:44.490878+05:30	f
-11316	churrostruck1	42cb478d1eb3855929cc3187c10aebec	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 00:29:29.553986+05:30	2017-05-11 00:29:29.553986+05:30	f
-11317	Boss@fanzone.com	ceb8447cc4ab78d2ec34cd9f11e4bed2	Boss	Man	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 01:34:17.256299+05:30	2017-05-11 01:34:17.256299+05:30	f
-11318	bosstruck1	ceb8447cc4ab78d2ec34cd9f11e4bed2	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 01:34:24.484097+05:30	2017-05-11 01:34:24.484097+05:30	f
-11319	fred@fritanga.com	570a90bfbf8c7eab5dc5d4e26832d5b1	Fred	Fritanga	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 02:28:39.690794+05:30	2017-05-11 02:28:39.690794+05:30	f
-11320	fredtruck1	570a90bfbf8c7eab5dc5d4e26832d5b1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 02:28:46.683897+05:30	2017-05-11 02:28:46.683897+05:30	f
-11321	Ron@ticketmaster.com	45798f269709550d6f6e1d2cf4b7d485	Ron	Ticket	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 02:35:56.747692+05:30	2017-05-11 02:35:56.747692+05:30	f
-11322	rontruck1	45798f269709550d6f6e1d2cf4b7d485	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 02:36:03.969185+05:30	2017-05-11 02:36:03.969185+05:30	f
-11323	t@b.cd	1a1dc91c907325c69271ddf0c944bc72	t	b	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 05:22:21.599849+05:30	2017-05-11 05:22:21.599849+05:30	f
-11324	ttruck1	1a1dc91c907325c69271ddf0c944bc72	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 05:22:30.435867+05:30	2017-05-11 05:22:30.435867+05:30	f
-11325	luiz@saborbrasil.com.br	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Claudio	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 21:24:53.539657+05:30	2017-05-11 21:24:53.539657+05:30	f
-11326	luiztruck1	5e9b9edbe4c007c65c56c686ea22c594	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 21:25:00.272585+05:30	2017-05-11 21:25:00.272585+05:30	f
-11327	luiz@saborbrasileiro.com.br	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Gomes	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-12 02:58:17.229644+05:30	2017-05-12 02:58:17.229644+05:30	f
-11328	saborbrasil	aec60231d83fe6cf81444bc536596887	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-12 03:04:01.401642+05:30	2017-05-12 03:04:01.401642+05:30	f
-11194	s56	73ebb0e2299c89dc70a54abbde5c0a7c	Stacy	Brown	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-05 08:59:11.870072+05:30	2017-03-05 08:59:11.870072+05:30	f
-\.
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: calc_earth_dist(numeric, numeric, numeric, numeric); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.calc_earth_dist(lat1 numeric, lng1 numeric, lat2 numeric, lng2 numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+	delta_lat NUMERIC;
+	delta_lng NUMERIC;
+	a NUMERIC;
+	c NUMERIC;
+	d NUMERIC;
+	earth_radius NUMERIC;
+BEGIN
+	delta_lat = radians(lat1) - radians(lat2);
+	delta_lng = radians(lng1) - radians(lng2);
+	earth_radius = 6371;
+
+	a = sin(delta_lat/2)^2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(delta_lng/2)^2;
+	c = 2 * atan2(sqrt(a), sqrt(1 - a));
+	d = earth_radius * c;
+
+	return d;
+END;
+$$;
+
+
+ALTER FUNCTION public.calc_earth_dist(lat1 numeric, lng1 numeric, lat2 numeric, lng2 numeric) OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: admins; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.admins (
+    id integer NOT NULL,
+    description text,
+    photo text,
+    phone text,
+    super_admin boolean DEFAULT false,
+    city text,
+    state text,
+    country text,
+    user_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.admins OWNER TO postgres;
+
+--
+-- Name: admins_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.admins_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.admins_id_seq OWNER TO postgres;
+
+--
+-- Name: admins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.admins_id_seq OWNED BY public.admins.id;
+
+
+--
+-- Name: categories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.categories (
+    id integer NOT NULL,
+    category character varying(125)
+);
+
+
+ALTER TABLE public.categories OWNER TO postgres;
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.categories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.categories_id_seq OWNER TO postgres;
+
+--
+-- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.categories_id_seq OWNED BY public.categories.id;
+
+
+--
+-- Name: checkin_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.checkin_history (
+    id integer NOT NULL,
+    unit_name text,
+    unit_id integer,
+    company_name text,
+    company_id integer,
+    user_id integer,
+    service_cancellation_time timestamp with time zone,
+    check_in timestamp with time zone,
+    check_out timestamp with time zone,
+    latitude double precision,
+    longitude double precision,
+    food_park_name text,
+    food_park_id integer,
+    note text,
+    display_address text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.checkin_history OWNER TO postgres;
+
+--
+-- Name: checkin_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.checkin_history_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.checkin_history_id_seq OWNER TO postgres;
+
+--
+-- Name: checkin_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.checkin_history_id_seq OWNED BY public.checkin_history.id;
+
+
+--
+-- Name: checkins; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.checkins (
+    id integer NOT NULL,
+    check_in timestamp with time zone,
+    check_out timestamp with time zone,
+    latitude double precision,
+    longitude double precision,
+    display_address text,
+    food_park_name text,
+    note text,
+    food_park_id integer,
+    unit_id integer,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.checkins OWNER TO postgres;
+
+--
+-- Name: checkins_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.checkins_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.checkins_id_seq OWNER TO postgres;
+
+--
+-- Name: checkins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.checkins_id_seq OWNED BY public.checkins.id;
+
+
+--
+-- Name: companies; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.companies (
+    id integer NOT NULL,
+    name text NOT NULL,
+    order_sys_id text,
+    base_slug text,
+    default_cat text,
+    daily_special_cat_id text,
+    daily_special_item_id text,
+    delivery_chg_cat_id text,
+    delivery_chg_item_id text,
+    delivery_chg_amount text,
+    description text,
+    email text,
+    phone text,
+    facebook text,
+    twitter text,
+    instagram text,
+    photo text,
+    featured_dish text,
+    hours text,
+    schedule text,
+    business_address text,
+    city text,
+    state text,
+    country text,
+    country_id integer,
+    taxband text,
+    tags text,
+    stub boolean,
+    calculated_rating numeric,
+    user_id integer,
+    show_vendor_setup boolean DEFAULT true,
+    default_unit integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    is_deleted boolean DEFAULT false,
+    territory_id integer
+);
+
+
+ALTER TABLE public.companies OWNER TO postgres;
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.companies_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.companies_id_seq OWNER TO postgres;
+
+--
+-- Name: companies_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.companies_id_seq OWNED BY public.companies.id;
+
+
+--
+-- Name: contracts; Type: TABLE; Schema: public; Owner: sfez_rw
+--
+
+CREATE TABLE public.contracts (
+    id integer NOT NULL,
+    company_id integer,
+    unit_id integer,
+    customer_id integer,
+    offer_id integer,
+    request_name character varying(225),
+    request_photo text,
+    cash_offer numeric(8,4),
+    buy_back_amount numeric(8,4),
+    tax_amount numeric(8,4),
+    term_months integer,
+    qr_code character varying(225),
+    offer_approved boolean DEFAULT true,
+    status boolean DEFAULT true,
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.contracts OWNER TO sfez_rw;
+
+--
+-- Name: contracts_id_seq; Type: SEQUENCE; Schema: public; Owner: sfez_rw
+--
+
+CREATE SEQUENCE public.contracts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.contracts_id_seq OWNER TO sfez_rw;
+
+--
+-- Name: contracts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: sfez_rw
+--
+
+ALTER SEQUENCE public.contracts_id_seq OWNED BY public.contracts.id;
+
+
+--
+-- Name: countries; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.countries (
+    id integer NOT NULL,
+    name text,
+    is_enabled boolean DEFAULT false,
+    tax_band text,
+    moltin_client_id text,
+    moltin_client_secret text,
+    currency_id text DEFAULT '1554615357396746864'::text,
+    currency text DEFAULT 'BRL'::text
+);
+
+
+ALTER TABLE public.countries OWNER TO postgres;
+
+--
+-- Name: countries_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.countries_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.countries_id_seq OWNER TO postgres;
+
+--
+-- Name: countries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.countries_id_seq OWNED BY public.countries.id;
+
+
+--
+-- Name: customers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.customers (
+    id integer NOT NULL,
+    order_sys_id text,
+    description text,
+    apns_id text,
+    gcm_id text,
+    device_type text,
+    fcm_id text,
+    phone text,
+    facebook text,
+    twitter text,
+    photo text,
+    power_reviewer boolean DEFAULT false,
+    city text,
+    state text,
+    country text,
+    user_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.customers OWNER TO postgres;
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.customers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.customers_id_seq OWNER TO postgres;
+
+--
+-- Name: customers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.customers_id_seq OWNED BY public.customers.id;
+
+
+--
+-- Name: delivery_addresses; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.delivery_addresses (
+    id integer NOT NULL,
+    nickname text,
+    address1 text,
+    address2 text,
+    city text,
+    state text,
+    phone text,
+    customer_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.delivery_addresses OWNER TO postgres;
+
+--
+-- Name: delivery_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.delivery_addresses_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.delivery_addresses_id_seq OWNER TO postgres;
+
+--
+-- Name: delivery_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.delivery_addresses_id_seq OWNED BY public.delivery_addresses.id;
+
+
+--
+-- Name: drivers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.drivers (
+    id integer NOT NULL,
+    name text,
+    phone text,
+    available boolean DEFAULT false,
+    unit_id integer,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    user_id integer,
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.drivers OWNER TO postgres;
+
+--
+-- Name: drivers_foodpark; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.drivers_foodpark (
+    available boolean DEFAULT false,
+    food_park_id integer,
+    user_id integer
+);
+
+
+ALTER TABLE public.drivers_foodpark OWNER TO postgres;
+
+--
+-- Name: drivers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.drivers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.drivers_id_seq OWNER TO postgres;
+
+--
+-- Name: drivers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.drivers_id_seq OWNED BY public.drivers.id;
+
+
+--
+-- Name: event_guests; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.event_guests (
+    guest integer NOT NULL,
+    event integer NOT NULL
+);
+
+
+ALTER TABLE public.event_guests OWNER TO postgres;
+
+--
+-- Name: events; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.events (
+    id integer NOT NULL,
+    name text NOT NULL,
+    ticketed boolean DEFAULT false,
+    start_date date NOT NULL,
+    end_date date NOT NULL,
+    schedule json[],
+    manager integer NOT NULL,
+    social_media json,
+    latitude real,
+    longitude real,
+    image text,
+    sponsors json[]
+);
+
+
+ALTER TABLE public.events OWNER TO postgres;
+
+--
+-- Name: events_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.events_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.events_id_seq OWNER TO postgres;
+
+--
+-- Name: events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.events_id_seq OWNED BY public.events.id;
+
+
+--
+-- Name: favorites; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.favorites (
+    customer_id integer NOT NULL,
+    unit_id integer NOT NULL,
+    company_id integer NOT NULL,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.favorites OWNER TO postgres;
+
+--
+-- Name: food_park_management; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.food_park_management (
+    id integer NOT NULL,
+    food_park_id integer NOT NULL,
+    unit_id integer NOT NULL
+);
+
+
+ALTER TABLE public.food_park_management OWNER TO postgres;
+
+--
+-- Name: TABLE food_park_management; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.food_park_management IS 'This table represents the relationship that food parks are enable to see orders from units';
+
+
+--
+-- Name: food_park_management_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.food_park_management_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.food_park_management_id_seq OWNER TO postgres;
+
+--
+-- Name: food_park_management_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.food_park_management_id_seq OWNED BY public.food_park_management.id;
+
+
+--
+-- Name: food_parks; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.food_parks (
+    id integer NOT NULL,
+    name text NOT NULL,
+    photo text,
+    territory_id integer,
+    city text,
+    state text,
+    postal_code text,
+    country text,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    is_deleted boolean DEFAULT false,
+    foodpark_mgr integer
+);
+
+
+ALTER TABLE public.food_parks OWNER TO postgres;
+
+--
+-- Name: food_parks_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.food_parks_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.food_parks_id_seq OWNER TO postgres;
+
+--
+-- Name: food_parks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.food_parks_id_seq OWNED BY public.food_parks.id;
+
+
+--
+-- Name: gen_state; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.gen_state (
+    id integer NOT NULL,
+    order_sys_order_id text,
+    step_name text,
+    step_status text,
+    api_call text,
+    param_string text,
+    error_info text,
+    info text
+);
+
+
+ALTER TABLE public.gen_state OWNER TO postgres;
+
+--
+-- Name: gen_state_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.gen_state_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.gen_state_id_seq OWNER TO postgres;
+
+--
+-- Name: gen_state_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.gen_state_id_seq OWNED BY public.gen_state.id;
+
+
+--
+-- Name: locations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.locations (
+    id integer NOT NULL,
+    name text NOT NULL,
+    type text,
+    main_loc_text text,
+    secondary_loc_text text,
+    regex_seed text,
+    hitcount integer,
+    territory_id integer,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.locations OWNER TO postgres;
+
+--
+-- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.locations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.locations_id_seq OWNER TO postgres;
+
+--
+-- Name: locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.locations_id_seq OWNED BY public.locations.id;
+
+
+--
+-- Name: loyalty; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.loyalty (
+    id integer NOT NULL,
+    balance integer,
+    customer_id integer,
+    company_id integer,
+    eligible_five boolean DEFAULT false,
+    eligible_ten boolean DEFAULT false,
+    eligible_fifteen boolean DEFAULT false,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.loyalty OWNER TO postgres;
+
+--
+-- Name: loyalty_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.loyalty_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.loyalty_id_seq OWNER TO postgres;
+
+--
+-- Name: loyalty_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.loyalty_id_seq OWNED BY public.loyalty.id;
+
+
+--
+-- Name: loyalty_rewards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.loyalty_rewards (
+    id integer NOT NULL,
+    company_id integer,
+    gold_reward_item text,
+    silver_reward_item text,
+    bronze_reward_item text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.loyalty_rewards OWNER TO postgres;
+
+--
+-- Name: loyalty_rewards_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.loyalty_rewards_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.loyalty_rewards_id_seq OWNER TO postgres;
+
+--
+-- Name: loyalty_rewards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.loyalty_rewards_id_seq OWNED BY public.loyalty_rewards.id;
+
+
+--
+-- Name: loyalty_used; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.loyalty_used (
+    id integer NOT NULL,
+    amount_redeemed integer,
+    customer_id integer,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.loyalty_used OWNER TO postgres;
+
+--
+-- Name: loyalty_used_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.loyalty_used_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.loyalty_used_id_seq OWNER TO postgres;
+
+--
+-- Name: loyalty_used_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.loyalty_used_id_seq OWNED BY public.loyalty_used.id;
+
+
+--
+-- Name: offers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.offers (
+    id integer NOT NULL,
+    request_id integer,
+    request_name character varying(225),
+    company_id integer,
+    pawn_poc character varying(225),
+    pawn_name character varying(225),
+    pawn_address text,
+    pawn_phone character varying(15),
+    unit_id integer,
+    cash_offer numeric(10,4) DEFAULT '0'::numeric,
+    buy_back_amount numeric(10,4) DEFAULT '0'::numeric,
+    tax_amount numeric(10,4) DEFAULT '0'::numeric,
+    offer_term integer,
+    offer_accepted boolean DEFAULT false,
+    total_redemption numeric(10,4) DEFAULT '0'::numeric,
+    maturity_date timestamp without time zone,
+    interest_rate numeric(6,4) DEFAULT '0'::numeric,
+    rating numeric(6,4) DEFAULT '0'::numeric,
+    distance numeric(6,4) DEFAULT '0'::numeric,
+    created_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    modified_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.offers OWNER TO postgres;
+
+--
+-- Name: offers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.offers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.offers_id_seq OWNER TO postgres;
+
+--
+-- Name: offers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.offers_id_seq OWNED BY public.offers.id;
+
+
+--
+-- Name: order_history; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.order_history (
+    id integer NOT NULL,
+    order_sys_order_id text,
+    amount text,
+    initiation_time timestamp with time zone,
+    payment_time timestamp with time zone,
+    actual_pickup_time timestamp with time zone,
+    desired_pickup_time timestamp with time zone,
+    prep_notice_time timestamp with time zone,
+    status jsonb,
+    messages text,
+    qr_code text,
+    manual_pickup boolean DEFAULT false,
+    for_delivery boolean DEFAULT false,
+    desired_delivery_time timestamp with time zone,
+    delivery_address_id integer,
+    delivery_address_details jsonb,
+    driver_id integer,
+    contact text,
+    order_detail jsonb,
+    checkin_id integer,
+    customer_name text,
+    customer_id integer,
+    unit_id integer,
+    company_name text,
+    company_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.order_history OWNER TO postgres;
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.order_history_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.order_history_id_seq OWNER TO postgres;
+
+--
+-- Name: order_history_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.order_history_id_seq OWNED BY public.order_history.id;
+
+
+--
+-- Name: order_state; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.order_state (
+    id integer NOT NULL,
+    order_id integer,
+    order_requested_step boolean DEFAULT false,
+    order_accepted_step boolean DEFAULT false,
+    order_pay_fail boolean DEFAULT false,
+    order_paid_step boolean DEFAULT false,
+    order_in_queue_step boolean DEFAULT false,
+    order_cooking_step boolean DEFAULT false,
+    order_ready_step boolean DEFAULT false,
+    order_dispatched_step boolean DEFAULT false,
+    order_picked_up_step boolean DEFAULT false,
+    order_no_show_step boolean DEFAULT false,
+    order_delivered_step boolean DEFAULT false,
+    apicall text,
+    paramstring text,
+    errorinfo text,
+    callinfo text
+);
+
+
+ALTER TABLE public.order_state OWNER TO postgres;
+
+--
+-- Name: order_state_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.order_state_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.order_state_id_seq OWNER TO postgres;
+
+--
+-- Name: order_state_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.order_state_id_seq OWNED BY public.order_state.id;
+
+
+--
+-- Name: requests; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.requests (
+    id integer NOT NULL,
+    customer_id integer,
+    request_name text,
+    request_photo text,
+    category_id integer,
+    latitude numeric(8,4),
+    longitude numeric(8,4),
+    created_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    modified_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    is_deleted boolean DEFAULT false,
+    request_description text,
+    condition character varying(100),
+    buy_back_term character varying(225),
+    country character varying(100),
+    state character varying(100),
+    territory character varying(100)
+);
+
+
+ALTER TABLE public.requests OWNER TO postgres;
+
+--
+-- Name: requests_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.requests_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.requests_id_seq OWNER TO postgres;
+
+--
+-- Name: requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.requests_id_seq OWNED BY public.requests.id;
+
+
+--
+-- Name: review_approvals; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.review_approvals (
+    id integer NOT NULL,
+    review_id integer,
+    reviewer_id integer,
+    status text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.review_approvals OWNER TO postgres;
+
+--
+-- Name: review_approvals_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.review_approvals_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.review_approvals_id_seq OWNER TO postgres;
+
+--
+-- Name: review_approvals_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.review_approvals_id_seq OWNED BY public.review_approvals.id;
+
+
+--
+-- Name: review_states; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.review_states (
+    id integer NOT NULL,
+    name text NOT NULL,
+    allowed_transitions integer[]
+);
+
+
+ALTER TABLE public.review_states OWNER TO postgres;
+
+--
+-- Name: review_states_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.review_states_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.review_states_id_seq OWNER TO postgres;
+
+--
+-- Name: review_states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.review_states_id_seq OWNED BY public.review_states.id;
+
+
+--
+-- Name: reviews; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reviews (
+    id integer NOT NULL,
+    comment text,
+    rating numeric,
+    answers json,
+    customer_id integer,
+    company_id integer,
+    unit_id integer,
+    status text,
+    power_reviewer boolean DEFAULT false,
+    power_title text,
+    reviewer_name text,
+    review_photo text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    contract_id integer
+);
+
+
+ALTER TABLE public.reviews OWNER TO postgres;
+
+--
+-- Name: reviews_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reviews_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reviews_id_seq OWNER TO postgres;
+
+--
+-- Name: reviews_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reviews_id_seq OWNED BY public.reviews.id;
+
+
+--
+-- Name: roles; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.roles (
+    id integer NOT NULL,
+    type text NOT NULL
+);
+
+
+ALTER TABLE public.roles OWNER TO postgres;
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.roles_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.roles_id_seq OWNER TO postgres;
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
+
+
+--
+-- Name: search_preferences; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.search_preferences (
+    id integer NOT NULL,
+    customer_id integer,
+    territory_id integer,
+    distance double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now())
+);
+
+
+ALTER TABLE public.search_preferences OWNER TO postgres;
+
+--
+-- Name: search_preferences_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.search_preferences_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.search_preferences_id_seq OWNER TO postgres;
+
+--
+-- Name: search_preferences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.search_preferences_id_seq OWNED BY public.search_preferences.id;
+
+
+--
+-- Name: square_unit; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.square_unit (
+    unit_id integer,
+    location_id text
+);
+
+
+ALTER TABLE public.square_unit OWNER TO postgres;
+
+--
+-- Name: square_user; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.square_user (
+    merchant_id text,
+    expires_at date,
+    access_token text,
+    user_id integer
+);
+
+
+ALTER TABLE public.square_user OWNER TO postgres;
+
+--
+-- Name: territories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.territories (
+    id integer NOT NULL,
+    city text,
+    territory text,
+    state text,
+    country text,
+    country_id integer,
+    timezone text,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.territories OWNER TO postgres;
+
+--
+-- Name: territories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.territories_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.territories_id_seq OWNER TO postgres;
+
+--
+-- Name: territories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.territories_id_seq OWNED BY public.territories.id;
+
+
+--
+-- Name: unit_types; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.unit_types (
+    id integer NOT NULL,
+    type text NOT NULL
+);
+
+
+ALTER TABLE public.unit_types OWNER TO postgres;
+
+--
+-- Name: unit_types_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.unit_types_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.unit_types_id_seq OWNER TO postgres;
+
+--
+-- Name: unit_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.unit_types_id_seq OWNED BY public.unit_types.id;
+
+
+--
+-- Name: units; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.units (
+    id integer NOT NULL,
+    name text NOT NULL,
+    number integer,
+    type text,
+    customer_order_window integer,
+    prep_notice integer,
+    delivery boolean DEFAULT false,
+    delivery_time_offset integer,
+    delivery_chg_amount text,
+    delivery_radius integer,
+    description text,
+    username text,
+    password text,
+    qr_code text,
+    phone text,
+    apns_id text,
+    fcm_id text,
+    gcm_id text,
+    device_type text,
+    unit_order_sys_id text,
+    territory_id integer,
+    company_id integer,
+    unit_mgr_id integer,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    currency_id text DEFAULT '1554615357396746864'::text,
+    currency text DEFAULT 'BRL'::text,
+    payment text DEFAULT 'SumUp'::text,
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.units OWNER TO postgres;
+
+--
+-- Name: units_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.units_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.units_id_seq OWNER TO postgres;
+
+--
+-- Name: units_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.units_id_seq OWNED BY public.units.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    username text NOT NULL,
+    password text NOT NULL,
+    first_name text,
+    last_name text,
+    role text,
+    territory_id integer,
+    country_id integer,
+    phone text,
+    provider text,
+    provider_id text,
+    provider_data text,
+    fbid text,
+    fb_token text,
+    fb_login boolean,
+    default_language text DEFAULT 'en'::text,
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    is_deleted boolean DEFAULT false
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: admins id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admins ALTER COLUMN id SET DEFAULT nextval('public.admins_id_seq'::regclass);
+
+
+--
+-- Name: categories id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories ALTER COLUMN id SET DEFAULT nextval('public.categories_id_seq'::regclass);
+
+
+--
+-- Name: checkin_history id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkin_history ALTER COLUMN id SET DEFAULT nextval('public.checkin_history_id_seq'::regclass);
+
+
+--
+-- Name: checkins id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkins ALTER COLUMN id SET DEFAULT nextval('public.checkins_id_seq'::regclass);
+
+
+--
+-- Name: companies id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies ALTER COLUMN id SET DEFAULT nextval('public.companies_id_seq'::regclass);
+
+
+--
+-- Name: contracts id; Type: DEFAULT; Schema: public; Owner: sfez_rw
+--
+
+ALTER TABLE ONLY public.contracts ALTER COLUMN id SET DEFAULT nextval('public.contracts_id_seq'::regclass);
+
+
+--
+-- Name: countries id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.countries ALTER COLUMN id SET DEFAULT nextval('public.countries_id_seq'::regclass);
+
+
+--
+-- Name: customers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customers ALTER COLUMN id SET DEFAULT nextval('public.customers_id_seq'::regclass);
+
+
+--
+-- Name: delivery_addresses id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delivery_addresses ALTER COLUMN id SET DEFAULT nextval('public.delivery_addresses_id_seq'::regclass);
+
+
+--
+-- Name: drivers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.drivers ALTER COLUMN id SET DEFAULT nextval('public.drivers_id_seq'::regclass);
+
+
+--
+-- Name: events id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.events ALTER COLUMN id SET DEFAULT nextval('public.events_id_seq'::regclass);
+
+
+--
+-- Name: food_park_management id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_park_management ALTER COLUMN id SET DEFAULT nextval('public.food_park_management_id_seq'::regclass);
+
+
+--
+-- Name: food_parks id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_parks ALTER COLUMN id SET DEFAULT nextval('public.food_parks_id_seq'::regclass);
+
+
+--
+-- Name: gen_state id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.gen_state ALTER COLUMN id SET DEFAULT nextval('public.gen_state_id_seq'::regclass);
+
+
+--
+-- Name: locations id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.locations ALTER COLUMN id SET DEFAULT nextval('public.locations_id_seq'::regclass);
+
+
+--
+-- Name: loyalty id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty ALTER COLUMN id SET DEFAULT nextval('public.loyalty_id_seq'::regclass);
+
+
+--
+-- Name: loyalty_rewards id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_rewards ALTER COLUMN id SET DEFAULT nextval('public.loyalty_rewards_id_seq'::regclass);
+
+
+--
+-- Name: loyalty_used id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_used ALTER COLUMN id SET DEFAULT nextval('public.loyalty_used_id_seq'::regclass);
+
+
+--
+-- Name: offers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.offers ALTER COLUMN id SET DEFAULT nextval('public.offers_id_seq'::regclass);
+
+
+--
+-- Name: order_history id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history ALTER COLUMN id SET DEFAULT nextval('public.order_history_id_seq'::regclass);
+
+
+--
+-- Name: order_state id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_state ALTER COLUMN id SET DEFAULT nextval('public.order_state_id_seq'::regclass);
+
+
+--
+-- Name: requests id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.requests ALTER COLUMN id SET DEFAULT nextval('public.requests_id_seq'::regclass);
+
+
+--
+-- Name: review_approvals id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.review_approvals ALTER COLUMN id SET DEFAULT nextval('public.review_approvals_id_seq'::regclass);
+
+
+--
+-- Name: review_states id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.review_states ALTER COLUMN id SET DEFAULT nextval('public.review_states_id_seq'::regclass);
+
+
+--
+-- Name: reviews id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews ALTER COLUMN id SET DEFAULT nextval('public.reviews_id_seq'::regclass);
+
+
+--
+-- Name: roles id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.roles_id_seq'::regclass);
+
+
+--
+-- Name: search_preferences id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.search_preferences ALTER COLUMN id SET DEFAULT nextval('public.search_preferences_id_seq'::regclass);
+
+
+--
+-- Name: territories id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.territories ALTER COLUMN id SET DEFAULT nextval('public.territories_id_seq'::regclass);
+
+
+--
+-- Name: unit_types id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.unit_types ALTER COLUMN id SET DEFAULT nextval('public.unit_types_id_seq'::regclass);
+
+
+--
+-- Name: units id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units ALTER COLUMN id SET DEFAULT nextval('public.units_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
@@ -192,177 +1746,6 @@ COPY public.admins (id, description, photo, phone, super_admin, city, state, cou
 --
 
 COPY public.categories (id, category) FROM stdin;
-\.
-
-
---
--- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.countries (id, name, is_enabled, tax_band, moltin_client_id, moltin_client_secret, currency_id, currency) FROM stdin;
-1	Brazil	t	1427064502431515521	\N	\N	1435543251393183865	BRL
-2	USA	f	1427064502431515521	\N	\N	1435543251393183865	USD
-\.
-
-
---
--- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, daily_special_item_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, instagram, photo, featured_dish, hours, schedule, business_address, city, state, country, country_id, taxband, tags, stub, calculated_rating, user_id, show_vendor_setup, default_unit, created_at, updated_at, is_deleted) FROM stdin;
-1005	Crazy Jacks	1440710633996681868	crazy-jacks-1485966112929	1440710643157041805	1463319152025404122	\N	1440710650237026958	1440710659665822351	1.6	Homemade subs "Crazy Jack" style	Streetfoodez@hotmail.com	\N	www.facebook.com/crazyjacks	\N	\N	https://commercecdn.com/1278235777548943678/8c75231e-33eb-4823-93e0-42093f79d98f.jpeg	https://commercecdn.com/1278235777548943678/ddcc397f-c3eb-4de2-babc-9a544ac5da9b.jpeg	10 am - 5 pm		\N	\N	\N	\N	2	\N	subs, burgers, bbq	\N	\N	11017	t	\N	2017-02-02 02:51:56.123+05:30	2017-03-05 02:31:14.476317+05:30	f
-1006	Moes Pizza	1441305766198772495	moes-pizza-1486037058170	1441305773295534864	1463320397347816156	\N	1441305780476183313	1441305790123082514	1.6	Pan pizza, buffalo wings, garlic chicken specials	Mo@totino.com	\N	www.facebook.com/Moespizza	\N	\N	https://commercecdn.com/1278235777548943678/2f70d68d-01c6-4522-bac7-6113f4627035.jpeg	https://commercecdn.com/1278235777548943678/703961d4-b2a2-4885-91bd-0b55a6785f38.jpeg	10 am - 8 pm		\N	\N	\N	\N	1	\N	pizza, lasagna, pasta	\N	\N	11020	t	\N	2017-02-02 22:34:21.21+05:30	2017-03-05 02:33:45.558819+05:30	f
-1091	Konfusion	1477040512786497724	konfusion-1490296971930	1477040520797618365	1477040528833904830	\N	1477040536735973567	1477040546768748736	1.6	Best Asian Fusion in Natal!	Jimmy@konfusion.com	555-8888	www.facebook.com/Konfusion	\N	\N	https://commercecdn.com/1278235777548943678/7b10d7fd-b3cd-4394-b482-63bd771d9dc7.jpeg	https://commercecdn.com/1278235777548943678/ce2b956f-a1a2-45df-92c6-5d210ccbe2a4.jpeg	\N	\N	123 Confused Ln	\N	\N	\N	1	\N	Asian Fusion, Pad Thai	\N	\N	11220	t	\N	2017-03-24 00:52:56.205119+05:30	2017-03-24 00:52:56.205119+05:30	f
-1096	Bob's bbq	1480661310474551374	bob-s-bbq-1490728604646	1480661318368231503	1480661326656176208	\N	1480661334667296849	1480661344700072018	10	Best bbq in town!	Bob@bbq.com	55 84 7534 3434	www.facebook.com/bobsbbq	\N	\N	https://commercecdn.com/1278235777548943678/20a2a239-84ab-42d2-89a0-8c61bfb69f3b.jpeg	https://commercecdn.com/1278235777548943678/b638ae6a-781f-478b-8594-139fab967d98.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 prudente	\N	\N	\N	1	\N	bbq, sandwiches	\N	\N	11231	t	\N	2017-03-29 00:46:48.916424+05:30	2017-03-29 00:46:48.916424+05:30	f
-1090	luigi	1476478201743016015	luigi-1490229939223	1476478209586364496	1476478217429712977	\N	1476478225247895634	1476478235406499923	1.6	\N	firminoata@gmail.com	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/e5a1db23-d896-4773-9dbb-607d37ceb38c.jpeg	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11219	t	\N	2017-03-23 06:15:43.432664+05:30	2017-03-23 06:15:43.432664+05:30	f
-1089	Vinay Bhavsar	1476087582344347651	vinay-bhavsar-1490183373758	1476087589952815108	1476087597687111685	\N	1476087605303967750	1476087615227691015	1.6	Just testing	vinaybhavsar@cdnsol.com	9893479705	\N	\N	\N	https://commercecdn.com/1278235777548943678/139509f9-dd3d-4216-b4d1-80205e62d577.jpeg	https://commercecdn.com/1278235777548943678/ed1b07d1-857b-4cbe-9ccd-252ead133d6f.jpeg	11:00 AM-8:00 PM	0,1,2,3,4,5,6	304 CDN Software Solutions, Princess Sky Park, AB Road, Indore	\N	\N	\N	1	\N	#testing	\N	\N	11217	t	\N	2017-03-22 17:19:37.871349+05:30	2017-03-22 17:19:37.871349+05:30	f
-1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	1463318392957043417	1488707787419550321	1463321163915592413	1463324599998481122	1.6	Fresh street food tacos	tacos@pacos.com	\N	www.facebook.com/pacostacos	@pacostacos	\N	commercecdn.com/1278235777548943678/9e5cd3fe-8f1b-4741-96c6-f54b90e5cf9a.jpeg	commercecdn.com/1278235777548943678/36091932-cb57-46ea-8694-bdaf344a0083.jpeg	11am-8pm		\N	\N	\N	\N	1	\N	tacos, enchiladas	\N	\N	11004	t	\N	2016-08-27 07:01:52.102+05:30	2017-03-05 02:42:32.307442+05:30	f
-1093	Nuvo	1478299382196470212	nuvo-1490447040851	1478299389981098437	1478299397690229190	\N	1478299405265142215	1478299415230808520	1.6	\N	nuvo@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11225	t	\N	2017-03-25 18:34:04.990298+05:30	2017-03-25 18:34:04.990298+05:30	f
-1088	Chunky Monkey	1445663478260957711	chunky-monkey-1486556537929	1445663485726818832	1463319636031308507	1465189269227176025	1445663493511447057	1445663503426781714	13	Best hot fudge sundaes in town	streetfoodez@sumup.com	212	www.facebook.com/chunkymonkey1	\N	\N	https://commercecdn.com/1278235777548943678/462a01bc-583c-4892-9144-a117ca406783.png	https://commercecdn.com/1278235777548943678/0ad8cddc-28c8-4ca5-b70c-77296672ccd6.jpeg	11:00 AM-8:00 PM	0,1,2,3,4	123 Chunky	\N	\N	\N	1	\N	bananas, ice cream	\N	\N	11192	t	\N	2017-02-08 17:52:21.119+05:30	2017-03-05 02:32:08.923872+05:30	f
-1095	Frank's BBQ	1480658966731030601	frank-s-bbq-1490728325251	1480658974465327178	1480658982182846539	1497996578563031143	1480658990454014028	1480659000478400589	9	Old fashion country bbq ready when you are!	streetfoodez@sumup.com	555-frankbbqnow	www.facebook.com/franksbbq	\N	\N	https://commercecdn.com/1278235777548943678/b73963cc-0025-4b0f-a2e3-3d1ac4ec1994.jpeg	https://commercecdn.com/1278235777548943678/3800a579-f9a8-4964-949e-fb53ed5d16d4.jpeg	12:00 PM-10:00 PM	0,1,2	123 bbq lane	\N	\N	\N	1	\N	bbq, pulled pork, brisket	\N	\N	11229	t	\N	2017-03-29 00:42:09.468753+05:30	2017-03-29 00:42:09.468753+05:30	f
-1097	My Food	1482791807895995121	my-food-1490982579738	1482791815806452466	1482791823398142707	\N	1482791831199548148	1482791841316209397	10	Best tacos in Natal!	Jimmy@MyFood.com	555-9999	www.facebook.com/myfood	\N	\N	https://commercecdn.com/1278235777548943678/386aac36-54fd-40e0-b697-375a04eb7c41.jpeg	https://commercecdn.com/1278235777548943678/056182db-e37a-49dc-a17a-915171e80a58.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Jackson ave	\N	\N	\N	1	\N	tacos, enchiladas	\N	\N	11233	t	\N	2017-03-31 23:19:43.924178+05:30	2017-03-31 23:19:43.924178+05:30	f
-1099	dfsdf	1483565024885605217	dfsdf-1491074754374	1483565032603124578	1483565040429695843	\N	1483565048004608868	1483565057936720741	10	\N	dfdsf@gmail.com	\N	\N	\N	\N	\N	\N	11:00 AM-8:00 PM	0	\N	\N	\N	\N	1	\N	\N	\N	\N	11236	t	\N	2017-04-02 00:55:58.634203+05:30	2017-04-02 00:55:58.634203+05:30	f
-1098	Dummy	1483533384364852056	dummy-1491070982562	1483533392401138521	1483533400303207258	\N	1483533407953617755	1483533418179330908	10	dumb dumb dumb	Dummy@me.com	\N	www.facebook.com/dumb	\N	\N	\N	\N	11:00 AM-9:00 PM	0,1,2,3,4	123 dumb	\N	\N	\N	1	\N	pizza	\N	\N	11234	t	\N	2017-04-01 23:53:06.780152+05:30	2017-04-01 23:53:06.780152+05:30	f
-1100	test2	1483587720071611253	test2-1491077459842	1483587733870871414	1483587742007821175	\N	1483587750002164600	1483587760915743609	10	\N	jon.kazarian@gmail.com	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/dee5d9d7-8251-42e3-b114-2e750b9b0837.jpeg	\N	11:00 AM-8:59 AM	2,3	\N	\N	\N	\N	1	\N	#pizza	\N	\N	11238	t	\N	2017-04-02 01:41:04.905197+05:30	2017-04-02 01:41:04.905197+05:30	f
-1008	Grilla Cheez	1441733842225332401	grilla-cheez-1486088088823	1441733850261618866	1463313172281688785	1468229545193636616	1441733858146910387	1441733867391156404	8	Get your taste buds ready for a cheese avalanche	streetfoodez@sumup.com	\N	www.facebook.com/grillacheez	\N	\N	https://commercecdn.com/1278235777548943678/b10b1939-f66f-4b49-837d-9c40a66d1ed0.jpeg	https://commercecdn.com/1278235777548943678/1d035d77-a55d-43fd-8654-e8f03de61220.jpeg	-		\N	\N	\N	\N	1	\N	grilled cheese, panini	\N	\N	11025	t	\N	2017-02-03 12:44:52.001+05:30	2017-03-05 02:28:19.357435+05:30	f
-1101	Billy's Burgers	1484399765453013923	billy-s-burgers-1491174263213	1484399773019538340	1484399780711891877	\N	1484399788169364390	1484399798227305383	10	Best bbq in Portland!	Billy@me.com	\N	www.facebook.com/billybob	\N	\N	https://commercecdn.com/1278235777548943678/dd19bbaf-5eeb-4c10-a752-f04c72268236.jpeg	https://commercecdn.com/1278235777548943678/f6183bfc-1409-4ee5-8bc1-ca7a68e93e56.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 1st ave	\N	\N	\N	2	\N	Cheeseburgers, pizza	\N	\N	11240	t	\N	2017-04-03 04:34:27.326878+05:30	2017-04-03 04:34:27.326878+05:30	f
-1110	Paco's Tacos	1491952453145329901	paco-s-tacos-1492074613789	1491952461559103726	1491952469477949679	\N	1491952477572956400	1491952487672840433	10	The best assortment of Mexican food you will find!	streetfoodez@sumup.com	555-Taco	www.facebook.com/pacostacos	\N	\N	https://commercecdn.com/1278235777548943678/6aae55a7-4f5d-4b7d-aeb1-ce231b8519ff.jpeg	https://commercecdn.com/1278235777548943678/a77107fd-3ebd-4aea-921d-7bd26ad9ede9.jpeg	10:00 AM-9:00 PM	0,1,2,3,4	123 taco lane	\N	\N	\N	1	\N	Tacos, Enchiladas, Carne Asada	\N	\N	11293	t	\N	2017-04-13 14:40:18.052114+05:30	2017-04-13 14:40:18.052114+05:30	f
-1104	Den's Food Truck	1485652576048251274	den-s-food-truck-1491323609849	1485652584092926347	1485652600442323340	\N	1485652608294060429	1485652618662379918	10	Best food in Natal!!!	Gen1Living@gmail.com	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/54a4873e-234a-4eca-abd8-04b5d1e0b0ee.jpeg	https://commercecdn.com/1278235777548943678/796e3a11-65a9-49e6-9d5e-119a7f0dc6fa.jpeg	11:00 AM-4:00 PM	0,1,2,3,4,5	\N	\N	\N	\N	1	\N	Food	\N	\N	11246	t	\N	2017-04-04 22:03:35.127092+05:30	2017-04-04 22:03:35.127092+05:30	f
-1092	Thaitanic Xpress	1477660013685113221	thaitanic-xpress-1490370822183	1477660021780119942	1477660029933846919	1479305500104327793	1477660037374542216	1477660047742861705	9	best asian fusion in town!	streetfoodez@sumup.com	555-8888	www.facebook.com/thaitanicxpress	\N	\N	https://commercecdn.com/1278235777548943678/7c617dfe-8299-42d2-91d4-dd17368b07f5.jpeg	https://commercecdn.com/1278235777548943678/c310f106-bdf0-4391-a607-1282e82029ca.jpeg	11:00 AM-8:00 PM	0,1,2,3,4	123 Ho Chi Min Ln	\N	\N	\N	1	\N	asian fusion, thai	\N	\N	11223	t	\N	2017-03-24 21:23:46.434461+05:30	2017-03-24 21:23:46.434461+05:30	f
-1113	lupk	1505143118813463378	lupk-1493647063572	1505143126908470099	1505143135691342676	\N	1505143144163836757	1505143154683151190	10	\N	louepark@gmail.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11310	t	\N	2017-05-01 19:27:48.040243+05:30	2017-05-01 19:27:48.040243+05:30	f
-1102	Mama's got SOUL	1485515543640277206	mama-s-got-soul-1491307274362	1485515551416516823	1485515559209533656	\N	1485515567061270745	1485515576825610458	10	\N	dnick66@gmail.com	\N	\N	\N	\N	commercecdn.com/1278235777548943678/836e86a4-85f6-4a16-9c49-0342cefca42b.jpeg	commercecdn.com/1278235777548943678/3c7ee2c9-73bc-400a-90a6-97549aea3478.jpeg	\N	\N	\N	\N	\N	\N	1	\N	Fried chicken, soul food, greens	\N	\N	11242	t	\N	2017-04-04 17:31:18.527117+05:30	2017-04-04 17:31:18.527117+05:30	f
-1111	rajanramani	1492011507074990336	rajanramani-1492081653535	1492011514700235009	1492011522610692354	\N	1492011530504372483	1492011540579090692	10	\N	rajan.rajan977@gmail.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11295	t	\N	2017-04-13 16:37:37.725477+05:30	2017-04-13 16:37:37.725477+05:30	f
-1103	Gen 1 Living	1485522640989847773	gen-1-living-1491308120431	1485522649026134238	1485522656953368799	\N	1485522664805105888	1485522675123093729	9	organic veggies for your delight	Dennis@streetfoodEZ.com	\N	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/9b576ec5-c6f1-4a65-ae9d-389f856dc3f6.jpeg	11:00 AM-3:00 PM	1,2,3,4	\N	\N	\N	\N	1	\N	whole organic veggies	\N	\N	11244	t	\N	2017-04-04 17:45:24.693776+05:30	2017-04-04 17:45:24.693776+05:30	f
-1106	tmr007	1489911623240909662	tmr007-1491831327808	1489911631352693599	1489911639623861088	\N	1489911648012469089	1489911658498229090	10	\N	testmngr@tester.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11282	t	\N	2017-04-10 19:05:32.21389+05:30	2017-04-10 19:05:32.21389+05:30	f
-1107	sam123	1489912624018621283	sam123-1491831447107	1489912631996187492	1489912647036961637	\N	1489912655509455718	1489912665768723303	10	\N	sam@grant.vom	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11283	t	\N	2017-04-10 19:07:32.284468+05:30	2017-04-10 19:07:32.284468+05:30	f
-1108	sfez01	1489916589800162152	sfez01-1491831919886	1489916597660287849	1489916606468326250	\N	1489916614420726635	1489916624403170156	10	\N	test5@sfez.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11285	t	\N	2017-04-10 19:15:24.387771+05:30	2017-04-10 19:15:24.387771+05:30	f
-1109	Crazy Jack's	1491314112741769362	crazy-jack-s-1491998517618	1491314123277861011	1491314132731822228	1491334549076967599	1491314140935880853	1491314155003576470	9	Food is always tastier when it has a little "crazy" added to it!	Crazy@crazysubs.com	1-800-Crazy	www.facebook.com/crazyjacksubs	\N	\N	https://commercecdn.com/1278235777548943678/c2e0e237-2648-47e1-aee1-5993d3a32139.jpeg	https://commercecdn.com/1278235777548943678/fe5da931-22e0-4b84-80a2-b38637592de1.jpeg	11:30 AM-10:00 PM	0,1,2,3,4	123 Crazy Lane	\N	\N	\N	1	\N	Subs, Sandwiches, Soup	\N	\N	11286	t	\N	2017-04-12 17:32:02.959033+05:30	2017-04-12 17:32:02.959033+05:30	f
-1105	Might Joe's	1488546329985548845	might-joe-s-1491668572190	1488546337803731502	1488546346544661039	\N	1488546354840994352	1488546368271155761	10	Marinated carne asada and smoked pork tacos!	streetfoodez@sumup.com	888-5555	www.facebook.com/mightyjoes	\N	\N	https://commercecdn.com/1278235777548943678/be83a820-b60f-441a-9178-e7a1eb212cd0.jpeg	https://commercecdn.com/1278235777548943678/d9c70c24-7d63-4391-a374-e4c66589444f.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Mighty lane	\N	\N	\N	1	\N	Tacos, Enchiladas, Burritos	\N	\N	11270	t	\N	2017-04-08 21:52:56.958871+05:30	2017-04-08 21:52:56.958871+05:30	f
-1112	Soul Man	1500229375184863794	soul-man-1493061299752	1500229386131997235	1500229394688377396	\N	1500229411717251637	1500229422957986358	10	Todos comida do America sul com SOUL!  BBQ é a nossa especialidade!!!	streetfoodez@sumup.com	(84) 99919-0001	\N	\N	\N	https://commercecdn.com/1278235777548943678/33e47d69-b706-4ef3-a632-6e3505fab928.jpeg	https://commercecdn.com/1278235777548943678/c3c01cd7-4cd9-4bf6-ba13-85a464973527.jpeg	6:00 PM-10:30 PM	2,3,4,5	\N	\N	\N	\N	1	\N	Soul food.  Todos comida do America sul!	\N	\N	11301	t	\N	2017-04-25 00:45:05.708298+05:30	2017-04-25 00:45:05.708298+05:30	f
-1114	Jose's Empanadas	1511779114413982166	jose-s-empanadas-1494438135941	1511779122559320535	1511779131568685528	\N	1511779140175397337	1511779150745043418	10	Stuffed bread, carne, cheddar cheese, huitlacoche and more!	Jose@empanada.com	\N	www.facebook.com/empanadaexpress	\N	\N	https://commercecdn.com/1278235777548943678/05d67253-d79e-4036-8235-41f7e13fb189.jpeg	https://commercecdn.com/1278235777548943678/dceaf21f-1a4f-4916-a077-ee57bdee104e.jpeg	11:00 AM-9:00 PM	0,1,2	\N	\N	\N	\N	1	\N	Empanadas, Tacos, Burritos	\N	\N	11313	t	\N	2017-05-10 23:12:20.474558+05:30	2017-05-10 23:12:20.474558+05:30	f
-1115	Churros Factory	1511812077138739683	churros-factory-1494442065438	1511812085779005924	1511812094285054437	\N	1511812102849823206	1511812113478189543	10	Nutella, jam, Belgium chocolate, sprinkles and a wide assortment of other toppings	Churros@me.com	\N	www.facebook.com/churrosmadness	\N	\N	https://commercecdn.com/1278235777548943678/69623b6f-86f2-4e60-b099-ab8f04df4dc1.jpeg	https://commercecdn.com/1278235777548943678/353ef2f4-7438-4497-9036-f0180932c2c8.jpeg	11:00 AM-8:00 PM	\N	Churro Lane	\N	\N	\N	1	\N	Churros, Pastries, Donuts	\N	\N	11315	t	\N	2017-05-11 00:17:49.97301+05:30	2017-05-11 00:17:49.97301+05:30	f
-1116	Fan Zone	1511850604689883662	fan-zone-1494446658266	1511850612977828367	1511850621542597136	\N	1511850629931205137	1511850640660234770	10	Everything a fan could ever want:  T-Shirts, Hats, Jerseys, Raffles, Food, Beer, All Access Pass	Boss@fanzone.com	\N	www.facebook.com/fanzonemania	\N	\N	https://commercecdn.com/1278235777548943678/f04e03e7-9856-47d4-aba3-ba281867ac5e.png	https://commercecdn.com/1278235777548943678/cbcda760-2e36-434b-b932-2a685731fdde.jpeg	12:00 PM-10:00 PM	\N	Fan ave	\N	\N	\N	1	\N	Jerseys, Fan Merchandise, Programs	\N	\N	11317	t	\N	2017-05-11 01:34:22.770244+05:30	2017-05-11 01:34:22.770244+05:30	f
-1117	Fritanga Fred	1511877969553916445	fritanga-fred-1494449920416	1511877978034799134	1511877986314355231	\N	1511877994753294880	1511878005624930849	10	Served with arepas, manioc or plantain, this is a plate full of grilled meat such as chicken or beef with aji sauce!	fred@fritanga.com	\N	www.facebook.com/fritangafred	\N	\N	https://commercecdn.com/1278235777548943678/06913d2d-cdc9-4f6d-aacc-b72c1e3395d1.png	https://commercecdn.com/1278235777548943678/cec8b925-3ce3-4eea-9b4b-1962f651bc86.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	Fritanga Lane	\N	\N	\N	1	\N	Fritanga, Lechona, Arepa	\N	\N	11319	t	\N	2017-05-11 02:28:44.929239+05:30	2017-05-11 02:28:44.929239+05:30	f
-1118	Ticket Master	1511881637934137890	ticket-master-1494450357736	1511881646331134499	1511881654342255140	\N	1511881662848303653	1511881673736716838	11	Buy tickets for any sporting event, concert, festival you want!	Ron@ticketmaster.com	\N	www.facebook.com/ticketmaster	\N	\N	https://commercecdn.com/1278235777548943678/15e77c49-f695-414a-92b7-73b6f3552e5d.jpeg	https://commercecdn.com/1278235777548943678/4091a037-93c8-4452-8193-9bb1725ffbf6.png	11:00 AM-9:00 PM	\N	123 Ticket	\N	\N	\N	1	\N	tickets, venues, events	\N	\N	11321	t	\N	2017-05-11 02:36:02.215922+05:30	2017-05-11 02:36:02.215922+05:30	f
-1120	Sabor Brasil	1512449852485665365	sabor-brasil-1494518094168	1512449860547117654	1512449869137052247	\N	1512449877206893144	1512449888422462041	10	\N	luiz@saborbrasil.com.br	(84) 9999-9999	\N	\N	\N	https://commercecdn.com/1278235777548943678/27c6f45d-2a54-47fb-a233-10972d2a949a.png	https://commercecdn.com/1278235777548943678/6b083cf3-2b54-4961-8bf8-f091ba0ea855.png	11:00 AM-8:00 PM	\N	Rua	\N	\N	\N	1	\N	\N	\N	\N	11325	t	\N	2017-05-11 21:24:58.651251+05:30	2017-05-11 21:24:58.651251+05:30	f
-1119	sfeztom5	1511965396758954556	sfeztom5-1494460342534	1511965405013344829	1511965413569724990	\N	1511965422352597567	1511965437301097024	10	A test vendor	t@b.cd	\N	test.fakedomain	\N	\N	https://commercecdn.com/1278235777548943678/b4ce059b-f29d-4a5c-ab83-6343f8f2c041.png	https://commercecdn.com/1278235777548943678/7d284648-1971-44c2-824e-c49249ecc20d.png	11:00 AM-8:00 PM	1,2,3	\N	\N	\N	\N	1	\N	test	\N	\N	11323	f	\N	2017-05-11 05:22:27.66898+05:30	2017-05-11 05:22:27.66898+05:30	f
-1121	Sabor Brasileiro	1512617656748868248	sabor-brasileiro-1494538098008	1512617665598849689	1512617674004234906	\N	1512617682082464411	1512617692593390236	10	Aqui nós temos a mais típica feijoada brasileira e os mais variados pratos tradicionais de todas as regiões do Brasil.	luiz@saborbrasileiro.com.br	(84) 99999-9999	facebook.com/saborbrasileiro	\N	\N	https://commercecdn.com/1278235777548943678/80c61edd-09b7-40d6-a340-399dc6534eb1.jpeg	https://commercecdn.com/1278235777548943678/b2203621-5caa-482e-b308-b64a932066a6.jpeg	10:00 AM-10:00 PM	1,2,3,4,5,6	Rua Brasil, 123	\N	\N	\N	1	\N	Feijoada, caipirinha, açaí	\N	\N	11327	t	\N	2017-05-12 02:58:22.483634+05:30	2017-05-12 02:58:22.483634+05:30	f
-1094	Classy Cuban	1479426030098711188	classy-cuban-1490581347750	1479426037740733077	1479426045449863830	1497995126587261030	1479426053435818647	1479426063325987480	7	Manny's secret cuban recipe!	streetfoodez@sumup.com	555-7878	www.facebook.com/classycuban	\N	\N	https://commercecdn.com/1278235777548943678/fe7ae581-d6a9-4d14-86a3-aef5e12e989e.jpeg	https://commercecdn.com/1278235777548943678/ddb53e6f-62aa-4a47-bfef-b912f1fd93a6.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Cuban dr	\N	\N	\N	1	\N	Cuban, Paninis	\N	\N	11227	t	\N	2017-03-27 07:52:31.905003+05:30	2017-03-27 07:52:31.905003+05:30	f
-\.
-
-
---
--- Data for Name: territories; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.territories (id, city, territory, state, country, country_id, timezone, latitude, longitude, created_at, updated_at, is_deleted) FROM stdin;
-1	Natal	 Natal-RN	RN	Brazil	1	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	1	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-3	Ponta Negra	 Ponta Negra-RN	RN	Brazil	1	Buenos Aires	-6.22899400000000014	-35.0487759999999966	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-4	Austin	 Austin-TX	TX	USA	2	Central Time (US & Canada)	30.2643169999999984	-97.7382280000000065	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-5	Pflugerville	 Pflugerville-TX	TX	USA	2	Central Time (US & Canada)	30.4400000000000013	-97.6200000000000045	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-6	Round Rock	 Round Rock-TX	TX	USA	2	Central Time (US & Canada)	30.5079999999999991	-97.6779999999999973	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-7	Fort Lauderdale	 Fort Lauderdale-TX	FL	USA	2	Eastern Time (US & Canada)	26.1219999999999999	-80.1370000000000005	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-8	Miami	 Miami-FL	FL	USA	2	Eastern Time (US & Canada)	25.7620000000000005	-80.1899999999999977	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-9	Coral Gables	 Coral Gables-FL	FL	USA	2	Eastern Time (US & Canada)	25.7220000000000013	-80.2690000000000055	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-10	Denver	 Denver-CO	CO	USA	2	Mountain Time (US & Canada)	39.7460000000000022	-104.992000000000004	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-11	Aurora	 Aurora-CO	CO	USA	2	Mountain Time (US & Canada)	39.7250000000000014	-104.846999999999994	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-12	Lakewood	 Lakewood-CO	CO	USA	2	Mountain Time (US & Canada)	39.7109999999999985	-105.081000000000003	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
-13	\N	Fortaleza	\N	\N	2	\N	-56	-10	2017-04-09 07:55:58.836362+05:30	2017-04-09 07:55:58.836362+05:30	f
-\.
-
-
---
--- Data for Name: food_parks; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.food_parks (id, name, photo, territory_id, city, state, postal_code, country, latitude, longitude, created_at, updated_at, is_deleted, foodpark_mgr) FROM stdin;
-3001	The Picnic	\N	4	Austin	TX	78704	US	30.2635748000000007	-97.7627071000000001	2016-08-22 05:01:43.131352+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3002	Alamo Drafthouse	\N	4	Austin	TX	78704	US	30.2560785999999986	-97.7635090999999647	2016-08-22 04:31:03.622149+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3003	Austin Food Park	\N	4	Austin	TX	78702	US	30.2544286999999983	-97.7371196999999938	2016-08-22 04:31:50.563872+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3004	Truck Garden Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.87437400000000043	-35.1786949999999976	2016-08-22 04:33:07.177813+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.86576900000000023	-35.1858780000000024	2016-08-22 04:35:04.914807+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3006	Natal Shopping Food Park - Av. das Brancas Dunas	\N	1	Natal	RN	\N	BR	-5.84256300000000017	-35.2106240000000028	2016-08-22 04:42:10.112015+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3007	Bar 54 Food Park - Rua Porto Mirim	\N	1	Natal	RN	\N	BR	-5.87467399999999973	-35.1835140000000024	2016-08-30 02:24:42.540882+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3008	Bar Trove Food Park - Rua Presidente José Bento	\N	1	Natal	RN	\N	BR	-5.80574800000000035	-35.2147050000000021	2016-08-31 02:42:08.717913+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3009	Food By Food West	\N	4	Austin	TX	78723	US	30.2979999999999983	-97.7069999999999936	2016-08-22 05:01:43.131352+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3010	Growler Food Park	\N	5	Pflugerville	TX	78660	US	30.4490000000000016	-97.6069999999999993	2016-08-22 04:31:03.622149+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3011	Food Park at La Frontera	\N	6	Round Rock	TX	78681	US	30.4810000000000016	-97.6770000000000067	2016-08-22 04:31:50.563872+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3012	Las Palmas Food Bazaar	\N	8	Miami	FL	33136	US	25.7920000000000016	-80.195999999999998	2016-08-22 04:33:07.177813+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3013	Tropical Food Court	\N	7	Fort Lauderdale	FL	33304	US	26.1359999999999992	-80.1370000000000005	2016-08-22 04:35:04.914807+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3014	Snappy Food Park	\N	9	Coral Gables	FL	33146	US	25.7289999999999992	-80.2609999999999957	2016-08-22 04:42:10.112015+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3015	LoDo TrPk	\N	10	Denver	CO	80202	US	39.7509999999999977	-105	2016-08-30 02:24:42.540882+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3016	Del Mar	\N	11	Aurora	CO	80042	US	39.7280000000000015	-104.843999999999994	2016-08-31 02:42:08.717913+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-3017	Foothills Food Court	\N	12	Lakewood	CO	80226	US	39.7109999999999985	-105.084000000000003	2016-08-31 02:42:08.717913+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
-30019	Ponta Negra Beach Boardwalk	\N	3	\N	\N	\N	\N	-5.87119999999999997	-35.1799999999999997	2017-04-08 21:31:23.846383+05:30	2017-04-08 21:33:08.092697+05:30	f	\N
-30020	Big 5 Sports Bar Food Park	\N	3	\N	\N	\N	\N	-5.66999999999999993	-36.2100000000000009	2017-04-09 07:57:13.714836+05:30	2017-04-09 07:57:13.714836+05:30	f	\N
-\.
-
-
---
--- Data for Name: unit_types; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.unit_types (id, type) FROM stdin;
-1	TRUCK
-2	CART
-3	RESTAURANT
-\.
-
-
---
--- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.units (id, name, number, type, customer_order_window, prep_notice, delivery, delivery_time_offset, delivery_chg_amount, delivery_radius, description, username, password, qr_code, phone, apns_id, fcm_id, gcm_id, device_type, unit_order_sys_id, territory_id, company_id, unit_mgr_id, created_at, updated_at, currency_id, currency, payment, is_deleted) FROM stdin;
-2003	Pacos Tacos Truck 12	1	TRUCK	10	\N	f	\N	\N	\N	\N	mptruck64five	mptruck64five	\N	\N	\N	\N	\N	\N	\N	\N	1006	11009	2017-02-01 05:02:49.181663+05:30	2017-02-06 14:59:12.298814+05:30	1435543251393183865	BRL	SumUp	f
-2097	Frank Truck #1	1	TRUCK	30	25	t	15	\N	10	\N	franktruck1	frank	\N	\N	\N	\N	APA91bF41fPOdQzdOqqrYwNYjEMSBmrfbQAwxgRrGKm2DIbYzRA3SYAfAJcwzfcYQZLR4s_hvyvfUkxEpEGTZK9az5OzCAjiRdI7YZku8e49upnJE-aZkvo	\N	\N	1	1095	11230	2017-03-29 00:42:11.61453+05:30	2017-04-28 04:07:48.184656+05:30	1435543251393183865	BRL	SumUp	f
-2128	Truck 3	4	TRUCK	30	30	f	10	\N	5	\N	fogo116	fogo116	\N	\N	\N	\N	APA91bGh8hKQ32M2cdtMNY3h-l2gY2t29KlmUYTR_YGZ4xyQMiPv54erfcgcy1B9TZZTDKYUQq_UeYWSlwfeVirMRannny8R2O6Oss3rwO1YCtFiyUI3nnkf6R2gWVMHqS4HntFAJ_bd	\N	\N	3	1092	11276	2017-04-10 05:42:05.829061+05:30	2017-04-27 15:33:05.257257+05:30	1435543251393183865	BRL	SumUp	f
-2002	Thaitanic Cart 1	1	CART	20	\N	f	\N	\N	\N	\N	mptruck64	mptruck64	\N	\N	\N	\N	APA91bGLPDm96TAg6C77VrwxlP1Nk11Md-hSRZGLOjS8CoECWfEFjp1Ise1_GRolqix4jydowaJ9d8OKxJMoiH3_qc0VEGNdqKiQ66Jbb_mneP-0T5qm4IK3RPZMKQlu9j2T7gOJGg0B	\N	\N	\N	1001	11008	2017-02-01 05:02:49.181663+05:30	2017-03-29 00:37:52.733603+05:30	1435543251393183865	BRL	SumUp	f
-2132	Crazy Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	crazytruck1	crazy	\N	\N	\N	\N	APA91bG2DPnoMR-TkhhHcixL-8uP6Rm5YN0UCqv5rv1nHdzkt3TrkqbQDvrmp5dRGkQorWx3r_zZGDS1Yi2_muJoMY61RThXVfBJJ-MpF2pZbtyqDr89NFI	\N	\N	1	1109	11287	2017-04-12 17:32:04.700899+05:30	2017-04-27 21:42:48.43914+05:30	1435543251393183865	BRL	SumUp	f
-2136	D Truck #1	1	TRUCK	30	25	t	\N	\N	10	\N	destructodentruck1	smiley66	\N	\N	\N	\N	APA91bG3q71WUOuK06XcUDiWTYK1bBJU7GSMv4VC8bxugs5Y-sRVOryb_KG-92mbwci8szGJOQTIUwMWm6Njn_BYK-aN1CDBl1CalcLdh-nWUt6N8YBbQBo	\N	\N	1	1112	11302	2017-04-25 00:45:07.450343+05:30	2017-04-27 02:24:11.879448+05:30	1435543251393183865	BRL	SumUp	f
-2075	Grilla Truck #1	1	CART	20	15	t	15	\N	10	\N	grilla26	grilla26	\N	\N	\N	\N	APA91bHCWKDYBbt3JL7ajuPyrZP3ASQP1XeNn4_-EBaxSPm3HAUG6Xjb9QpQF68IoZ3AeH9KEgvcfXWfLFgbPq25HIG2m5OCh-C-IsLLoyLXCr7EqS_vcWk	\N	\N	1	1008	11174	2017-02-06 15:21:07.210394+05:30	2017-05-01 20:46:15.039601+05:30	1435543251393183865	BRL	SumUp	f
-2094	Fogo Truck #1	1	TRUCK	30	25	t	15	\N	10	\N	fogotruck1	fogo	\N	\N	\N	\N	APA91bFWVXFrQz5B8wA6K8qIOqdbyC0pDtnR3Kd_4XqN3tZj0cH-FNwUzmOcq0eFT60ZnR29ocaafc2ztCQ1AiO3NRqbpLVLazbFq1QAQ6CNBlpw6xDWSgg	\N	\N	1	1092	11224	2017-03-24 21:24:11.300743+05:30	2017-05-01 20:30:09.925919+05:30	1435543251393183865	BRL	SumUp	f
-2127	Truck #2	4	TRUCK	30	30	f	10	\N	5	\N	fogo46	fogo46	\N	\N	\N	\N	APA91bFOPNguXOsMnovayP1TZj0uhkaTvIloVc6tZpC2HZ2QEzdsBmjGcydh1bZlpFDqoOMLCSsiN03Q7soYJ7ddiAXDPcza4GT0fUdRnZF2JzQy_cNQ-too2MbizQYtdNCXcXNzERtb	\N	\N	3	1092	11275	2017-04-10 03:55:13.74483+05:30	2017-04-25 23:35:43.083326+05:30	1435543251393183865	BRL	SumUp	f
-2125	Ponta Negra Truck2	2	TRUCK	30	20	f	15	\N	10	\N	joe56	joe56	\N	\N	\N	\N	\N	\N	\N	3	1105	11272	2017-04-08 22:00:09.629615+05:30	2017-04-11 19:55:15.751657+05:30	1435543251393183865	BRL	SumUp	f
-2091	Vinay Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	vinaybhavsartruck1	cdn123	\N	\N	\N	\N	\N	\N	\N	1	1089	11218	2017-03-22 17:19:39.947588+05:30	2017-03-22 17:19:39.947588+05:30	1435543251393183865	BRL	SumUp	f
-2095	nuvo Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	nuvotruck1	nuvo	\N	\N	\N	\N	\N	\N	\N	1	1093	11226	2017-03-25 18:34:06.78761+05:30	2017-03-25 19:52:23.705259+05:30	1435543251393183865	BRL	SumUp	f
-2089	Chunky Truck #1	1	CART	60	30	t	30	\N	15	\N	chunkytruck1	chunkymonkey	\N	\N	\N	\N	APA91bGex9UmnMoD0h_KHfRAdBK2-QF1m-vPIQgYofG3YFPzFzvJwM5mgWog8yTCoO5sYzVX-I8wv8BCjS3mdffeSNbTHHcSwj2tsog8e6GMK0vZSHIkRqU	\N	\N	1	1088	11193	2017-02-08 12:52:22.776055+05:30	2017-04-25 17:10:48.716315+05:30	1435543251393183865	BRL	SumUp	f
-2099	Dummy Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	dummytruck1	dummy	\N	\N	\N	\N	\N	\N	\N	1	1098	11235	2017-04-01 23:53:08.972411+05:30	2017-04-01 23:53:08.972411+05:30	1435543251393183865	BRL	SumUp	f
-2098	Bob Truck #1	1	TRUCK	40	25	f	15	\N	10	\N	bobtruck1	bob	\N	\N	\N	\N	\N	\N	\N	3	1096	11232	2017-03-29 00:46:50.676091+05:30	2017-03-29 01:06:01.583526+05:30	1435543251393183865	BRL	SumUp	f
-2102	Billy Truck #1	1	RESTAURANT	30	25	f	15	\N	10	\N	billytruck1	billy	\N	\N	\N	\N	\N	\N	\N	4	1101	11241	2017-04-03 04:34:30.650284+05:30	2017-04-03 04:38:42.608407+05:30	1435543251393183865	USD	SumUp	f
-2100	dsfdsf Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	dfdsftruck1	idontknow	\N	\N	\N	\N	\N	\N	\N	1	1099	11237	2017-04-02 00:55:59.782045+05:30	2017-04-02 00:55:59.782045+05:30	1435543251393183865	BRL	SumUp	f
-2135	cart 2	2	TRUCK	30	30	f	15	\N	10	\N	classy56	classy56	\N	\N	\N	\N	\N	\N	\N	3	1094	11297	2017-04-16 20:03:07.035234+05:30	2017-04-27 01:45:05.095226+05:30	1435543251393183865	BRL	SumUp	f
-2103	Dennis Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	dnick66truck1	smiley66	\N	\N	\N	\N	APA91bEBbLnE4vXEcmy83D8LHr59wq8G2C8exP-UDGxy1Vyf461iBDoIO55OFAe8Eyl49z4I_hcZj73gVDMVWITfJJbdBFaQmjebDjjIOkNMGT0oJ5Ld2nU	\N	\N	1	1102	11243	2017-04-04 17:31:20.479621+05:30	2017-04-25 02:22:17.450486+05:30	1435543251393183865	BRL	SumUp	f
-2137	D Truck #2	2	TRUCK	40	30	f	30	\N	5	\N	manager2	smiley66	\N	\N	\N	\N	\N	\N	\N	1	1112	11303	2017-04-25 00:59:23.374981+05:30	2017-04-25 17:09:48.997138+05:30	1435543251393183865	BRL	SumUp	f
-2106	Here	1	TRUCK	30	30	f	\N	\N	\N	\N	Gen1Living	smiley66	\N	\N	\N	\N	\N	\N	\N	1	1104	11248	2017-04-04 22:37:04.576686+05:30	2017-04-04 22:37:04.576686+05:30	1435543251393183865	BRL	SumUp	f
-2107	Here2	2	TRUCK	20	10	f	\N	\N	\N	\N	gen1	smiley66	\N	\N	\N	\N	\N	\N	\N	1	1104	11249	2017-04-04 22:37:42.24167+05:30	2017-04-04 22:37:42.24167+05:30	1435543251393183865	BRL	SumUp	f
-2101	j Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	jon.kazariantruck1	test1234	\N	\N	\N	\N	\N	\N	\N	1	1100	11239	2017-04-02 01:41:06.020718+05:30	2017-04-02 01:41:06.020718+05:30	1435543251393183865	BRL	SumUp	f
-2007	Moe Truck #1	4	TRUCK	20	15	f	\N	\N	\N	\N	moe56	moe56	\N	\N	\N	\N	\N	\N	\N	2	1005	11021	2017-02-02 13:17:24.083754+05:30	2017-04-02 01:42:44.583302+05:30	1435543251393183865	BRL	SumUp	f
-2118	Sao Paolo Truck #3	4	TRUCK	30	30	f	25	\N	10	\N	sfsdf	sdffs	\N	\N	\N	\N	\N	\N	\N	2	1088	11262	2017-04-08 10:24:57.556556+05:30	2017-04-15 19:46:22.04093+05:30	1435543251393183865	BRL	SumUp	f
-2070	Crazy Truck 5	5	TRUCK	20	15	f	\N	\N	\N	\N	Jack	jack	\N	\N	\N	cNXGElYdnDQ:APA91bH6L7mau4dFV_woD7vmapgsm0gIV3lE34Oqua2H7sZ9t3XoXAMVBagVA3PNPzWClL-TTvYnLa-XEzPMtNfP_uGtrMf9Avd6M2tfN8Jhzw--dhkYhETx6P_385NBUdsSCtLGHaLV	\N	\N	\N	1	1005	11169	2017-02-06 12:41:55.248113+05:30	2017-04-07 17:15:54.971128+05:30	1435543251393183865	BRL	SumUp	f
-2115	test 2	4	TRUCK	30	30	f	20	\N	10	\N	asdasd	asd	\N	\N	\N	\N	\N	\N	\N	3	1005	11259	2017-04-08 10:22:48.711481+05:30	2017-04-08 10:22:48.711481+05:30	1435543251393183865	BRL	SumUp	f
-2006	jack	5	TRUCK	20	15	t	15	\N	5	Crazy Jacks Truck	crazy56	crazy56	\N	\N	\N	\N	APA91bGg0iBMwhOiySq6IEeuGoQjALsuIXbPUe6oTLE74L97UFquAXwNtPkAsQmWHCtg5zl--EtPen7jDYhH8gi5A0V-KB72vv8OI9YVgOcc5rQIrycMVtYmPz6zajSARiP3HEUFMzfV	\N	\N	4	1005	11018	2017-02-01 17:16:50.747716+05:30	2017-04-07 17:24:08.076457+05:30	1435543251393183865	USD	SumUp	f
-2008	Grilla Truck 1	1	TRUCK	20	15	f	\N	\N	\N	\N	grilla56	grilla56	\N	\N	\N	\N	APA91bFpsAYejc4VbU7ec8kPQ71TTztyXhkFd3txsOfn2V5rO9U65NB7szEVaI5jqk2wQ9DSxJcicKUEyL3MEIPft96au_6MjW5qrKBgxDx-LGcnUbKv388	\N	\N	1	1005	11026	2017-02-03 02:55:02.490854+05:30	2017-04-12 16:50:13.308447+05:30	1435543251393183865	BRL	SumUp	f
-2131	qwerty	4	TRUCK	30	30	f	10	\N	5	\N	qwerty	qwerty	\N	\N	\N	\N	\N	\N	\N	3	1104	11280	2017-04-10 09:32:41.873633+05:30	2017-04-10 09:32:41.873633+05:30	1435543251393183865	BRL	SumUp	f
-2111	sdasdasd	4	TRUCK	30	30	f	25	\N	15	\N	asd	asdasd	\N	\N	\N	\N	\N	\N	\N	1	1005	11255	2017-04-08 10:04:02.28844+05:30	2017-04-12 17:44:41.997895+05:30	1435543251393183865	BRL	SumUp	f
-2001	Thaitanic Truck 1	1	TRUCK	15	\N	f	\N	\N	\N	\N	mptruck61	mptruck61	\N	\N	\N	cNXGElYdnDQ:APA91bH6L7mau4dFV_woD7vmapgsm0gIV3lE34Oqua2H7sZ9t3XoXAMVBagVA3PNPzWClL-TTvYnLa-XEzPMtNfP_uGtrMf9Avd6M2tfN8Jhzw--dhkYhETx6P_385NBUdsSCtLGHaLV	c9k1cdeqqlc:APA91bE3N9DPEPRVrylvqniUc0YkeqiDcL0bLF7wEpm0BUFDspsRMjJGenLnF07ssEmBZe90pG983xq9cQLzLzu6uWXYyhv1OZpDrUeCirxjBSzmIX-TJlO5T58PxakjRLd8LIghjnuy	\N	\N	\N	1005	11007	2017-02-01 05:02:49.181663+05:30	2017-04-11 11:41:29.633649+05:30	1435543251393183865	BRL	SumUp	f
-2121	Ponta Negra Truck#2	2	TRUCK	30	30	f	15	\N	10	\N	fogo76	fogo76	\N	\N	\N	\N	\N	\N	\N	3	1088	11266	2017-04-08 21:16:18.677079+05:30	2017-04-12 09:34:26.299748+05:30	1435543251393183865	BRL	SumUp	f
-2124	Mighty Truck #1	1	TRUCK	30	25	f	15	\N	10	\N	joetruck1	joe	\N	\N	\N	\N	\N	\N	\N	1	1105	11271	2017-04-08 21:52:59.321931+05:30	2017-04-11 19:54:57.73502+05:30	1435543251393183865	BRL	SumUp	f
-2129	asdasdasdatests	4	TRUCK	30	30	f	30	\N	15	\N	yogesh	123	\N	\N	\N	\N	\N	\N	\N	2	1088	11277	2017-04-10 09:20:44.732805+05:30	2017-04-12 09:34:23.638533+05:30	1435543251393183865	BRL	SumUp	f
-2130	tester	4	TRUCK	25	15	f	25	\N	15	\N	testera	tester11a	\N	\N	\N	\N	\N	\N	\N	2	1088	11278	2017-04-10 09:24:54.954704+05:30	2017-04-12 09:39:23.833171+05:30	1435543251393183865	BRL	SumUp	f
-2116	Ponta Negra Truck #2	4	TRUCK	30	30	f	20	\N	10	\N	chunky56	chunky56	\N	\N	\N	fXS-t9CJhBM:APA91bE6zYJ007cPVdVRrMxE4ajL-Ca2ptJ14H2kr0oNX6RvJ5gPqeL91rvN9df-GNGPJviNjkEYudWMvmM2zjmxquZK1IHUgqoPp8buvc2aTsuYjSwP_Kmj4rRGeEywiTVRgu3cRXlI	\N	\N	\N	3	1088	11260	2017-04-08 10:23:07.845841+05:30	2017-04-12 09:40:09.082879+05:30	1435543251393183865	BRL	SumUp	f
-2133	Paco Truck #1	1	TRUCK	30	25	t	15	\N	10	\N	tacostruck1	tacos	\N	\N	\N	\N	APA91bGex9UmnMoD0h_KHfRAdBK2-QF1m-vPIQgYofG3YFPzFzvJwM5mgWog8yTCoO5sYzVX-I8wv8BCjS3mdffeSNbTHHcSwj2tsog8e6GMK0vZSHIkRqU	\N	\N	1	1110	11294	2017-04-13 14:40:19.81029+05:30	2017-04-15 19:24:31.653443+05:30	1435543251393183865	BRL	SumUp	f
-2134	rajan Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	rajan.rajan977truck1	123456	\N	\N	\N	\N	\N	\N	\N	1	1111	11296	2017-04-13 16:37:39.781341+05:30	2017-04-13 16:37:39.781341+05:30	1435543251393183865	BRL	SumUp	f
-2138	D Truck #3	3	TRUCK	30	30	t	15	\N	10	\N	destructodentruck3	smiley66	\N	\N	\N	\N	\N	\N	\N	3	1112	11304	2017-04-25 17:44:38.303248+05:30	2017-04-25 19:27:36.515451+05:30	1435543251393183865	BRL	SumUp	f
-2139	Jose Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	josetruck1	jose	\N	\N	\N	\N	\N	\N	\N	1	1114	11314	2017-05-10 23:12:22.201211+05:30	2017-05-10 23:12:22.201211+05:30	1435543251393183865	BRL	SumUp	f
-2140	Churros Truck #1	1	TRUCK	30	30	f	\N	\N	\N	\N	churrostruck1	churros	\N	\N	\N	\N	\N	\N	\N	1	1115	11316	2017-05-11 00:29:29.544017+05:30	2017-05-11 00:29:29.544017+05:30	1435543251393183865	BRL	SumUp	f
-2141	Boss Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	bosstruck1	boss	\N	\N	\N	\N	\N	\N	\N	1	1116	11318	2017-05-11 01:34:24.475976+05:30	2017-05-11 01:34:24.475976+05:30	1435543251393183865	BRL	SumUp	f
-2142	Fred Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	fredtruck1	fred	\N	\N	\N	\N	\N	\N	\N	1	1117	11320	2017-05-11 02:28:46.675951+05:30	2017-05-11 02:28:46.675951+05:30	1435543251393183865	BRL	SumUp	f
-2143	Ron Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	rontruck1	ron	\N	\N	\N	\N	\N	\N	\N	1	1118	11322	2017-05-11 02:36:03.952129+05:30	2017-05-11 02:36:03.952129+05:30	1435543251393183865	BRL	SumUp	f
-2144	t Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	ttruck1	pass	\N	\N	\N	\N	\N	\N	\N	1	1119	11324	2017-05-11 05:22:30.429381+05:30	2017-05-11 05:22:30.429381+05:30	1435543251393183865	BRL	SumUp	f
-2096	Natal Cart #1	1	CART	30	15	t	15	\N	10	\N	mannytruck1	manny	\N	\N	\N	\N	APA91bG2DPnoMR-TkhhHcixL-8uP6Rm5YN0UCqv5rv1nHdzkt3TrkqbQDvrmp5dRGkQorWx3r_zZGDS1Yi2_muJoMY61RThXVfBJJ-MpF2pZbtyqDr89NFI	\N	\N	1	1094	11228	2017-03-27 07:52:34.955715+05:30	2017-05-11 16:45:45.138951+05:30	1435543251393183865	BRL	SumUp	f
-2145	Sabor Brasil	1	RESTAURANT	30	20	f	15	\N	10	\N	luiztruck1	oioioi	\N	\N	\N	\N	\N	\N	\N	1	1120	11326	2017-05-11 21:25:00.266151+05:30	2017-05-11 21:44:15.334751+05:30	1435543251393183865	BRL	SumUp	f
 \.
 
 
@@ -449,10 +1832,69 @@ COPY public.checkins (id, check_in, check_out, latitude, longitude, display_addr
 
 
 --
--- Data for Name: contracts; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.companies (id, name, order_sys_id, base_slug, default_cat, daily_special_cat_id, daily_special_item_id, delivery_chg_cat_id, delivery_chg_item_id, delivery_chg_amount, description, email, phone, facebook, twitter, instagram, photo, featured_dish, hours, schedule, business_address, city, state, country, country_id, taxband, tags, stub, calculated_rating, user_id, show_vendor_setup, default_unit, created_at, updated_at, is_deleted, territory_id) FROM stdin;
+1090	luigi	1476478201743016015	luigi-1490229939223	1476478209586364496	1476478217429712977	\N	1476478225247895634	1476478235406499923	1.6	\N	firminoata@gmail.com	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/e5a1db23-d896-4773-9dbb-607d37ceb38c.jpeg	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11219	t	\N	2017-03-23 06:15:43.432664+05:30	2017-03-23 06:15:43.432664+05:30	f	\N
+1089	Vinay Bhavsar	1476087582344347651	vinay-bhavsar-1490183373758	1476087589952815108	1476087597687111685	\N	1476087605303967750	1476087615227691015	1.6	Just testing	vinaybhavsar@cdnsol.com	9893479705	\N	\N	\N	https://commercecdn.com/1278235777548943678/139509f9-dd3d-4216-b4d1-80205e62d577.jpeg	https://commercecdn.com/1278235777548943678/ed1b07d1-857b-4cbe-9ccd-252ead133d6f.jpeg	11:00 AM-8:00 PM	0,1,2,3,4,5,6	304 CDN Software Solutions, Princess Sky Park, AB Road, Indore	\N	\N	\N	1	\N	#testing	\N	\N	11217	t	\N	2017-03-22 17:19:37.871349+05:30	2017-03-22 17:19:37.871349+05:30	f	\N
+1001	Pacos Tacos	1293770040725734215	pacos-1472261511383	1325748109401129298	1463318392957043417	1488707787419550321	1463321163915592413	1463324599998481122	1.6	Fresh street food tacos	tacos@pacos.com	\N	www.facebook.com/pacostacos	@pacostacos	\N	commercecdn.com/1278235777548943678/9e5cd3fe-8f1b-4741-96c6-f54b90e5cf9a.jpeg	commercecdn.com/1278235777548943678/36091932-cb57-46ea-8694-bdaf344a0083.jpeg	11am-8pm		\N	\N	\N	\N	1	\N	tacos, enchiladas	\N	\N	11004	t	\N	2016-08-27 07:01:52.102+05:30	2017-03-05 02:42:32.307442+05:30	f	\N
+1093	Nuvo	1478299382196470212	nuvo-1490447040851	1478299389981098437	1478299397690229190	\N	1478299405265142215	1478299415230808520	1.6	\N	nuvo@me.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11225	t	\N	2017-03-25 18:34:04.990298+05:30	2017-03-25 18:34:04.990298+05:30	f	\N
+1095	Frank's BBQ	1480658966731030601	frank-s-bbq-1490728325251	1480658974465327178	1480658982182846539	1497996578563031143	1480658990454014028	1480659000478400589	9	Old fashion country bbq ready when you are!	streetfoodez@sumup.com	555-frankbbqnow	www.facebook.com/franksbbq	\N	\N	https://commercecdn.com/1278235777548943678/b73963cc-0025-4b0f-a2e3-3d1ac4ec1994.jpeg	https://commercecdn.com/1278235777548943678/3800a579-f9a8-4964-949e-fb53ed5d16d4.jpeg	12:00 PM-10:00 PM	0,1,2	123 bbq lane	\N	\N	\N	1	\N	bbq, pulled pork, brisket	\N	\N	11229	t	\N	2017-03-29 00:42:09.468753+05:30	2017-03-29 00:42:09.468753+05:30	f	\N
+1097	My Food	1482791807895995121	my-food-1490982579738	1482791815806452466	1482791823398142707	\N	1482791831199548148	1482791841316209397	10	Best tacos in Natal!	Jimmy@MyFood.com	555-9999	www.facebook.com/myfood	\N	\N	https://commercecdn.com/1278235777548943678/386aac36-54fd-40e0-b697-375a04eb7c41.jpeg	https://commercecdn.com/1278235777548943678/056182db-e37a-49dc-a17a-915171e80a58.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Jackson ave	\N	\N	\N	1	\N	tacos, enchiladas	\N	\N	11233	t	\N	2017-03-31 23:19:43.924178+05:30	2017-03-31 23:19:43.924178+05:30	f	\N
+1008	Grilla Cheez	1441733842225332401	grilla-cheez-1486088088823	1441733850261618866	1463313172281688785	1468229545193636616	1441733858146910387	1441733867391156404	8	Get your taste buds ready for a cheese avalanche	streetfoodez@sumup.com	\N	www.facebook.com/grillacheez	\N	\N	https://commercecdn.com/1278235777548943678/b10b1939-f66f-4b49-837d-9c40a66d1ed0.jpeg	https://commercecdn.com/1278235777548943678/1d035d77-a55d-43fd-8654-e8f03de61220.jpeg	-		\N	\N	\N	\N	1	\N	grilled cheese, panini	\N	\N	11025	t	\N	2017-02-03 12:44:52.001+05:30	2017-03-05 02:28:19.357435+05:30	f	\N
+1101	Billy's Burgers	1484399765453013923	billy-s-burgers-1491174263213	1484399773019538340	1484399780711891877	\N	1484399788169364390	1484399798227305383	10	Best bbq in Portland!	Billy@me.com	\N	www.facebook.com/billybob	\N	\N	https://commercecdn.com/1278235777548943678/dd19bbaf-5eeb-4c10-a752-f04c72268236.jpeg	https://commercecdn.com/1278235777548943678/f6183bfc-1409-4ee5-8bc1-ca7a68e93e56.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 1st ave	\N	\N	\N	2	\N	Cheeseburgers, pizza	\N	\N	11240	t	\N	2017-04-03 04:34:27.326878+05:30	2017-04-03 04:34:27.326878+05:30	f	\N
+1110	Paco's Tacos	1491952453145329901	paco-s-tacos-1492074613789	1491952461559103726	1491952469477949679	\N	1491952477572956400	1491952487672840433	10	The best assortment of Mexican food you will find!	streetfoodez@sumup.com	555-Taco	www.facebook.com/pacostacos	\N	\N	https://commercecdn.com/1278235777548943678/6aae55a7-4f5d-4b7d-aeb1-ce231b8519ff.jpeg	https://commercecdn.com/1278235777548943678/a77107fd-3ebd-4aea-921d-7bd26ad9ede9.jpeg	10:00 AM-9:00 PM	0,1,2,3,4	123 taco lane	\N	\N	\N	1	\N	Tacos, Enchiladas, Carne Asada	\N	\N	11293	t	\N	2017-04-13 14:40:18.052114+05:30	2017-04-13 14:40:18.052114+05:30	f	\N
+1006	Moes Pizza	1441305766198772495	moes-pizza-1486037058170	1441305773295534864	1463320397347816156	\N	1441305780476183313	1441305790123082514	1.6	Pan pizza, buffalo wings, garlic chicken specials	Mo@totino.com	\N	www.facebook.com/Moespizza	\N	\N	https://commercecdn.com/1278235777548943678/2f70d68d-01c6-4522-bac7-6113f4627035.jpeg	https://commercecdn.com/1278235777548943678/703961d4-b2a2-4885-91bd-0b55a6785f38.jpeg	10 am - 8 pm		\N	\N	\N	\N	1	\N	pizza, lasagna, pasta	\N	\N	11020	t	5	2017-02-02 22:34:21.21+05:30	2017-03-05 02:33:45.558819+05:30	f	\N
+1091	Konfusion	1477040512786497724	konfusion-1490296971930	1477040520797618365	1477040528833904830	\N	1477040536735973567	1477040546768748736	1.6	Best Asian Fusion in Natal!	Jimmy@konfusion.com	555-8888	www.facebook.com/Konfusion	\N	\N	https://commercecdn.com/1278235777548943678/7b10d7fd-b3cd-4394-b482-63bd771d9dc7.jpeg	https://commercecdn.com/1278235777548943678/ce2b956f-a1a2-45df-92c6-5d210ccbe2a4.jpeg	\N	\N	123 Confused Ln	\N	\N	\N	1	\N	Asian Fusion, Pad Thai	\N	\N	11220	t	\N	2017-03-24 00:52:56.205119+05:30	2017-03-24 00:52:56.205119+05:30	f	1
+1099	dfsdf	1483565024885605217	dfsdf-1491074754374	1483565032603124578	1483565040429695843	\N	1483565048004608868	1483565057936720741	10	\N	dfdsf@gmail.com	\N	\N	\N	\N	\N	\N	11:00 AM-8:00 PM	0	\N	\N	\N	\N	1	\N	\N	\N	\N	11236	t	\N	2017-04-02 00:55:58.634203+05:30	2017-04-02 00:55:58.634203+05:30	f	1
+1096	Bob's bbq	1480661310474551374	bob-s-bbq-1490728604646	1480661318368231503	1480661326656176208	\N	1480661334667296849	1480661344700072018	10	Best bbq in town!	Bob@bbq.com	55 84 7534 3434	www.facebook.com/bobsbbq	\N	\N	https://commercecdn.com/1278235777548943678/20a2a239-84ab-42d2-89a0-8c61bfb69f3b.jpeg	https://commercecdn.com/1278235777548943678/b638ae6a-781f-478b-8594-139fab967d98.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 prudente	\N	\N	\N	1	\N	bbq, sandwiches	\N	\N	11231	t	\N	2017-03-29 00:46:48.916424+05:30	2017-03-29 00:46:48.916424+05:30	f	2
+1098	Dummy	1483533384364852056	dummy-1491070982562	1483533392401138521	1483533400303207258	\N	1483533407953617755	1483533418179330908	10	dumb dumb dumb	Dummy@me.com	\N	www.facebook.com/dumb	\N	\N	\N	\N	11:00 AM-9:00 PM	0,1,2,3,4	123 dumb	\N	\N	\N	1	\N	pizza	\N	\N	11234	t	\N	2017-04-01 23:53:06.780152+05:30	2017-04-01 23:53:06.780152+05:30	f	2
+1104	Den's Food Truck	1485652576048251274	den-s-food-truck-1491323609849	1485652584092926347	1485652600442323340	\N	1485652608294060429	1485652618662379918	10	Best food in Natal!!!	Gen1Living@gmail.com	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/54a4873e-234a-4eca-abd8-04b5d1e0b0ee.jpeg	https://commercecdn.com/1278235777548943678/796e3a11-65a9-49e6-9d5e-119a7f0dc6fa.jpeg	11:00 AM-4:00 PM	0,1,2,3,4,5	\N	\N	\N	\N	1	\N	Food	\N	\N	11246	t	\N	2017-04-04 22:03:35.127092+05:30	2017-04-04 22:03:35.127092+05:30	f	\N
+1092	Thaitanic Xpress	1477660013685113221	thaitanic-xpress-1490370822183	1477660021780119942	1477660029933846919	1479305500104327793	1477660037374542216	1477660047742861705	9	best asian fusion in town!	streetfoodez@sumup.com	555-8888	www.facebook.com/thaitanicxpress	\N	\N	https://commercecdn.com/1278235777548943678/7c617dfe-8299-42d2-91d4-dd17368b07f5.jpeg	https://commercecdn.com/1278235777548943678/c310f106-bdf0-4391-a607-1282e82029ca.jpeg	11:00 AM-8:00 PM	0,1,2,3,4	123 Ho Chi Min Ln	\N	\N	\N	1	\N	asian fusion, thai	\N	\N	11223	t	\N	2017-03-24 21:23:46.434461+05:30	2017-03-24 21:23:46.434461+05:30	f	\N
+1102	Mama's got SOUL	1485515543640277206	mama-s-got-soul-1491307274362	1485515551416516823	1485515559209533656	\N	1485515567061270745	1485515576825610458	10	\N	dnick66@gmail.com	\N	\N	\N	\N	commercecdn.com/1278235777548943678/836e86a4-85f6-4a16-9c49-0342cefca42b.jpeg	commercecdn.com/1278235777548943678/3c7ee2c9-73bc-400a-90a6-97549aea3478.jpeg	\N	\N	\N	\N	\N	\N	1	\N	Fried chicken, soul food, greens	\N	\N	11242	t	\N	2017-04-04 17:31:18.527117+05:30	2017-04-04 17:31:18.527117+05:30	f	\N
+1103	Gen 1 Living	1485522640989847773	gen-1-living-1491308120431	1485522649026134238	1485522656953368799	\N	1485522664805105888	1485522675123093729	9	organic veggies for your delight	Dennis@streetfoodEZ.com	\N	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/9b576ec5-c6f1-4a65-ae9d-389f856dc3f6.jpeg	11:00 AM-3:00 PM	1,2,3,4	\N	\N	\N	\N	1	\N	whole organic veggies	\N	\N	11244	t	\N	2017-04-04 17:45:24.693776+05:30	2017-04-04 17:45:24.693776+05:30	f	\N
+1106	tmr007	1489911623240909662	tmr007-1491831327808	1489911631352693599	1489911639623861088	\N	1489911648012469089	1489911658498229090	10	\N	testmngr@tester.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11282	t	\N	2017-04-10 19:05:32.21389+05:30	2017-04-10 19:05:32.21389+05:30	f	\N
+1107	sam123	1489912624018621283	sam123-1491831447107	1489912631996187492	1489912647036961637	\N	1489912655509455718	1489912665768723303	10	\N	sam@grant.vom	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11283	t	\N	2017-04-10 19:07:32.284468+05:30	2017-04-10 19:07:32.284468+05:30	f	\N
+1108	sfez01	1489916589800162152	sfez01-1491831919886	1489916597660287849	1489916606468326250	\N	1489916614420726635	1489916624403170156	10	\N	test5@sfez.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11285	t	\N	2017-04-10 19:15:24.387771+05:30	2017-04-10 19:15:24.387771+05:30	f	\N
+1109	Crazy Jack's	1491314112741769362	crazy-jack-s-1491998517618	1491314123277861011	1491314132731822228	1491334549076967599	1491314140935880853	1491314155003576470	9	Food is always tastier when it has a little "crazy" added to it!	Crazy@crazysubs.com	1-800-Crazy	www.facebook.com/crazyjacksubs	\N	\N	https://commercecdn.com/1278235777548943678/c2e0e237-2648-47e1-aee1-5993d3a32139.jpeg	https://commercecdn.com/1278235777548943678/fe5da931-22e0-4b84-80a2-b38637592de1.jpeg	11:30 AM-10:00 PM	0,1,2,3,4	123 Crazy Lane	\N	\N	\N	1	\N	Subs, Sandwiches, Soup	\N	\N	11286	t	\N	2017-04-12 17:32:02.959033+05:30	2017-04-12 17:32:02.959033+05:30	f	\N
+1105	Might Joe's	1488546329985548845	might-joe-s-1491668572190	1488546337803731502	1488546346544661039	\N	1488546354840994352	1488546368271155761	10	Marinated carne asada and smoked pork tacos!	streetfoodez@sumup.com	888-5555	www.facebook.com/mightyjoes	\N	\N	https://commercecdn.com/1278235777548943678/be83a820-b60f-441a-9178-e7a1eb212cd0.jpeg	https://commercecdn.com/1278235777548943678/d9c70c24-7d63-4391-a374-e4c66589444f.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Mighty lane	\N	\N	\N	1	\N	Tacos, Enchiladas, Burritos	\N	\N	11270	t	\N	2017-04-08 21:52:56.958871+05:30	2017-04-08 21:52:56.958871+05:30	f	\N
+1115	Churros Factory	1511812077138739683	churros-factory-1494442065438	1511812085779005924	1511812094285054437	\N	1511812102849823206	1511812113478189543	10	Nutella, jam, Belgium chocolate, sprinkles and a wide assortment of other toppings	Churros@me.com	\N	www.facebook.com/churrosmadness	\N	\N	https://commercecdn.com/1278235777548943678/69623b6f-86f2-4e60-b099-ab8f04df4dc1.jpeg	https://commercecdn.com/1278235777548943678/353ef2f4-7438-4497-9036-f0180932c2c8.jpeg	11:00 AM-8:00 PM	\N	Churro Lane	\N	\N	\N	1	\N	Churros, Pastries, Donuts	\N	\N	11315	t	\N	2017-05-11 00:17:49.97301+05:30	2017-05-11 00:17:49.97301+05:30	f	\N
+1116	Fan Zone	1511850604689883662	fan-zone-1494446658266	1511850612977828367	1511850621542597136	\N	1511850629931205137	1511850640660234770	10	Everything a fan could ever want:  T-Shirts, Hats, Jerseys, Raffles, Food, Beer, All Access Pass	Boss@fanzone.com	\N	www.facebook.com/fanzonemania	\N	\N	https://commercecdn.com/1278235777548943678/f04e03e7-9856-47d4-aba3-ba281867ac5e.png	https://commercecdn.com/1278235777548943678/cbcda760-2e36-434b-b932-2a685731fdde.jpeg	12:00 PM-10:00 PM	\N	Fan ave	\N	\N	\N	1	\N	Jerseys, Fan Merchandise, Programs	\N	\N	11317	t	\N	2017-05-11 01:34:22.770244+05:30	2017-05-11 01:34:22.770244+05:30	f	\N
+1117	Fritanga Fred	1511877969553916445	fritanga-fred-1494449920416	1511877978034799134	1511877986314355231	\N	1511877994753294880	1511878005624930849	10	Served with arepas, manioc or plantain, this is a plate full of grilled meat such as chicken or beef with aji sauce!	fred@fritanga.com	\N	www.facebook.com/fritangafred	\N	\N	https://commercecdn.com/1278235777548943678/06913d2d-cdc9-4f6d-aacc-b72c1e3395d1.png	https://commercecdn.com/1278235777548943678/cec8b925-3ce3-4eea-9b4b-1962f651bc86.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	Fritanga Lane	\N	\N	\N	1	\N	Fritanga, Lechona, Arepa	\N	\N	11319	t	\N	2017-05-11 02:28:44.929239+05:30	2017-05-11 02:28:44.929239+05:30	f	\N
+1118	Ticket Master	1511881637934137890	ticket-master-1494450357736	1511881646331134499	1511881654342255140	\N	1511881662848303653	1511881673736716838	11	Buy tickets for any sporting event, concert, festival you want!	Ron@ticketmaster.com	\N	www.facebook.com/ticketmaster	\N	\N	https://commercecdn.com/1278235777548943678/15e77c49-f695-414a-92b7-73b6f3552e5d.jpeg	https://commercecdn.com/1278235777548943678/4091a037-93c8-4452-8193-9bb1725ffbf6.png	11:00 AM-9:00 PM	\N	123 Ticket	\N	\N	\N	1	\N	tickets, venues, events	\N	\N	11321	t	\N	2017-05-11 02:36:02.215922+05:30	2017-05-11 02:36:02.215922+05:30	f	\N
+1112	Soul Man	1500229375184863794	soul-man-1493061299752	1500229386131997235	1500229394688377396	\N	1500229411717251637	1500229422957986358	10	Todos comida do America sul com SOUL!  BBQ é a nossa especialidade!!!	streetfoodez@sumup.com	(84) 99919-0001	\N	\N	\N	https://commercecdn.com/1278235777548943678/33e47d69-b706-4ef3-a632-6e3505fab928.jpeg	https://commercecdn.com/1278235777548943678/c3c01cd7-4cd9-4bf6-ba13-85a464973527.jpeg	6:00 PM-10:30 PM	2,3,4,5	\N	\N	\N	\N	1	\N	Soul food.  Todos comida do America sul!	\N	\N	11301	t	\N	2017-04-25 00:45:05.708298+05:30	2017-04-25 00:45:05.708298+05:30	f	2
+1120	Sabor Brasil	1512449852485665365	sabor-brasil-1494518094168	1512449860547117654	1512449869137052247	\N	1512449877206893144	1512449888422462041	10	\N	luiz@saborbrasil.com.br	(84) 9999-9999	\N	\N	\N	https://commercecdn.com/1278235777548943678/27c6f45d-2a54-47fb-a233-10972d2a949a.png	https://commercecdn.com/1278235777548943678/6b083cf3-2b54-4961-8bf8-f091ba0ea855.png	11:00 AM-8:00 PM	\N	Rua	\N	\N	\N	1	\N	\N	\N	\N	11325	t	\N	2017-05-11 21:24:58.651251+05:30	2017-05-11 21:24:58.651251+05:30	f	\N
+1119	sfeztom5	1511965396758954556	sfeztom5-1494460342534	1511965405013344829	1511965413569724990	\N	1511965422352597567	1511965437301097024	10	A test vendor	t@b.cd	\N	test.fakedomain	\N	\N	https://commercecdn.com/1278235777548943678/b4ce059b-f29d-4a5c-ab83-6343f8f2c041.png	https://commercecdn.com/1278235777548943678/7d284648-1971-44c2-824e-c49249ecc20d.png	11:00 AM-8:00 PM	1,2,3	\N	\N	\N	\N	1	\N	test	\N	\N	11323	f	\N	2017-05-11 05:22:27.66898+05:30	2017-05-11 05:22:27.66898+05:30	f	\N
+1094	Classy Cuban	1479426030098711188	classy-cuban-1490581347750	1479426037740733077	1479426045449863830	1497995126587261030	1479426053435818647	1479426063325987480	7	Manny's secret cuban recipe!	streetfoodez@sumup.com	555-7878	www.facebook.com/classycuban	\N	\N	https://commercecdn.com/1278235777548943678/fe7ae581-d6a9-4d14-86a3-aef5e12e989e.jpeg	https://commercecdn.com/1278235777548943678/ddb53e6f-62aa-4a47-bfef-b912f1fd93a6.jpeg	11:00 AM-9:00 PM	0,1,2,3,4	123 Cuban dr	\N	\N	\N	1	\N	Cuban, Paninis	\N	\N	11227	t	\N	2017-03-27 07:52:31.905003+05:30	2017-03-27 07:52:31.905003+05:30	f	\N
+1005	Crazy Jacks	1440710633996681868	crazy-jacks-1485966112929	1440710643157041805	1463319152025404122	\N	1440710650237026958	1440710659665822351	1.6	Homemade subs "Crazy Jack" style	Streetfoodez@hotmail.com	\N	www.facebook.com/crazyjacks	\N	\N	https://commercecdn.com/1278235777548943678/8c75231e-33eb-4823-93e0-42093f79d98f.jpeg	https://commercecdn.com/1278235777548943678/ddcc397f-c3eb-4de2-babc-9a544ac5da9b.jpeg	10 am - 5 pm		\N	\N	\N	\N	2	\N	subs, burgers, bbq	\N	\N	11017	t	5	2017-02-02 02:51:56.123+05:30	2017-03-05 02:31:14.476317+05:30	f	\N
+1088	Chunky Monkey	1445663478260957711	chunky-monkey-1486556537929	1445663485726818832	1463319636031308507	1465189269227176025	1445663493511447057	1445663503426781714	13	Best hot fudge sundaes in town	streetfoodez@sumup.com	212	www.facebook.com/chunkymonkey1	\N	\N	https://commercecdn.com/1278235777548943678/462a01bc-583c-4892-9144-a117ca406783.png	https://commercecdn.com/1278235777548943678/0ad8cddc-28c8-4ca5-b70c-77296672ccd6.jpeg	11:00 AM-8:00 PM	0,1,2,3,4	123 Chunky	\N	\N	\N	1	\N	bananas, ice cream	\N	\N	11192	t	\N	2017-02-08 17:52:21.119+05:30	2017-03-05 02:32:08.923872+05:30	f	1
+1100	test2	1483587720071611253	test2-1491077459842	1483587733870871414	1483587742007821175	\N	1483587750002164600	1483587760915743609	10	\N	jon.kazarian@gmail.com	\N	\N	\N	\N	https://commercecdn.com/1278235777548943678/dee5d9d7-8251-42e3-b114-2e750b9b0837.jpeg	\N	11:00 AM-8:59 AM	2,3	\N	\N	\N	\N	1	\N	#pizza	\N	\N	11238	t	\N	2017-04-02 01:41:04.905197+05:30	2017-04-02 01:41:04.905197+05:30	f	1
+1113	lupk	1505143118813463378	lupk-1493647063572	1505143126908470099	1505143135691342676	\N	1505143144163836757	1505143154683151190	10	\N	louepark@gmail.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11310	t	\N	2017-05-01 19:27:48.040243+05:30	2017-05-01 19:27:48.040243+05:30	f	1
+1114	Jose's Empanadas	1511779114413982166	jose-s-empanadas-1494438135941	1511779122559320535	1511779131568685528	\N	1511779140175397337	1511779150745043418	10	Stuffed bread, carne, cheddar cheese, huitlacoche and more!	Jose@empanada.com	\N	www.facebook.com/empanadaexpress	\N	\N	https://commercecdn.com/1278235777548943678/05d67253-d79e-4036-8235-41f7e13fb189.jpeg	https://commercecdn.com/1278235777548943678/dceaf21f-1a4f-4916-a077-ee57bdee104e.jpeg	11:00 AM-9:00 PM	0,1,2	\N	\N	\N	\N	1	\N	Empanadas, Tacos, Burritos	\N	\N	11313	t	\N	2017-05-10 23:12:20.474558+05:30	2017-05-10 23:12:20.474558+05:30	f	2
+1121	Sabor Brasileiro	1512617656748868248	sabor-brasileiro-1494538098008	1512617665598849689	1512617674004234906	\N	1512617682082464411	1512617692593390236	10	Aqui nós temos a mais típica feijoada brasileira e os mais variados pratos tradicionais de todas as regiões do Brasil.	luiz@saborbrasileiro.com.br	(84) 99999-9999	facebook.com/saborbrasileiro	\N	\N	https://commercecdn.com/1278235777548943678/80c61edd-09b7-40d6-a340-399dc6534eb1.jpeg	https://commercecdn.com/1278235777548943678/b2203621-5caa-482e-b308-b64a932066a6.jpeg	10:00 AM-10:00 PM	1,2,3,4,5,6	Rua Brasil, 123	\N	\N	\N	1	\N	Feijoada, caipirinha, açaí	\N	\N	11327	t	\N	2017-05-12 02:58:22.483634+05:30	2017-05-12 02:58:22.483634+05:30	f	2
+1111	rajanramani	1492011507074990336	rajanramani-1492081653535	1492011514700235009	1492011522610692354	\N	1492011530504372483	1492011540579090692	10	\N	rajan.rajan977@gmail.com	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	1	\N	\N	\N	\N	11295	t	\N	2017-04-13 16:37:37.725477+05:30	2017-04-13 16:37:37.725477+05:30	f	2
+\.
+
+
+--
+-- Data for Name: contracts; Type: TABLE DATA; Schema: public; Owner: sfez_rw
 --
 
 COPY public.contracts (id, company_id, unit_id, customer_id, offer_id, request_name, request_photo, cash_offer, buy_back_amount, tax_amount, term_months, qr_code, offer_approved, status, is_deleted) FROM stdin;
+1	1	1	9001	1	Test Postman 2 BY Rahul	http://en.freejpg.com.ar/asset/900/ba/baaa/F100011052.jpg	103.1200	210.3400	20.2100	3	Qr Code Test	t	t	f
+2	1	1	9001	3	Test Postman	http://en.freejpg.com.ar/asset/900/ba/baaa/F100011052.jpg	123.5600	0.0000	0.0000	6	Qr Code Test	t	t	f
+3	1001	1	9001	5	Contract For Iphone 8	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1020.0000	1200.0000	125.0000	4	958565028790101	t	t	f
+\.
+
+
+--
+-- Data for Name: countries; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.countries (id, name, is_enabled, tax_band, moltin_client_id, moltin_client_secret, currency_id, currency) FROM stdin;
+1	Brazil	t	1427064502431515521	\N	\N	1435543251393183865	BRL
+2	USA	f	1427064502431515521	\N	\N	1435543251393183865	USD
 \.
 
 
@@ -551,18 +1993,18 @@ COPY public.drivers_foodpark (available, food_park_id, user_id) FROM stdin;
 
 
 --
--- Data for Name: events; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.events (id, name, ticketed, start_date, end_date, schedule, manager, social_media, latitude, longitude, image, sponsors) FROM stdin;
-\.
-
-
---
 -- Data for Name: event_guests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.event_guests (guest, event) FROM stdin;
+\.
+
+
+--
+-- Data for Name: events; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.events (id, name, ticketed, start_date, end_date, schedule, manager, social_media, latitude, longitude, image, sponsors) FROM stdin;
 \.
 
 
@@ -579,6 +2021,33 @@ COPY public.favorites (customer_id, unit_id, company_id, created_at) FROM stdin;
 --
 
 COPY public.food_park_management (id, food_park_id, unit_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: food_parks; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.food_parks (id, name, photo, territory_id, city, state, postal_code, country, latitude, longitude, created_at, updated_at, is_deleted, foodpark_mgr) FROM stdin;
+3001	The Picnic	\N	4	Austin	TX	78704	US	30.2635748000000007	-97.7627071000000001	2016-08-22 05:01:43.131352+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3002	Alamo Drafthouse	\N	4	Austin	TX	78704	US	30.2560785999999986	-97.7635090999999647	2016-08-22 04:31:03.622149+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3003	Austin Food Park	\N	4	Austin	TX	78702	US	30.2544286999999983	-97.7371196999999938	2016-08-22 04:31:50.563872+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3004	Truck Garden Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.87437400000000043	-35.1786949999999976	2016-08-22 04:33:07.177813+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3005	Neide Artesanato/Praia Shopping Food Park - Av. Roberto Freire	\N	3	Ponta Negra	RN	\N	BR	-5.86576900000000023	-35.1858780000000024	2016-08-22 04:35:04.914807+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3006	Natal Shopping Food Park - Av. das Brancas Dunas	\N	1	Natal	RN	\N	BR	-5.84256300000000017	-35.2106240000000028	2016-08-22 04:42:10.112015+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3007	Bar 54 Food Park - Rua Porto Mirim	\N	1	Natal	RN	\N	BR	-5.87467399999999973	-35.1835140000000024	2016-08-30 02:24:42.540882+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3008	Bar Trove Food Park - Rua Presidente José Bento	\N	1	Natal	RN	\N	BR	-5.80574800000000035	-35.2147050000000021	2016-08-31 02:42:08.717913+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3009	Food By Food West	\N	4	Austin	TX	78723	US	30.2979999999999983	-97.7069999999999936	2016-08-22 05:01:43.131352+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3010	Growler Food Park	\N	5	Pflugerville	TX	78660	US	30.4490000000000016	-97.6069999999999993	2016-08-22 04:31:03.622149+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3011	Food Park at La Frontera	\N	6	Round Rock	TX	78681	US	30.4810000000000016	-97.6770000000000067	2016-08-22 04:31:50.563872+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3012	Las Palmas Food Bazaar	\N	8	Miami	FL	33136	US	25.7920000000000016	-80.195999999999998	2016-08-22 04:33:07.177813+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3013	Tropical Food Court	\N	7	Fort Lauderdale	FL	33304	US	26.1359999999999992	-80.1370000000000005	2016-08-22 04:35:04.914807+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3014	Snappy Food Park	\N	9	Coral Gables	FL	33146	US	25.7289999999999992	-80.2609999999999957	2016-08-22 04:42:10.112015+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3015	LoDo TrPk	\N	10	Denver	CO	80202	US	39.7509999999999977	-105	2016-08-30 02:24:42.540882+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3016	Del Mar	\N	11	Aurora	CO	80042	US	39.7280000000000015	-104.843999999999994	2016-08-31 02:42:08.717913+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+3017	Foothills Food Court	\N	12	Lakewood	CO	80226	US	39.7109999999999985	-105.084000000000003	2016-08-31 02:42:08.717913+05:30	2017-03-22 08:00:49.056127+05:30	f	\N
+30019	Ponta Negra Beach Boardwalk	\N	3	\N	\N	\N	\N	-5.87119999999999997	-35.1799999999999997	2017-04-08 21:31:23.846383+05:30	2017-04-08 21:33:08.092697+05:30	f	\N
+30020	Big 5 Sports Bar Food Park	\N	3	\N	\N	\N	\N	-5.66999999999999993	-36.2100000000000009	2017-04-09 07:57:13.714836+05:30	2017-04-09 07:57:13.714836+05:30	f	\N
 \.
 
 
@@ -631,8 +2100,10 @@ COPY public.loyalty_used (id, amount_redeemed, customer_id, company_id, created_
 --
 
 COPY public.offers (id, request_id, request_name, company_id, pawn_poc, pawn_name, pawn_address, pawn_phone, unit_id, cash_offer, buy_back_amount, tax_amount, offer_term, offer_accepted, total_redemption, maturity_date, interest_rate, rating, distance, created_at, modified_at, is_deleted) FROM stdin;
-1	1	Test Request	1005	Test Pawn Poc	Test Pawn Name	Test Pawn Address	Test Pawn Phone	1	103.1200	210.3400	20.1200	Test Offer Term	f	200.2100	2018-04-17 14:18:51.270486	7.4300	5.0000	21.2300	2018-04-17 14:18:51.270486	2018-04-17 14:18:51.270486	f
-2	1	Test Request 1	1005	Test Pawn Poc 1	Test Pawn Name	Test Pawn Address	Test Pawn Phone	1	103.1200	210.3400	20.1200	Test Offer Term	f	200.2100	2018-04-17 14:20:05.236397	7.4300	5.0000	21.2300	2018-04-17 14:20:05.236397	2018-04-17 14:20:05.236397	f
+1	1	Test Request	1005	Test Pawn Poc	Test Pawn Name	Test Pawn Address	Test Pawn Phone	1	103.1200	210.3400	20.1200	3	t	200.2100	2018-04-17 14:18:51.270486	7.4300	5.0000	21.2300	2018-04-17 14:18:51.270486	2018-04-17 14:18:51.270486	f
+3	4	Test Name	1005	Test 	\N	\N	\N	1	123.5600	0.0000	0.0000	6	f	0.0000	\N	0.0000	0.0000	0.0000	2018-04-19 09:36:20.517975	2018-04-19 09:36:20.517975	f
+2	1	Test Request 1	1005	Test Pawn Poc 1	Test Pawn Name	Test Pawn Address	Test Pawn Phone	1	103.1200	210.3400	20.1200	6	f	200.2100	2018-04-17 14:20:05.236397	7.4300	5.0000	21.2300	2018-04-17 14:20:05.236397	2018-04-17 14:20:05.236397	f
+5	4	Rahul Offer	1005	Test 	\N	\N	\N	1	123.5600	123.5600	0.0000	6	f	143.3450	\N	0.0000	0.0000	0.0000	2018-04-19 09:43:49.739	2018-04-19 09:43:49.739	f
 \.
 
 
@@ -1051,11 +2522,11 @@ COPY public.order_state (id, order_id, order_requested_step, order_accepted_step
 -- Data for Name: requests; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.requests (id, customer_id, request_name, request_photo, category_id, latitude, longitude, created_at, modified_at, is_deleted, description, condition, buy_back_term) FROM stdin;
-4	9001	Test Postman	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1	140.4500	204.1200	2018-04-17 10:18:06.480154	2018-04-17 10:18:06.480154	f	\N	\N	\N
-7	9001	Test Postman 1	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1	140.4500	204.1200	2018-04-18 06:01:46.19811	2018-04-18 06:01:46.19811	f	Very Nice IPHone 5 with cable	Branch New	3 Months
-8	9001	Test Postman 2	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1	140.4500	204.1200	2018-04-18 06:01:52.04494	2018-04-18 06:01:52.04494	t	Very Nice IPHone 5 with cable	Branch New	3 Months
-1	9001	Test Postman 2 BY Rahul	http://en.freejpg.com.ar/asset/900/ba/baaa/F100011052.jpg	1	140.4500	105.1400	2018-04-17 05:55:13.653735	2018-04-17 11:25:13.653735	t	\N	\N	3 Months
+COPY public.requests (id, customer_id, request_name, request_photo, category_id, latitude, longitude, created_at, modified_at, is_deleted, request_description, condition, buy_back_term, country, state, territory) FROM stdin;
+4	9001	Test Postman	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1	140.4500	204.1200	2018-04-17 10:18:06.480154	2018-04-17 10:18:06.480154	f	\N	\N	\N	\N	\N	\N
+7	9001	Test Postman 1	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1	140.4500	204.1200	2018-04-18 06:01:46.19811	2018-04-18 06:01:46.19811	f	Very Nice IPHone 5 with cable	Branch New	3 Months	\N	\N	\N
+8	9001	Test Postman 2	http://en.freejpg.com.ar/asset/400/ba/baaa/F100011052.jpg	1	140.4500	204.1200	2018-04-18 06:01:52.04494	2018-04-18 06:01:52.04494	t	Very Nice IPHone 5 with cable	Branch New	3 Months	\N	\N	\N
+1	9001	Test Postman 2 BY Rahul	http://en.freejpg.com.ar/asset/900/ba/baaa/F100011052.jpg	1	140.4500	105.1400	2018-04-17 05:55:13.653735	2018-04-17 11:25:13.653735	t	\N	\N	3 Months	\N	\N	\N
 \.
 
 
@@ -1090,6 +2561,20 @@ COPY public.reviews (id, comment, rating, answers, customer_id, company_id, unit
 
 
 --
+-- Data for Name: roles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.roles (id, type) FROM stdin;
+1	CUSTOMER
+2	OWNER
+3	UNITMGR
+4	ADMIN
+5	DRIVER
+6	FOODPARKMGR
+\.
+
+
+--
 -- Data for Name: search_preferences; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1110,6 +2595,241 @@ COPY public.square_unit (unit_id, location_id) FROM stdin;
 --
 
 COPY public.square_user (merchant_id, expires_at, access_token, user_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: territories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.territories (id, city, territory, state, country, country_id, timezone, latitude, longitude, created_at, updated_at, is_deleted) FROM stdin;
+1	Natal	 Natal-RN	RN	Brazil	1	Buenos Aires	-5.77718199999999982	-35.2003229999999974	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+2	Sao Paolo	 Sao Paolo-SP	RN	Brazil	1	Brasilia	-23.5500000000000007	-46.6333330000000004	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+3	Ponta Negra	 Ponta Negra-RN	RN	Brazil	1	Buenos Aires	-6.22899400000000014	-35.0487759999999966	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+4	Austin	 Austin-TX	TX	USA	2	Central Time (US & Canada)	30.2643169999999984	-97.7382280000000065	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+5	Pflugerville	 Pflugerville-TX	TX	USA	2	Central Time (US & Canada)	30.4400000000000013	-97.6200000000000045	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+6	Round Rock	 Round Rock-TX	TX	USA	2	Central Time (US & Canada)	30.5079999999999991	-97.6779999999999973	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+7	Fort Lauderdale	 Fort Lauderdale-TX	FL	USA	2	Eastern Time (US & Canada)	26.1219999999999999	-80.1370000000000005	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+8	Miami	 Miami-FL	FL	USA	2	Eastern Time (US & Canada)	25.7620000000000005	-80.1899999999999977	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+9	Coral Gables	 Coral Gables-FL	FL	USA	2	Eastern Time (US & Canada)	25.7220000000000013	-80.2690000000000055	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+10	Denver	 Denver-CO	CO	USA	2	Mountain Time (US & Canada)	39.7460000000000022	-104.992000000000004	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+11	Aurora	 Aurora-CO	CO	USA	2	Mountain Time (US & Canada)	39.7250000000000014	-104.846999999999994	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+12	Lakewood	 Lakewood-CO	CO	USA	2	Mountain Time (US & Canada)	39.7109999999999985	-105.081000000000003	2016-09-07 04:30:00+05:30	2017-03-05 01:26:28.353788+05:30	f
+13	\N	Fortaleza	\N	\N	2	\N	-56	-10	2017-04-09 07:55:58.836362+05:30	2017-04-09 07:55:58.836362+05:30	f
+\.
+
+
+--
+-- Data for Name: unit_types; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.unit_types (id, type) FROM stdin;
+1	TRUCK
+2	CART
+3	RESTAURANT
+\.
+
+
+--
+-- Data for Name: units; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.units (id, name, number, type, customer_order_window, prep_notice, delivery, delivery_time_offset, delivery_chg_amount, delivery_radius, description, username, password, qr_code, phone, apns_id, fcm_id, gcm_id, device_type, unit_order_sys_id, territory_id, company_id, unit_mgr_id, created_at, updated_at, currency_id, currency, payment, is_deleted) FROM stdin;
+2003	Pacos Tacos Truck 12	1	TRUCK	10	\N	f	\N	\N	\N	\N	mptruck64five	mptruck64five	\N	\N	\N	\N	\N	\N	\N	\N	1006	11009	2017-02-01 05:02:49.181663+05:30	2017-02-06 14:59:12.298814+05:30	1435543251393183865	BRL	SumUp	f
+2097	Frank Truck #1	1	TRUCK	30	25	t	15	\N	10	\N	franktruck1	frank	\N	\N	\N	\N	APA91bF41fPOdQzdOqqrYwNYjEMSBmrfbQAwxgRrGKm2DIbYzRA3SYAfAJcwzfcYQZLR4s_hvyvfUkxEpEGTZK9az5OzCAjiRdI7YZku8e49upnJE-aZkvo	\N	\N	1	1095	11230	2017-03-29 00:42:11.61453+05:30	2017-04-28 04:07:48.184656+05:30	1435543251393183865	BRL	SumUp	f
+2128	Truck 3	4	TRUCK	30	30	f	10	\N	5	\N	fogo116	fogo116	\N	\N	\N	\N	APA91bGh8hKQ32M2cdtMNY3h-l2gY2t29KlmUYTR_YGZ4xyQMiPv54erfcgcy1B9TZZTDKYUQq_UeYWSlwfeVirMRannny8R2O6Oss3rwO1YCtFiyUI3nnkf6R2gWVMHqS4HntFAJ_bd	\N	\N	3	1092	11276	2017-04-10 05:42:05.829061+05:30	2017-04-27 15:33:05.257257+05:30	1435543251393183865	BRL	SumUp	f
+2002	Thaitanic Cart 1	1	CART	20	\N	f	\N	\N	\N	\N	mptruck64	mptruck64	\N	\N	\N	\N	APA91bGLPDm96TAg6C77VrwxlP1Nk11Md-hSRZGLOjS8CoECWfEFjp1Ise1_GRolqix4jydowaJ9d8OKxJMoiH3_qc0VEGNdqKiQ66Jbb_mneP-0T5qm4IK3RPZMKQlu9j2T7gOJGg0B	\N	\N	\N	1001	11008	2017-02-01 05:02:49.181663+05:30	2017-03-29 00:37:52.733603+05:30	1435543251393183865	BRL	SumUp	f
+2132	Crazy Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	crazytruck1	crazy	\N	\N	\N	\N	APA91bG2DPnoMR-TkhhHcixL-8uP6Rm5YN0UCqv5rv1nHdzkt3TrkqbQDvrmp5dRGkQorWx3r_zZGDS1Yi2_muJoMY61RThXVfBJJ-MpF2pZbtyqDr89NFI	\N	\N	1	1109	11287	2017-04-12 17:32:04.700899+05:30	2017-04-27 21:42:48.43914+05:30	1435543251393183865	BRL	SumUp	f
+2136	D Truck #1	1	TRUCK	30	25	t	\N	\N	10	\N	destructodentruck1	smiley66	\N	\N	\N	\N	APA91bG3q71WUOuK06XcUDiWTYK1bBJU7GSMv4VC8bxugs5Y-sRVOryb_KG-92mbwci8szGJOQTIUwMWm6Njn_BYK-aN1CDBl1CalcLdh-nWUt6N8YBbQBo	\N	\N	1	1112	11302	2017-04-25 00:45:07.450343+05:30	2017-04-27 02:24:11.879448+05:30	1435543251393183865	BRL	SumUp	f
+2075	Grilla Truck #1	1	CART	20	15	t	15	\N	10	\N	grilla26	grilla26	\N	\N	\N	\N	APA91bHCWKDYBbt3JL7ajuPyrZP3ASQP1XeNn4_-EBaxSPm3HAUG6Xjb9QpQF68IoZ3AeH9KEgvcfXWfLFgbPq25HIG2m5OCh-C-IsLLoyLXCr7EqS_vcWk	\N	\N	1	1008	11174	2017-02-06 15:21:07.210394+05:30	2017-05-01 20:46:15.039601+05:30	1435543251393183865	BRL	SumUp	f
+2094	Fogo Truck #1	1	TRUCK	30	25	t	15	\N	10	\N	fogotruck1	fogo	\N	\N	\N	\N	APA91bFWVXFrQz5B8wA6K8qIOqdbyC0pDtnR3Kd_4XqN3tZj0cH-FNwUzmOcq0eFT60ZnR29ocaafc2ztCQ1AiO3NRqbpLVLazbFq1QAQ6CNBlpw6xDWSgg	\N	\N	1	1092	11224	2017-03-24 21:24:11.300743+05:30	2017-05-01 20:30:09.925919+05:30	1435543251393183865	BRL	SumUp	f
+2127	Truck #2	4	TRUCK	30	30	f	10	\N	5	\N	fogo46	fogo46	\N	\N	\N	\N	APA91bFOPNguXOsMnovayP1TZj0uhkaTvIloVc6tZpC2HZ2QEzdsBmjGcydh1bZlpFDqoOMLCSsiN03Q7soYJ7ddiAXDPcza4GT0fUdRnZF2JzQy_cNQ-too2MbizQYtdNCXcXNzERtb	\N	\N	3	1092	11275	2017-04-10 03:55:13.74483+05:30	2017-04-25 23:35:43.083326+05:30	1435543251393183865	BRL	SumUp	f
+2125	Ponta Negra Truck2	2	TRUCK	30	20	f	15	\N	10	\N	joe56	joe56	\N	\N	\N	\N	\N	\N	\N	3	1105	11272	2017-04-08 22:00:09.629615+05:30	2017-04-11 19:55:15.751657+05:30	1435543251393183865	BRL	SumUp	f
+2091	Vinay Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	vinaybhavsartruck1	cdn123	\N	\N	\N	\N	\N	\N	\N	1	1089	11218	2017-03-22 17:19:39.947588+05:30	2017-03-22 17:19:39.947588+05:30	1435543251393183865	BRL	SumUp	f
+2095	nuvo Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	nuvotruck1	nuvo	\N	\N	\N	\N	\N	\N	\N	1	1093	11226	2017-03-25 18:34:06.78761+05:30	2017-03-25 19:52:23.705259+05:30	1435543251393183865	BRL	SumUp	f
+2089	Chunky Truck #1	1	CART	60	30	t	30	\N	15	\N	chunkytruck1	chunkymonkey	\N	\N	\N	\N	APA91bGex9UmnMoD0h_KHfRAdBK2-QF1m-vPIQgYofG3YFPzFzvJwM5mgWog8yTCoO5sYzVX-I8wv8BCjS3mdffeSNbTHHcSwj2tsog8e6GMK0vZSHIkRqU	\N	\N	1	1088	11193	2017-02-08 12:52:22.776055+05:30	2017-04-25 17:10:48.716315+05:30	1435543251393183865	BRL	SumUp	f
+2099	Dummy Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	dummytruck1	dummy	\N	\N	\N	\N	\N	\N	\N	1	1098	11235	2017-04-01 23:53:08.972411+05:30	2017-04-01 23:53:08.972411+05:30	1435543251393183865	BRL	SumUp	f
+2098	Bob Truck #1	1	TRUCK	40	25	f	15	\N	10	\N	bobtruck1	bob	\N	\N	\N	\N	\N	\N	\N	3	1096	11232	2017-03-29 00:46:50.676091+05:30	2017-03-29 01:06:01.583526+05:30	1435543251393183865	BRL	SumUp	f
+2102	Billy Truck #1	1	RESTAURANT	30	25	f	15	\N	10	\N	billytruck1	billy	\N	\N	\N	\N	\N	\N	\N	4	1101	11241	2017-04-03 04:34:30.650284+05:30	2017-04-03 04:38:42.608407+05:30	1435543251393183865	USD	SumUp	f
+2100	dsfdsf Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	dfdsftruck1	idontknow	\N	\N	\N	\N	\N	\N	\N	1	1099	11237	2017-04-02 00:55:59.782045+05:30	2017-04-02 00:55:59.782045+05:30	1435543251393183865	BRL	SumUp	f
+2135	cart 2	2	TRUCK	30	30	f	15	\N	10	\N	classy56	classy56	\N	\N	\N	\N	\N	\N	\N	3	1094	11297	2017-04-16 20:03:07.035234+05:30	2017-04-27 01:45:05.095226+05:30	1435543251393183865	BRL	SumUp	f
+2103	Dennis Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	dnick66truck1	smiley66	\N	\N	\N	\N	APA91bEBbLnE4vXEcmy83D8LHr59wq8G2C8exP-UDGxy1Vyf461iBDoIO55OFAe8Eyl49z4I_hcZj73gVDMVWITfJJbdBFaQmjebDjjIOkNMGT0oJ5Ld2nU	\N	\N	1	1102	11243	2017-04-04 17:31:20.479621+05:30	2017-04-25 02:22:17.450486+05:30	1435543251393183865	BRL	SumUp	f
+2137	D Truck #2	2	TRUCK	40	30	f	30	\N	5	\N	manager2	smiley66	\N	\N	\N	\N	\N	\N	\N	1	1112	11303	2017-04-25 00:59:23.374981+05:30	2017-04-25 17:09:48.997138+05:30	1435543251393183865	BRL	SumUp	f
+2106	Here	1	TRUCK	30	30	f	\N	\N	\N	\N	Gen1Living	smiley66	\N	\N	\N	\N	\N	\N	\N	1	1104	11248	2017-04-04 22:37:04.576686+05:30	2017-04-04 22:37:04.576686+05:30	1435543251393183865	BRL	SumUp	f
+2107	Here2	2	TRUCK	20	10	f	\N	\N	\N	\N	gen1	smiley66	\N	\N	\N	\N	\N	\N	\N	1	1104	11249	2017-04-04 22:37:42.24167+05:30	2017-04-04 22:37:42.24167+05:30	1435543251393183865	BRL	SumUp	f
+2101	j Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	jon.kazariantruck1	test1234	\N	\N	\N	\N	\N	\N	\N	1	1100	11239	2017-04-02 01:41:06.020718+05:30	2017-04-02 01:41:06.020718+05:30	1435543251393183865	BRL	SumUp	f
+2007	Moe Truck #1	4	TRUCK	20	15	f	\N	\N	\N	\N	moe56	moe56	\N	\N	\N	\N	\N	\N	\N	2	1005	11021	2017-02-02 13:17:24.083754+05:30	2017-04-02 01:42:44.583302+05:30	1435543251393183865	BRL	SumUp	f
+2118	Sao Paolo Truck #3	4	TRUCK	30	30	f	25	\N	10	\N	sfsdf	sdffs	\N	\N	\N	\N	\N	\N	\N	2	1088	11262	2017-04-08 10:24:57.556556+05:30	2017-04-15 19:46:22.04093+05:30	1435543251393183865	BRL	SumUp	f
+2070	Crazy Truck 5	5	TRUCK	20	15	f	\N	\N	\N	\N	Jack	jack	\N	\N	\N	cNXGElYdnDQ:APA91bH6L7mau4dFV_woD7vmapgsm0gIV3lE34Oqua2H7sZ9t3XoXAMVBagVA3PNPzWClL-TTvYnLa-XEzPMtNfP_uGtrMf9Avd6M2tfN8Jhzw--dhkYhETx6P_385NBUdsSCtLGHaLV	\N	\N	\N	1	1005	11169	2017-02-06 12:41:55.248113+05:30	2017-04-07 17:15:54.971128+05:30	1435543251393183865	BRL	SumUp	f
+2115	test 2	4	TRUCK	30	30	f	20	\N	10	\N	asdasd	asd	\N	\N	\N	\N	\N	\N	\N	3	1005	11259	2017-04-08 10:22:48.711481+05:30	2017-04-08 10:22:48.711481+05:30	1435543251393183865	BRL	SumUp	f
+2006	jack	5	TRUCK	20	15	t	15	\N	5	Crazy Jacks Truck	crazy56	crazy56	\N	\N	\N	\N	APA91bGg0iBMwhOiySq6IEeuGoQjALsuIXbPUe6oTLE74L97UFquAXwNtPkAsQmWHCtg5zl--EtPen7jDYhH8gi5A0V-KB72vv8OI9YVgOcc5rQIrycMVtYmPz6zajSARiP3HEUFMzfV	\N	\N	4	1005	11018	2017-02-01 17:16:50.747716+05:30	2017-04-07 17:24:08.076457+05:30	1435543251393183865	USD	SumUp	f
+2008	Grilla Truck 1	1	TRUCK	20	15	f	\N	\N	\N	\N	grilla56	grilla56	\N	\N	\N	\N	APA91bFpsAYejc4VbU7ec8kPQ71TTztyXhkFd3txsOfn2V5rO9U65NB7szEVaI5jqk2wQ9DSxJcicKUEyL3MEIPft96au_6MjW5qrKBgxDx-LGcnUbKv388	\N	\N	1	1005	11026	2017-02-03 02:55:02.490854+05:30	2017-04-12 16:50:13.308447+05:30	1435543251393183865	BRL	SumUp	f
+2131	qwerty	4	TRUCK	30	30	f	10	\N	5	\N	qwerty	qwerty	\N	\N	\N	\N	\N	\N	\N	3	1104	11280	2017-04-10 09:32:41.873633+05:30	2017-04-10 09:32:41.873633+05:30	1435543251393183865	BRL	SumUp	f
+2111	sdasdasd	4	TRUCK	30	30	f	25	\N	15	\N	asd	asdasd	\N	\N	\N	\N	\N	\N	\N	1	1005	11255	2017-04-08 10:04:02.28844+05:30	2017-04-12 17:44:41.997895+05:30	1435543251393183865	BRL	SumUp	f
+2001	Thaitanic Truck 1	1	TRUCK	15	\N	f	\N	\N	\N	\N	mptruck61	mptruck61	\N	\N	\N	cNXGElYdnDQ:APA91bH6L7mau4dFV_woD7vmapgsm0gIV3lE34Oqua2H7sZ9t3XoXAMVBagVA3PNPzWClL-TTvYnLa-XEzPMtNfP_uGtrMf9Avd6M2tfN8Jhzw--dhkYhETx6P_385NBUdsSCtLGHaLV	c9k1cdeqqlc:APA91bE3N9DPEPRVrylvqniUc0YkeqiDcL0bLF7wEpm0BUFDspsRMjJGenLnF07ssEmBZe90pG983xq9cQLzLzu6uWXYyhv1OZpDrUeCirxjBSzmIX-TJlO5T58PxakjRLd8LIghjnuy	\N	\N	\N	1005	11007	2017-02-01 05:02:49.181663+05:30	2017-04-11 11:41:29.633649+05:30	1435543251393183865	BRL	SumUp	f
+2121	Ponta Negra Truck#2	2	TRUCK	30	30	f	15	\N	10	\N	fogo76	fogo76	\N	\N	\N	\N	\N	\N	\N	3	1088	11266	2017-04-08 21:16:18.677079+05:30	2017-04-12 09:34:26.299748+05:30	1435543251393183865	BRL	SumUp	f
+2124	Mighty Truck #1	1	TRUCK	30	25	f	15	\N	10	\N	joetruck1	joe	\N	\N	\N	\N	\N	\N	\N	1	1105	11271	2017-04-08 21:52:59.321931+05:30	2017-04-11 19:54:57.73502+05:30	1435543251393183865	BRL	SumUp	f
+2129	asdasdasdatests	4	TRUCK	30	30	f	30	\N	15	\N	yogesh	123	\N	\N	\N	\N	\N	\N	\N	2	1088	11277	2017-04-10 09:20:44.732805+05:30	2017-04-12 09:34:23.638533+05:30	1435543251393183865	BRL	SumUp	f
+2130	tester	4	TRUCK	25	15	f	25	\N	15	\N	testera	tester11a	\N	\N	\N	\N	\N	\N	\N	2	1088	11278	2017-04-10 09:24:54.954704+05:30	2017-04-12 09:39:23.833171+05:30	1435543251393183865	BRL	SumUp	f
+2116	Ponta Negra Truck #2	4	TRUCK	30	30	f	20	\N	10	\N	chunky56	chunky56	\N	\N	\N	fXS-t9CJhBM:APA91bE6zYJ007cPVdVRrMxE4ajL-Ca2ptJ14H2kr0oNX6RvJ5gPqeL91rvN9df-GNGPJviNjkEYudWMvmM2zjmxquZK1IHUgqoPp8buvc2aTsuYjSwP_Kmj4rRGeEywiTVRgu3cRXlI	\N	\N	\N	3	1088	11260	2017-04-08 10:23:07.845841+05:30	2017-04-12 09:40:09.082879+05:30	1435543251393183865	BRL	SumUp	f
+2133	Paco Truck #1	1	TRUCK	30	25	t	15	\N	10	\N	tacostruck1	tacos	\N	\N	\N	\N	APA91bGex9UmnMoD0h_KHfRAdBK2-QF1m-vPIQgYofG3YFPzFzvJwM5mgWog8yTCoO5sYzVX-I8wv8BCjS3mdffeSNbTHHcSwj2tsog8e6GMK0vZSHIkRqU	\N	\N	1	1110	11294	2017-04-13 14:40:19.81029+05:30	2017-04-15 19:24:31.653443+05:30	1435543251393183865	BRL	SumUp	f
+2134	rajan Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	rajan.rajan977truck1	123456	\N	\N	\N	\N	\N	\N	\N	1	1111	11296	2017-04-13 16:37:39.781341+05:30	2017-04-13 16:37:39.781341+05:30	1435543251393183865	BRL	SumUp	f
+2138	D Truck #3	3	TRUCK	30	30	t	15	\N	10	\N	destructodentruck3	smiley66	\N	\N	\N	\N	\N	\N	\N	3	1112	11304	2017-04-25 17:44:38.303248+05:30	2017-04-25 19:27:36.515451+05:30	1435543251393183865	BRL	SumUp	f
+2139	Jose Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	josetruck1	jose	\N	\N	\N	\N	\N	\N	\N	1	1114	11314	2017-05-10 23:12:22.201211+05:30	2017-05-10 23:12:22.201211+05:30	1435543251393183865	BRL	SumUp	f
+2140	Churros Truck #1	1	TRUCK	30	30	f	\N	\N	\N	\N	churrostruck1	churros	\N	\N	\N	\N	\N	\N	\N	1	1115	11316	2017-05-11 00:29:29.544017+05:30	2017-05-11 00:29:29.544017+05:30	1435543251393183865	BRL	SumUp	f
+2141	Boss Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	bosstruck1	boss	\N	\N	\N	\N	\N	\N	\N	1	1116	11318	2017-05-11 01:34:24.475976+05:30	2017-05-11 01:34:24.475976+05:30	1435543251393183865	BRL	SumUp	f
+2142	Fred Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	fredtruck1	fred	\N	\N	\N	\N	\N	\N	\N	1	1117	11320	2017-05-11 02:28:46.675951+05:30	2017-05-11 02:28:46.675951+05:30	1435543251393183865	BRL	SumUp	f
+2143	Ron Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	rontruck1	ron	\N	\N	\N	\N	\N	\N	\N	1	1118	11322	2017-05-11 02:36:03.952129+05:30	2017-05-11 02:36:03.952129+05:30	1435543251393183865	BRL	SumUp	f
+2144	t Truck #1	1	TRUCK	30	25	f	\N	\N	\N	\N	ttruck1	pass	\N	\N	\N	\N	\N	\N	\N	1	1119	11324	2017-05-11 05:22:30.429381+05:30	2017-05-11 05:22:30.429381+05:30	1435543251393183865	BRL	SumUp	f
+2096	Natal Cart #1	1	CART	30	15	t	15	\N	10	\N	mannytruck1	manny	\N	\N	\N	\N	APA91bG2DPnoMR-TkhhHcixL-8uP6Rm5YN0UCqv5rv1nHdzkt3TrkqbQDvrmp5dRGkQorWx3r_zZGDS1Yi2_muJoMY61RThXVfBJJ-MpF2pZbtyqDr89NFI	\N	\N	1	1094	11228	2017-03-27 07:52:34.955715+05:30	2017-05-11 16:45:45.138951+05:30	1435543251393183865	BRL	SumUp	f
+2145	Sabor Brasil	1	RESTAURANT	30	20	f	15	\N	10	\N	luiztruck1	oioioi	\N	\N	\N	\N	\N	\N	\N	1	1120	11326	2017-05-11 21:25:00.266151+05:30	2017-05-11 21:44:15.334751+05:30	1435543251393183865	BRL	SumUp	f
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, username, password, first_name, last_name, role, territory_id, country_id, phone, provider, provider_id, provider_data, fbid, fb_token, fb_login, default_language, created_at, updated_at, is_deleted) FROM stdin;
+11001	mp10	61a71ecc0510731399d2ecdae912760e	Stacy	Tran	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 05:01:43.131352+05:30	2017-02-03 14:55:30.279083+05:30	f
+11002	mp27	defc72a96803a619a6735cd7e7e69e1b	Jonathan	Jones	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:31:03.622149+05:30	2017-02-03 15:24:22.527595+05:30	f
+11004	mp4@gmail.com	4866d635ea7b0ed8e2452da897143528	Julie	Grant	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:33:07.177813+05:30	2017-02-01 05:02:49.172208+05:30	f
+11005	mp5@gmail.com	146eb1afa89654aca443976646460ef4	Bob	Smith	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:35:04.914807+05:30	2017-02-01 05:02:49.172208+05:30	f
+11006	mp6@gmail.com	5ce4c4a0a26e6df0fdbb380d78f4fab2	Cindy	Clark	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:42:10.112015+05:30	2017-02-01 05:02:49.172208+05:30	f
+11007	mptruck61	6cf9be93694189e06c66faa49a6cbc93	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-30 02:24:42.540882+05:30	2017-02-01 05:02:49.172208+05:30	f
+11008	mptruck64	5db0aeb457f45ddb90c35b39569c1348	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-31 02:42:08.717913+05:30	2017-02-01 05:02:49.172208+05:30	f
+11009	mptruck64five	dda2549944250c6c038797b463e7de99	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-31 02:52:22.983667+05:30	2017-02-01 05:02:49.172208+05:30	f
+11010	trucker1	2c914a017cf7354e6c6319afe0b664b2	\N	\N	UNITMGR	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-09-07 05:27:26.291924+05:30	2017-02-01 05:02:49.172208+05:30	f
+11011	dn10@gmail.com	e04ddb7bae832648e9d649858ef578cb	Dennis	Nichols	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-21 05:03:15.004572+05:30	2017-02-01 05:02:49.172208+05:30	f
+11012	lc11@gmail.com	23ad11f37c9dffc926f57dc0f8455dbc	Luiz	Cobello	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-23 00:12:04.179585+05:30	2017-02-01 05:02:49.172208+05:30	f
+11013	mh12@gmail.com	125512e2351c28ad0bb01cc3d8db3703	Marcos	Hirano	ADMIN	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-10-23 00:11:25.721489+05:30	2017-02-01 05:02:49.172208+05:30	f
+11017	jack@crazysubs.com	4ff9fc6e4e5d5f590c4f2134a8cc96d1	Jack	Crazy	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-01 16:51:51.951081+05:30	2017-02-01 16:51:51.951081+05:30	f
+11018	crazy56	33b0a180f307ca68ba2c2dfa55f6ff4c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-01 17:16:50.778073+05:30	2017-02-01 17:16:50.778073+05:30	f
+11020	Mo@totino.com	27c9d5187cd283f8d160ec1ed2b5ac89	Mo	Totino	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-02 12:34:17.433015+05:30	2017-02-02 12:34:17.433015+05:30	f
+11021	moe56	276fbf86abd87a184df2b737328b6973	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-02 13:17:24.105698+05:30	2017-02-02 13:17:24.105698+05:30	f
+11024	Bangkok@cafe.com	bangkok	Bangkok	Cafe	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-02 14:13:47.94126+05:30	2017-02-02 14:39:32.202801+05:30	f
+11003	mp4	28dafd4a8cb5f33065e93cbc83862563	Marco and Inez	Pena	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2016-08-22 04:31:50.563872+05:30	2017-02-02 15:05:54.217743+05:30	f
+11025	Grilla@grillacheez.com	82edd3141a6270a3ac5e93323c07a7e1	Grilla	Cheez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-03 02:44:48.007795+05:30	2017-02-03 02:44:48.007795+05:30	f
+11026	grilla56	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-03 02:55:02.499941+05:30	2017-02-03 02:55:02.499941+05:30	f
+11068	mg26@gmail.com	22c7b568334f78f0a122ee388557660e	mg2	spy	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-04 00:37:56.71264+05:30	2017-02-04 00:37:56.71264+05:30	f
+11165	suren@aryvart.com	b6c231fc212b1a67d4965d0b1527358c	Surendiran	Parasuraman	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-06 11:14:09.338925+05:30	2017-02-06 11:14:09.338925+05:30	f
+11168	grilla56@gmail.com	09424725eaf9b79082cff28ec83e114c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-06 12:31:15.7952+05:30	2017-02-06 12:31:15.7952+05:30	f
+11169	Jack	4ff9fc6e4e5d5f590c4f2134a8cc96d1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-06 12:41:55.254344+05:30	2017-02-06 12:41:55.254344+05:30	f
+11174	grilla26	3ee0410d3f0f9cf2d1b2f07c2d74604d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-06 15:21:07.21648+05:30	2017-02-06 15:21:07.21648+05:30	f
+11190	testetcus@gmail.com	e10adc3949ba59abbe56e057f20f883e	Tester	Customer	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-08 07:07:49.206449+05:30	2017-02-08 07:07:49.206449+05:30	f
+11192	chunky@monkey.com	90ead2a2940e7f354c310900a950043a	Chunky	Monkey	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-02-08 12:52:17.334042+05:30	2017-02-08 12:52:17.334042+05:30	f
+11193	chunkytruck1	90ead2a2940e7f354c310900a950043a	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-02-08 12:52:22.781745+05:30	2017-02-08 12:52:22.781745+05:30	f
+11195	bob56	90c4b084124e57b98082ce30f93e87dd	Bob	Smith	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-05 08:59:28.312808+05:30	2017-03-05 08:59:28.312808+05:30	f
+11216	j56	ab75a542f5cf2bb17bf700ea393b4326	Jimmy	Chow	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-07 01:08:15.612023+05:30	2017-03-07 01:08:15.612023+05:30	f
+11217	vinaybhavsar@cdnsol.com	704da6e1589cfc6fe1cd2ac59addfec8	Vinay	Bhavsar	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-22 17:19:33.173004+05:30	2017-03-22 17:19:33.173004+05:30	f
+11218	vinaybhavsartruck1	704da6e1589cfc6fe1cd2ac59addfec8	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-22 17:19:39.954103+05:30	2017-03-22 17:19:39.954103+05:30	f
+11219	firminoata@gmail.com	e9da82f4c252e7f1745ae88f2624fc07	Joao	Firmino	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-23 06:15:38.618878+05:30	2017-03-23 06:15:38.618878+05:30	f
+11220	Jimmy@konfusion.com	c2fe677a63ffd5b7ffd8facbf327dad0	Jimmy	Chu	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-24 00:52:51.062785+05:30	2017-03-24 00:52:51.062785+05:30	f
+11221	Jimmytruck1	c2fe677a63ffd5b7ffd8facbf327dad0	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-24 02:01:57.029208+05:30	2017-03-24 02:01:57.029208+05:30	f
+11222	chutruck1	cbcefaf71b4677cb8bcc006e0aeaa34a	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-24 02:30:11.570319+05:30	2017-03-24 02:30:11.570319+05:30	f
+11223	Fogo@thaitanicxpress.com	705eb2cad4537d7ace7fc73bb273f50d	Fogo	Ho	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-24 21:23:41.496447+05:30	2017-03-24 21:23:41.496447+05:30	f
+11224	fogotruck1	705eb2cad4537d7ace7fc73bb273f50d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-24 21:24:11.306417+05:30	2017-03-24 21:24:11.306417+05:30	f
+11225	nuvo@me.com	4bd71661de7274e452bc735e1b9bb7ed	nuvo	goody	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-25 18:34:00.221987+05:30	2017-03-25 18:34:00.221987+05:30	f
+11226	nuvotruck1	4bd71661de7274e452bc735e1b9bb7ed	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-25 18:34:06.793619+05:30	2017-03-25 18:34:06.793619+05:30	f
+11227	Manny@classycuban.com	8fe78ac0eaabf2f474b0de3a968e165e	Manny	Cuba	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-27 07:52:27.156454+05:30	2017-03-27 07:52:27.156454+05:30	f
+11228	mannytruck1	8fe78ac0eaabf2f474b0de3a968e165e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-27 07:52:34.961865+05:30	2017-03-27 07:52:34.961865+05:30	f
+11229	Frank@bbq.com	26253c50741faa9c2e2b836773c69fe6	Frank	Hill	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-29 00:42:04.676928+05:30	2017-03-29 00:42:04.676928+05:30	f
+11230	franktruck1	26253c50741faa9c2e2b836773c69fe6	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-29 00:42:11.624981+05:30	2017-03-29 00:42:11.624981+05:30	f
+11231	Bob@bbq.com	9f9d51bc70ef21ca5c14f307980a29d8	Bob	Jones	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-29 00:46:44.00305+05:30	2017-03-29 00:46:44.00305+05:30	f
+11232	bobtruck1	9f9d51bc70ef21ca5c14f307980a29d8	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-03-29 00:46:50.683263+05:30	2017-03-29 00:46:50.683263+05:30	f
+11233	Jimmy@MyFood.com	c2fe677a63ffd5b7ffd8facbf327dad0	Jimmy	Chow	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-31 23:19:39.128683+05:30	2017-03-31 23:19:39.128683+05:30	f
+11234	Dummy@me.com	275876e34cf609db118f3d84b799a790	Dummy	Dumb	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-01 23:53:01.697481+05:30	2017-04-01 23:53:01.697481+05:30	f
+11235	dummytruck1	275876e34cf609db118f3d84b799a790	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-01 23:53:08.986062+05:30	2017-04-01 23:53:08.986062+05:30	f
+11236	dfdsf@gmail.com	a1fa59e79bba1a38bb0684d3298c9ddd	dsfdsf	dsfdf	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-02 00:55:53.606803+05:30	2017-04-02 00:55:53.606803+05:30	f
+11237	dfdsftruck1	a1fa59e79bba1a38bb0684d3298c9ddd	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-02 00:55:59.79044+05:30	2017-04-02 00:55:59.79044+05:30	f
+11238	jon.kazarian@gmail.com	16d7a4fca7442dda3ad93c9a726597e4	j	k	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-02 01:40:59.253743+05:30	2017-04-02 01:40:59.253743+05:30	f
+11239	jon.kazariantruck1	16d7a4fca7442dda3ad93c9a726597e4	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-02 01:41:06.027822+05:30	2017-04-02 01:41:06.027822+05:30	f
+11240	Billy@me.com	89c246298be2b6113fb10ba80f3c6956	Billy	Bob	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-03 04:34:22.597168+05:30	2017-04-03 04:34:22.597168+05:30	f
+11241	billytruck1	89c246298be2b6113fb10ba80f3c6956	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-03 04:34:30.660808+05:30	2017-04-03 04:34:30.660808+05:30	f
+11242	dnick66@gmail.com	416a88b9efa03e0f809958793624cea5	Dennis	Nichols	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-04 17:31:13.741651+05:30	2017-04-04 17:31:13.741651+05:30	f
+11243	dnick66truck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 17:31:20.506246+05:30	2017-04-04 17:31:20.506246+05:30	f
+11244	Dennis@streetfoodEZ.com	416a88b9efa03e0f809958793624cea5	Dennis	Nichols	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-04 17:45:19.781387+05:30	2017-04-04 17:45:19.781387+05:30	f
+11245	dennistruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 17:45:26.401626+05:30	2017-04-04 17:45:26.401626+05:30	f
+11246	Gen1Living@gmail.com	416a88b9efa03e0f809958793624cea5	Dennis	Nichols	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-04 22:03:29.250527+05:30	2017-04-04 22:03:29.250527+05:30	f
+11247	gen1livingtruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 22:03:36.725433+05:30	2017-04-04 22:03:36.725433+05:30	f
+11248	Gen1Living	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 22:37:04.584469+05:30	2017-04-04 22:37:04.584469+05:30	f
+11249	gen1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-04 22:37:42.249866+05:30	2017-04-04 22:37:42.249866+05:30	f
+11250	root	aa95959e46a8f9c9580ad338a5c0542b	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-05 15:34:45.91599+05:30	2017-04-05 15:34:45.91599+05:30	f
+11251	matt.guiger@gmail.com	ce86d7d02a229acfaca4b63f01a1171b	Matt	Guiger	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-05 19:44:22.988427+05:30	2017-04-05 19:44:22.988427+05:30	f
+11252	chunkytruck2	90ead2a2940e7f354c310900a950043a	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-07 17:29:50.670266+05:30	2017-04-07 17:29:50.670266+05:30	f
+11253	usernameqwwqwqw	1a1dc91c907325c69271ddf0c944bc72	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 09:26:54.01191+05:30	2017-04-08 09:26:54.01191+05:30	f
+11254	asdsad	a8f5f167f44f4964e6c998dee827110c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:03:08.231996+05:30	2017-04-08 10:03:08.231996+05:30	f
+11255	asd	a8f5f167f44f4964e6c998dee827110c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:04:02.296302+05:30	2017-04-08 10:04:02.296302+05:30	f
+11256	yog	cef468eeda569cc1b16b45fd53200b9c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:04:49.133773+05:30	2017-04-08 10:04:49.133773+05:30	f
+11257	sdfsdf	979d472a84804b9f647bc185a877a8b5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:12:15.84034+05:30	2017-04-08 10:12:15.84034+05:30	f
+11258	retert	e3e84538a1b02b1cc11bf71fe3169958	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:13:11.916678+05:30	2017-04-08 10:13:11.916678+05:30	f
+11259	asdasd	7815696ecbf1c96e6894b779456d330e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:22:48.718835+05:30	2017-04-08 10:22:48.718835+05:30	f
+11261	qweqw	006d2143154327a64d86a264aea225f3	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:23:24.23281+05:30	2017-04-08 10:23:24.23281+05:30	f
+11263	ashishsebastian@cdnsol.com	704da6e1589cfc6fe1cd2ac59addfec8	allwyn	alvin	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-08 15:59:29.066162+05:30	2017-04-08 15:59:29.066162+05:30	f
+11260	chunky56	2ea461d364cd78ffc364ceedbb12da91	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:23:07.853728+05:30	2017-04-08 10:23:07.853728+05:30	f
+11264	fogo56	7639294f3d74108e5c0d029ffa05200e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:13:54.335992+05:30	2017-04-08 21:13:54.335992+05:30	f
+11265	fogo26	7a24aff8b46ffd92b002f6e1054c67ba	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:14:39.917619+05:30	2017-04-08 21:14:39.917619+05:30	f
+11266	fogo76	d571ebb8956cf5e642a983f6caa797ca	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:16:18.687364+05:30	2017-04-08 21:16:18.687364+05:30	f
+11268	manny56	a809b284f8106a91d89df25e18f2c668	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:46:49.111114+05:30	2017-04-08 21:46:49.111114+05:30	f
+11269	manny26	d841d99d6c33f479181431373ae5bb71	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:48:36.70971+05:30	2017-04-08 21:48:36.70971+05:30	f
+11270	Joe@mightjoes.com	8ff32489f92f33416694be8fdc2d4c22	Mighty	Joe	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-08 21:52:51.569562+05:30	2017-04-08 21:52:51.569562+05:30	f
+11271	joetruck1	8ff32489f92f33416694be8fdc2d4c22	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:52:59.351554+05:30	2017-04-08 21:52:59.351554+05:30	f
+11272	joe56	0a920d52b15f92c35393a0d4480f0767	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 22:00:09.638072+05:30	2017-04-08 22:00:09.638072+05:30	f
+11273	tango56	b72deb0db6864258c12eeeae3ee2895f	tango56	tango56	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-09 05:05:01.728961+05:30	2017-04-09 05:05:01.728961+05:30	f
+11274	fogo16	f79c422cd62e5006292cb49cbc5f693d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 03:52:49.775635+05:30	2017-04-10 03:52:49.775635+05:30	f
+11275	fogo46	f32fa5f81b6a0d4cdc9662d74bb122f9	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 03:55:13.761133+05:30	2017-04-10 03:55:13.761133+05:30	f
+11267	fogo106	686036a8d37e73b887b437eae0bee3c7	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 21:45:25.144058+05:30	2017-04-10 05:39:45.955109+05:30	f
+11276	fogo116	1da69897d917a8f348baff61b9daf3ec	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 05:42:05.84375+05:30	2017-04-10 05:42:05.84375+05:30	f
+11277	yogesh	202cb962ac59075b964b07152d234b70	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:20:44.73999+05:30	2017-04-10 09:20:44.73999+05:30	f
+11279	test	d5d8982b86cf8b0c34727c6eea13c053	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:26:42.461772+05:30	2017-04-10 09:26:42.461772+05:30	f
+11280	qwerty	d8578edf8458ce06fbc5bb76a58c5ca4	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:32:41.882991+05:30	2017-04-10 09:32:41.882991+05:30	f
+11281	raskstn@gmail.com	751420e2457e6ccc7971358d5d8a8215	raskin	stans	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 17:10:43.095535+05:30	2017-04-10 17:10:43.095535+05:30	f
+11282	testmngr@tester.com	cc03e747a6afbbcbf8be7668acfebee5	testmngr	testmngr	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:05:27.210568+05:30	2017-04-10 19:05:27.210568+05:30	f
+11283	sam@grant.vom	56fafa8964024efa410773781a5f9e93	sam	Garnant	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:07:26.48264+05:30	2017-04-10 19:07:26.48264+05:30	f
+11284	test@tester.com	704da6e1589cfc6fe1cd2ac59addfec8	stanins	bartheion	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:13:53.449113+05:30	2017-04-10 19:13:53.449113+05:30	f
+11285	test5@sfez.com	289d9c456f886cc8876392260e103ff2	stanins	bartheion	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-10 19:15:19.277613+05:30	2017-04-10 19:15:19.277613+05:30	f
+11262	sfsdfas	115ad9fa3a50d87327ac757c61ff8528	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-08 10:24:57.563275+05:30	2017-04-08 10:24:57.563275+05:30	f
+11278	testera	07862e6794a39c150aef26ee61538797	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-10 09:24:54.971092+05:30	2017-04-10 09:24:54.971092+05:30	f
+11286	Crazy@crazysubs.com	297aae72cc4d0d068f46a9158469e34d	Crazy	One	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-12 17:31:57.013755+05:30	2017-04-12 17:31:57.013755+05:30	f
+11287	crazytruck1	297aae72cc4d0d068f46a9158469e34d	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-12 17:32:04.711554+05:30	2017-04-12 17:32:04.711554+05:30	f
+11288	tester@qr.com	19f6d71f70c2c2eb05e7579dfd234e8b	testerqr	qrcode	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-12 18:55:25.762646+05:30	2017-04-12 18:55:25.762646+05:30	f
+11293	tacos@pacostacos.com	dacedf41210444fe8547f5b1cf085a6c	Paco	Rodriguez	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-13 14:40:13.108285+05:30	2017-04-13 14:40:13.108285+05:30	f
+11294	tacostruck1	dacedf41210444fe8547f5b1cf085a6c	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-13 14:40:19.816691+05:30	2017-04-13 14:40:19.816691+05:30	f
+11295	rajan.rajan977@gmail.com	e10adc3949ba59abbe56e057f20f883e	rajan	ramani	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-13 16:37:32.709035+05:30	2017-04-13 16:37:32.709035+05:30	f
+11296	rajan.rajan977truck1	e10adc3949ba59abbe56e057f20f883e	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-13 16:37:39.789052+05:30	2017-04-13 16:37:39.789052+05:30	f
+11297	classy56	a26bf6439c7b17fab1c6cd0ae43b7512	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-16 20:03:07.043751+05:30	2017-04-16 20:03:07.043751+05:30	f
+11298	m56	1500036860c8afd328309fa3af15e933	Marcy	Jones	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-16 20:24:44.284436+05:30	2017-04-16 20:24:44.284436+05:30	f
+11299	d56	ad71b715717f7e4757565373c1a88e1f	Dirk	Nowitzki	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-17 00:47:03.953835+05:30	2017-04-17 00:47:03.953835+05:30	f
+11300	health@gen1living.com	416a88b9efa03e0f809958793624cea5	d	n	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-24 22:30:57.093372+05:30	2017-04-24 22:30:57.093372+05:30	f
+11301	destructoden@gmail.com	416a88b9efa03e0f809958793624cea5	D	N	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-25 00:44:59.113433+05:30	2017-04-25 00:44:59.113433+05:30	f
+11302	destructodentruck1	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-25 00:45:07.486618+05:30	2017-04-25 00:45:07.486618+05:30	f
+11303	manager2	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-25 00:59:23.383457+05:30	2017-04-25 00:59:23.383457+05:30	f
+11304	destructodentruck3	416a88b9efa03e0f809958793624cea5	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-04-25 17:44:38.315145+05:30	2017-04-25 17:44:38.315145+05:30	f
+11305	Luiz.cambao@gmail.com	80e408ff350752abc908fb59bdd94fe8	Luiz	Claudio	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-27 21:28:32.282696+05:30	2017-04-27 21:28:32.282696+05:30	f
+11306	lui_cla@hotmail.com	170f9a8f689fc69157ad6d3a62ecd92f	luiz	Claudio	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-04-30 19:54:27.607111+05:30	2017-04-30 19:54:27.607111+05:30	f
+11307	ramonswiz@gmail.com	6a557ed1005dddd940595b8fc6ed47b2	ramon	siwzki	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 18:47:50.158416+05:30	2017-05-01 18:47:50.158416+05:30	f
+11308	regist@gmail.com	5c769a1e38d1af34a22a4fdf3e334409	registertest	test	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 18:51:57.102972+05:30	2017-05-01 18:51:57.102972+05:30	f
+11309	samtag@gmail.com	56fafa8964024efa410773781a5f9e93	samule	tagore	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 19:05:44.954441+05:30	2017-05-01 19:05:44.954441+05:30	f
+11310	louepark@gmail.com	e759345b7ed1cedf9c5bf757ec0189b5	louis	parker	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 19:27:42.925882+05:30	2017-05-01 19:27:42.925882+05:30	f
+11311	solm@gmail.com	d0b8291c599616ebebd69629aa5fc077	standley	solomon	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 20:42:37.59943+05:30	2017-05-01 20:42:37.59943+05:30	f
+11312	silvia@gmail.com	ecb22d57339b946f66817e43583e51ce	silvia	drozen	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-01 21:02:06.524032+05:30	2017-05-01 21:02:06.524032+05:30	f
+11313	Jose@empanada.com	662eaa47199461d01a623884080934ab	Jose	Empanada	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-10 23:12:14.962606+05:30	2017-05-10 23:12:14.962606+05:30	f
+11314	josetruck1	662eaa47199461d01a623884080934ab	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-10 23:12:22.22021+05:30	2017-05-10 23:12:22.22021+05:30	f
+11315	Churros@me.com	42cb478d1eb3855929cc3187c10aebec	Churros	Factory	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 00:17:44.490878+05:30	2017-05-11 00:17:44.490878+05:30	f
+11316	churrostruck1	42cb478d1eb3855929cc3187c10aebec	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 00:29:29.553986+05:30	2017-05-11 00:29:29.553986+05:30	f
+11317	Boss@fanzone.com	ceb8447cc4ab78d2ec34cd9f11e4bed2	Boss	Man	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 01:34:17.256299+05:30	2017-05-11 01:34:17.256299+05:30	f
+11318	bosstruck1	ceb8447cc4ab78d2ec34cd9f11e4bed2	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 01:34:24.484097+05:30	2017-05-11 01:34:24.484097+05:30	f
+11319	fred@fritanga.com	570a90bfbf8c7eab5dc5d4e26832d5b1	Fred	Fritanga	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 02:28:39.690794+05:30	2017-05-11 02:28:39.690794+05:30	f
+11320	fredtruck1	570a90bfbf8c7eab5dc5d4e26832d5b1	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 02:28:46.683897+05:30	2017-05-11 02:28:46.683897+05:30	f
+11321	Ron@ticketmaster.com	45798f269709550d6f6e1d2cf4b7d485	Ron	Ticket	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 02:35:56.747692+05:30	2017-05-11 02:35:56.747692+05:30	f
+11322	rontruck1	45798f269709550d6f6e1d2cf4b7d485	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 02:36:03.969185+05:30	2017-05-11 02:36:03.969185+05:30	f
+11323	t@b.cd	1a1dc91c907325c69271ddf0c944bc72	t	b	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 05:22:21.599849+05:30	2017-05-11 05:22:21.599849+05:30	f
+11324	ttruck1	1a1dc91c907325c69271ddf0c944bc72	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 05:22:30.435867+05:30	2017-05-11 05:22:30.435867+05:30	f
+11325	luiz@saborbrasil.com.br	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Claudio	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-11 21:24:53.539657+05:30	2017-05-11 21:24:53.539657+05:30	f
+11326	luiztruck1	5e9b9edbe4c007c65c56c686ea22c594	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-11 21:25:00.272585+05:30	2017-05-11 21:25:00.272585+05:30	f
+11327	luiz@saborbrasileiro.com.br	170f9a8f689fc69157ad6d3a62ecd92f	Luiz	Gomes	OWNER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-05-12 02:58:17.229644+05:30	2017-05-12 02:58:17.229644+05:30	f
+11328	saborbrasil	aec60231d83fe6cf81444bc536596887	\N	\N	UNITMGR	\N	\N	\N	\N	\N	\N	\N	\N	\N	en	2017-05-12 03:04:01.401642+05:30	2017-05-12 03:04:01.401642+05:30	f
+11194	s56	73ebb0e2299c89dc70a54abbde5c0a7c	Stacy	Brown	CUSTOMER	\N	\N	\N	local	local	{}	\N	\N	\N	en	2017-03-05 08:59:11.870072+05:30	2017-03-05 08:59:11.870072+05:30	f
 \.
 
 
@@ -1146,6 +2866,13 @@ SELECT pg_catalog.setval('public.checkins_id_seq', 120, true);
 --
 
 SELECT pg_catalog.setval('public.companies_id_seq', 1121, true);
+
+
+--
+-- Name: contracts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: sfez_rw
+--
+
+SELECT pg_catalog.setval('public.contracts_id_seq', 3, true);
 
 
 --
@@ -1236,7 +2963,7 @@ SELECT pg_catalog.setval('public.loyalty_used_id_seq', 1, false);
 -- Name: offers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.offers_id_seq', 2, true);
+SELECT pg_catalog.setval('public.offers_id_seq', 5, true);
 
 
 --
@@ -1321,6 +3048,1147 @@ SELECT pg_catalog.setval('public.units_id_seq', 2146, true);
 --
 
 SELECT pg_catalog.setval('public.users_id_seq', 11328, true);
+
+
+--
+-- Name: admins admins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admins
+    ADD CONSTRAINT admins_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories
+    ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: checkin_history checkin_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkin_history
+    ADD CONSTRAINT checkin_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: checkins checkins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkins
+    ADD CONSTRAINT checkins_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: companies companies_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_name_key UNIQUE (name);
+
+
+--
+-- Name: companies companies_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: contracts contracts_pkey; Type: CONSTRAINT; Schema: public; Owner: sfez_rw
+--
+
+ALTER TABLE ONLY public.contracts
+    ADD CONSTRAINT contracts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: countries countries_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.countries
+    ADD CONSTRAINT countries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: customers customers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customers
+    ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: delivery_addresses delivery_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delivery_addresses
+    ADD CONSTRAINT delivery_addresses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: drivers drivers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.drivers
+    ADD CONSTRAINT drivers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: event_guests event_guests_guest_event_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.event_guests
+    ADD CONSTRAINT event_guests_guest_event_key UNIQUE (guest, event);
+
+
+--
+-- Name: events events_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.events
+    ADD CONSTRAINT events_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: favorites favorites_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT favorites_pkey PRIMARY KEY (customer_id, unit_id, company_id);
+
+
+--
+-- Name: food_park_management food_park_management_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_park_management
+    ADD CONSTRAINT food_park_management_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: food_parks food_parks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_parks
+    ADD CONSTRAINT food_parks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: gen_state gen_state_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.gen_state
+    ADD CONSTRAINT gen_state_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: locations locations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.locations
+    ADD CONSTRAINT locations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: loyalty loyalty_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty
+    ADD CONSTRAINT loyalty_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: loyalty_rewards loyalty_rewards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_rewards
+    ADD CONSTRAINT loyalty_rewards_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: loyalty_used loyalty_used_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_used
+    ADD CONSTRAINT loyalty_used_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: offers offers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.offers
+    ADD CONSTRAINT offers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_history order_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: order_state order_state_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_state
+    ADD CONSTRAINT order_state_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: requests requests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: review_approvals review_approvals_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.review_approvals
+    ADD CONSTRAINT review_approvals_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: review_states review_states_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.review_states
+    ADD CONSTRAINT review_states_name_key UNIQUE (name);
+
+
+--
+-- Name: review_states review_states_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.review_states
+    ADD CONSTRAINT review_states_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reviews reviews_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_type_key UNIQUE (type);
+
+
+--
+-- Name: search_preferences search_preferences_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.search_preferences
+    ADD CONSTRAINT search_preferences_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: territories territories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.territories
+    ADD CONSTRAINT territories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unit_types unit_types_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.unit_types
+    ADD CONSTRAINT unit_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: unit_types unit_types_type_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.unit_types
+    ADD CONSTRAINT unit_types_type_key UNIQUE (type);
+
+
+--
+-- Name: units units_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units
+    ADD CONSTRAINT units_name_key UNIQUE (name);
+
+
+--
+-- Name: units units_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units
+    ADD CONSTRAINT units_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users users_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- Name: admins admins_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admins
+    ADD CONSTRAINT admins_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: checkin_history checkin_history_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkin_history
+    ADD CONSTRAINT checkin_history_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: checkin_history checkin_history_food_park_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkin_history
+    ADD CONSTRAINT checkin_history_food_park_id_fkey FOREIGN KEY (food_park_id) REFERENCES public.food_parks(id);
+
+
+--
+-- Name: checkin_history checkin_history_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkin_history
+    ADD CONSTRAINT checkin_history_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id);
+
+
+--
+-- Name: checkin_history checkin_history_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkin_history
+    ADD CONSTRAINT checkin_history_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: checkins checkins_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkins
+    ADD CONSTRAINT checkins_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: checkins checkins_food_park_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkins
+    ADD CONSTRAINT checkins_food_park_id_fkey FOREIGN KEY (food_park_id) REFERENCES public.food_parks(id);
+
+
+--
+-- Name: checkins checkins_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.checkins
+    ADD CONSTRAINT checkins_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id);
+
+
+--
+-- Name: companies companies_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_country_id_fkey FOREIGN KEY (country_id) REFERENCES public.countries(id);
+
+
+--
+-- Name: companies companies_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.companies
+    ADD CONSTRAINT companies_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: customers customers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.customers
+    ADD CONSTRAINT customers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: delivery_addresses delivery_addresses_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.delivery_addresses
+    ADD CONSTRAINT delivery_addresses_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: drivers drivers_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.drivers
+    ADD CONSTRAINT drivers_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: drivers drivers_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.drivers
+    ADD CONSTRAINT drivers_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id);
+
+
+--
+-- Name: drivers drivers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.drivers
+    ADD CONSTRAINT drivers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: event_guests event_guests_event_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.event_guests
+    ADD CONSTRAINT event_guests_event_fkey FOREIGN KEY (event) REFERENCES public.events(id);
+
+
+--
+-- Name: event_guests event_guests_guest_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.event_guests
+    ADD CONSTRAINT event_guests_guest_fkey FOREIGN KEY (guest) REFERENCES public.users(id);
+
+
+--
+-- Name: events events_manager_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.events
+    ADD CONSTRAINT events_manager_fkey FOREIGN KEY (manager) REFERENCES public.users(id);
+
+
+--
+-- Name: favorites favorites_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT favorites_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: favorites favorites_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT favorites_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: favorites favorites_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.favorites
+    ADD CONSTRAINT favorites_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id);
+
+
+--
+-- Name: food_park_management food_park_management_food_park_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_park_management
+    ADD CONSTRAINT food_park_management_food_park_id_fkey FOREIGN KEY (food_park_id) REFERENCES public.food_parks(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: food_park_management food_park_management_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_park_management
+    ADD CONSTRAINT food_park_management_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: food_parks food_parks_foodpark_mgr_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_parks
+    ADD CONSTRAINT food_parks_foodpark_mgr_fkey FOREIGN KEY (foodpark_mgr) REFERENCES public.users(id) ON DELETE SET NULL;
+
+
+--
+-- Name: food_parks food_parks_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.food_parks
+    ADD CONSTRAINT food_parks_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES public.territories(id);
+
+
+--
+-- Name: locations locations_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.locations
+    ADD CONSTRAINT locations_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES public.territories(id);
+
+
+--
+-- Name: loyalty loyalty_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty
+    ADD CONSTRAINT loyalty_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: loyalty loyalty_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty
+    ADD CONSTRAINT loyalty_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: loyalty_rewards loyalty_rewards_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_rewards
+    ADD CONSTRAINT loyalty_rewards_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: loyalty_used loyalty_used_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_used
+    ADD CONSTRAINT loyalty_used_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: loyalty_used loyalty_used_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.loyalty_used
+    ADD CONSTRAINT loyalty_used_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: order_history order_history_checkin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_checkin_id_fkey FOREIGN KEY (checkin_id) REFERENCES public.checkins(id);
+
+
+--
+-- Name: order_history order_history_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: order_history order_history_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: order_history order_history_delivery_address_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_delivery_address_id_fkey FOREIGN KEY (delivery_address_id) REFERENCES public.delivery_addresses(id);
+
+
+--
+-- Name: order_history order_history_driver_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_driver_id_fkey FOREIGN KEY (driver_id) REFERENCES public.drivers(id);
+
+
+--
+-- Name: order_history order_history_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_history
+    ADD CONSTRAINT order_history_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id);
+
+
+--
+-- Name: order_state order_state_order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.order_state
+    ADD CONSTRAINT order_state_order_id_fkey FOREIGN KEY (order_id) REFERENCES public.order_history(id);
+
+
+--
+-- Name: requests requests_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.requests
+    ADD CONSTRAINT requests_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: review_approvals review_approvals_reviewer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.review_approvals
+    ADD CONSTRAINT review_approvals_reviewer_id_fkey FOREIGN KEY (reviewer_id) REFERENCES public.admins(id);
+
+
+--
+-- Name: reviews reviews_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: reviews reviews_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: reviews reviews_status_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_status_fkey FOREIGN KEY (status) REFERENCES public.review_states(name);
+
+
+--
+-- Name: reviews reviews_unit_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reviews
+    ADD CONSTRAINT reviews_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.units(id);
+
+
+--
+-- Name: search_preferences search_preferences_customer_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.search_preferences
+    ADD CONSTRAINT search_preferences_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+
+
+--
+-- Name: search_preferences search_preferences_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.search_preferences
+    ADD CONSTRAINT search_preferences_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES public.territories(id);
+
+
+--
+-- Name: territories territories_country_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.territories
+    ADD CONSTRAINT territories_country_id_fkey FOREIGN KEY (country_id) REFERENCES public.countries(id);
+
+
+--
+-- Name: units units_company_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units
+    ADD CONSTRAINT units_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id);
+
+
+--
+-- Name: units units_territory_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units
+    ADD CONSTRAINT units_territory_id_fkey FOREIGN KEY (territory_id) REFERENCES public.territories(id);
+
+
+--
+-- Name: units units_type_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units
+    ADD CONSTRAINT units_type_fkey FOREIGN KEY (type) REFERENCES public.unit_types(type);
+
+
+--
+-- Name: units units_unit_mgr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.units
+    ADD CONSTRAINT units_unit_mgr_id_fkey FOREIGN KEY (unit_mgr_id) REFERENCES public.users(id);
+
+
+--
+-- Name: users users_role_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_role_fkey FOREIGN KEY (role) REFERENCES public.roles(type);
+
+
+--
+-- Name: FUNCTION calc_earth_dist(lat1 numeric, lng1 numeric, lat2 numeric, lng2 numeric); Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON FUNCTION public.calc_earth_dist(lat1 numeric, lng1 numeric, lat2 numeric, lng2 numeric) TO sfez_rw;
+
+
+--
+-- Name: TABLE admins; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.admins TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE admins_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.admins_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE checkin_history; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.checkin_history TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE checkin_history_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.checkin_history_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE checkins; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.checkins TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE checkins_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.checkins_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE companies; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.companies TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE companies_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.companies_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE countries; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.countries TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE countries_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.countries_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE customers; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.customers TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE customers_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.customers_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE delivery_addresses; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.delivery_addresses TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE delivery_addresses_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.delivery_addresses_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE drivers; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.drivers TO sfez_rw;
+
+
+--
+-- Name: TABLE drivers_foodpark; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.drivers_foodpark TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE drivers_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.drivers_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE event_guests; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.event_guests TO sfez_rw;
+
+
+--
+-- Name: TABLE events; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.events TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE events_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.events_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE favorites; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.favorites TO sfez_rw;
+
+
+--
+-- Name: TABLE food_park_management; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.food_park_management TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE food_park_management_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.food_park_management_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE food_parks; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.food_parks TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE food_parks_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.food_parks_id_seq TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE gen_state_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.gen_state_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE locations; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.locations TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE locations_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.locations_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE loyalty; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.loyalty TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE loyalty_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.loyalty_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE loyalty_rewards; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.loyalty_rewards TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE loyalty_rewards_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.loyalty_rewards_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE loyalty_used; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.loyalty_used TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE loyalty_used_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.loyalty_used_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE order_history; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.order_history TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE order_history_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.order_history_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE order_state; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.order_state TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE order_state_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.order_state_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE review_approvals; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.review_approvals TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE review_approvals_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.review_approvals_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE review_states; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.review_states TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE review_states_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.review_states_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE reviews; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.reviews TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE reviews_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.reviews_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE roles; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.roles TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE roles_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.roles_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE search_preferences; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.search_preferences TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE search_preferences_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.search_preferences_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE square_unit; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.square_unit TO sfez_rw;
+
+
+--
+-- Name: TABLE square_user; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON TABLE public.square_user TO sfez_rw;
+
+
+--
+-- Name: TABLE territories; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.territories TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE territories_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.territories_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE unit_types; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.unit_types TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE unit_types_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.unit_types_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE units; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.units TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE units_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.units_id_seq TO sfez_rw;
+
+
+--
+-- Name: TABLE users; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.users TO sfez_rw;
+
+
+--
+-- Name: SEQUENCE users_id_seq; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT ALL ON SEQUENCE public.users_id_seq TO sfez_rw;
 
 
 --

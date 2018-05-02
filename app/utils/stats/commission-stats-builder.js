@@ -138,8 +138,8 @@ function getType(order) {
     return "Cash on Delivery";
   else if (order.context === 'hotel')
     return "Room Service";
-  else if (order.context === null && order.for_delivery)
+  else if ((order.context === null || order.context === '') && order.for_delivery)
     return "Delivery";
-  else if (order.context === null && !order.for_delivery)
-    return "Pick up";
+  else if ((order.context === null || order.context === '') && !order.for_delivery)
+    return "Pickup";
 }

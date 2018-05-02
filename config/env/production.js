@@ -7,11 +7,11 @@ var properties = {
     apiVersion: "v1",
     moltinAuthUrl: "https://api.molt.in/oauth/access_token",
     moltinStoreUrl: "https://api.molt.in/v1",
-    clientId: "eDlPjoMabiu84tszlmr9gcpgm1YJXOJoSZxCBooYuW",
-    client_secret: "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3",
+    clientId: process.env.CLIENT_ID || "eDlPjoMabiu84tszlmr9gcpgm1YJXOJoSZxCBooYuW",
+    client_secret: process.env.CLIENT_SECRET || "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3",
     grant_type: "client_credentials",
-    olddefaultTaxBand: "1278235843793780901", // Brazil ICMS
-    defaultTaxBand: "1554615357396746864",
+    olddefaultTaxBand: process.env.TAXBAND || "1278235843793780901", // Brazil ICMS
+    defaultTaxBand: process.env.TAXBAND || "1554615357396746864",
     deliveryCharge: "10",
     deliveryOffset: 15,
     granuo : {
