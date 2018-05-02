@@ -734,6 +734,7 @@ function *afterUpdateOrderHistory(orderHistory) {
 
   if (!customer.gcmId && !customer.fcmId){
     notify = false;
+    updated = true;
   }
 
   for (var i = 0; i < keys.length; i++) {
@@ -802,8 +803,6 @@ function *afterUpdateOrderHistory(orderHistory) {
           msgTarget.os = 'ios';
         else
           msgTarget.os = 'android';
-        console.log('======================================>');
-        console.log(msgTarget);
 
         msgTarget.gcmId = customer.gcm_id;
         msgTarget.fcmId = customer.fcm_id;
