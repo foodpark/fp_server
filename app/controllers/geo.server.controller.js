@@ -59,11 +59,8 @@ exports.searchUnits=function *(next) {
   });
 
 	resultUnits = yield venueTypeResponse;
-  console.log(userPromises.length);
 
 	var managerResponse = Promise.all(userPromises).then(function (result) {
-	  console.log(result);
-	  console.log(resultUnits);
     result.forEach(function (user, index) {
       if (user) {
         resultUnits[index].venue_fbid = user[0].fbid;

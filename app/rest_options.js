@@ -718,22 +718,28 @@ function *afterUpdateOrderHistory(orderHistory) {
   debug("...number of entries= "+ keys.length)
   var updated = false
   var orderAccepted;
+
+  var customer ='';
+  try {
+    customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
+  } catch (err) {
+    var ce = meta;
+    ce.error = err;
+    logger.error('Error retrieving customer ', orderHistory.customer_id, ce);
+    throw err;
+  }
+  debug(customer);
+
+  if (!customer.gcmId && !customer.fcmId){
+    return;
+  }
+
   for (var i = 0; i < keys.length; i++) {
     debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
     if (!orderHistoryStatus[keys[i]]) { // notification not yet sent
       var status = keys[i]
       logger.info('Notification not yet sent for status '+status+' for order '+ orderHistory.id, meta);
       debug('...status '+ status)
-      var customer ='';
-      try {
-        customer = (yield Customer.getSingleCustomer(orderHistory.customer_id))[0];
-      } catch (err) {
-        var ce = meta;
-        ce.error = err;
-        logger.error('Error retrieving customer ', orderHistory.customer_id, ce);
-        throw err;
-      }
-      debug(customer);
       var user ='';
       try {
         user = (yield User.getSingleUser(customer.user_id))[0];
@@ -800,12 +806,7 @@ function *afterUpdateOrderHistory(orderHistory) {
         msgTarget.gcmId = customer.gcm_id;
         msgTarget.fcmId = customer.fcm_id;
       }
-      if (!msgTarget.gcmId && !msgTarget.fcmId){
-        var fge = meta;
-        fge.error = 'No fcm/gcm for '+ msgTarget.to;
-        logger.error('No fcm/gcm id for '+ msgTarget.to + ' ' + msgTarget.toId, fge);
-        throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to);
-      }
+
       var orderNum = osoId;
       orderNum = orderNum.substring(orderNum.length-4);
       debug('..order number '+ orderNum);
