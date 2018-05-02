@@ -730,14 +730,11 @@ function *afterUpdateOrderHistory(orderHistory) {
   }
   debug(customer);
 
-  console.log('HEEEEREE');
-  console.log('===========================');
-  console.log(customer);
+  var notify = true;
+
   if (!customer.gcmId && !customer.fcmId){
-    console.log('in here');
-    return;
+    notify = false;
   }
-  console.log('not supposed to be here'); 
 
   for (var i = 0; i < keys.length; i++) {
     debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
@@ -818,7 +815,6 @@ function *afterUpdateOrderHistory(orderHistory) {
       var custName = user.first_name +' '+ user.last_name.charAt(0);
       debug(custName);
       debug(status);
-      var notify = true;
       switch(status) {
           // From Customer
           case 'order_paid':
