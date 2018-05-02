@@ -730,9 +730,14 @@ function *afterUpdateOrderHistory(orderHistory) {
   }
   debug(customer);
 
-  if (!customer.gcmId || !customer.fcmId){
+  console.log('HEEEEREE');
+  console.log('===========================');
+  console.log(customer);
+  if (!customer.gcmId && !customer.fcmId){
+    console.log('in here');
     return;
   }
+  console.log('not supposed to be here'); 
 
   for (var i = 0; i < keys.length; i++) {
     debug(' name=' + keys[i] + ' value=' + orderHistoryStatus[keys[i]]);
