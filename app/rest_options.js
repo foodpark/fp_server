@@ -1771,11 +1771,14 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   else
     msgTarget.os = 'android';
 
+  var updatedStatus = orderHistory.status;
+  updatedStatus.order_accepted = timestamp.now();
+
   if (!msgTarget.gcmId && !msgTarget.fcmId){
     var fge = meta;
     fge.error = 'No fcm/gcm for '+ msgTarget.to;
     logger.error('No fcm/gcm id for '+ msgTarget.to + ' ' + msgTarget.toId, fge);
-    throw new Error ('Cannot notify! No fcm/gcm id for '+ msgTarget.to);
+    return updatedStatus.order_accepted;
   }
   var orderNum = osoId;
   orderNum = orderNum.substring(orderNum.length-4);
@@ -1807,7 +1810,6 @@ function *afterOrderPaid(orderHistory, passport, user, customer, company, knex) 
   debug('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
   logger.info('sending notification to '+ msgTarget.to +' ('+ msgTarget.toId +')');
   var mt = meta;
-  var updatedStatus = orderHistory.status;
 
   updatedStatus.order_accepted = timestamp.now();
   logger.info('updated Status : ', updatedStatus);
