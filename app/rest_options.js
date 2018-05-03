@@ -878,7 +878,7 @@ function *afterUpdateOrderHistory(orderHistory) {
 
       if (notify) {
         msgTarget.body = msgTarget.message;
-        msgTarget.status = status
+        msgTarget.status = status;
         debug(msgTarget);
         var msgTime = timestamp.now();
         var supplemental = {};
@@ -908,9 +908,10 @@ function *afterUpdateOrderHistory(orderHistory) {
         debug('..returned from notifying');
 
         // record notification time
-        orderHistoryStatus[keys[i]] = msgTime;
-        debug(orderHistoryStatus);
       }
+
+      orderHistoryStatus[keys[i]] = timestamp.now();
+      debug(orderHistoryStatus);
 
       updated = true;
 
