@@ -62,7 +62,7 @@ exports.searchUnits=function *(next) {
 
 	var managerResponse = Promise.all(userPromises).then(function (result) {
     result.forEach(function (user, index) {
-      if (user) {
+      if (user.length > 0) {
         resultUnits[index].venue_fbid = user[0].fbid;
         resultUnits[index].venue_fb_handle = user[0].provider_data;
       }
