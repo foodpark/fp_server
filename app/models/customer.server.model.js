@@ -1,6 +1,7 @@
 var knex  = require('../../config/knex');
 var debug = require('debug')('customer.model');
 var logger = require('winston');
+
 exports.getAllCustomers = function() {
   return knex('customers').select()
 };

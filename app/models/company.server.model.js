@@ -68,3 +68,7 @@ exports.softDeleteCompany = function(companyId) {
           is_deleted: true
         }).where({id: companyId});
 }
+
+exports.getCompanyByUnit = function(company_id, unit_id) {
+	return knex('companies').select('id').where({id: company_id, default_unit: unit_id});
+}
