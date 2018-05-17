@@ -3,6 +3,7 @@ var Customer = require('../models/customer.server.model');
 var Request = require('../models/request.server.model');
 var Offer = require('../models/offer.server.model');
 var debug   = require('debug')('auth');
+var logger = require('winston');
 var ParseUtils = require('../utils/parseutils');
 
 exports.createRequest = function * (next) {
@@ -78,7 +79,7 @@ function validateRequestData(requestBody) {
     var errors = [];
 
     Object.keys(requestBody).forEach(function eachKey(key) {
-        if (typeof requestBody[key] == "undefined" || requestBody[key] === null || requestBody[key] == '') {
+        if (typeof requestBody[key] == "undefined" || requestBody[key] == null || requestBody[key] === '') {
             errors.push({ "field": key, "error": "The field is required."});
         } else if (key == "latitude" || key == "longitude") {
             if (!Number.isFinite(requestBody[key])) {
@@ -98,7 +99,7 @@ exports.getAllRequests = function * (next) {
     var allRequests = (yield Request.getAllRequests());
 
     this.status = 200;
-    this.body = (yield Request.getAllOffers(allRequests))
+    this.body = (yield Offer.getAllOffers(allRequests))
     return;
 }
 

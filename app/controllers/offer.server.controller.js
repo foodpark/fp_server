@@ -7,6 +7,7 @@ var Offer = require('../models/offer.server.model');
 var QueryHelper = require('../utils/query-helper')
 var debug   = require('debug')('auth');
 var ParseUtils = require('../utils/parseutils');
+var logger = require('winston');
 
 exports.getOffersByCompany = function * (next) {
     try {
@@ -71,12 +72,12 @@ exports.createOffer = function * (next) {
 
     var pawnPoc = null;
     try {
-        pawnPoc = yield Pawn.getPawnPoc(request.unit_id);
+        pawnPoc = yield Pawnshop.getPawnPoc(request.unit_id);
     } catch (err) {
         logger.error("Invalid Unit ID provided.");
         this.status = 404;
         this.body = {error: 'Invalid Unit ID.'};
-        return;
+        throw(err);
     }
 
     if(pawnPoc) {
@@ -90,10 +91,12 @@ exports.createOffer = function * (next) {
         return;
     }
 
-    request.pawn_name = company.name;
-    request.pawn_address = company.business_address;
-    request.pawn_phone = company.phone;
+    request.pawn_name = company[0].name;
+    request.pawn_address = company[0].business_address;
+    request.pawn_phone = company[0].phone;
 
+    // TODO: Evaluate the proper place to make these validations.
+    /*
     var total_days = parseInt(request.offer_term)*30;
     var date = new Date();
     var newDate = new Date(date.setTime( date.getTime() + total_days * 86400000 ));
@@ -107,6 +110,7 @@ exports.createOffer = function * (next) {
         this.body = {status: false, error : { "field": "interest_rate", "error": "Cash offer should be less than buy back amount."}};
         return;
     }
+    */
 
     try {
         var response = yield Offer.createOffer(request);
@@ -142,16 +146,16 @@ exports.updateOffer = function * (next) {
     }
 
     this.status = 201;
-    this.body = (yield Pawnshop.updateOffer(this.params.offer_id ,key));
+    this.body = (yield Offer.updateOffer(this.params.offer_id ,key));
     return;
     
 }
 
-function validateRequestData(requestBody) {
+function validateOfferData(requestBody) {
     var errors = [];
 
     Object.keys(requestBody).forEach(function eachKey(key) {
-        if (typeof requestBody[key] == "undefined" || requestBody[key] === null || requestBody[key] == '') {
+        if (typeof requestBody[key] == "undefined" || requestBody[key] == null || requestBody[key] === '') {
             errors.push({ "field": key, "error": "The field is required."});
         } else if (key == "offer_term" || key == "cash_offer"
          || key == "buy_back_amount" || key == "tax_amount"
