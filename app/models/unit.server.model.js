@@ -96,3 +96,11 @@ exports.verifyUnitManager = function(companyId, unitId, unitMgrId) {
 exports.getForUser = function(userId) {
   return knex('units').select().where('unit_mgr_id', userId);
 };
+
+exports.getUnitCoordinates = function(unit_id) {
+  return knex('units').join('territories', 'units.territory_id', 'territories.id').select('territories.latitude', 'territories.longitude').where('units.id', unit_id);
+}
+
+exports.getDistanceByCoordinates = function (unit_latitude, unit_longitude, latitude, longitude) {
+  return knex.raw(`SELECT calc_earth_dist(${unit_latitude}, ${unit_longitude}, ${latitude}, ${longitude})`);
+};

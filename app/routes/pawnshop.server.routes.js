@@ -20,12 +20,12 @@ module.exports = function (app) {
   router.get(apiPath + 'customers/:customer_id/requests', request.getRequestsByCustomerId);
   router.post(apiPath + 'customers/:customer_id/requests', request.createRequest);
   router.delete(apiPath + 'request/:request_id', request.deleteRequest);
-  router.put(apiPath + 'request/:request_id', request.updateRequest);
+  router.put(apiPath + 'request/:request_id', requireJWT, request.updateRequest);
     
   // Pawn Shop Offers
   router.get(apiPath + 'companies/:company_id/offers', offer.getOffersByCompany);
   router.post(apiPath + 'offers', offer.createOffer);
-  router.put(apiPath + 'offers/:offer_id', offer.updateOffer);
+  router.put(apiPath + 'offers/:offer_id', requireJWT, offer.updateOffer);
   router.delete(apiPath + 'offers/:offer_id', offer.deleteOffer);
   router.get(apiPath + 'companies/:company_id/units/:unit_id/offers', offer.getOffersByUnit);
 
