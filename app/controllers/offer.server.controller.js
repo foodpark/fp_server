@@ -4,14 +4,16 @@ var Customer = require('../models/customer.server.model');
 var Company = require('../models/company.server.model');
 var Request = require('../models/request.server.model');
 var Offer = require('../models/offer.server.model');
+var Unit = require('../models/unit.server.model');
 var QueryHelper = require('../utils/query-helper')
 var debug   = require('debug')('auth');
 var ParseUtils = require('../utils/parseutils');
 var logger = require('winston');
+var passport = require('passport');
 
 exports.getOffersByCompany = function * (next) {
     try {
-        var companyCheck = yield Company.getSingleCompany(this.param.company_id);
+        var companyCheck = yield Company.getSingleCompany(this.params.company_id);
     } catch (err) {
         logger.error("Invalid Company ID provided. Cannot get offers.");
         this.status = 404;
@@ -21,8 +23,16 @@ exports.getOffersByCompany = function * (next) {
     
     var request_ids = (yield Request.getRequestsByCompany(this.params.company_id));
 
-    this.status = 200;
-    this.body = (yield Offer.getOffersByRequest(request_ids));
+    var offer_accepted = this.query.offer_accepted;
+
+    if (offer_accepted != null) {
+        this.status = 200;
+        var offerList = (yield Offer.getOffersByCompanyAndStatus(this.params.company_id, offer_accepted));
+        this.body = (yield Request.getRequestsByOfferList(offerList));
+    } else {
+        this.status = 200;
+        this.body = (yield Offer.getOffersByRequest(request_ids));
+    }
     return;
 }
 
@@ -95,6 +105,11 @@ exports.createOffer = function * (next) {
     request.pawn_address = company[0].business_address;
     request.pawn_phone = company[0].phone;
 
+    var requestData = yield Request.getRequest(request.request_id);
+    var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
+    var distanceData = yield Unit.getDistanceByCoordinates(parseFloat(unitCoordinates[0].latitude), parseFloat(unitCoordinates[0].longitude), parseFloat(requestData.latitude), parseFloat(requestData.longitude));
+    //request.distance = parseFloat(distanceData.rows[0].calc_earth_dist);
+
     // TODO: Evaluate the proper place to make these validations.
     /*
     var total_days = parseInt(request.offer_term)*30;
@@ -126,6 +141,18 @@ exports.createOffer = function * (next) {
 }
 
 exports.updateOffer = function * (next) {
+
+    var user = this.passport.user;
+    var requestInfo = yield Request.getRequestsByOffer(this.params.offer_id);
+    var customerInfo = yield Customer.getSingleCustomer(requestInfo[0].customer_id);
+
+    if (!(user.role == 'CUSTOMER' && user.id == customerInfo[0].user_id)) {
+      logger.error('User not authorized');
+      this.status=401
+      this.body = {error: 'User not authorized'}
+      return;
+    }
+
     var request = this.body;
 
     try{
@@ -137,16 +164,16 @@ exports.updateOffer = function * (next) {
         return;
     } 
 
-    var passed_arr = [];
-    var key = {};
-    for (var i = param_array.length - 1; i >= 0; i--) {
-        if(!checkArr.includes(param_array[i])) {
-            key[keys_array[i]] = param_array[i];
-        }
+    var errors = validateOfferData(request);
+    if (errors.length > 0) {
+        this.status = 422; // Unprocessable Entity
+        this.body = {status: false, error : errors};
+        return;
     }
 
-    this.status = 201;
-    this.body = (yield Offer.updateOffer(this.params.offer_id ,key));
+
+    this.status = 200;
+    this.body = (yield Offer.updateOffer(this.params.offer_id, request));
     return;
     
 }

@@ -52,3 +52,7 @@ exports.getOffersByRequest = function(request_ids) {
 
 	return returnArr;
 }
+
+exports.getOffersByCompanyAndStatus = function(company_id, offer_accepted) {
+	return knex(OFFER_TABLE).select().where('company_id', company_id).andWhere('offer_accepted', offer_accepted);
+}
