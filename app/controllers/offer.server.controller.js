@@ -23,16 +23,27 @@ exports.getOffersByCompany = function * (next) {
     
     var request_ids = (yield Request.getRequestsByCompany(this.params.company_id));
 
+    // Filtering by Offer Accepted
     var offer_accepted = this.query.offer_accepted;
-
     if (offer_accepted != null) {
         this.status = 200;
-        var offerList = (yield Offer.getOffersByCompanyAndStatus(this.params.company_id, offer_accepted));
+        var offerList = (yield Offer.getOffersByCompanyAndOfferStatus(this.params.company_id, offer_accepted));
         this.body = (yield Request.getRequestsByOfferList(offerList));
-    } else {
-        this.status = 200;
-        this.body = (yield Offer.getOffersByRequest(request_ids));
+        return;
     }
+    
+    // Filtering by Contract Approved.
+    var contract_approved = this.query.contract_approved;
+    if (contract_approved != null) {
+        this.status = 200;
+        var offerList = (yield Offer.getOffersByCompanyAndContractStatus(this.params.company_id, contract_approved));
+        this.body = (yield Request.getRequestsByOfferList(offerList));
+        return;
+    }
+    
+    // If there's no query in the URL, the all offers will be displayed.
+    this.status = 200;
+    this.body = (yield Offer.getOffersByRequest(request_ids));
     return;
 }
 
@@ -104,28 +115,16 @@ exports.createOffer = function * (next) {
     request.pawn_name = company[0].name;
     request.pawn_address = company[0].business_address;
     request.pawn_phone = company[0].phone;
+    request.pawn_image = company[0].photo;
 
     var requestData = yield Request.getRequest(request.request_id);
+    request.offer_condition = requestData.condition;
+    request.offer_category_id = requestData.category_id;
+    request.offer_photo = requestData.request_photo;
+
     var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
     var distanceData = yield Unit.getDistanceByCoordinates(parseFloat(unitCoordinates[0].latitude), parseFloat(unitCoordinates[0].longitude), parseFloat(requestData.latitude), parseFloat(requestData.longitude));
     //request.distance = parseFloat(distanceData.rows[0].calc_earth_dist);
-
-    // TODO: Evaluate the proper place to make these validations.
-    /*
-    var total_days = parseInt(request.offer_term)*30;
-    var date = new Date();
-    var newDate = new Date(date.setTime( date.getTime() + total_days * 86400000 ));
-    request.maturity_date = newDate;
-
-    if(request.buy_back_amount > request.cash_offer) {
-        var interest_rate = (1/request.offer_term)*(request.buy_back_amount/request.cash_offer - 1);
-        request.interest_rate = interest_rate*100;
-    } else {
-        this.status = 422; // Unprocessable Entity
-        this.body = {status: false, error : { "field": "interest_rate", "error": "Cash offer should be less than buy back amount."}};
-        return;
-    }
-    */
 
     try {
         var response = yield Offer.createOffer(request);
@@ -154,9 +153,9 @@ exports.updateOffer = function * (next) {
     }
 
     var request = this.body;
-
+    var offerData;
     try{
-        var offerCheck = yield Offer.getSingleOffer(this.params.offer_id);
+        offerData = yield Offer.getOffer(this.params.offer_id);
     } catch(err){
         logger.error('Error while retrieving offer.');
         this.status = 404;
@@ -171,6 +170,21 @@ exports.updateOffer = function * (next) {
         return;
     }
 
+    if (request.contract_approved != null && request.contract_approved) {
+        request.contract_date = new Date().toUTCString();
+        
+        var date = new Date();
+        request.maturity_date = new Date(date.getTime() + parseInt(offerData.offer_term) * 86400000).toUTCString();
+
+        if(parseInt(offerData.buy_back_amount) > parseInt(offerData.cash_offer)) {
+            var interest_rate = (1/(offerData.offer_term/30))*(offerData.buy_back_amount/offerData.cash_offer - 1);
+            request.interest_rate = interest_rate*100;
+        } else {
+            this.status = 422; // Unprocessable Entity
+            this.body = {status: false, error : { "field": "interest_rate", "error": "Cash offer should be less than buy back amount."}};
+            return;
+        }    
+    }
 
     this.status = 200;
     this.body = (yield Offer.updateOffer(this.params.offer_id, request));
@@ -184,16 +198,22 @@ function validateOfferData(requestBody) {
     Object.keys(requestBody).forEach(function eachKey(key) {
         if (typeof requestBody[key] == "undefined" || requestBody[key] == null || requestBody[key] === '') {
             errors.push({ "field": key, "error": "The field is required."});
-        } else if (key == "offer_term" || key == "cash_offer"
-         || key == "buy_back_amount" || key == "tax_amount"
-         || key == "total_redemption" || key == "rating"
-         || key == "distance") {
+        } else if (key == "distance" || key == "cash_offer" || key == "buy_back_amount"
+         || key == "tax_amount" || key == "total_redemption" || key == "rating") {
             if (!Number.isFinite(requestBody[key])) {
                 errors.push({ "field": key, "error": "Invalid value provided for the field."});
             }
         } else if (key == "request_id" || key == "company_id" || key == "unit_id") {
             if (!Number.isInteger(requestBody[key])) {
                 errors.push({ "field": key, "error": "Invalid value provided for the field."});
+            }
+        } else if (key == "offer_term") {
+            if (!Number.isFinite(requestBody[key])) {
+                errors.push({ "field": key, "error": "Invalid value provided for the field."});
+            }
+
+            if (parseFloat(requestBody[key]) % 30 !== 0) {
+                errors.push({ "field": key, "error": "Only multiples of 30 are accepted in the field."});
             }
         }
     });
