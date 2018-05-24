@@ -28,6 +28,7 @@ exports.getSingleRequest = function (id) {
 exports.getRequest = function (id) {
     return knex(REQUEST_TABLE).select('*').where('id', id).first();
 };
+
 exports.getRequestsByCompany = function(id){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id);
 }
