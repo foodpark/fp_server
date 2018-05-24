@@ -5,6 +5,8 @@ var Company = require('../models/company.server.model');
 var Request = require('../models/request.server.model');
 var Offer = require('../models/offer.server.model');
 var Unit = require('../models/unit.server.model');
+var Categories = require('../models/categories.server.model');
+var User = require('../models/user.server.model');
 var QueryHelper = require('../utils/query-helper')
 var debug   = require('debug')('auth');
 var ParseUtils = require('../utils/parseutils');
@@ -119,8 +121,15 @@ exports.createOffer = function * (next) {
 
     var requestData = yield Request.getRequest(request.request_id);
     request.offer_condition = requestData.condition;
-    request.offer_category_id = requestData.category_id;
     request.offer_photo = requestData.request_photo;
+    request.offer_description = requestData.request_description;
+    
+    var userData = yield User.getUserByCustomerId(requestData.customer_id);
+    request.customer = userData.first_name + " " + userData.last_name.substring(0,1);
+
+    var categoryData = yield Categories.getCategory(requestData.category_id);
+    request.offer_category = categoryData.category;
+    request.category_photo = categoryData.category_photo;
 
     var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
     var distanceData = yield Unit.getDistanceByCoordinates(parseFloat(unitCoordinates[0].latitude), parseFloat(unitCoordinates[0].longitude), parseFloat(requestData.latitude), parseFloat(requestData.longitude));

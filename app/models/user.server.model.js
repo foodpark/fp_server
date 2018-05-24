@@ -97,3 +97,7 @@ exports.findByFB = function(fbid) {
 exports.getByCustomId = function (jsonQuery) {
   return knex('users').select('*').whereRaw(jsonQuery);
 }
+
+exports.getUserByCustomerId = function (customerId) {
+  return knex('users').join('customers', 'customers.user_id', 'users.id').select('users.*').where('customers.id', customerId).first();
+}
