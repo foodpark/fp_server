@@ -12,6 +12,8 @@ var debug   = require('debug')('auth');
 var ParseUtils = require('../utils/parseutils');
 var logger = require('winston');
 var passport = require('passport');
+var geodist = require('geodist');
+
 
 exports.getOffersByCompany = function * (next) {
     try {
@@ -123,17 +125,17 @@ exports.createOffer = function * (next) {
     request.offer_condition = requestData.condition;
     request.offer_photo = requestData.request_photo;
     request.offer_description = requestData.request_description;
+    request.offer_category = requestData.category;
+    request.category_photo = requestData.category_photo;
+
     
     var userData = yield User.getUserByCustomerId(requestData.customer_id);
     request.customer = userData.first_name + " " + userData.last_name.substring(0,1);
 
-    var categoryData = yield Categories.getCategory(requestData.category_id);
-    request.offer_category = categoryData.category;
-    request.category_photo = categoryData.category_photo;
-
     var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
-    var distanceData = yield Unit.getDistanceByCoordinates(parseFloat(unitCoordinates[0].latitude), parseFloat(unitCoordinates[0].longitude), parseFloat(requestData.latitude), parseFloat(requestData.longitude));
-    //request.distance = parseFloat(distanceData.rows[0].calc_earth_dist);
+    var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
+    var customerCoordinates = {lat: parseFloat(requestData.latitude), lon: parseFloat(requestData.longitude)};
+    request.distance = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'km'});
 
     try {
         var response = yield Offer.createOffer(request);

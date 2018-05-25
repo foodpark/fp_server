@@ -56,3 +56,7 @@ exports.getRequestsByOfferList = function(offer_list) {
 
 	return returnArr;
 }
+
+exports.getRequestByCustomerId = function (customer_id) {
+    return knex(REQUEST_TABLE).where('customer_id', customer_id);
+};

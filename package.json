@@ -17,6 +17,7 @@
     "firebase": "^3.4.1",
     "firebase-admin": "^4.1.1",
     "form-data": "^2.1.2",
+    "geodist": "^0.2.1",
     "gmaps": "0.4.24",
     "jscs": "^3.0.7",
     "jsonwebtoken": "^7.1.6",

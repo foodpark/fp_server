@@ -129,8 +129,10 @@ exports.getRequestsByCustomerId = function * (next) {
     }
   
     try {
+        var allRequests = (yield Request.getRequestByCustomerId(this.params.customer_id));
+
         this.status = 200;
-        this.body = (yield Offer.getOffersByCustomerId(this.params.customer_id))
+        this.body = (yield Offer.getAllOffers(allRequests))
     } catch (err) {
         logger.error('Error getting request by customer ID.');
         this.status = 500; // Internal Server Error - Operation Failed
