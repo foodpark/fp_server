@@ -100,7 +100,3 @@ exports.getForUser = function(userId) {
 exports.getUnitCoordinates = function(unit_id) {
   return knex('units').join('food_parks', 'units.food_park_id', 'food_parks.id').select('food_parks.latitude', 'food_parks.longitude').where('units.id', unit_id);
 }
-
-exports.getDistanceByCoordinates = function (unit_latitude, unit_longitude, latitude, longitude) {
-  return knex.raw(`SELECT calc_earth_dist(${unit_latitude}, ${unit_longitude}, ${latitude}, ${longitude})`);
-};
