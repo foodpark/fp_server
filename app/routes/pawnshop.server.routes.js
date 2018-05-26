@@ -39,7 +39,7 @@ module.exports = function (app) {
 
   // 
   router.get(apiPath + 'count/*', pawnshop.getCountByContext);
-  router.get(apiPath + 'mapsearch/pawnshops', pawnshop.getPawnshopsByTerritory);
+  router.get(apiPath + 'mapsearch/pawnshops', pawnshop.getPawnshopsByCoordinates);
 
   app.use(router.routes());	
   app.use(router.allowedMethods());
