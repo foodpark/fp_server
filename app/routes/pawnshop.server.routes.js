@@ -29,9 +29,10 @@ module.exports = function (app) {
   router.get(apiPath + 'companies/:company_id/units/:unit_id/offers', offer.getOffersByUnit);
 
   // Pawn Shop and Customer Contracts
+  router.get(apiPath + 'companies/:company_id/contracts', request.getRequestsContractApprovedByCompany);
+  router.get(apiPath + 'customers/:customer_id/contracts', request.getRequestsContractApprovedByCustomer);
+
   router.get(apiPath + 'contracts/:contract_id', pawnshop.getContractsById);
-  router.get(apiPath + 'companies/:company_id/contracts', pawnshop.getContractsByCompanyId);
-  router.get(apiPath + 'customers/:customer_id/contracts', pawnshop.getContractsByCustomerId);
   router.delete(apiPath + 'contracts/:contract_id', pawnshop.deleteContract);
   router.post(apiPath + 'contracts', pawnshop.createContract);
   router.get(apiPath + 'contracts/qrcode/:qr_code', pawnshop.getContractsByQrCode);

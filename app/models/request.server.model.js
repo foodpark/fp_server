@@ -28,6 +28,13 @@ exports.getRequestsByCompany = function(id){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id).andWhere('requests.is_deleted', false);
 }
 
+exports.getRequestsByCompanyContractNotApproved = function(id){
+	return knex.raw("SELECT requests.* FROM requests " +
+					 	"WHERE requests.id NOT IN " + 
+						"(SELECT DISTINCT offers.request_id AS id FROM offers " +
+							"WHERE offers.company_id=" + id + "AND offers.is_deleted=false AND offers.contract_approved=true)");
+}
+
 exports.getRequestsByCompanyMultiple = function(ids){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id','in' , ids);
 }
@@ -47,6 +54,14 @@ exports.getRequestsByOfferList = function(offer_list) {
 	return returnArr;
 }
 
-exports.getRequestByCustomerId = function (customer_id) {
-    return knex(REQUEST_TABLE).where('customer_id', customer_id).andWhere('is_deleted', false);
-};
+exports.getRequestByCustomerContractApproved = function (customer_id) {
+	return knex(REQUEST_TABLE).join(OFFER_TABLE, 'offers.request_id', 'requests.id')
+			.where('requests.customer_id', customer_id).andWhere('requests.is_deleted', false)
+			.andWhere('contract_approved', true);;
+}
+
+exports.getRequestsByCompanyContractApproved = function(id){
+	return knex(REQUEST_TABLE).join(OFFER_TABLE, 'offers.request_id', 'requests.id')
+			.where('offers.company_id', id).andWhere('requests.is_deleted', false)
+			.andWhere('contract_approved', true);
+}

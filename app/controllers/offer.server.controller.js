@@ -47,6 +47,7 @@ exports.getOffersByCompany = function * (next) {
     }
     
     // If there's no query in the URL, the all offers will be displayed.
+    var request_ids = (yield Request.getRequestsByCompanyContractNotApproved(this.params.company_id));
     this.status = 200;
     this.body = (yield Offer.getOffersByRequest(request_ids));
     return;

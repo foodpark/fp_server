@@ -1,4 +1,5 @@
 var auth = require('./authentication.server.controller');
+var Company = require('../models/company.server.model');
 var Customer = require('../models/customer.server.model');
 var Request = require('../models/request.server.model');
 var Offer = require('../models/offer.server.model');
@@ -151,6 +152,50 @@ exports.deleteRequest = function * (next){
         logger.error('Error deleting request.');
         this.status = 500; // Internal Server Error - Operation Failed
         this.body = {error : 'Error deleting request.'};
+        throw (err);
+    }
+    return;
+}
+
+exports.getRequestsContractApprovedByCompany = function * (next) {
+    try {
+        var companyCheck = yield Company.getSingleCompany(this.params.company_id);
+    } catch (err) {
+        logger.error("Invalid Company ID provided. Cannot get offers.");
+        this.status = 404;
+        this.body = {error: 'Invalid Company ID.'};
+        return;
+    }
+  
+    try {
+        this.status = 200;
+        this.body = (yield Request.getRequestsByCompanyContractApproved(this.params.company_id));
+    } catch (err) {
+        logger.error('Error getting request by company ID.');
+        this.status = 500; // Internal Server Error - Operation Failed
+        this.body = {error : 'Error getting request by company ID.'};
+        throw (err);
+    }
+    return;
+}
+
+exports.getRequestsContractApprovedByCustomer = function * (next) {
+    try {
+        var customerCheck = yield Customer.getSingleCustomer(this.params.customer_id);
+    } catch (err) {
+        logger.error("Invalid Customer ID provided. Cannot get the request.");
+        this.status = 404;
+        this.body = {error: 'Invalid Customer ID.'};
+        return;
+    }
+  
+    try {
+        this.status = 200;
+        this.body = (yield Request.getRequestByCustomerContractApproved(this.params.customer_id));
+    } catch (err) {
+        logger.error('Error getting request by customer ID.');
+        this.status = 500; // Internal Server Error - Operation Failed
+        this.body = {error : 'Error getting request by customer ID.'};
         throw (err);
     }
     return;
