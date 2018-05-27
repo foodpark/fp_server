@@ -122,8 +122,8 @@ exports.getRequestsByCustomerId = function * (next) {
     }
   
     try {
-        var allRequests = (yield Request.getRequestByCustomerId(this.params.customer_id));
-
+        var allRequests = (yield Request.getRequestByCustomerId(this.params.customer_id)).rows;
+        
         this.status = 200;
         this.body = (yield Offer.getAllOffers(allRequests))
     } catch (err) {
