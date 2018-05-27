@@ -54,10 +54,17 @@ exports.getRequestsByOfferList = function(offer_list) {
 	return returnArr;
 }
 
+exports.getRequestByCustomerId = function (customer_id) {
+	return knex.raw("SELECT requests.* FROM requests " +
+						"WHERE requests.customer_id=" + customer_id + " AND requests.id NOT IN " + 
+   							"(SELECT DISTINCT offers.request_id AS id FROM offers " +
+	   							"WHERE offers.is_deleted=false AND offers.contract_approved=true)");
+}	
+
 exports.getRequestByCustomerContractApproved = function (customer_id) {
 	return knex(REQUEST_TABLE).join(OFFER_TABLE, 'offers.request_id', 'requests.id')
 			.where('requests.customer_id', customer_id).andWhere('requests.is_deleted', false)
-			.andWhere('contract_approved', true);;
+			.andWhere('contract_approved', true);
 }
 
 exports.getRequestsByCompanyContractApproved = function(id){
