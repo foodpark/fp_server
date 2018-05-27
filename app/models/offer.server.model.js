@@ -8,10 +8,6 @@ exports.getOffersByRequestId = function(id) {
 	return knex(OFFER_TABLE).select().where('request_id', id);
 }
 
-exports.getOffersByCustomerId = function(id){
-	return knex(OFFER_TABLE).join(REQUEST_TABLE, 'offers.request_id', 'requests.id').select('offers.*').where('requests.customer_id', id);
-}
-
 exports.createOffer = function (request) {
 	return knex(OFFER_TABLE).insert(request).returning('*');
 }
@@ -49,8 +45,7 @@ exports.getOffersByRequest = function(request_ids) {
 	var offersArr = [];
 	
 	for (var i = request_ids.length - 1; i >= 0; i--) {
-		console.log(request_ids[i]);
-		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id);
+		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id).andWhere('is_deleted', false);
 		returnArr.push({"request": request_ids[i], "offers": offersArr});
 	}
 
@@ -58,7 +53,7 @@ exports.getOffersByRequest = function(request_ids) {
 }
 
 exports.getOffersByCompanyAndOfferStatus = function(company_id, offer_accepted) {
-	return knex(OFFER_TABLE).select().where('company_id', company_id).andWhere('offer_accepted', offer_accepted);
+	return knex(OFFER_TABLE).select().where('company_id', company_id).andWhere('offer_accepted', offer_accepted).andWhere('is_deleted', false);
 }
 
 exports.getOffersByCompanyAndContractStatus = function(company_id, contract_approved) {

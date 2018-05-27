@@ -95,14 +95,6 @@ function validateRequestData(requestBody) {
     return errors;
 }
 
-exports.getAllRequests = function * (next) {
-    var allRequests = (yield Request.getAllRequests());
-
-    this.status = 200;
-    this.body = (yield Offer.getAllOffers(allRequests))
-    return;
-}
-
 exports.getRequestsById = function * (next) {
     try {
         var requestCheck = yield Request.getSingleRequest(this.params.request_id);
