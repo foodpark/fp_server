@@ -30,9 +30,12 @@ exports.getRequestsByCompany = function(id){
 
 exports.getRequestsByCompanyContractNotApproved = function(id){
 	return knex.raw("SELECT requests.* FROM requests " +
-					 	"WHERE requests.id NOT IN " + 
-						"(SELECT DISTINCT offers.request_id AS id FROM offers " +
-							"WHERE offers.company_id=" + id + "AND offers.is_deleted=false AND offers.contract_approved=true)");
+						"WHERE requests.id IN " +
+						"(SELECT DISTINCT offers.request_id FROM offers " + 
+							"WHERE offers.company_id=" + id + " AND request_id IN " +
+								"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false " +
+									"AND request_id NOT IN " + 
+										"(SELECT DISTINCT request_id FROM offers WHERE offers.contract_approved=true)))");
 }
 
 exports.getRequestsByCompanyMultiple = function(ids){
@@ -54,9 +57,14 @@ exports.getRequestsByOfferList = function(offer_list) {
 	return returnArr;
 }
 
-exports.getRequestByCustomerId = function (customer_id) {
+exports.getRequestByCustomer = function (request_id, customer_id) {
+	return knex(REQUEST_TABLE).select('*').where('id', request_id).andWhere('is_deleted', false)
+			.andWhere('customer_id', customer_id).first();
+};
+
+exports.getRequestsByCustomerId = function (customer_id) {
 	return knex.raw("SELECT requests.* FROM requests " +
-						"WHERE requests.customer_id=" + customer_id + " AND requests.id NOT IN " + 
+						"WHERE requests.customer_id=" + customer_id + " AND requests.is_deleted=false AND requests.id NOT IN " + 
    							"(SELECT DISTINCT offers.request_id AS id FROM offers " +
 	   							"WHERE offers.is_deleted=false AND offers.contract_approved=true)");
 }	

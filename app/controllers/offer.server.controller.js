@@ -49,7 +49,7 @@ exports.getOffersByCompany = function * (next) {
     // If there's no query in the URL, the all offers will be displayed.
     var request_ids = (yield Request.getRequestsByCompanyContractNotApproved(this.params.company_id));
     this.status = 200;
-    this.body = (yield Offer.getOffersByRequest(request_ids));
+    this.body = (yield Offer.getOffersByRequestAndCompany(request_ids.rows, this.params.company_id));
     return;
 }
 
@@ -62,31 +62,38 @@ exports.getOffersByUnit = function * (next) {
         this.body = {error: 'Invalid Company ID.'};
         return;
     }
+    
+    var request_ids = (yield Request.getRequestsByCompany(this.params.company_id));
 
-    var company_ids = null;
-    try{
-        company_ids = yield Company.getCompanyByUnit(this.params.company_id ,this.params.unit_id);
-    } catch(err) {
-        logger.error('Error while retrieving company IDs by Unit.');
-        this.status = 404;
-        this.body = {error: 'Error while retrieving company IDs by Unit.'};
+    // Filtering by Offer Accepted
+    var offer_accepted = this.query.offer_accepted;
+    if (offer_accepted != null) {
+        this.status = 200;
+        var offerList = (yield Offer.getOffersByCompanyAndOfferStatus(this.params.company_id, offer_accepted));
+        this.body = (yield Request.getRequestsByOfferList(offerList));
         return;
     }
-
-    var arrIds = [];
-    for (var i = company_ids.length - 1; i >= 0; i--) {
-        arrIds.push(company_ids[i].id);
+    
+    // Filtering by Contract Approved.
+    var contract_approved = this.query.contract_approved;
+    if (contract_approved != null) {
+        this.status = 200;
+        var offerList = (yield Offer.getOffersByCompanyAndContractStatus(this.params.company_id, contract_approved));
+        this.body = (yield Request.getRequestsByOfferList(offerList));
+        return;
     }
-
-    var request_ids = (yield Request.getRequestsByCompanyMultiple(arrIds));
+    
+    // If there's no query in the URL, the all offers will be displayed.
+    var request_ids = (yield Request.getRequestsByCompanyContractNotApproved(this.params.company_id));
     this.status = 200;
-    this.body = (yield Offer.getOffersByRequest(request_ids));
+    this.body = (yield Offer.getOffersByRequestAndUnit(request_ids.rows, this.params.unit_id));
     return;
 }
 
 exports.createOffer = function * (next) {
     var request = this.body;
 
+    request.company_id = parseInt(this.params.company_id);
     var company = null;
     try {
         var company = yield Company.getSingleCompany(request.company_id);
@@ -96,7 +103,9 @@ exports.createOffer = function * (next) {
         this.body = {error: 'Invalid Company ID.'};
         return;
     }
+        
 
+    request.unit_id = parseInt(this.params.unit_id);
     var pawnPoc = null;
     try {
         pawnPoc = yield Pawnshop.getPawnPoc(request.unit_id);
@@ -123,13 +132,19 @@ exports.createOffer = function * (next) {
     request.pawn_phone = company[0].phone;
     request.pawn_image = company[0].photo;
 
-    var requestData = yield Request.getRequest(request.request_id);
-    request.offer_condition = requestData.condition;
-    request.offer_photo = requestData.request_photo;
-    request.offer_description = requestData.request_description;
-    request.offer_category = requestData.category;
-    request.category_photo = requestData.category_photo;
-
+    var requestData;
+    try {
+        requestData = yield Request.getRequest(request.request_id);
+        request.offer_condition = requestData.condition;
+        request.offer_photo = requestData.request_photo;
+        request.offer_description = requestData.request_description;
+        request.offer_category = requestData.category;
+        request.category_photo = requestData.category_photo;
+    } catch (err) {
+        this.status = 422; // Unprocessable Entity
+        this.body = {status: false, error : "Invalid Request ID provided."};
+        return;
+    }
     
     var userData = yield User.getUserByCustomerId(requestData.customer_id);
     request.customer = userData.first_name + " " + userData.last_name.substring(0,1);

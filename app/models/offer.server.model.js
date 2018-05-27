@@ -12,13 +12,20 @@ exports.createOffer = function (request) {
 	return knex(OFFER_TABLE).insert(request).returning('*');
 }
 
-exports.getAllOffers = function (request) {
+exports.getAllOffersByRequest = function (requestList) {
+	var offersArr = [];
+
+	offersArr = knex(OFFER_TABLE).select().where('request_id', requestList.id).andWhere('is_deleted', false);
+	return {"request": requestList, "offers": offersArr};
+}
+
+exports.getAllOffersRequestList = function (requestList) {
 	var returnArr = [];
 	var offersArr = [];
 	
-	for (var i = request.length - 1; i >= 0; i--) {
-		offersArr = knex(OFFER_TABLE).select().where('request_id', request[i].id).andWhere('is_deleted', false);
-		returnArr.push({"request": request[i], "offers": offersArr});
+	for (var i = requestList.length - 1; i >= 0; i--) {
+		offersArr = knex(OFFER_TABLE).select().where('request_id', requestList[i].id).andWhere('is_deleted', false);
+		returnArr.push({"request": requestList[i], "offers": offersArr});
 	}
 
 	return returnArr;
@@ -47,6 +54,32 @@ exports.getOffersByRequest = function(request_ids) {
 	for (var i = request_ids.rows.length - 1; i >= 0; i--) {
 		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids.rows[i].id).andWhere('is_deleted', false);
 		returnArr.push({"request": request_ids.rows[i], "offers": offersArr});
+	}
+
+	return returnArr;
+}
+
+exports.getOffersByRequestAndCompany = function(request_ids, company_id) {
+	var returnArr = [];
+	var offersArr = [];
+	
+	for (var i = request_ids.length - 1; i >= 0; i--) {
+		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id)
+						.andWhere('company_id', company_id).andWhere('is_deleted', false);
+		returnArr.push({"request": request_ids[i], "offers": offersArr});
+	}
+
+	return returnArr;
+}
+
+exports.getOffersByRequestAndUnit = function(request_ids, unit_id) {
+	var returnArr = [];
+	var offersArr = [];
+	
+	for (var i = request_ids.length - 1; i >= 0; i--) {
+		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id)
+						.andWhere('unit_id', unit_id).andWhere('is_deleted', false);
+		returnArr.push({"request": request_ids[i], "offers": offersArr});
 	}
 
 	return returnArr;

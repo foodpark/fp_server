@@ -15,17 +15,17 @@ module.exports = function (app) {
   var apiPath = '/api/'+ config.apiVersion + '/rel/';
 
   // Customer Offers
-  router.get(apiPath + 'requests/:request_id', request.getRequestsById);
-  router.get(apiPath + 'customers/:customer_id/requests', request.getRequestsByCustomerId);
+  router.get(apiPath + 'customers/:customer_id/requests/:request_id', request.getRequestsById);
+  router.get(apiPath + 'customers/:customer_id/requests', request.getAllRequestsByCustomerId);
   router.post(apiPath + 'customers/:customer_id/requests', request.createRequest);
-  router.delete(apiPath + 'requests/:request_id', request.deleteRequest);
-  router.put(apiPath + 'requests/:request_id', requireJWT, request.updateRequest);
+  router.delete(apiPath + 'customers/:customer_id/requests/:request_id', request.deleteRequest);
+  router.put(apiPath + 'customers/:customer_id/requests/:request_id', requireJWT, request.updateRequest);
     
   // Pawn Shop Offers
   router.get(apiPath + 'companies/:company_id/offers', offer.getOffersByCompany);
-  router.post(apiPath + 'offers', offer.createOffer);
-  router.put(apiPath + 'offers/:offer_id', requireJWT, offer.updateOffer);
-  router.delete(apiPath + 'offers/:offer_id', offer.deleteOffer);
+  router.post(apiPath + 'companies/:company_id/units/:unit_id/offers', offer.createOffer);
+  router.put(apiPath + 'companies/:company_id/units/:unit_id/offers/:offer_id', requireJWT, offer.updateOffer);
+  router.delete(apiPath + 'companies/:company_id/units/:unit_id/offers/:offer_id', offer.deleteOffer);
   router.get(apiPath + 'companies/:company_id/units/:unit_id/offers', offer.getOffersByUnit);
 
   // Pawn Shop and Customer Contracts
