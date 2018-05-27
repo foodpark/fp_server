@@ -1,6 +1,7 @@
 var auth = require('./authentication.server.controller');
 var Company = require('../models/company.server.model');
 var Customer = require('../models/customer.server.model');
+var Categories = require('../models/categories.server.model');
 var Request = require('../models/request.server.model');
 var Offer = require('../models/offer.server.model');
 var debug   = require('debug')('auth');
@@ -28,6 +29,17 @@ exports.createRequest = function * (next) {
     }
    
     try {
+        var categories = yield Categories.getCategory(request.category_id);
+        request.category = categories.category;
+        request.category_photo = categories.category_photo;
+    } catch (err) {
+        logger.error("Invalid Category ID provided. Cannot create request.");
+        this.status = 404;
+        this.body = {error: 'Invalid Category provided.'};
+        return;
+    }
+
+    try {
         var response = yield Request.createRequest(request);
         this.status = 201;
         this.body = {message : 'Request created.', data : response};
@@ -41,12 +53,12 @@ exports.createRequest = function * (next) {
 }
 
 exports.updateRequest = function * (next) {
-    try {
-        var requestCheck = yield Request.getSingleRequest(this.params.request_id);
-    } catch (err) {
-        logger.error("Invalid Request ID provided. Cannot update the request.");
+    var requestCheck = yield Request.getRequestByCustomer(this.params.request_id, this.params.customer_id);
+
+    if (!requestCheck) {
+        logger.error("Invalid Request data provided. Cannot update the request.");
         this.status = 404;
-        this.body = {error: 'Invalid Request ID.'};
+        this.body = {error: 'Invalid Request data provided. Cannot update the request.'};
         return;
     }
     
@@ -68,11 +80,6 @@ exports.updateRequest = function * (next) {
         this.body = {error : 'Error saving the request.'};
         throw (err);
     }
-    return;
-
-
-    this.status = 201;
-    this.body = (yield Request.updateRequest(this.params.request_id ,key));
     return;
 }
 
@@ -97,21 +104,22 @@ function validateRequestData(requestBody) {
 }
 
 exports.getRequestsById = function * (next) {
-    try {
-        var requestCheck = yield Request.getSingleRequest(this.params.request_id);
-    } catch (err) {
-        logger.error("Invalid Request ID provided. Cannot update the request.");
+    var requestData = yield Request.getRequestByCustomer(this.params.request_id, this.params.customer_id);
+    
+    if (!requestData)
+    {
+        logger.error("Request not found with the Request ID and Customer ID provided.");
         this.status = 404;
-        this.body = {error: 'Invalid Request ID.'};
+        this.body = {error: 'Request not found with the Request ID and Customer ID provided.'};
         return;
     }
   
     this.status = 200;
-    this.body = (yield Offer.getOffersByRequestId(this.params.request_id));
+    this.body = (yield Offer.getAllOffersByRequest(requestData));
     return;
 };
 
-exports.getRequestsByCustomerId = function * (next) {
+exports.getAllRequestsByCustomerId = function * (next) {
     try {
         var customerCheck = yield Customer.getSingleCustomer(this.params.customer_id);
     } catch (err) {
@@ -122,10 +130,10 @@ exports.getRequestsByCustomerId = function * (next) {
     }
   
     try {
-        var allRequests = (yield Request.getRequestByCustomerId(this.params.customer_id)).rows;
+        var allRequests = (yield Request.getRequestsByCustomerId(this.params.customer_id)).rows;
         
         this.status = 200;
-        this.body = (yield Offer.getAllOffers(allRequests))
+        this.body = (yield Offer.getAllOffersRequestList(allRequests))
     } catch (err) {
         logger.error('Error getting request by customer ID.');
         this.status = 500; // Internal Server Error - Operation Failed
@@ -136,12 +144,12 @@ exports.getRequestsByCustomerId = function * (next) {
 }
 
 exports.deleteRequest = function * (next){
-    try {
-        var requestCheck = yield Request.getSingleRequest(this.params.request_id);
-    } catch (err) {
-        logger.error("Invalid Request ID provided. Cannot delete the request.");
+    var requestCheck = yield Request.getRequestByCustomer(this.params.request_id, this.params.customer_id);
+
+    if (!requestCheck) {
+        logger.error("Invalid Request data provided. Cannot delete the request.");
         this.status = 404;
-        this.body = {error: 'Invalid Request ID.'};
+        this.body = {error: 'Invalid Request data provided. Cannot delete the request.'};
         return;
     }
 
