@@ -28,3 +28,8 @@ exports.formatPrice = function (value, currency) {
       maximumFractionDigits: 2
     });
 };
+
+exports.round = function (number, precision) {
+    var factor = Math.pow(10, precision);
+    return Math.round(number * factor) / factor;
+}

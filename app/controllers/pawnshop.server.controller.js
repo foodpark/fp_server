@@ -3,7 +3,8 @@
  */
 var auth = require('./authentication.server.controller');
 var Pawnshop = require('../models/pawnshop.server.model');
-var QueryHelper = require('../utils/query-helper')
+var QueryHelper = require('../utils/query-helper');
+var FormatUtils = require('../utils/formatutils');
 var debug   = require('debug')('auth');
 var ParseUtils = require('../utils/parseutils');
 var geodist = require('geodist');
@@ -128,7 +129,7 @@ exports.getPawnshopsByCoordinates = function * (next){
         var distCustomerPawnShop = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'km'});
 
         if (distCustomerPawnShop <= distance) {
-            pawnShopList[i].distance = distCustomerPawnShop;
+            pawnShopList[i].distance = FormatUtils.round(distCustomerPawnShop, 1);
             pawnShopsFound.push(pawnShopList[i]);
         }
     }
