@@ -21,7 +21,7 @@ exports.getAllOffers = function (request) {
 	var offersArr = [];
 	
 	for (var i = request.length - 1; i >= 0; i--) {
-		offersArr = knex(OFFER_TABLE).select().where('request_id', request[i].id);
+		offersArr = knex(OFFER_TABLE).select().where('request_id', request[i].id).andWhere('is_deleted', false);
 		returnArr.push({"request": request[i], "offers": offersArr});
 	}
 

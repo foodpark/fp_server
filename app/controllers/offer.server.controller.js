@@ -7,7 +7,8 @@ var Offer = require('../models/offer.server.model');
 var Unit = require('../models/unit.server.model');
 var Categories = require('../models/categories.server.model');
 var User = require('../models/user.server.model');
-var QueryHelper = require('../utils/query-helper')
+var QueryHelper = require('../utils/query-helper');
+var FormatUtils = require('../utils/formatutils');
 var debug   = require('debug')('auth');
 var ParseUtils = require('../utils/parseutils');
 var logger = require('winston');
@@ -53,7 +54,7 @@ exports.getOffersByCompany = function * (next) {
 
 exports.getOffersByUnit = function * (next) {
     try {
-        var companyCheck = yield Company.getSingleCompany(this.param.company_id);
+        var companyCheck = yield Company.getSingleCompany(this.params.company_id);
     } catch (err) {
         logger.error("Invalid Company ID provided. Cannot get offers.");
         this.status = 404;
@@ -102,7 +103,7 @@ exports.createOffer = function * (next) {
         logger.error("Invalid Unit ID provided.");
         this.status = 404;
         this.body = {error: 'Invalid Unit ID.'};
-        throw(err);
+        return;
     }
 
     if(pawnPoc) {
@@ -132,10 +133,17 @@ exports.createOffer = function * (next) {
     var userData = yield User.getUserByCustomerId(requestData.customer_id);
     request.customer = userData.first_name + " " + userData.last_name.substring(0,1);
 
-    var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
-    var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
-    var customerCoordinates = {lat: parseFloat(requestData.latitude), lon: parseFloat(requestData.longitude)};
-    request.distance = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'km'});
+    try {
+        var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
+        var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
+        var customerCoordinates = {lat: parseFloat(requestData.latitude), lon: parseFloat(requestData.longitude)};
+        request.distance = FormatUtils.round(geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'km'}), 1);
+    } catch (err) {
+        logger.error('Coordinates not available for Pawn Shop. Cannot process this request.');
+        this.status = 500; // Internal Server Error - Operation Failed
+        this.body = {error : 'Coordinates not available for Pawn Shop. Cannot process this request. (' + request.unit_id + ')'};
+        return;
+    }
 
     try {
         var response = yield Offer.createOffer(request);

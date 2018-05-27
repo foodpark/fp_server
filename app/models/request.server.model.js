@@ -30,7 +30,7 @@ exports.getRequest = function (id) {
 };
 
 exports.getRequestsByCompany = function(id){
-	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id);
+	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id).andWhere('is_deleted', false);
 }
 
 exports.getRequestsByCompanyMultiple = function(ids){
@@ -58,5 +58,5 @@ exports.getRequestsByOfferList = function(offer_list) {
 }
 
 exports.getRequestByCustomerId = function (customer_id) {
-    return knex(REQUEST_TABLE).where('customer_id', customer_id);
+    return knex(REQUEST_TABLE).where('customer_id', customer_id).andWhere('is_deleted', false);
 };

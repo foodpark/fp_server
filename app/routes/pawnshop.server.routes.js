@@ -15,7 +15,6 @@ module.exports = function (app) {
   var apiPath = '/api/'+ config.apiVersion + '/rel/';
 
   // Customer Offers
-  router.get(apiPath + 'requests', request.getAllRequests);
   router.get(apiPath + 'request/:request_id/', request.getRequestsById);
   router.get(apiPath + 'customers/:customer_id/requests', request.getRequestsByCustomerId);
   router.post(apiPath + 'customers/:customer_id/requests', request.createRequest);
@@ -37,7 +36,7 @@ module.exports = function (app) {
   router.post(apiPath + 'contracts', pawnshop.createContract);
   router.get(apiPath + 'contracts/qrcode/:qr_code', pawnshop.getContractsByQrCode);
 
-  // 
+  // Map Search Pawn Shops
   router.get(apiPath + 'count/*', pawnshop.getCountByContext);
   router.get(apiPath + 'mapsearch/pawnshops', pawnshop.getPawnshopsByCoordinates);
 
