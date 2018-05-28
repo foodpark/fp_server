@@ -155,6 +155,7 @@ exports.createOffer = function * (next) {
     var requestData;
     try {
         requestData = yield Request.getRequest(request.request_id);
+        request.request_name = requestData.request_name;
         request.offer_condition = requestData.condition;
         request.offer_photo = requestData.request_photo;
         request.offer_photo2 = requestData.request_photo2;
