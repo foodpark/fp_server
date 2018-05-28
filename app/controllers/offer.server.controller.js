@@ -33,7 +33,9 @@ exports.getOffersByCompany = function * (next) {
     if (offer_accepted != null) {
         this.status = 200;
         var offerList = (yield Offer.getOffersByCompanyAndOfferStatus(this.params.company_id, offer_accepted));
-        this.body = (yield Request.getRequestsByOfferList(offerList));
+        var requestList = (yield Request.getRequestsByOfferIdList(offerList.map(x => x.request_id)));
+        
+        this.body = mergeRequestOffer(requestList, offerList);
         return;
     }
     
@@ -42,7 +44,9 @@ exports.getOffersByCompany = function * (next) {
     if (contract_approved != null) {
         this.status = 200;
         var offerList = (yield Offer.getOffersByCompanyAndContractStatus(this.params.company_id, contract_approved));
-        this.body = (yield Request.getRequestsByOfferList(offerList));
+        var requestList = (yield Request.getRequestsByOfferIdList(offerList.map(x => x.request_id)));
+        
+        this.body = mergeRequestOffer(requestList, offerList);
         return;
     }
     
@@ -54,23 +58,22 @@ exports.getOffersByCompany = function * (next) {
 }
 
 exports.getOffersByUnit = function * (next) {
-    try {
-        var companyCheck = yield Company.getSingleCompany(this.params.company_id);
-    } catch (err) {
-        logger.error("Invalid Company ID provided. Cannot get offers.");
+    var company = yield Company.getCompanyByUnit(this.params.company_id, this.params.unit_id);
+    if (company.length === 0) {
+        logger.error("Invalid Company ID/Unit ID provided. Cannot get offers.");
         this.status = 404;
-        this.body = {error: 'Invalid Company ID.'};
+        this.body = {error: 'Invalid Company ID/Unit ID provided.'};
         return;
     }
     
-    var request_ids = (yield Request.getRequestsByCompany(this.params.company_id));
-
     // Filtering by Offer Accepted
     var offer_accepted = this.query.offer_accepted;
     if (offer_accepted != null) {
         this.status = 200;
-        var offerList = (yield Offer.getOffersByCompanyAndOfferStatus(this.params.company_id, offer_accepted));
-        this.body = (yield Request.getRequestsByOfferList(offerList));
+        var offerList = (yield Offer.getOffersByCompanyUnitAndOfferStatus(this.params.company_id, this.params.unit_id, offer_accepted));
+        var requestList = (yield Request.getRequestsByOfferIdList(offerList.map(x => x.request_id)));
+        
+        this.body = mergeRequestOffer(requestList, offerList);
         return;
     }
     
@@ -78,34 +81,51 @@ exports.getOffersByUnit = function * (next) {
     var contract_approved = this.query.contract_approved;
     if (contract_approved != null) {
         this.status = 200;
-        var offerList = (yield Offer.getOffersByCompanyAndContractStatus(this.params.company_id, contract_approved));
-        this.body = (yield Request.getRequestsByOfferList(offerList));
+        var offerList = (yield Offer.getOffersByCompanyUnitAndContractStatus(this.params.company_id, this.params.unit_id, contract_approved));
+        var requestList = (yield Request.getRequestsByOfferIdList(offerList.map(x => x.request_id)));
+       
+        this.body = mergeRequestOffer(requestList, offerList);
         return;
     }
     
     // If there's no query in the URL, the all offers will be displayed.
+    //var request_ids = (yield Request.getRequestsByCompanyUnit(this.params.company_id, this.params.unit_id));
     var request_ids = (yield Request.getRequestsByCompanyContractNotApproved(this.params.company_id));
     this.status = 200;
-    this.body = (yield Offer.getOffersByRequestAndUnit(request_ids.rows, this.params.unit_id));
+    this.body = (yield Offer.getOffersByRequestAndCompanyUnit(request_ids.rows, this.params.company_id, this.params.unit_id));
     return;
+}
+
+function mergeRequestOffer(requestList, offerList) {
+    var offerAcceptedList = [];
+    for (var i = 0; i < requestList.length; i++) {
+        var tempOfferList = [];
+        for (var j = 0; j < offerList.length; j++) {
+            if (requestList[i].id == offerList[j].request_id) {
+                tempOfferList.push(offerList[j]);
+            }
+        }
+        if (tempOfferList.length > 0) {
+            offerAcceptedList.push({"request": requestList[i], "offers": tempOfferList});
+        }
+    }
+
+    return offerAcceptedList;
 }
 
 exports.createOffer = function * (next) {
     var request = this.body;
 
     request.company_id = parseInt(this.params.company_id);
-    var company = null;
-    try {
-        var company = yield Company.getSingleCompany(request.company_id);
-    } catch (err) {
-        logger.error("Invalid Company ID provided.");
+    request.unit_id = parseInt(this.params.unit_id);
+    var company = yield Company.getCompanyByUnit(request.company_id, request.unit_id);
+    if (company.length === 0) {
+        logger.error("Invalid Company ID/Unit ID provided.");
         this.status = 404;
-        this.body = {error: 'Invalid Company ID.'};
+        this.body = {error: 'Invalid Company ID/Unit ID provided.'};
         return;
     }
-        
-
-    request.unit_id = parseInt(this.params.unit_id);
+    
     var pawnPoc = null;
     try {
         pawnPoc = yield Pawnshop.getPawnPoc(request.unit_id);
@@ -137,6 +157,8 @@ exports.createOffer = function * (next) {
         requestData = yield Request.getRequest(request.request_id);
         request.offer_condition = requestData.condition;
         request.offer_photo = requestData.request_photo;
+        request.offer_photo2 = requestData.request_photo2;
+        request.offer_photo3 = requestData.request_photo3;
         request.offer_description = requestData.request_description;
         request.offer_category = requestData.category;
         request.category_photo = requestData.category_photo;
@@ -224,7 +246,6 @@ exports.updateOffer = function * (next) {
     this.status = 200;
     this.body = (yield Offer.updateOffer(this.params.offer_id, request));
     return;
-    
 }
 
 function validateOfferData(requestBody) {
@@ -258,11 +279,22 @@ function validateOfferData(requestBody) {
 
 exports.deleteOffer = function * (next) {
     try{
-        var offerCheck = yield Offer.getSingleOffer(this.params.offer_id);
+        var offerCheck = yield Offer.getOffer(this.params.offer_id);
+        if (offerCheck.is_deleted == true) {
+            this.status = 404;
+            this.body = { error: 'Offer ID does not exist. Cannot delete it.' };
+            return;
+        }
+        if ((offerCheck.company_id != parseInt(this.params.company_id))
+             || (offerCheck.unit_id != parseInt(this.params.unit_id))) {
+            this.status = 404;
+            this.body = { error: 'Invalid Company ID/Unit ID provided. Cannot delete the Offer.' };
+            return;
+        }
     } catch(err){
         logger.error('Error while retrieving offer.');
         this.status = 404;
-        this.body = {error: 'Invalid Offer ID.'};
+        this.body = {error: 'Invalid Offer ID. Cannot delete the Offer.'};
         return;
     } 
 
