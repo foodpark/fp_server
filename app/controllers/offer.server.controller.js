@@ -175,7 +175,7 @@ exports.createOffer = function * (next) {
         var unitCoordinates = yield Unit.getUnitCoordinates(request.unit_id);
         var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
         var customerCoordinates = {lat: parseFloat(requestData.latitude), lon: parseFloat(requestData.longitude)};
-        request.distance = FormatUtils.round(geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'km'}), 1);
+        request.distance = FormatUtils.round(geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'mi'}), 1);
     } catch (err) {
         logger.error('Coordinates not available for Pawn Shop. Cannot process this request.');
         this.status = 500; // Internal Server Error - Operation Failed

@@ -126,7 +126,7 @@ exports.getPawnshopsByCoordinates = function * (next){
     var pawnShopsFound = [];
     for (var i = 0; i < pawnShopList.length; i++) {
         var pawnShopCoordinates = {lat: parseFloat(pawnShopList[i].latitude), lon: parseFloat(pawnShopList[i].longitude)};
-        var distCustomerPawnShop = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'km'});
+        var distCustomerPawnShop = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'mi'});
 
         if (distCustomerPawnShop <= distance) {
             pawnShopList[i].distance = FormatUtils.round(distCustomerPawnShop, 1);
