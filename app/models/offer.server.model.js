@@ -72,13 +72,14 @@ exports.getOffersByRequestAndCompany = function(request_ids, company_id) {
 	return returnArr;
 }
 
-exports.getOffersByRequestAndUnit = function(request_ids, unit_id) {
+exports.getOffersByRequestAndCompanyUnit = function(request_ids, company_id, unit_id) {
 	var returnArr = [];
 	var offersArr = [];
 	
 	for (var i = request_ids.length - 1; i >= 0; i--) {
 		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id)
-						.andWhere('unit_id', unit_id).andWhere('is_deleted', false);
+						.andWhere('company_id', company_id).andWhere('unit_id', unit_id)
+						.andWhere('is_deleted', false);
 		returnArr.push({"request": request_ids[i], "offers": offersArr});
 	}
 
@@ -86,9 +87,21 @@ exports.getOffersByRequestAndUnit = function(request_ids, unit_id) {
 }
 
 exports.getOffersByCompanyAndOfferStatus = function(company_id, offer_accepted) {
-	return knex(OFFER_TABLE).select().where('company_id', company_id).andWhere('offer_accepted', offer_accepted).andWhere('is_deleted', false);
+	return knex(OFFER_TABLE).select().where('company_id', company_id)
+			.andWhere('offer_accepted', offer_accepted).andWhere('is_deleted', false);
+}
+
+exports.getOffersByCompanyUnitAndOfferStatus = function(company_id, unit_id, offer_accepted) {
+	return knex(OFFER_TABLE).select().where('company_id', company_id)
+			.andWhere('unit_id', unit_id).andWhere('offer_accepted', offer_accepted)
+			.andWhere('is_deleted', false);
 }
 
 exports.getOffersByCompanyAndContractStatus = function(company_id, contract_approved) {
 	return knex(OFFER_TABLE).select().where('company_id', company_id).andWhere('contract_approved', contract_approved);
+}
+
+exports.getOffersByCompanyUnitAndContractStatus = function(company_id, unit_id, contract_approved) {
+	return knex(OFFER_TABLE).select().where('company_id', company_id)
+			.andWhere('unit_id', unit_id).andWhere('contract_approved', contract_approved);
 }

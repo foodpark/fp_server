@@ -28,9 +28,14 @@ exports.getRequestsByCompany = function(id){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id).andWhere('requests.is_deleted', false);
 }
 
+exports.getRequestsByCompanyUnit = function(company_id, unit_id){
+	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id')
+			.where('offers.company_id', company_id).andWhere('unit_id', unit_id).andWhere('requests.is_deleted', false);
+}
+
 exports.getRequestsByCompanyContractNotApproved = function(id){
 	return knex.raw("SELECT requests.* FROM requests " +
-						"WHERE requests.id IN " +
+						"WHERE requests.is_deleted=false AND requests.id IN " +
 						"(SELECT DISTINCT offers.request_id FROM offers " + 
 							"WHERE offers.company_id=" + id + " AND request_id IN " +
 								"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false " +
@@ -55,6 +60,10 @@ exports.getRequestsByOfferList = function(offer_list) {
 	}
 
 	return returnArr;
+}
+
+exports.getRequestsByOfferIdList = function(offer_id_list) {
+	return knex(REQUEST_TABLE).distinct('*').where('id', 'in', offer_id_list).andWhere('is_deleted', false);
 }
 
 exports.getRequestByCustomer = function (request_id, customer_id) {
