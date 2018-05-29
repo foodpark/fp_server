@@ -236,7 +236,7 @@ exports.updateOffer = function * (next) {
 
         if(parseInt(offerData.buy_back_amount) > parseInt(offerData.cash_offer)) {
             var interest_rate = (1/(offerData.offer_term/30))*(offerData.buy_back_amount/offerData.cash_offer - 1);
-            request.interest_rate = interest_rate*100;
+            request.interest_rate = FormatUtils.round(interest_rate*100, 1);
         } else {
             this.status = 422; // Unprocessable Entity
             this.body = {status: false, error : { "field": "interest_rate", "error": "Cash offer should be less than buy back amount."}};
