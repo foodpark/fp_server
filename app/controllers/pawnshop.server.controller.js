@@ -3,6 +3,8 @@
  */
 var auth = require('./authentication.server.controller');
 var Pawnshop = require('../models/pawnshop.server.model');
+var Request = require('../models/request.server.model');
+var Offer = require('../models/offer.server.model');
 var QueryHelper = require('../utils/query-helper');
 var FormatUtils = require('../utils/formatutils');
 var debug   = require('debug')('auth');
@@ -162,6 +164,12 @@ function validateCoordinatesDistance(latitude, longitude, distance) {
     return errorList;
 }
 
+exports.getAllRequests = function * (next) {
+    var request_ids = (yield Request.getRequestsContractNotApproved());
+    this.status = 200;
+    this.body = (yield Offer.getOffersByRequest(request_ids));
+    return;
+}
 exports.getCountByContext = function * (next) {
     var params = this.params[0];    
     var param_array = params.split('/');
