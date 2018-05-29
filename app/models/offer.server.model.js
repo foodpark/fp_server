@@ -51,9 +51,9 @@ exports.getOffersByRequest = function(request_ids) {
 	var returnArr = [];
 	var offersArr = [];
 	
-	for (var i = request_ids.rows.length - 1; i >= 0; i--) {
-		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids.rows[i].id).andWhere('is_deleted', false);
-		returnArr.push({"request": request_ids.rows[i], "offers": offersArr});
+	for (var i = request_ids.length - 1; i >= 0; i--) {
+		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id).andWhere('is_deleted', false);
+		returnArr.push({"request": request_ids[i], "offers": offersArr});
 	}
 
 	return returnArr;
