@@ -24,6 +24,10 @@ exports.getRequest = function (id) {
     return knex(REQUEST_TABLE).select('*').where('id', id).first();
 };
 
+exports.getRequests = function() {
+	return knex(REQUEST_TABLE).distinct('requests.*').andWhere('requests.is_deleted', false);
+}
+
 exports.getRequestsByCompany = function(id){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id).andWhere('requests.is_deleted', false);
 }

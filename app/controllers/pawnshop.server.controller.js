@@ -165,7 +165,7 @@ function validateCoordinatesDistance(latitude, longitude, distance) {
 }
 
 exports.getAllRequests = function * (next) {
-    var request_ids = (yield Request.getRequestsContractNotApproved());
+    var request_ids = (yield Request.getRequests());
     this.status = 200;
     this.body = (yield Offer.getOffersByRequest(request_ids));
     return;
