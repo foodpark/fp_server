@@ -43,6 +43,14 @@ exports.getRequestsByCompanyContractNotApproved = function(id){
 										"(SELECT DISTINCT request_id FROM offers WHERE offers.contract_approved=true)))");
 }
 
+exports.getRequestsContractNotApproved = function(){
+	return knex.raw("SELECT requests.* FROM requests " +
+						"WHERE requests.is_deleted=false AND requests.id IN " +
+							"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false " +
+								"AND request_id NOT IN " + 
+									"(SELECT DISTINCT request_id FROM offers WHERE offers.contract_approved=true))");
+}
+
 exports.getRequestsByCompanyMultiple = function(ids){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id','in' , ids);
 }

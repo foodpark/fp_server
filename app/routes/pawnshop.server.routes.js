@@ -31,6 +31,8 @@ module.exports = function (app) {
   // Pawn Shop and Customer Contracts
   router.get(apiPath + 'companies/:company_id/contracts', request.getRequestsContractApprovedByCompany);
   router.get(apiPath + 'customers/:customer_id/contracts', request.getRequestsContractApprovedByCustomer);
+  router.get(apiPath + 'requests', pawnshop.getAllRequests);
+
 
   router.get(apiPath + 'contracts/:contract_id', pawnshop.getContractsById);
   router.delete(apiPath + 'contracts/:contract_id', pawnshop.deleteContract);
