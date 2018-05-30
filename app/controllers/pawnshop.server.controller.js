@@ -109,7 +109,7 @@ exports.getPawnshopsByCoordinates = function * (next){
      * the search in database will be restricted to Pawn Shops inside this
      * interval. More accurate search is performed below based on the
      * distance provided. This interval was added just to avoid returning
-     * all Pawn Shops that exists in the database.
+     * all Pawn Shops that exist in the database.
      */
     var interval =  5;
     var latRange = [customerLatitude + interval, customerLatitude - interval];
@@ -165,6 +165,55 @@ function validateCoordinatesDistance(latitude, longitude, distance) {
 }
 
 exports.getAllRequests = function * (next) {
+    if ((this.query.latitude) || (this.query.longitude) || (this.query.distance)) {
+        var companyLatitude = parseFloat(this.query.latitude);
+        var companyLongitude = parseFloat(this.query.longitude);
+        var distance = parseFloat(this.query.distance);
+
+        var paramsValidation = validateCoordinatesDistance(companyLatitude, companyLongitude, distance);
+        if(paramsValidation.length > 0) {
+            this.status = 404;
+            this.body = paramsValidation;
+            return;
+        }
+
+        /*
+        * This interval (5) represents about 550km radius from the coordinates
+        * provided considering the coordinates are in Equator. It means that
+        * the search in database will be restricted to Requests inside this
+        * interval. More accurate search is performed below based on the
+        * distance provided. This interval was added just to avoid returning
+        * all Requests that exist in the database.
+        */
+        var interval =  5;
+        var latRange = [companyLatitude + interval, companyLatitude - interval];
+        var longRange = [companyLongitude + interval, companyLongitude - interval];
+
+        var requestList;
+        try{
+            requestList = yield Request.getRequestsNoOffersByCoordinates(latRange, longRange);
+        }catch(err){
+            logger.error('Error Getting Requests');
+            debug('Error Getting Requests');
+            throw(err);
+        }
+
+        var companyCoordinates = {lat: companyLatitude, lon: companyLongitude};
+        var requestsFound = [];
+        for (var i = 0; i < requestList.rows.length; i++) {
+            var requestsCoordinates = {lat: parseFloat(requestList.rows[i].latitude), lon: parseFloat(requestList.rows[i].longitude)};
+            var distRequestCompany = geodist(companyCoordinates, requestsCoordinates, {exact: true, unit: 'mi'});
+
+            if (distRequestCompany <= distance) {
+                requestsFound.push({"request": requestList.rows[i], "offers": []});
+            }
+        }
+
+        this.status = 200;
+        this.body = requestsFound;
+        return;
+    }
+
     var request_ids = (yield Request.getRequests());
     this.status = 200;
     this.body = (yield Offer.getOffersByRequest(request_ids));
