@@ -203,7 +203,8 @@ exports.updateOffer = function * (next) {
     var requestInfo = yield Request.getRequestsByOffer(this.params.offer_id);
     var customerInfo = yield Customer.getSingleCustomer(requestInfo[0].customer_id);
 
-    if (!(user.role == 'CUSTOMER' && user.id == customerInfo[0].user_id)) {
+    if (!((user.role == 'CUSTOMER' && user.id == customerInfo[0].user_id) ||
+        (user.role == 'ADMIN') || (user.role == 'UNITMGR'))) {
       logger.error('User not authorized');
       this.status=401
       this.body = {error: 'User not authorized'}
