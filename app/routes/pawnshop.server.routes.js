@@ -23,6 +23,8 @@ module.exports = function (app) {
     
   // Pawn Shop Offers
   router.get(apiPath + 'companies/:company_id/offers', offer.getOffersByCompany);
+  router.get(apiPath + 'companies/:company_id/requests', offer.getOffersEmptyRequestsByCompany);
+  router.get(apiPath + 'companies/:company_id/units/:unit_id/requests', offer.getOffersEmptyRequestsByCompanyUnit);
   router.post(apiPath + 'companies/:company_id/units/:unit_id/offers', offer.createOffer);
   router.put(apiPath + 'companies/:company_id/offers/:offer_id', requireJWT, offer.updateOffer);
   router.put(apiPath + 'companies/:company_id/units/:unit_id/offers/:offer_id', requireJWT, offer.updateOffer);

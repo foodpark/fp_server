@@ -100,3 +100,7 @@ exports.getForUser = function(userId) {
 exports.getUnitCoordinates = function(unit_id) {
   return knex('units').join('food_parks', 'units.food_park_id', 'food_parks.id').select('food_parks.latitude', 'food_parks.longitude').where('units.id', unit_id);
 }
+
+exports.getAllCompanyCoordinates = function(company_id) {
+  return knex('units').select('food_parks.latitude', 'food_parks.longitude').join('food_parks', 'units.food_park_id', 'food_parks.id').select('food_parks.latitude', 'food_parks.longitude').where('units.company_id', company_id);;
+}
