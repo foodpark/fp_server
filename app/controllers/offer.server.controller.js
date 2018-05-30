@@ -303,3 +303,61 @@ exports.deleteOffer = function * (next) {
     this.body = (yield Offer.deleteSingleOffer(this.params.offer_id));
     return;
 }
+
+exports.getOffersEmptyRequestsByCompany = function * (next) {
+    try {
+        var companyCheck = yield Company.getSingleCompany(this.params.company_id);
+    } catch (err) {
+        logger.error("Invalid Company ID provided. Cannot get offers.");
+        this.status = 404;
+        this.body = {error: 'Invalid Company ID.'};
+        return;
+    }
+
+    var requestsList = (yield Request.getRequestsByCompany(this.params.company_id));
+    var unitCoordinates = yield Unit.getAllCompanyCoordinates(this.params.company_id);
+
+    var requestsNoOffersList = (yield Request.getRequestsNoOffers());
+    for (var i = 0; i < requestsNoOffersList.rows.length; i++) {
+        for (var j = 0; j < unitCoordinates.length; j++) {
+            var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[j].latitude), lon: parseFloat(unitCoordinates[j].longitude)};
+            var customerCoordinates = {lat: parseFloat(requestsNoOffersList.rows[i].latitude), lon: parseFloat(requestsNoOffersList.rows[i].longitude)};
+
+            var currentDistance = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'mi'});
+            if (currentDistance <= 30) {
+                requestsList.push(requestsNoOffersList.rows[i]);
+                break;
+            }
+        }
+    }
+    this.status = 200;
+    this.body = (yield Offer.getOffersByRequestAndCompany(requestsList, this.params.company_id));
+    return;
+}
+
+exports.getOffersEmptyRequestsByCompanyUnit = function * (next) {
+    var company = yield Company.getCompanyByUnit(this.params.company_id, this.params.unit_id);
+    if (company.length === 0) {
+        logger.error("Invalid Company ID/Unit ID provided.");
+        this.status = 404;
+        this.body = {error: 'Invalid Company ID/Unit ID provided.'};
+        return;
+    }
+
+    var requestsList = (yield Request.getRequestsByCompanyUnit(this.params.company_id, this.params.unit_id));
+    var unitCoordinates = yield Unit.getUnitCoordinates(this.params.unit_id);
+
+    var requestsNoOffersList = (yield Request.getRequestsNoOffers());
+    for (var i = 0; i < requestsNoOffersList.rows.length; i++) {
+        var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
+        var customerCoordinates = {lat: parseFloat(requestsNoOffersList.rows[i].latitude), lon: parseFloat(requestsNoOffersList.rows[i].longitude)};
+
+        var currentDistance = geodist(pawnShopCoordinates, customerCoordinates, {exact: true, unit: 'mi'});
+        if (currentDistance <= 30) {
+            requestsList.push(requestsNoOffersList.rows[i]);
+        }
+    }
+    this.status = 200;
+    this.body = (yield Offer.getOffersByRequestAndCompanyUnit(requestsList, this.params.company_id, this.params.unit_id));
+    return;
+}

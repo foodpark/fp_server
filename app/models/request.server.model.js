@@ -101,3 +101,8 @@ exports.getRequestsByCompanyContractApproved = function(id){
 			.where('offers.company_id', id).andWhere('requests.is_deleted', false)
 			.andWhere('contract_approved', true);
 }
+
+exports.getRequestsNoOffers = function(){
+	return knex.raw("SELECT * FROM requests WHERE requests.is_deleted=false AND requests.id NOT IN " +
+						"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false);");
+}
