@@ -1174,7 +1174,7 @@ function *beforeSaveUnit() {
       throw new Error('That name already exists. Try another name', 422);
     }
 
-    var unitmgr = { role: 'UNITMGR', username: username, password: password };
+    var unitmgr = { role: 'UNITMGR', username: username, password: password, country_id: (countryId ? countryId : 1)};
     var user = '';
     try {
       user = (yield User.createOrUpdateUser(unitmgr))[0];
