@@ -346,8 +346,8 @@ exports.getOffersEmptyRequestsByCompanyUnit = function * (next) {
     }
 
     var requestsList = (yield Request.getRequestsByCompanyUnit(this.params.company_id, this.params.unit_id));
-    var unitCoordinates = yield Unit.getUnitCoordinates(this.params.unit_id);
 
+    var unitCoordinates = yield Unit.getUnitCoordinates(this.params.unit_id);
     var requestsNoOffersList = (yield Request.getRequestsNoOffers());
     for (var i = 0; i < requestsNoOffersList.rows.length; i++) {
         var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
@@ -359,6 +359,6 @@ exports.getOffersEmptyRequestsByCompanyUnit = function * (next) {
         }
     }
     this.status = 200;
-    this.body = (yield Offer.getOffersByRequestAndCompanyUnit(requestsList, this.params.company_id, this.params.unit_id));
+    this.body = (yield Offer.getOffersByRequestAndCompanyUnitAndOfferStatus(requestsList, this.params.company_id, this.params.unit_id, false));
     return;
 }

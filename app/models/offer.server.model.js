@@ -86,6 +86,20 @@ exports.getOffersByRequestAndCompanyUnit = function(request_ids, company_id, uni
 	return returnArr;
 }
 
+exports.getOffersByRequestAndCompanyUnitAndOfferStatus = function(request_ids, company_id, unit_id, offer_accepted) {
+	var returnArr = [];
+	var offersArr = [];
+	
+	for (var i = request_ids.length - 1; i >= 0; i--) {
+		offersArr = knex(OFFER_TABLE).select().where('request_id', request_ids[i].id)
+						.andWhere('company_id', company_id).andWhere('unit_id', unit_id)
+						.andWhere('offer_accepted', offer_accepted).andWhere('is_deleted', false);
+		returnArr.push({"request": request_ids[i], "offers": offersArr});
+	}
+
+	return returnArr;
+}
+
 exports.getOffersByCompanyAndOfferStatus = function(company_id, offer_accepted) {
 	return knex(OFFER_TABLE).select().where('company_id', company_id)
 			.andWhere('offer_accepted', offer_accepted).andWhere('is_deleted', false);

@@ -34,7 +34,8 @@ exports.getRequestsByCompany = function(id){
 
 exports.getRequestsByCompanyUnit = function(company_id, unit_id){
 	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id')
-			.where('offers.company_id', company_id).andWhere('unit_id', unit_id).andWhere('requests.is_deleted', false);
+			.where('offers.company_id', company_id).andWhere('unit_id', unit_id)
+			.andWhere('offers.offer_accepted', false).andWhere('requests.is_deleted', false);
 }
 
 exports.getRequestsByCompanyContractNotApproved = function(id){
