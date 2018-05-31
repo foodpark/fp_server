@@ -109,6 +109,7 @@ exports.login = function *(next) {
         throw err;
       }
       userInfo.food_park_id = foodPark.id;
+      userInfo.country_id = this.passport.user.country_id;
       meta.customer_id = foodPark.id;
   } else if (this.passport.user.role == 'ADMIN') {
     var admin = '';
@@ -134,6 +135,7 @@ exports.login = function *(next) {
     userInfo.unit_id = unit.id;
     userInfo.company_id =  company.id;
     userInfo.owner_id = company.user_id;
+    userInfo.country_id = this.passport.user.country_id;
     meta.unit_id = unit.id;
   }else if (this.passport.user.role == 'DRIVER') {
     var drivers = '';
