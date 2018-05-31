@@ -1137,6 +1137,7 @@ function *beforeSaveUnit() {
   // If username or password is changed, we need to update the Users table
   var username = this.resteasy.object.username;
   var password = this.resteasy.object.password;
+  var countryId = this.resteasy.object.country_id;
   if (this.resteasy.operation == 'create') {
     logger.info('Starting create of new Unit',meta);
     debug('..starting create of new Unit');
