@@ -254,9 +254,7 @@ function validateOfferData(requestBody) {
     var errors = [];
 
     Object.keys(requestBody).forEach(function eachKey(key) {
-        if (typeof requestBody[key] == "undefined" || requestBody[key] == null || requestBody[key] === '') {
-            errors.push({ "field": key, "error": "The field is required."});
-        } else if (key == "distance" || key == "cash_offer" || key == "buy_back_amount"
+        if (key == "distance" || key == "cash_offer" || key == "buy_back_amount"
          || key == "tax_amount" || key == "total_redemption" || key == "rating") {
             if (!Number.isFinite(requestBody[key])) {
                 errors.push({ "field": key, "error": "Invalid value provided for the field."});
