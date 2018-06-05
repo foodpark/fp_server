@@ -89,7 +89,15 @@ exports.getRequestsByCustomerId = function (customer_id) {
 						"WHERE requests.customer_id=" + customer_id + " AND requests.is_deleted=false AND requests.id NOT IN " + 
    							"(SELECT DISTINCT offers.request_id AS id FROM offers " +
 	   							"WHERE offers.is_deleted=false AND offers.contract_approved=true)");
-}	
+}
+
+exports.getRequestsByCustomerIdWeekFilter = function (customer_id, weekFilter) {
+	return knex.raw("SELECT requests.* FROM requests " +
+						"WHERE requests.customer_id=" + customer_id + " AND requests.created_at >= now() - interval '" + weekFilter + " week' " +
+						"AND requests.is_deleted=false AND requests.id NOT IN " + 
+   							"(SELECT DISTINCT offers.request_id AS id FROM offers " +
+	   							"WHERE offers.is_deleted=false AND offers.contract_approved=true)");
+}
 
 exports.getRequestByCustomerContractApproved = function (customer_id) {
 	return knex(REQUEST_TABLE).join(OFFER_TABLE, 'offers.request_id', 'requests.id')

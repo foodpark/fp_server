@@ -87,9 +87,7 @@ function validateRequestData(requestBody) {
     var errors = [];
 
     Object.keys(requestBody).forEach(function eachKey(key) {
-        if (typeof requestBody[key] == "undefined" || requestBody[key] == null || requestBody[key] === '') {
-            errors.push({ "field": key, "error": "The field is required."});
-        } else if (key == "latitude" || key == "longitude") {
+        if (key == "latitude" || key == "longitude") {
             if (!Number.isFinite(requestBody[key])) {
                 errors.push({ "field": key, "error": "Invalid value provided for the field."});
             }
@@ -130,7 +128,12 @@ exports.getAllRequestsByCustomerId = function * (next) {
     }
   
     try {
-        var allRequests = (yield Request.getRequestsByCustomerId(this.params.customer_id)).rows;
+        var allRequests;
+        if (this.query.filter_in_weeks) {
+            allRequests = (yield Request.getRequestsByCustomerIdWeekFilter(this.params.customer_id, this.query.filter_in_weeks)).rows;
+        } else {
+            allRequests = (yield Request.getRequestsByCustomerId(this.params.customer_id)).rows;
+        }
         
         this.status = 200;
         this.body = (yield Offer.getAllOffersRequestList(allRequests))
