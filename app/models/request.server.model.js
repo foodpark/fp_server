@@ -29,7 +29,9 @@ exports.getRequests = function() {
 }
 
 exports.getRequestsByCompany = function(id){
-	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id').where('offers.company_id', id).andWhere('requests.is_deleted', false);
+	return knex(REQUEST_TABLE).distinct('requests.*').join(OFFER_TABLE, 'offers.request_id', 'requests.id')
+			.where('offers.company_id', id).andWhere('requests.is_deleted', false)
+			.andWhere('offers.is_deleted', false);
 }
 
 exports.getRequestsByCompanyUnit = function(company_id, unit_id){
@@ -114,6 +116,26 @@ exports.getRequestsByCompanyContractApproved = function(id){
 exports.getRequestsNoOffers = function(){
 	return knex.raw("SELECT * FROM requests WHERE requests.is_deleted=false AND requests.id NOT IN " +
 						"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false);");
+}
+
+exports.getRequestsNoOffersByCompany = function(company_id) {
+	return knex.raw("SELECT * FROM requests WHERE requests.is_deleted=false AND " +
+						"(requests.id NOT IN " +
+							"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false) OR " +
+						"requests.id NOT IN " +
+							"(SELECT DISTINCT requests.id FROM requests JOIN offers ON (offers.request_id=requests.id) " +
+								"WHERE offers.company_id=" + company_id + " AND requests.is_deleted=false " +
+									"AND offers.is_deleted=false));");
+}
+
+exports.getRequestsNoOffersByCompanyUnit = function(company_id, unit_id) {
+	return knex.raw("SELECT * FROM requests WHERE requests.is_deleted=false AND " +
+						"(requests.id NOT IN " +
+							"(SELECT DISTINCT offers.request_id FROM offers WHERE offers.is_deleted=false) OR " +
+						"requests.id NOT IN " +
+							"(SELECT DISTINCT requests.id FROM requests JOIN offers ON (offers.request_id=requests.id) " +
+								"WHERE offers.company_id=" + company_id + " AND offers.unit_id=" + unit_id + " AND " +
+									"requests.is_deleted=false AND offers.is_deleted=false));");
 }
 
 exports.getRequestsNoOffersByCoordinates = function(latitude, longitude){

@@ -316,7 +316,7 @@ exports.getOffersEmptyRequestsByCompany = function * (next) {
     var requestsList = (yield Request.getRequestsByCompany(this.params.company_id));
     var unitCoordinates = yield Unit.getAllCompanyCoordinates(this.params.company_id);
 
-    var requestsNoOffersList = (yield Request.getRequestsNoOffers());
+    var requestsNoOffersList = (yield Request.getRequestsNoOffersByCompany(this.params.company_id));
     for (var i = 0; i < requestsNoOffersList.rows.length; i++) {
         for (var j = 0; j < unitCoordinates.length; j++) {
             var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[j].latitude), lon: parseFloat(unitCoordinates[j].longitude)};
@@ -346,7 +346,7 @@ exports.getOffersEmptyRequestsByCompanyUnit = function * (next) {
     var requestsList = (yield Request.getRequestsByCompanyUnit(this.params.company_id, this.params.unit_id));
 
     var unitCoordinates = yield Unit.getUnitCoordinates(this.params.unit_id);
-    var requestsNoOffersList = (yield Request.getRequestsNoOffers());
+    var requestsNoOffersList = (yield Request.getRequestsNoOffersByCompanyUnit(this.params.company_id, this.params.unit_id));
     for (var i = 0; i < requestsNoOffersList.rows.length; i++) {
         var pawnShopCoordinates = {lat: parseFloat(unitCoordinates[0].latitude), lon: parseFloat(unitCoordinates[0].longitude)};
         var customerCoordinates = {lat: parseFloat(requestsNoOffersList.rows[i].latitude), lon: parseFloat(requestsNoOffersList.rows[i].longitude)};
