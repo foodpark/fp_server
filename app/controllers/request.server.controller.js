@@ -4,6 +4,7 @@ var Customer = require('../models/customer.server.model');
 var Categories = require('../models/categories.server.model');
 var Request = require('../models/request.server.model');
 var Offer = require('../models/offer.server.model');
+var User = require('../models/user.server.model');
 var debug   = require('debug')('auth');
 var logger = require('winston');
 var ParseUtils = require('../utils/parseutils');
@@ -20,6 +21,9 @@ exports.createRequest = function * (next) {
         this.body = {error: 'Invalid Customer ID.'};
         return;
     }
+
+    var userData = yield User.getUserByCustomerId(request.customer_id);
+    request.customer = userData.first_name + " " + userData.last_name.substring(0,1);
 
     var errors = validateRequestData(request);
     if (errors.length > 0) {
