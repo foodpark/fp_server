@@ -3,9 +3,9 @@ var fs = require('fs');
 var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('requestretry');
+const requestPromise = require('request-promise')
 var logger = require('winston');
 var Country = require('../models/countries.server.model');
-
 
 const DELETE = 'DELETE';
 const GET = 'GET';
@@ -19,7 +19,6 @@ const MENU_ITEMS        = '/products';
 const OPTION_CATEGORIES = '/modifiers';
 const OPTION_ITEMS      = '/variations';
 const ORDERS            = '/orders';
-
 var bearerToken='';
 
 var refreshBearerToken = function () {
@@ -121,17 +120,23 @@ var sendRequest = function *(url, method, data) {
         bearerToken = '';
         reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
-      if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
         debug('..Moltin call successful');
-        var result = res.body.result;
-        if (method == GET) result = JSON.parse(res.body).result;
-        if (method == DELETE) result = JSON.parse(res.body);
-        debug(result);
+        var result = null
+        if (res.statusCode !== 204) {
+          result = res.body.result;
+        }
+        debug('RES.BODY', res.body)
+        if (method == GET) result = res.body ? JSON.parse(res.body).data : null;
+        if (method == DELETE && res.statusCode !== 204) {
+          result = res.body ? JSON.parse(res.body).data : null;
+        }
+        debug('sendRequest result', result);
         resolve (result)
         return;
       } else { // something went wrong
         debug('..something went wrong with call to Moltin');
-        var errors = res.body;
+        var errors = res.body ? res.body : res;
         debug(errors);
         reject(errors);
       }
@@ -211,11 +216,14 @@ exports.createDefaultCategory=function(moltincompany) {
   debug('slug '+ slug)
   var flow = "/categories"
   var data = {
-    'slug': slug,
-    'status': 1,
-    'title': moltincompany.name + ' Menu',
-    'description': moltincompany.name + ' Menu',
-    'company': moltincompany.id
+    data:{
+      slug: slug,
+      status: 'live',
+      name: moltincompany.name + ' Menu',
+      description: moltincompany.name + ' Menu',
+      company: moltincompany.id,
+      type: 'category'
+    }
   }
   return requestEntities(flow, POST, data)
 };
@@ -226,12 +234,15 @@ exports.createCategory=function (company, catTitle, catParent) {
   var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
   if (!catParent) catParent = company.default_cat;
   var data = {
-    parent: catParent,
-    slug : catSlug,
-    status : 1,
-    title : catTitle,
-    description : catTitle,
-    company : company.order_sys_id
+    data: {
+      parent: catParent,
+      slug : catSlug,
+      status : 'live',
+      name : catTitle,
+      description : catTitle,
+      company : company.order_sys_id,
+      type: 'category'
+    }
   }
   debug(data)
   return requestEntities(CATEGORIES, POST, data)
@@ -273,19 +284,36 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
      taxBand=config.defaultTaxBand;
   }
   var data = {
-    sku : sku,
-    slug : slug,
-    status : status,
-    title : title,
-    description : description,
-    price : price,
-    category : category,
-    stock_level : stockLevel,
-    stock_status : stockStatus,
-    requires_shipping : requiresShipping,
-    catalog_only : catalogOnly,
-    tax_band : taxBand,
-    company : company.order_sys_id
+    data: {
+      type: 'product',
+      name: title,
+      slug: slug,
+      sku: sku,
+      manage_stock: true,
+      description: description,
+      price: [
+        {
+          amount: price,
+          currency: 'USD',
+          includes_tax: false
+        }
+      ],
+      status: 'live',
+      commodity_type: 'physical',
+      meta: {
+        stock: {
+          level: stockLevel
+        }
+      },
+
+      category : category,
+      stock_level : stockLevel,
+      stock_status : stockStatus,
+      requires_shipping : requiresShipping,
+      catalog_only : catalogOnly,
+      tax_band : taxBand,
+      company : company.order_sys_id
+    }
   }
   debug(data)
   return requestEntities(MENU_ITEMS, POST, data)
@@ -366,26 +394,39 @@ exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
 exports.createOptionCategory=function(menuItemId, title, type) {
   debug('createOptionCategory')
   var data = {
-    title : title,
-    type : type
+    data: {
+      name : title,
+      type : 'product-variation'
+    }
   }
-  return requestEntities(menuOptionFlow(menuItemId), POST, data)
+  var variation = requestEntities('/variations', POST, data)
+  requestEntities(
+    '/products/' + menuItemId + '/relationships/variations',
+    POST,
+    {
+      data: {
+        type: 'product-variation',
+        id: variation.id
+      }
+    }
+  )
+  return variation
 };
-exports.listOptionCategories=function(menuItemId) {
+exports.listOptionCategories=function(menuItemId) { // ok
   debug('listOptionCategories')
-  return requestEntities(menuOptionFlow(menuItemId), GET)
+  return requestEntities(MENU_ITEMS, GET, '', menuItemId).relationships.variants
 };
-exports.findOptionCategory=function(menuItemId, optionCategoryId) {
+exports.findOptionCategory=function(menuItemId, optionCategoryId) { // ok
   debug('findOptionCategory')
-  return requestEntities(menuOptionFlow(menuItemId), GET, '', optionCategoryId)
+  return requestEntities('/variations', GET, '', optionCategoryId)
 };
-exports.updateOptionCategory=function(menuItemId, optionCategoryId, data) {
+exports.updateOptionCategory=function(menuItemId, optionCategoryId, data) { // ok
   debug('updateOptionCategory')
-  return requestEntities(menuOptionFlow(menuItemId), PUT, data, optionCategoryId)
+  return requestEntities('/variations', PUT, data, optionCategoryId)
 };
-exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
+exports.deleteOptionCategory=function(menuItemId, optionCategoryId) { // ok
   debug('deleteOptionCategory')
-  return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
+  return requestEntities('/variations', DELETE, '', optionCategoryId)
 };
 
 exports.findOrder=function(orderSysOrderId) {
@@ -442,37 +483,49 @@ exports.uploadImage = function *(itemId, path) {
   debug(imagefile)
   var data = {
     file: imagefile,
-    assign_to: itemId
+    public: true
   }
   debug(data)
   debug('...uploading')
   return new Promise(function(resolve, reject) {
-    request({
-      method: POST,
+    requestPromise.post({
       url: url,
+      json: false,
       formData: data,
       headers: {
-        'Authorization': 'Bearer '+ token
-      },
-      maxAttempts: 3,
-      retryDelay: 150,  // wait for 150 ms before trying again
+        'Authorization': 'Bearer '+ token,
+        'Content-Type': 'multipart/form-data'
+      }
     })
-    .then( function (res) {
+    .then(function (res) {
       debug('status code '+ res.statusCode)
       debug('sendRequest: parsing...')
       debug(res.body)
+      
       if (res.statusCode == 401 ) { // Unauthorized
         debug('...Access token expired')
         debug('...clear bearer token and throw error')
         bearerToken = '';
         reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
-      var result = JSON.parse(res.body).result
-      resolve (result)
-      return;
 
+      var result = res.body ? JSON.parse(res.body).data : null
+
+      var data = {
+        data: [
+          {
+            "type": "file",
+            "id": result.id
+          }
+        ]
+      }
+
+      console.log(MENU_ITEMS + '/' + menuItemId + '/relationships/files')
+      requestEntities(MENU_ITEMS + '/' + menuItemId + '/relationships/files', POST, data)
+
+      resolve (result)
     })
-    .catch( function (err) {
+    .catch( function(err) {
       console.error("uploadImage: statusCode: " + err.statusCode);
       console.error("uploadImage: statusText: " + err.statusText);
       reject (err)
