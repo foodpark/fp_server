@@ -7,158 +7,140 @@
 // Done.
 
 var knex = require('../config/knex');
+var cron = require('node-cron');
 
-var currentDateTime = new Date();
-
-console.log('current date and time: ' + currentDateTime);
-
-var currHour = currentDateTime.getHours(); // TODO: account for time zone in sql query results
-
-var doCheckIn = function(companyId) {
-  // find all unit IDs for the company then check-in each unit
-  // TODO: figure out how to get lat/long
-  return knex.select('id','company_id').from('units').where('company_id', companyId).andWhere('type','RESTAURANT')
-    .then(function(units) {
-      console.log("About to loop through each unit");
-      units.forEach(function(row) {
-        if (row.id) {
-          console.log("Performing checkin insert for unit " + row.id);
-          return doInsert(row.company_id, row.id);
-        }
-      });
-    })
-    .catch(function(err) { console.error('error: ' + err);});
+var getUnitInfo = function(id, callback) {
+  knex.select('id','company_id').from('units').where('id', id)
+    .then(function(unit) {
+      callback(unit);
+    });
 }
 
-var doInsert = function(companyId, unitId) {
-  var meta = {fn:'doInsert'}
-  meta.company_id=companyId;
-  meta.unit_id=unitId;
-   return knex('checkins').insert(
-    {
-      company_id: companyId,
-      unit_id: unitId,
-      check_in: currentDateTime
+var doCheckIn = function(unitData, currentDateTime, callback) {
+  knex('checkins').insert({company_id: unitData.company_id, unit_id: unitData.id, check_in: currentDateTime})
+    .then(function(result) {
+      callback(result);
+    });
+}
+
+var doCheckOut = function(unitData, currentDateTime, callback) {
+  knex('checkins').where({company_id: unitData.company_id, unit_id: unitData.id}).andWhere('check_out', null)
+    .update({check_out: currentDateTime})
+    .then(function(result){
+      callback(result);
+    });
+}
+
+var getUnits = function(currDayOfWeekOrdinal, callback) {
+  knex.select('id', 'schedule', 'hours').from('units')
+    .where('stub', true)
+    .andWhere('schedule', 'LIKE', '%' + currDayOfWeekOrdinal + '%')
+    .then(function(result) {
+      callback(result);
+    });
+}
+
+var getOpenCloseHour = function(openCloseHourRaw) {
+  var splitHours = openCloseHourRaw.split('-');
+  var openCloseTime = { open: null, close: null };
+
+  if (splitHours && splitHours.length > 1) {
+    var openHour = parseHour(splitHours[0]);
+    openCloseTime.open = openHour;
+
+    var closeHour = parseHour(splitHours[1]);
+    openCloseTime.close = closeHour;
+  }
+
+  return openCloseTime;
+}
+
+var parseHour = function(hourRaw) {
+  var hourData = { hour: 0, minutes: 0 };
+
+  if (hourRaw.toLowerCase().indexOf('a') > 0) {
+    var tempHourRaw = hourRaw.toLowerCase().split('a');
+
+    // Hour (AM)
+    var hourMinute = tempHourRaw[0].split(':');
+    hourData.hour = parseInt(hourMinute[0]);
+    if (hourData.hour == 12) {
+      hourData.hour = 0; // 12am is 0 hours
     }
-  ).catch(function(err) { 
-    meta.error=err;
-    console.error('error inserting checkin: ', meta); 
-    throw err;
-  }); // catch error on the insert because otherwise you just return the query definition and it doesn't do work
-}
+    // Minutes (AM)
+    hourData.minutes = parseInt(hourMinute[1]);
+  } else if (hourRaw.toLowerCase().indexOf('p') > 0) {
+    var tempHourRaw = hourRaw.toLowerCase().split('p');
 
-var doCheckOut = function(companyId) {
-  var meta = {fn:'doCheckOut'}
-  meta.company_id=companyId;
-  return knex.select('id','company_id').from('units').where('company_id', companyId).andWhere('type','RESTAURANT')
-    .then(function(units) {
-      units.forEach(function(row) {
-        if (row.id) {
-          meta.unit_id=units.id;
-          return knex('checkins').where(
-          {
-            company_id: row.company_id,
-            unit_id: row.id
-          }).update({check_out:currentDateTime}).catch(function(err) { 
-            meta.error=err;
-            console.error('error inserting checkin: ', meta); 
-            throw err;
-          }); // catch error on the update because otherwise you just return the query definition and it doesn't do work
-        }
-      });
-    })
-    .catch(function(err) { console.error('error: ' + err);});
+    // Hour (PM)
+    var hourMinute = tempHourRaw[0].split(':');
+    hourData.hour = parseInt(hourMinute[0]);
+    if (hourData.hour < 12) {
+      hourData.hour += 12;
+    }
+    // Minutes (PM)
+    hourData.minutes = parseInt(hourMinute[1]);
+  } else {
+    var hourMinute = hourRaw.split(':');
+    hourData.hour = parseInt(hourMinute[0]);
+    hourData.minutes = parseInt(hourMinute[1]);
+  }
+
+  return hourData;
 }
 
 // Main logic
+cron.schedule('0,59 * * * *', function() {
+  main();
+});
 
-var currDayOfWeekOrdinal = currentDateTime.getDay();
-var currDayOfWeek = "";
-switch (currDayOfWeekOrdinal) {
-  case 0:
-    currDayOfWeek = 'Su';
-    break;
-  case 1:
-    currDayOfWeek = 'M';
-    break;
-  case 2:
-    currDayOfWeek = 'Tu';
-    break;
-  case 3:
-    currDayOfWeek = 'W';
-    break;
-  case 4:
-    currDayOfWeek = 'Th';
-    break;
-  case 5:
-    currDayOfWeek = 'F';
-    break;
-  case 6:
-    currDayOfWeek = 'Sa';
-    break;
-}
+var main = function() {
+  var currentDateTime = new Date();
+  console.log('------------------------------');
+  console.log('Updating Check-in/Check-out...');
+  console.log('Current date and time: ' + currentDateTime);
 
-console.log('Day of week: ' + currDayOfWeek);
-console.log('Hour: ' + currHour);
+  var currHour = currentDateTime.getHours();
+  var currMinute = currentDateTime.getMinutes();
+  /*
+  * 0 = Sunday / 1 = Monday / 2 = Tuesday / 3 = Wednesday
+  * 4 = Thursday / 5 = Friday / 6 = Saturday
+  */
+  var currDayOfWeekOrdinal = currentDateTime.getDay();
 
-var results;
-
-knex.select('id', 'schedule', 'hours').from('companies').whereRaw('stub IS true AND schedule LIKE \'%' + currDayOfWeekOrdinal + '%\'')
-  .then(function(stubs) {
-    stubs.forEach(function(row) {
+  getUnits(currDayOfWeekOrdinal, function(result) {
+    result.forEach(function(row) {
       if (row.hours) {
-        var splitHours = row.hours.split('-');
-        if (splitHours && splitHours.length > 1) {
-          console.log(splitHours[0]);
-          var openHourRaw = splitHours[0];
-          console.log(splitHours[1]);
-          var closeHourRaw = splitHours[1];
+        var openCloseHour = getOpenCloseHour(row.hours);
+        if ((openCloseHour.open != null) && (openCloseHour.close != null)) {
 
-          var openHour;
-          if (openHourRaw.toLowerCase().indexOf('a') > 0) {
-            openHour = parseInt(openHourRaw.toLowerCase().split('a'));
-            if (openHour == 12) {
-              openHour = 0; // 12am is 0 hours
-            }
-          } else if (openHourRaw.toLowerCase().indexOf('p') > 0) {
-            openHour = parseInt(openHourRaw.toLowerCase().split('p'));
-            if (openHour < 12) {
-              openHour += 12;
-            }
-          } else {
-            openHour = parseInt(openHourRaw);
-          }
-          console.log(openHour);
+          // CHECK-IN
+          if ((currHour == openCloseHour.open.hour) && (currMinute == openCloseHour.open.minutes)) {
+            getUnitInfo(row.id, function(result){
+              if (result[0].id) {
+                console.log('Check-in: Unit ' + row.id);
+                doCheckIn(result[0], currentDateTime, function(result) {});
+              }
+            });
 
-          var closeHour;
-          if (closeHourRaw.toLowerCase().indexOf('a') > 0) {
-            closeHour = parseInt(closeHourRaw.toLowerCase().split('a'));
-            if (closeHour == 12) {
-              closeHour = 0; // 12am is 0 hours
-            }
-          } else if (closeHourRaw.toLowerCase().indexOf('p') > 0) {
-            closeHour = parseInt(closeHourRaw.toLowerCase().split('p'));
-            if (closeHour < 12) {
-              closeHour += 12;
-            }
-          } else {
-            closeHour = parseInt(closeHourRaw);
-          }
-          console.log(closeHour);
-
-          if (currHour == openHour) {
-            console.log('Company ' + row.id + ' is open!');
-            return doCheckIn(row.id);
-          } else if (currHour == closeHour) {
-            console.log('Company ' + row.id + ' is closed!');
-            return doCheckOut(row.id);
+          // CHECK-OUT
+          } else if ((currHour == openCloseHour.close.hour) && (currMinute == openCloseHour.close.minutes)) {
+            getUnitInfo(row.id, function(result){
+              if (result[0].id) {
+                doCheckOut(result[0], currentDateTime, function(result) {
+                  if (result > 0) {
+                    console.log('Check-out: Unit ' + row.id);
+                  }
+                });
+              }
+            });
           }
         } else {
-          console.log("NOTHING");
+          console.log("Open/Close hour not found!");
         }
       } else {
-        console.log("row.hours is false");
+        console.log("Hours object not defined.");
       }
     });
-  })
-  .catch(function(err) { console.error('error: ' + err);});
+  });
+}
