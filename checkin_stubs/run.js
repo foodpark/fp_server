@@ -10,14 +10,22 @@ var knex = require('../config/knex');
 var cron = require('node-cron');
 
 var getUnitInfo = function(id, callback) {
-  knex.select('id','company_id').from('units').where('id', id)
+  knex.select('units.id','units.company_id', 'units.food_park_id',
+                'food_parks.latitude', 'food_parks.longitude',
+                'food_parks.name')
+        .from('units')
+        .innerJoin('food_parks', 'units.food_park_id', 'food_parks.id')
+        .where('units.id', id)
     .then(function(unit) {
       callback(unit);
     });
 }
 
 var doCheckIn = function(unitData, currentDateTime, callback) {
-  knex('checkins').insert({company_id: unitData.company_id, unit_id: unitData.id, check_in: currentDateTime})
+  knex('checkins').insert({company_id: unitData.company_id, unit_id: unitData.id,
+                            check_in: currentDateTime, latitude: unitData.latitude,
+                            longitude: unitData.longitude, food_park_id: unitData.food_park_id,
+                            food_park_name: unitData.name})
     .then(function(result) {
       callback(result);
     });
