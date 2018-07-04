@@ -124,7 +124,7 @@ var sendRequest = function *(url, method, data) {
         debug('..Moltin call successful');
         var result = null
         if (res.statusCode !== 204) {
-          result = res.body.result;
+          result = res.body.data;
         }
         debug('RES.BODY', res.body)
         if (method == GET) result = res.body ? JSON.parse(res.body).data : null;
@@ -182,12 +182,13 @@ var requestEntities = function *(flow, method, data, id, params) {
 exports.createCompany=function *(sfezCompany) {
   debug('createCompany')
   var data = {
+    'type': 'entry',
     'name': sfezCompany.name,
     'email': sfezCompany.email
   }
   debug(data)
   try {
-    var result = yield requestEntities(COMPANIES, POST, data)
+    var result = yield requestEntities(COMPANIES, 'POST', {data})
   } catch (err) {
     console.error(err)
     throw(err)
