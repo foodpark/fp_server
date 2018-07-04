@@ -269,7 +269,7 @@ exports.deleteCategory=function(categoryId) {
   return requestEntities(CATEGORIES, DELETE, '', categoryId)
 };
 
-exports.createMenuItem=function(company, title, status, price, category, description, taxBand) {
+exports.createMenuItem = async function(company, title, status, price, category, description, taxBand) {
   debug('createMenuItem')
   //generate unique sku
   var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
@@ -279,7 +279,7 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
   var stockStatus = 0; // unlimited
   var requiresShipping = 0; // No shipping required
   var catalogOnly = 0; // Not catalog only
-
+  const country = await Country.getSingleCountry(company.country_id)
   
   if (!taxBand){
      taxBand=config.defaultTaxBand;
@@ -295,7 +295,7 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
       price: [
         {
           amount: price,
-          currency: 'USD',
+          currency: country.currency,
           includes_tax: false
         }
       ],
