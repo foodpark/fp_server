@@ -258,12 +258,18 @@ exports.listCategories=function *(next) {
   debug(this.company)
   try {
     var categories = (yield msc.listCategories(this.company))
+    var filteredCategories = []
+    for (let i = 0; i < categories.length; i++) {
+      if (categories[i].company === this.company.order_sys_id) {
+        filteredCategories.push(categories[i])
+      }
+    }
   } catch (err) {
     console.error('error retrieving categories from ordering system ')
     throw(err)
   }
   debug(categories)
-  this.body = categories
+  this.body = filteredCategories
   return;
 }
 
