@@ -268,7 +268,17 @@ var createMoltinDeliveryChargeItem = function* (company, deliveryCat) {
   var status = 1; // live
   var description = "Delivery Charge";
   try {
-    chargeItem = yield msc.createMenuItem(company, title, status, config.deliveryCharge, deliveryCat, description);
+    var country = (yield Country.getSingleCountry(company.country_id));
+    if (country.length && country[0].currency) {
+      var currency = country[0].currency;
+    } else {
+      var error = {
+        message: 'country.currency is undefined'
+      }
+      throw error;
+    }
+
+    chargeItem = yield msc.createMenuItem(company, title, status, config.deliveryCharge, deliveryCat, description, null, currency);
   } catch (err) {
     meta.error = err;
     logger.error('Error creating delivery charge item', meta);
@@ -324,8 +334,7 @@ var createCompany = function* (company_name, email, country_id, userId) {
   debug('..create daily special category');
   var dailySpecialCat = '';
   try {
-    var co =
-      dailySpecialCat = yield createMoltinDailySpecialCategory(company, moltinCat.id);
+    var dailySpecialCat = yield createMoltinDailySpecialCategory(company, moltinCat.id);
   } catch (err) {
     meta.error = err;
     logger.error('Error during Moltin daily special category creation', meta);
@@ -341,8 +350,7 @@ var createCompany = function* (company_name, email, country_id, userId) {
   debug('..create delivery charge category');
   var deliveryChgCat = '';
   try {
-    var co =
-      deliveryChgCat = yield createMoltinDeliveryChargeCategory(company, moltinCat.id);
+    var deliveryChgCat = yield createMoltinDeliveryChargeCategory(company, moltinCat.id);
   } catch (err) {
     meta.error = err;
     logger.error('Error during Moltin delivery charge category creation', meta);

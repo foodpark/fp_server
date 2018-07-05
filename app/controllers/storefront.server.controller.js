@@ -258,12 +258,18 @@ exports.listCategories=function *(next) {
   debug(this.company)
   try {
     var categories = (yield msc.listCategories(this.company))
+    var filteredCategories = []
+    for (let i = 0; i < categories.length; i++) {
+      if (categories[i].company === this.company.order_sys_id) {
+        filteredCategories.push(categories[i])
+      }
+    }
   } catch (err) {
     console.error('error retrieving categories from ordering system ')
     throw(err)
   }
   debug(categories)
-  this.body = categories
+  this.body = filteredCategories
   return;
 }
 
@@ -405,10 +411,12 @@ exports.createMenuItem=function *(next) {
         return this.body = { error: 'Description is required.'};
       }
       var taxBand = '';
+      var currency = '';
       if (company.country_id){
         try{
           var country = (yield Country.getSingleCountry(company.country_id))[0];
           taxBand=country.tax_band;
+          currency = country.currency;
         }
         catch(err){
           meta.error=err;
@@ -418,7 +426,7 @@ exports.createMenuItem=function *(next) {
       }
       debug('..creating menu item');
       try {
-        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand)
+        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand, currency)
       } catch (err) {
         meta.error=err;
         logger.error('error creating menu item in ordering system ', meta);
