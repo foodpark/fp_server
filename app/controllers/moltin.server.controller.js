@@ -16,8 +16,9 @@ const CATEGORIES        = '/categories';
 const COMPANIES         = '/flows/companies/entries'
 const IMAGES            = '/files';
 const MENU_ITEMS        = '/products';
-const OPTION_CATEGORIES = '/modifiers';
+const OPTION_EXTRA      = '/modifiers'; //OPTION_CATEGORIES
 const OPTION_ITEMS      = '/variations';
+const OPTION            = '/options';
 const ORDERS            = '/orders';
 var bearerToken='';
 
@@ -92,6 +93,7 @@ var getBearerToken = function *(next) {
 
 var sendRequest = function *(url, method, data) {
   debug('sendRequest')
+  debug(data)
   try {
     var token = yield getBearerToken()
     debug('...token '+ token)
@@ -99,11 +101,20 @@ var sendRequest = function *(url, method, data) {
     console.error(err);
     throw (err);
   }
+  var payload = '';
+  
+  if (data) {
+      payload = {
+          data: data
+        }
+   }
+   
+  
   return new Promise(function(resolve, reject) {
     request({
       method: method,
       url: url,
-      json: data,
+      json: payload,
       headers: {
         'Authorization': 'Bearer '+ token
       },
@@ -111,7 +122,9 @@ var sendRequest = function *(url, method, data) {
       retryDelay: 150,  // wait for 150 ms before trying again
     })
     .then( function (res) {
-      debug('status code '+ res.statusCode)
+      var meta = {fn: 'sendRequest', method: method};
+      debug('status code '+ res.statusCode);
+      debug(res.statusMesage);
       debug('sendRequest: parsing...')
       debug(res.body)
       if (res.statusCode == 401 ) { // Unauthorized
@@ -122,23 +135,26 @@ var sendRequest = function *(url, method, data) {
       }
       if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
         debug('..Moltin call successful');
-        var result = null
-        if (res.statusCode !== 204) {
-          result = res.body.data;
-        }
-        debug('RES.BODY', res.body)
-        if (method == GET) result = res.body ? JSON.parse(res.body).data : null;
-        if (method == DELETE && res.statusCode !== 204) {
+        var result = null;
+        if (method == DELETE && res.statusCode == 204) {
+            logger.info('Delete completed', meta)
+            result = {status: 'ok', message: 'Deleted successfully'};
+        } else if (method == GET)
+        {
           result = res.body ? JSON.parse(res.body).data : null;
+        } else {
+            result = res.body.data;
+            //if (method == GET) result =  JSON.parse(res.body).data;
         }
+        
         debug('sendRequest result', result);
         resolve (result)
         return;
       } else { // something went wrong
-        debug('..something went wrong with call to Moltin');
+debug('..something went wrong with call to Moltin');
         var errors = res.body ? res.body : res;
-        debug(errors);
-        reject(errors);
+debug(errors);        
+reject(errors);
       }
     })
     .catch( function (err) {
@@ -152,12 +168,14 @@ var sendRequest = function *(url, method, data) {
 var requestEntities = function *(flow, method, data, id, params) {
   debug('requestEntities')
   debug('... id is '+ id)
+  debug(data)
   var oid = '';
   if (id) oid = '/'+id
   var urlParams = '';
   if (params) urlParams = '?'+params;
   var url = config.moltinStoreUrl + flow + oid + urlParams
   debug('...url : '+ url)
+  
   try {
     var result = yield sendRequest(url, method, data)
   } catch (err) {
@@ -188,7 +206,7 @@ exports.createCompany=function *(sfezCompany) {
   }
   debug(data)
   try {
-    var result = yield requestEntities(COMPANIES, 'POST', {data})
+    var result = yield requestEntities(COMPANIES, POST, data)
   } catch (err) {
     console.error(err)
     throw(err)
@@ -217,14 +235,14 @@ exports.createDefaultCategory=function(moltincompany) {
   debug('slug '+ slug)
   var flow = "/categories"
   var data = {
-    data:{
-      slug: slug,
+    
+   slug: slug,
       status: 'live',
       name: moltincompany.name + ' Menu',
       description: moltincompany.name + ' Menu',
       company: moltincompany.id,
-      type: 'category'
-    }
+    type: 'category'
+
   }
   return requestEntities(flow, POST, data)
 };
@@ -235,7 +253,6 @@ exports.createCategory=function (company, catTitle, catParent) {
   var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
   if (!catParent) catParent = company.default_cat;
   var data = {
-    data: {
       parent: catParent,
       slug : catSlug,
       status : 'live',
@@ -243,7 +260,7 @@ exports.createCategory=function (company, catTitle, catParent) {
       description : catTitle,
       company : company.order_sys_id,
       type: 'category'
-    }
+
   }
   debug(data)
   return requestEntities(CATEGORIES, POST, data)
@@ -285,7 +302,6 @@ exports.createMenuItem = async function(company, title, status, price, category,
      taxBand=config.defaultTaxBand;
   }
   var data = {
-    data: {
       type: 'product',
       name: title,
       slug: slug,
@@ -295,7 +311,7 @@ exports.createMenuItem = async function(company, title, status, price, category,
       price: [
         {
           amount: price,
-          currency: country.currency,
+          currency: country[0].currency,
           includes_tax: false
         }
       ],
@@ -314,7 +330,6 @@ exports.createMenuItem = async function(company, title, status, price, category,
       catalog_only : catalogOnly,
       tax_band : taxBand,
       company : company.order_sys_id
-    }
   }
   debug(data)
   return requestEntities(MENU_ITEMS, POST, data)
@@ -341,7 +356,7 @@ exports.deleteMenuItem=function(menuItemId) {
 
 var menuOptionFlow = function (menuItemId, optionCategoryId, showOptionItems) {
   debug('menuOptionFlow')
-  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_CATEGORIES
+  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_EXTRA
   if (optionCategoryId) {
     debug('...option category id '+ optionCategoryId)
     flow = flow + '/' + optionCategoryId
@@ -354,15 +369,16 @@ var menuOptionFlow = function (menuItemId, optionCategoryId, showOptionItems) {
   return flow
 }
 
-exports.createOptionItem=function(menuItemId, optionCategoryId, title, modPrice) {
+exports.createOptionItem=function(optionCategoryId, title, description) {
   debug('createOptionItem')
-  if (!modPrice) modPrice = "+0.00"
-  var data = {
-    title : title,
-    mod_price : modPrice
-  }
+  var flow = OPTION_ITEMS+'/'+optionCategoryId +OPTION ;
+   var data ={
+                 name : title,
+                 type  : 'option',
+                 description : description
+          }
   debug(data)
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId, true), POST, data)
+  return requestEntities(flow, POST, data)
 };
 
 exports.listOptionItems=function(menuItemId, optionCategoryId) {
@@ -375,59 +391,80 @@ exports.findOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
   return requestEntities(menuOptionFlow(menuItemId, optionCategoryId, true), GET, '', optionItemId)
 };
 
-exports.updateOptionItem=function(menuItemId, optionCategoryId, optionItemId, data) {
+exports.updateOptionItem=function(optionCategoryId, optionItemId, title,description) {
   debug('updateOptionItem')
-  var flow = menuOptionFlow(menuItemId, optionCategoryId, true)
+  
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION ;
+   var data ={ 
+                name : title,
+                 type  : 'option',
+                 description : description,
+                 id : optionItemId,
+                 flow : flow
+                }
   debug('...'+ flow)
   debug('...'+ optionItemId)
-  debug('...'+ data)
+  debug('...'+ data)       
+    
   return requestEntities(flow, PUT, data, optionItemId)
 };
 
-exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
+exports.deleteOptionItem=function(optionCategoryId, optionItemId) {
   debug('deleteOptionItem')
-  var flow = menuOptionFlow(menuItemId, optionCategoryId, true)
+
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION ;
+  
   debug('...'+ flow)
   debug('...'+ optionItemId)
+
   return requestEntities(flow, DELETE, '', optionItemId)
+
+  
 };
 
-exports.createOptionCategory=function(menuItemId, title, type) {
+/* function For Create variation & create Relationship with product */
+exports.createOptionCategory=function(title) {
   debug('createOptionCategory')
   var data = {
-    data: {
       name : title,
       type : 'product-variation'
-    }
   }
-  var variation = requestEntities('/variations', POST, data)
-  requestEntities(
-    '/products/' + menuItemId + '/relationships/variations',
-    POST,
-    {
-      data: {
-        type: 'product-variation',
-        id: variation.id
-      }
-    }
-  )
+  var variation = requestEntities(OPTION_ITEMS, POST, data)
+  
   return variation
 };
-exports.listOptionCategories=function(menuItemId) { // ok
+
+exports.createRelationship = function(menuItemId ,variationId) {
+  debug('create Relationship')
+
+  var product_rel_url = MENU_ITEMS +'/'+ menuItemId + '/relationships' + OPTION_ITEMS ;
+    var relationData = [{
+          type: 'product-variation',
+          id: variationId
+    }]
+    return requestEntities(product_rel_url ,POST,relationData)
+}
+exports.listOptionCategories = function(menuItemId) { 
   debug('listOptionCategories')
-  return requestEntities(MENU_ITEMS, GET, '', menuItemId).relationships.variants
+  return requestEntities(OPTION_ITEMS, GET) 
 };
-exports.findOptionCategory=function(menuItemId, optionCategoryId) { // ok
+exports.findoptionCategory = function(optionCategoryId) { 
   debug('findOptionCategory')
-  return requestEntities('/variations', GET, '', optionCategoryId)
+  return requestEntities(OPTION_ITEMS, GET, '', optionCategoryId)
+
 };
-exports.updateOptionCategory=function(menuItemId, optionCategoryId, data) { // ok
+exports.updateOptionCategory=function(optionCategoryId, title) { 
   debug('updateOptionCategory')
-  return requestEntities('/variations', PUT, data, optionCategoryId)
+  var data = {
+      name : title,
+      type : 'product-variation',
+      id   : optionCategoryId
+  }
+  return requestEntities(OPTION_ITEMS, PUT, data, optionCategoryId)
 };
-exports.deleteOptionCategory=function(menuItemId, optionCategoryId) { // ok
+exports.deleteOptionCategory=function(optionCategoryId) { 
   debug('deleteOptionCategory')
-  return requestEntities('/variations', DELETE, '', optionCategoryId)
+  return requestEntities(OPTION_ITEMS, DELETE, '', optionCategoryId)
 };
 
 exports.findOrder=function(orderSysOrderId) {
@@ -462,10 +499,17 @@ exports.deleteImage = function(imageId) {
   return requestEntities(IMAGES, DELETE, '', imageId)
 }
 
-exports.uploadImage = function *(itemId, path) {
+exports.getFile = function (fileId) {
+ 
+ return requestEntities(IMAGES, GET , '',fileId);  
+
+}
+exports.uploadImage = function *(itemId, path,type) {
+  console.log('type is :::::',type)
   debug('uploadImage')
   try {
     var token = yield getBearerToken()
+    console.log('token is',token)
     debug('...token '+ token)
   } catch (err) {
     console.error(err)
@@ -473,23 +517,41 @@ exports.uploadImage = function *(itemId, path) {
   }
 
   var url = config.moltinStoreUrl + IMAGES
+  
   debug('...url : '+ url)
   try {
+    
     var imagefile = fs.createReadStream(path)
+    
   } catch (err) {
+    
     console.error('uploadImage: error')
     console.error(err)
-  }
 
-  debug(imagefile)
-  var data = {
-    file: imagefile,
-    public: true
   }
+  
+
+ debug(imagefile)
+ console.log('image file ',imagefile);
+  /*var data = {
+    file: path,
+    public: true
+  }*/
+  var data = { 
+    file: { value: imagefile,
+            options: 
+              { filename: path, contentType: null } 
+          },
+          public: 'true' 
+        } ;
+  console.log('data >>>>',data);
+
+  
   debug(data)
   debug('...uploading')
+    
   return new Promise(function(resolve, reject) {
-    requestPromise.post({
+    request.post({
       url: url,
       json: false,
       formData: data,
@@ -499,6 +561,8 @@ exports.uploadImage = function *(itemId, path) {
       }
     })
     .then(function (res) {
+      console.log('complete moltin file >>>>>.')
+      console.log('file response is ',res)
       debug('status code '+ res.statusCode)
       debug('sendRequest: parsing...')
       debug(res.body)
@@ -511,20 +575,16 @@ exports.uploadImage = function *(itemId, path) {
       }
 
       var result = res.body ? JSON.parse(res.body).data : null
-
-      var data = {
-        data: [
-          {
-            "type": "file",
-            "id": result.id
-          }
-        ]
+      
+      var imageId = result.id ;
+      if(type == 'menu')
+      {
+        var mainImage = mainImageUpload(token,itemId,imageId)
       }
-
-      console.log(MENU_ITEMS + '/' + menuItemId + '/relationships/files')
-      requestEntities(MENU_ITEMS + '/' + menuItemId + '/relationships/files', POST, data)
-
-      resolve (result)
+        
+      resolve(result)
+      
+      return;
     })
     .catch( function(err) {
       console.error("uploadImage: statusCode: " + err.statusCode);
@@ -532,4 +592,62 @@ exports.uploadImage = function *(itemId, path) {
       reject (err)
     })
   })
+  
+}
+var mainImageUpload = function(token,itemId,imageId) {
+  
+  var url = config.moltinStoreUrl+MENU_ITEMS + '/' + itemId + '/relationships/main-image' ;
+
+  var options = { method: 'POST',
+  url: url,
+  headers: 
+   { 
+    'Content-Type': 'application/json',
+     Authorization: 'Bearer '+ token },
+  body: 
+   { data: 
+      { type: 'main_image',
+        id: ''+imageId+'' } 
+      },
+      json: true 
+    };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  console.log(body);
+  return body ;
+});
+}
+
+/* Functions for modifier */
+
+exports.createModifer = function(optionCategoryId,optionItemId,data) {
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA ;
+   
+  debug(data)
+  
+  return requestEntities(flow, POST, data)
+}
+
+exports.updateModifer = function(optionCategoryId,optionItemId,modifierId,data) {
+   
+   var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA+'/'+modifierId ;
+   var Data ={ 
+                 "value" : data.value,
+                 "type": "modifier",
+                 "modifer_type": data.modifer_type,
+                 "id" : modifierId
+                 
+                }
+         
+  debug(data)
+  
+  return requestEntities(flow, PUT, Data)
+
+}
+
+exports.deleteModifer = function(optionCategoryId,optionItemId,modifierId) {
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA ;
+  return requestEntities(flow, DELETE, '', modifierId)
 }
