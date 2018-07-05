@@ -405,10 +405,12 @@ exports.createMenuItem=function *(next) {
         return this.body = { error: 'Description is required.'};
       }
       var taxBand = '';
+      var currency = '';
       if (company.country_id){
         try{
           var country = (yield Country.getSingleCountry(company.country_id))[0];
           taxBand=country.tax_band;
+          currency = country.currency;
         }
         catch(err){
           meta.error=err;
@@ -418,7 +420,7 @@ exports.createMenuItem=function *(next) {
       }
       debug('..creating menu item');
       try {
-        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand)
+        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand, currency)
       } catch (err) {
         meta.error=err;
         logger.error('error creating menu item in ordering system ', meta);
