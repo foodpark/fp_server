@@ -471,7 +471,7 @@ exports.listMenuItems=function *(next) {
                   }
                   else
                   {
-                    for(x=0; y<relationship.main_image.data.length;x++)
+                    for(var x=0; x<relationship.main_image.data.length;x++)
                     {
                       var fileId = relationship.main_image.data.id ; 
                       var FileDetail = yield msc.getFile(fileId) ;
@@ -505,9 +505,7 @@ exports.readMenuItem=function *(next) {
     var relationship =  menuItemDetail.relationships
     if(relationship.hasOwnProperty('main_image'))
     {
-      
-      var type = Array.isArray(relationship.variations.data)
-      console.log('type....',type)
+    
       if(Array.isArray(relationship.main_image.data) == false )
       {
 
@@ -520,9 +518,9 @@ exports.readMenuItem=function *(next) {
       }
       else
       {
-        for(i=0; j<relationship.main_image.data.length;i++)
+        for(var i=0;i<relationship.main_image.data.length;i++)
         {
-          var fileId = relationship.main_image.data.id ; 
+          var fileId = relationship.main_image.data[i].id ; 
           var FileDetail = yield msc.getFile(fileId) ;
           var url = FileDetail.link.href;
           var http = url.replace(/^https?\:\/\//i, "http://");
@@ -532,6 +530,232 @@ exports.readMenuItem=function *(next) {
       }
 
     }
+   if(relationship.hasOwnProperty('variations'))
+   {
+      
+      
+      if(Array.isArray(relationship.variations.data) == true )
+      {
+        relationship.is_variation = true;
+
+        console.log('length is :',relationship.variations.data.length);
+        for(var i=0;i<relationship.variations.data.length;i++)
+        {
+          console.log('variation id is ',relationship.variations.data[i].id);
+          var variationId = relationship.variations.data[i].id ;
+
+          var VariationDetail = yield msc.findoptionCategory(variationId)
+          if(VariationDetail.hasOwnProperty('options'))
+          {
+            if(Array.isArray(VariationDetail.options) == true )
+            {
+                for(var i=0;i<VariationDetail.options.length;i++)
+                {
+                  // console.log("0")
+                  if(VariationDetail.options[i].hasOwnProperty('modifiers'))
+                  {
+                    var modifer = { }
+                    // console.log("1");
+                    if(Array.isArray(VariationDetail.options[i].modifiers) == true )
+                    {
+                      // console.log("2");
+                      
+                      for(var j=0;j<VariationDetail.options[i].modifiers.length;j++)
+                      {  
+                          // console.log("reached here");   
+                        var variations = { }  
+                        VariationDetail.options[i].modifiers[j].id         = VariationDetail.options[i].modifiers[j].id;
+                        VariationDetail.options[i].modifiers[j].order      = "null"
+                        VariationDetail.options[i].modifiers[j].created_at = "";
+                        VariationDetail.options[i].modifiers[j].updated_at = "";
+                        VariationDetail.options[i].modifiers[j].type       = VariationDetail.options[i].modifiers[j].type;
+                        VariationDetail.options[i].modifiers[j].value      = VariationDetail.options[i].modifiers[j].value;
+                        VariationDetail.options[i].modifiers[j].title      = VariationDetail.options[i].name;
+                        VariationDetail.options[i].modifiers[j].instructions= "";
+                        VariationDetail.options[i].modifiers[j].product    = menuItemDetail.id;
+                        // variations[relationship.variations.data[i].id]     = variations.data[i];
+                        VariationDetail.options[i].modifiers[j].variations = variations;
+
+                        // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].difference = VariationDetail.options[i];
+                        // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].modifier = VariationDetail.options[i].modifiers[j].id;
+
+                        if(menuItemDetail.hasOwnProperty('meta')){
+                          //console.log('meta');
+                          if(menuItemDetail.meta.hasOwnProperty('variations')){
+                              menuItemDetail.meta.variations[i].title = menuItemDetail.name;
+                              menuItemDetail.meta.variations[i].product = menuItemDetail.id;
+                              menuItemDetail.meta.variations[i].modifier = VariationDetail.options[i].modifiers[j].id;
+                              if(VariationDetail.options[i].modifiers[j].type == 'price_decrement'){
+                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options[i].modifiers[j].value[0].amount/100;
+                              }
+                              // menuItemDetail.meta.variations[i].mod_price = 
+                              menuItemDetail.meta.variations[i].id
+                              variations[menuItemDetail.meta.variations[i].id] = menuItemDetail.meta.variations[i];
+                              // variations[menuItemDetail.meta.variations[i].id][0].modifier = VariationDetail.options[i].modifiers[j].id;
+                          }
+                          if(menuItemDetail.meta.hasOwnProperty('timestamps')){
+                              console.log('timestamps');
+                              if(menuItemDetail.meta.timestamps.hasOwnProperty('created_at')){
+                                VariationDetail.options[i].modifiers[j].created_at = menuItemDetail.meta.timestamps.created_at;
+                              }
+                              if(menuItemDetail.meta.timestamps.hasOwnProperty('updated_at')){
+                                 VariationDetail.options[i].modifiers[j].updated_at =  menuItemDetail.meta.timestamps.updated_at;
+                              }                                  
+                          }
+                        }
+
+                           
+                          modifer[VariationDetail.options[i].modifiers[j].id] = VariationDetail.options[i].modifiers[j]
+                          if(VariationDetail.options[i].modifiers[j].type == 'price_increment'){
+                             VariationDetail.options[i].modifiers[j].value[0].mod_price = VariationDetail.options[i].modifiers[j].value[0].amount*100;
+                          }
+
+                      }
+                    }else{
+
+                      var variations = { }  
+                        VariationDetail.options[i].modifiers.id         = VariationDetail.options[i].modifiers.id;
+                        VariationDetail.options[i].modifiers.order      = "null"
+                        VariationDetail.options[i].modifiers.created_at = "";
+                        VariationDetail.options[i].modifiers.updated_at = "";
+                        VariationDetail.options[i].modifiers.type       = VariationDetail.options[i].modifiers.type;
+                        VariationDetail.options[i].modifiers.value      = VariationDetail.options[i].modifiers.value;
+                        VariationDetail.options[i].modifiers.title      = VariationDetail.options[i].name;
+                        VariationDetail.options[i].modifiers.instructions= "";
+                        VariationDetail.options[i].modifiers.product    = menuItemDetail.id;
+                        // variations[relationship.variations.data[i].id]     = variations.data[i];
+                        VariationDetail.options[i].modifiers.variations = variations;
+
+                        // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].difference = VariationDetail.options[i];
+                        // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].modifier = VariationDetail.options[i].modifiers[j].id;
+
+                        if(menuItemDetail.hasOwnProperty('meta')){
+                          //console.log('meta');
+                          if(menuItemDetail.meta.hasOwnProperty('variations')){
+                              menuItemDetail.meta.variations[i].title = menuItemDetail.name;
+                              menuItemDetail.meta.variations[i].product = menuItemDetail.id;
+                              menuItemDetail.meta.variations[i].modifier = VariationDetail.options[i].modifiers.id;
+                              if(VariationDetail.options[i].modifiers[j].type == 'price_decrement'){
+                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options[i].modifiers.value[0].amount/100;
+                              }
+                              // menuItemDetail.meta.variations[i].mod_price = 
+                              menuItemDetail.meta.variations[i].id
+                              variations[menuItemDetail.meta.variations[i].id] = menuItemDetail.meta.variations[i];
+                              // variations[menuItemDetail.meta.variations[i].id][0].modifier = VariationDetail.options[i].modifiers[j].id;
+                          }
+                          if(menuItemDetail.meta.hasOwnProperty('timestamps')){
+                              console.log('timestamps');
+                              if(menuItemDetail.meta.timestamps.hasOwnProperty('created_at')){
+                                VariationDetail.options[i].modifiers[j].created_at = menuItemDetail.meta.timestamps.created_at;
+                              }
+                              if(menuItemDetail.meta.timestamps.hasOwnProperty('updated_at')){
+                                 VariationDetail.options[i].modifiers[j].updated_at =  menuItemDetail.meta.timestamps.updated_at;
+                              }                                  
+                          }
+                        }
+                        modifer[VariationDetail.options[i].modifiers.id] = VariationDetail.options[i].modifiers
+                        if(VariationDetail.options[i].modifiers.type == 'price_increment'){
+                          VariationDetail.options[i].modifiers.value[0].mod_price = VariationDetail.options[i].modifiers.value[0].amount*100;
+                        }
+                    } 
+                  }
+                  menuItemDetail.relationships.modifier = modifer;
+                  //menuItemDetail.relationships.variations.data[i].modifier = modifer;
+
+                }
+
+
+            }
+            else{
+                if(VariationDetail.options.hasOwnProperty('modifiers')){
+
+                  var modifer = { }
+                    // console.log("1");
+                    if(Array.isArray(VariationDetail.options.modifiers) == true )
+                    {
+                      // console.log("2");
+                      
+                      for(var j=0;j<VariationDetail.options.modifiers.length;j++)
+                      {  
+                          // console.log("reached here");  
+
+                          // console.log("reached here");   
+                        var variations = { }  
+                        VariationDetail.options.modifiers[j].id         = VariationDetail.options[i].modifiers[j].id;
+                        VariationDetail.options.modifiers[j].order      = "null"
+                        VariationDetail.options.modifiers[j].created_at = "";
+                        VariationDetail.options.modifiers[j].updated_at = "";
+                        VariationDetail.options.modifiers[j].type       = VariationDetail.options.modifiers[j].type;
+                        VariationDetail.options.modifiers[j].value      = VariationDetail.options.modifiers[j].value;
+                        VariationDetail.options.modifiers[j].title      = VariationDetail.options.name;
+                        VariationDetail.options.modifiers[j].instructions= "";
+                        VariationDetail.options.modifiers[j].product    = menuItemDetail.id;
+                        // variations[relationship.variations.data[i].id]     = variations.data[i];
+                        VariationDetail.options.modifiers[j].variations = variations;
+
+                        // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].difference = VariationDetail.options[i];
+                        // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].modifier = VariationDetail.options[i].modifiers[j].id;
+
+                        if(menuItemDetail.hasOwnProperty('meta')){
+                          //console.log('meta');
+                          if(menuItemDetail.meta.hasOwnProperty('variations')){
+                              menuItemDetail.meta.variations[i].title = menuItemDetail.name;
+                              menuItemDetail.meta.variations[i].product = menuItemDetail.id;
+                              menuItemDetail.meta.variations[i].modifier = VariationDetail.options.modifiers[j].id;
+                              if(VariationDetail.options.modifiers[j].type == 'price_decrement'){
+                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options.modifiers[j].value[0].amount/100;
+                              }
+                              // menuItemDetail.meta.variations[i].mod_price = 
+                              menuItemDetail.meta.variations[i].id
+                              variations[menuItemDetail.meta.variations[i].id] = menuItemDetail.meta.variations[i];
+                              // variations[menuItemDetail.meta.variations[i].id][0].modifier = VariationDetail.options[i].modifiers[j].id;
+                          }
+                          if(menuItemDetail.meta.hasOwnProperty('timestamps')){
+                              console.log('timestamps');
+                              if(menuItemDetail.meta.timestamps.hasOwnProperty('created_at')){
+                                VariationDetail.options.modifiers[j].created_at = menuItemDetail.meta.timestamps.created_at;
+                              }
+                              if(menuItemDetail.meta.timestamps.hasOwnProperty('updated_at')){
+                                 VariationDetail.options.modifiers[j].updated_at =  menuItemDetail.meta.timestamps.updated_at;
+                              }                                  
+                          }
+                        }
+ 
+                          modifer[VariationDetail.options.modifiers[j].id] = VariationDetail.options.modifiers[j]
+                          if(VariationDetail.options.modifiers[j].type == 'price_increment'){
+                             VariationDetail.options.modifiers[j].value[0].mod_price = VariationDetail.options.modifiers[j].value[0].amount*100;
+                          }
+
+                      }
+                    }else{
+                        modifer[VariationDetail.options.modifiers.id] = VariationDetail.options.modifiers
+                        if(VariationDetail.options.modifiers.type == 'price_increment'){
+                          VariationDetail.options.modifiers.value[0].mod_price = VariationDetail.options.modifiers.value[0].amount*100;
+                        }
+                    }
+                    menuItemDetail.relationships.variations.data[i].modifier = modifer; 
+                }
+            }
+
+
+          }
+
+
+          //menuItemDetail.relationships.variations.data[i].modifier = VariationDetail ;
+
+        }
+
+     }
+     else {
+          relationship.is_variation = false;
+          var variationId     = relationship.variations.data.id;
+          var VariationDetail = yield msc.findoptionCategory(variationId)
+     }
+
+   }
+    
+
+
     
   }
   this.body = menuItemDetail
