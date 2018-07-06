@@ -13,6 +13,7 @@ var Packages = require('../controllers/packages.server.controller');
 var PackageModel = require('../models/packages.server.model');
 var Loyalty = require('../models/loyalty.server.model');
 
+const PRICE_MODIFIER = 100;
 
 var getErrorMessage = function(err) {
     var message = '';
@@ -499,411 +500,430 @@ exports.listMenuItems=function *(next) {
                 
               }
 
-              // Mapping variation in json
+                // Mapping variation in json
 
-              if(relationship.hasOwnProperty('variations'))
-              {
-                
-                var modifer = { }
-                if(Array.isArray(relationship.variations.data) == true ) {
-                    for(var i=0;i<relationship.variations.data.length;i++)
-                    {
-                      
-                       var variationId =  relationship.variations.data[i].id 
-                       var VariationDetail = yield msc.findoptionCategory(variationId) 
-
-                                        
-                      if(VariationDetail.hasOwnProperty('options'))
+                if(relationship.hasOwnProperty('variations'))
+                {
+                  
+                  var modifer = { }
+                  if(Array.isArray(relationship.variations.data) == true ) {
+                      for(var i=0;i<relationship.variations.data.length;i++)
                       {
-                        if(Array.isArray(VariationDetail.options) == true )
-                        {
-                          for(var k=0;k<VariationDetail.options.length;k++)
-                          {
-                            if(VariationDetail.options[k].hasOwnProperty('modifiers'))
-                            {
-                              
-                                
-                                if(Array.isArray(VariationDetail.options[k].modifiers) == true )
-                                {
-                                  
-                                  for(var m=0;m<VariationDetail.options[k].modifiers.length;m++)
-                                  {
-                                    var variations = { }
-                                     var type = {
-                                      value : VariationDetail.options[k].modifiers[m].type,
-                                      data  : VariationDetail.options[k].modifiers[m].value[0]
-                                     }
-                                     
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation 
-
-                                     variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers[m].id
-                                     if(VariationDetail.options[k].modifiers[m].type === "price_increment")
-                                     {
-                                      console.log('type ',VariationDetail.options[k].modifiers[m].type)
-                                      var price = VariationDetail.options[k].modifiers[m].value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     
-                                     
-                                     var temModifier = {
-                                        id : VariationDetail.options[k].modifiers[m].id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options[k].name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-                                     
-                                     modifer[VariationDetail.options[k].modifiers[m].id] = temModifier
-
-
-                                  }
-                                }
-                                else
-                                {
-                                  var variations = { }
-                                  var type = {
-                                      value : VariationDetail.options[k].modifiers.type,
-                                      data  : VariationDetail.options[k].modifiers.value[0]
-                                     }
-
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-
-                                    variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers.id
-                                     if(VariationDetail.options[k].modifiers.type === "price_increment")
-                                     {
-                                      var price = VariationDetail.options[k].modifiers.value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     var temModifier = {
-                                        id : VariationDetail.options[k].modifiers.id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options[k].name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-
-                                     modifer[VariationDetail.options[k].modifiers.id] = temModifier
-
-
-
-                                }
-                                  
-                                  //console.log(modifer)
-                                  results[j]['is_variation'] = true ;
-                                 results[j]['modifiers'] = modifer
-                            }
-
-                          }
-                        }
-                        else
-                        {
-                          if(VariationDetail.options.hasOwnProperty('modifiers'))
-                          {
-                             
-                            if(Array.isArray(VariationDetail.options.modifiers) == true )
-                            {
-                              for(var m=0;m<VariationDetail.options.modifiers.length;m++)
-                                  {
-                                    var variations ={ }
-                                     var type = {
-                                      value : VariationDetail.options.modifiers[m].type,
-                                      data  : VariationDetail.options.modifiers[m].value[0]
-                                     }
-
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-
-                                     
-                                     variations[VariationDetail.id].modifier = VariationDetail.options.modifiers[m].id
-                                     if(VariationDetail.options.modifiers[m].type === 'price_increment')
-                                     {
-                                      var price = VariationDetail.options.modifiers[m].value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     var temModifier = {
-                                        id : VariationDetail.options.modifiers[m].id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options.name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-                                     
-                                     modifer[VariationDetail.options.modifiers[m].id] = temModifier
-
-
-                                  }
-
-                            }
-                            else
-                            {
-                              var variations = {}
-                              var type = {
-                                      value : VariationDetail.options.modifiers.type,
-                                      data  : VariationDetail.options.modifiers.value[0]
-                                     }
-
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-
-                                     variations[VariationDetail.id].modifier = VariationDetail.options.modifiers.id
-                                     if(VariationDetail.options.modifiers.type === 'price_increment')
-                                     {
-                                      var price = VariationDetail.options.modifiers.value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     var temModifier = {
-                                        id : VariationDetail.options.modifiers.id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options.name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-
-                                     modifer[VariationDetail.options.modifiers.id] = temModifier
-
-
-                            }
-                             results[j]['is_variation'] = true ;
-                             results[j]['modifiers'] = modifer 
-                          }
-
-
-                        }
                         
-                      }                          
+                        var variationId =  relationship.variations.data[i].id 
+                        var VariationDetail = yield msc.findoptionCategory(variationId) 
 
-                    }
-                }                
-                else {
-
-                    var variationId =  relationship.variations.data.id 
-                    var VariationDetail = yield msc.findoptionCategory(variationId)
-                    
-                      if(VariationDetail.hasOwnProperty('options'))
-                      {
-                        if(Array.isArray(VariationDetail.options) == true )
+                                          
+                        if(VariationDetail.hasOwnProperty('options'))
                         {
-                          for(var k=0;k<VariationDetail.options.length;k++)
+                          if(Array.isArray(VariationDetail.options) == true )
                           {
-                            if(VariationDetail.options[k].hasOwnProperty('modifiers'))
+                            for(var k=0;k<VariationDetail.options.length;k++)
                             {
-                              
+                              if(VariationDetail.options[k].hasOwnProperty('modifiers'))
+                              {
                                 
-                                if(Array.isArray(VariationDetail.options[k].modifiers) == true )
-                                {
                                   
-                                  for(var m=0;m<VariationDetail.options[k].modifiers.length;m++)
-                                  {
-                                    var variations = {}
-                                     var type = {
-                                      value : VariationDetail.options[k].modifiers[m].type,
-                                      data  : VariationDetail.options[k].modifiers[m].value[0]
-                                     }
-
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-                                     
-                                     variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers[m].id
-                                     if(VariationDetail.options[k].modifiers[m].type === 'price_increment')
-                                     {
-                                      var price = VariationDetail.options[k].modifiers[m].value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     var temModifier = {
-                                        id : VariationDetail.options[k].modifiers[m].id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options[k].name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-                                     
-                                     modifer[VariationDetail.options[k].modifiers[m].id] = temModifier
-
-
-                                  }
-                                }
-                                else
-                                {
-                                  var variations = { }
-                                  var type = {
-                                      value : VariationDetail.options[k].modifiers.type,
-                                      data  : VariationDetail.options[k].modifiers.value[0]
-                                     }
-
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-
-                                     variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers.id
-                                     if(VariationDetail.options[k].modifiers.type === 'price_increment')
-                                     {
-                                      var price = VariationDetail.options[k].modifiers.value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     var temModifier = {
-                                        id : VariationDetail.options[k].modifiers.id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options[k].name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-
-                                     modifer[VariationDetail.options[k].modifiers.id] = temModifier
-
-
-
-                                }
-                                  
-                                  //console.log(modifer)
-                                  results[j]['is_variation'] = true ;
-                                 results[j]['modifiers'] = modifer
-                            }
-
-                          }
-                        }
-                        else
-                        {
-                          if(VariationDetail.options.hasOwnProperty('modifiers'))
-                          {
-                             
-                            if(Array.isArray(VariationDetail.options.modifiers) == true )
-                            {
-                              for(var m=0;m<VariationDetail.options.modifiers.length;m++)
+                                  if(Array.isArray(VariationDetail.options[k].modifiers) == true )
                                   {
                                     
-                                     var variations = { }
-                                     var type = {
-                                      value : VariationDetail.options.modifiers[m].type,
-                                      data  : VariationDetail.options.modifiers[m].value[0]
-                                     }
+                                    for(var m=0;m<VariationDetail.options[k].modifiers.length;m++)
+                                    {
+                                      var variations = { }
+                                      var type = {
+                                        value : VariationDetail.options[k].modifiers[m].type,
+                                        data  : VariationDetail.options[k].modifiers[m].value[0]
+                                      }
+                                      
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation 
 
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-                                     
-                                     variations[VariationDetail.id].modifier = VariationDetail.options.modifiers[m].id
-                                     if(VariationDetail.options.modifiers[m].type === 'price_increment')
-                                     {
-                                      var price = VariationDetail.options.modifiers[m].value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-                                     var temModifier = {
-                                        id : VariationDetail.options.modifiers[m].id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options.name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-                                     
-                                     modifer[VariationDetail.options.modifiers[m].id] = temModifier
+                                      variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers[m].id
+                                      if(VariationDetail.options[k].modifiers[m].type === "price_increment")
+                                      {
+                                        console.log('type ',VariationDetail.options[k].modifiers[m].type)
+                                        var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      
+                                      
+                                      var temModifier = {
+                                          id : VariationDetail.options[k].modifiers[m].id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options[k].name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+                                      
+                                      modifer[VariationDetail.options[k].modifiers[m].id] = temModifier
+
+
+                                    }
+                                  }
+                                  else
+                                  {
+                                    var variations = { }
+                                    var type = {
+                                        value : VariationDetail.options[k].modifiers.type,
+                                        data  : VariationDetail.options[k].modifiers.value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+
+                                      variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers.id
+                                      if(VariationDetail.options[k].modifiers.type === "price_increment")
+                                      {
+                                        var price = VariationDetail.options[k].modifiers.value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      var temModifier = {
+                                          id : VariationDetail.options[k].modifiers.id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options[k].name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+
+                                      modifer[VariationDetail.options[k].modifiers.id] = temModifier
+
 
 
                                   }
+                                    
+                                    //console.log(modifer)
+                                    results[j]['is_variation'] = true ;
+                                  results[j]['modifiers'] = modifer
+                              }
 
                             }
-                            else
-                            {
-                              var variations = { }
-                              var type = {
-                                      value : VariationDetail.options.modifiers.type,
-                                      data  : VariationDetail.options.modifiers.value[0]
-                                     }
-
-                                     var tempVariation = {
-                                                title : VariationDetail.name ,
-                                                product : results[j].id,
-                                                id      : VariationDetail.id
-                                              }
-                                     variations[VariationDetail.id]   =  tempVariation
-
-                                     
-                                     variations[VariationDetail.id].modifier = VariationDetail.options.modifiers.id
-                                     if(VariationDetail.options.modifiers.type === 'price_increment')
-                                     {
-                                      var price = VariationDetail.options.modifiers.value[0].amount/100 ; 
-                                      variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                      variations[VariationDetail.id].difference = "+R$"+price+".00";
-                                     }
-
-                                     var temModifier = {
-                                        id : VariationDetail.options.modifiers.id,
-                                        order : null,
-                                        type  : type,
-                                        title : VariationDetail.options.name,
-                                        instructions : "",
-                                        product : results[j].id,
-                                        variations : variations
-                                     }
-
-                                     modifer[VariationDetail.options.modifiers.id] = temModifier
-
-
-                            }
-                             results[j]['is_variation'] = true ;
-                             results[j]['modifiers'] = modifer 
                           }
+                          else
+                          {
+                            if(VariationDetail.options.hasOwnProperty('modifiers'))
+                            {
+                              
+                              if(Array.isArray(VariationDetail.options.modifiers) == true )
+                              {
+                                for(var m=0;m<VariationDetail.options.modifiers.length;m++)
+                                    {
+                                      var variations ={ }
+                                      var type = {
+                                        value : VariationDetail.options.modifiers[m].type,
+                                        data  : VariationDetail.options.modifiers[m].value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+
+                                      
+                                      variations[VariationDetail.id].modifier = VariationDetail.options.modifiers[m].id
+                                      if(VariationDetail.options.modifiers[m].type === 'price_increment')
+                                      {
+                                        var price = VariationDetail.options.modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      var temModifier = {
+                                          id : VariationDetail.options.modifiers[m].id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options.name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+                                      
+                                      modifer[VariationDetail.options.modifiers[m].id] = temModifier
 
 
-                        }
+                                    }
+
+                              }
+                              else
+                              {
+                                var variations = {}
+                                var type = {
+                                        value : VariationDetail.options.modifiers.type,
+                                        data  : VariationDetail.options.modifiers.value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+
+                                      variations[VariationDetail.id].modifier = VariationDetail.options.modifiers.id
+                                      if(VariationDetail.options.modifiers.type === 'price_increment')
+                                      {
+                                        var price = VariationDetail.options.modifiers.value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      var temModifier = {
+                                          id : VariationDetail.options.modifiers.id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options.name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+
+                                      modifer[VariationDetail.options.modifiers.id] = temModifier
+
+
+                              }
+                              results[j]['is_variation'] = true ;
+                              results[j]['modifiers'] = modifer 
+                            }
+
+
+                          }
+                          
+                        }                          
+
                       }
+                  }                
+                  else {
+
+                      var variationId =  relationship.variations.data.id 
+                      var VariationDetail = yield msc.findoptionCategory(variationId)
+                      
+                        if(VariationDetail.hasOwnProperty('options'))
+                        {
+                          if(Array.isArray(VariationDetail.options) == true )
+                          {
+                            for(var k=0;k<VariationDetail.options.length;k++)
+                            {
+                              if(VariationDetail.options[k].hasOwnProperty('modifiers'))
+                              {
+                                
+                                  
+                                  if(Array.isArray(VariationDetail.options[k].modifiers) == true )
+                                  {
+                                    
+                                    for(var m=0;m<VariationDetail.options[k].modifiers.length;m++)
+                                    {
+                                      var variations = {}
+                                      var type = {
+                                        value : VariationDetail.options[k].modifiers[m].type,
+                                        data  : VariationDetail.options[k].modifiers[m].value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+                                      
+                                      variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers[m].id
+                                      if(VariationDetail.options[k].modifiers[m].type === 'price_increment')
+                                      {
+                                        var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      var temModifier = {
+                                          id : VariationDetail.options[k].modifiers[m].id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options[k].name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+                                      
+                                      modifer[VariationDetail.options[k].modifiers[m].id] = temModifier
+
+
+                                    }
+                                  }
+                                  else
+                                  {
+                                    var variations = { }
+                                    var type = {
+                                        value : VariationDetail.options[k].modifiers.type,
+                                        data  : VariationDetail.options[k].modifiers.value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+
+                                      variations[VariationDetail.id].modifier = VariationDetail.options[k].modifiers.id
+                                      if(VariationDetail.options[k].modifiers.type === 'price_increment')
+                                      {
+                                        var price = VariationDetail.options[k].modifiers.value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      var temModifier = {
+                                          id : VariationDetail.options[k].modifiers.id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options[k].name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+
+                                      modifer[VariationDetail.options[k].modifiers.id] = temModifier
+
+
+
+                                  }
+                                    
+                                    //console.log(modifer)
+                                    results[j]['is_variation'] = true ;
+                                  results[j]['modifiers'] = modifer
+                              }
+
+                            }
+                          }
+                          else
+                          {
+                            if(VariationDetail.options.hasOwnProperty('modifiers'))
+                            {
+                              
+                              if(Array.isArray(VariationDetail.options.modifiers) == true )
+                              {
+                                for(var m=0;m<VariationDetail.options.modifiers.length;m++)
+                                    {
+                                      
+                                      var variations = { }
+                                      var type = {
+                                        value : VariationDetail.options.modifiers[m].type,
+                                        data  : VariationDetail.options.modifiers[m].value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+                                      
+                                      variations[VariationDetail.id].modifier = VariationDetail.options.modifiers[m].id
+                                      if(VariationDetail.options.modifiers[m].type === 'price_increment')
+                                      {
+                                        var price = VariationDetail.options.modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+                                      var temModifier = {
+                                          id : VariationDetail.options.modifiers[m].id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options.name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+                                      
+                                      modifer[VariationDetail.options.modifiers[m].id] = temModifier
+
+
+                                    }
+
+                              }
+                              else
+                              {
+                                var variations = { }
+                                var type = {
+                                        value : VariationDetail.options.modifiers.type,
+                                        data  : VariationDetail.options.modifiers.value[0]
+                                      }
+
+                                      var tempVariation = {
+                                                  title : VariationDetail.name ,
+                                                  product : results[j].id,
+                                                  id      : VariationDetail.id
+                                                }
+                                      variations[VariationDetail.id]   =  tempVariation
+
+                                      
+                                      variations[VariationDetail.id].modifier = VariationDetail.options.modifiers.id
+                                      if(VariationDetail.options.modifiers.type === 'price_increment')
+                                      {
+                                        var price = VariationDetail.options.modifiers.value[0].amount/PRICE_MODIFIER ; 
+                                        variations[VariationDetail.id].mod_price  = "+"+price ; 
+                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                      }
+
+                                      var temModifier = {
+                                          id : VariationDetail.options.modifiers.id,
+                                          order : null,
+                                          type  : type,
+                                          title : VariationDetail.options.name,
+                                          instructions : "",
+                                          product : results[j].id,
+                                          variations : variations
+                                      }
+
+                                      modifer[VariationDetail.options.modifiers.id] = temModifier
+
+
+                              }
+                              results[j]['is_variation'] = true ;
+                              results[j]['modifiers'] = modifer 
+                            }
+
+
+                          }
+                        }
+                  }
+
+
+                }
+                else
+                {                
+                  results[j]['is_variation'] = false ;
+                }
+                /*--- json mapping end ----*/
+
+                if (results[j].price && Array.isArray(results[j].price)) {
+                  for (let o = 0; o < results[j].price.length; o++) {
+                    if (results[j].price[o].amount) {
+                      results[j].price[o].amount /= PRICE_MODIFIER
+                    }
+                  }
                 }
 
+                if (results[j].meta && results[j].meta.display_price) {
+                  if (results[j].meta.display_price.with_tax && results[j].meta.display_price.with_tax.amount) {
+                    results[j].meta.display_price.with_tax.amount /= PRICE_MODIFIER
+                  }
 
-              }
-              else
-              {                
-                results[j]['is_variation'] = false ;
-              }
-                /*--- json mapping end ----*/
+                  if (results[j].meta.display_price.without_tax && results[j].meta.display_price.without_tax.amount) {
+                    results[j].meta.display_price.without_tax.amount /= PRICE_MODIFIER
+                  }
+                }
+
                 console.log('result ',results[j])
                 filteredItems.push(results[j])
               }
@@ -1010,7 +1030,7 @@ exports.readMenuItem=function *(next) {
                               menuItemDetail.meta.variations[i].product = menuItemDetail.id;
                               menuItemDetail.meta.variations[i].modifier = VariationDetail.options[i].modifiers[j].id;
                               if(VariationDetail.options[i].modifiers[j].type == 'price_decrement'){
-                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options[i].modifiers[j].value[0].amount/100;
+                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options[i].modifiers[j].value[0].amount/PRICE_MODIFIER;
                               }
                               // menuItemDetail.meta.variations[i].mod_price = 
                               menuItemDetail.meta.variations[i].id
@@ -1031,7 +1051,7 @@ exports.readMenuItem=function *(next) {
                            
                           modifer[VariationDetail.options[i].modifiers[j].id] = VariationDetail.options[i].modifiers[j]
                           if(VariationDetail.options[i].modifiers[j].type == 'price_increment'){
-                             VariationDetail.options[i].modifiers[j].value[0].mod_price = VariationDetail.options[i].modifiers[j].value[0].amount*100;
+                             VariationDetail.options[i].modifiers[j].value[0].mod_price = VariationDetail.options[i].modifiers[j].value[0].amount*PRICE_MODIFIER;
                           }
 
                       }
@@ -1060,7 +1080,7 @@ exports.readMenuItem=function *(next) {
                               menuItemDetail.meta.variations[i].product = menuItemDetail.id;
                               menuItemDetail.meta.variations[i].modifier = VariationDetail.options[i].modifiers.id;
                               if(VariationDetail.options[i].modifiers[j].type == 'price_decrement'){
-                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options[i].modifiers.value[0].amount/100;
+                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options[i].modifiers.value[0].amount/PRICE_MODIFIER;
                               }
                               // menuItemDetail.meta.variations[i].mod_price = 
                               menuItemDetail.meta.variations[i].id
@@ -1079,7 +1099,7 @@ exports.readMenuItem=function *(next) {
                         }
                         modifer[VariationDetail.options[i].modifiers.id] = VariationDetail.options[i].modifiers
                         if(VariationDetail.options[i].modifiers.type == 'price_increment'){
-                          VariationDetail.options[i].modifiers.value[0].mod_price = VariationDetail.options[i].modifiers.value[0].amount*100;
+                          VariationDetail.options[i].modifiers.value[0].mod_price = VariationDetail.options[i].modifiers.value[0].amount*PRICE_MODIFIER;
                         }
                     } 
                   }
@@ -1127,7 +1147,7 @@ exports.readMenuItem=function *(next) {
                               menuItemDetail.meta.variations[i].product = menuItemDetail.id;
                               menuItemDetail.meta.variations[i].modifier = VariationDetail.options.modifiers[j].id;
                               if(VariationDetail.options.modifiers[j].type == 'price_decrement'){
-                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options.modifiers[j].value[0].amount/100;
+                                  menuItemDetail.meta.variations[i].mod_price = VariationDetail.options.modifiers[j].value[0].amount/PRICE_MODIFIER;
                               }
                               // menuItemDetail.meta.variations[i].mod_price = 
                               menuItemDetail.meta.variations[i].id
@@ -1147,14 +1167,14 @@ exports.readMenuItem=function *(next) {
  
                           modifer[VariationDetail.options.modifiers[j].id] = VariationDetail.options.modifiers[j]
                           if(VariationDetail.options.modifiers[j].type == 'price_increment'){
-                             VariationDetail.options.modifiers[j].value[0].mod_price = VariationDetail.options.modifiers[j].value[0].amount*100;
+                             VariationDetail.options.modifiers[j].value[0].mod_price = VariationDetail.options.modifiers[j].value[0].amount*PRICE_MODIFIER;
                           }
 
                       }
                     }else{
                         modifer[VariationDetail.options.modifiers.id] = VariationDetail.options.modifiers
                         if(VariationDetail.options.modifiers.type == 'price_increment'){
-                          VariationDetail.options.modifiers.value[0].mod_price = VariationDetail.options.modifiers.value[0].amount*100;
+                          VariationDetail.options.modifiers.value[0].mod_price = VariationDetail.options.modifiers.value[0].amount*PRICE_MODIFIER;
                         }
                     }
                     menuItemDetail.relationships.variations.data[i].modifier = modifer; 
@@ -1943,9 +1963,15 @@ exports.createModifier = function *(next)
             this.body = { error: 'Value for mod_price is required.'}
             return;
           }
-          
-          
-          var newAmount = parseInt(mod_price*100) ;
+
+          if(!currency) {
+            this.status = 422
+            this.body = { error: 'Value for currency is required.'}
+            return;
+          }
+          var oldAmount = parseInt(mod_price) ;
+          var newAmount = oldAmount*PRICE_MODIFIER ;
+
           var data = {
                           "type": "modifier",
                           "modifier_type": modifier_type,
