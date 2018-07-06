@@ -262,6 +262,8 @@ exports.listCategories=function *(next) {
     var filteredCategories = []
     for (let i = 0; i < categories.length; i++) {
       if (categories[i].company === this.company.order_sys_id) {
+        console.log('done');
+        categories[i].title = categories[i].name
         filteredCategories.push(categories[i])
       }
     }
@@ -1352,11 +1354,26 @@ exports.uploadMenuItemImage=function *(next) {
       debug(data)
       try {
         var item = yield msc.uploadImage(this.menuItem.id, this.body.files.file.path,'menu')
+        console.log('item response ',item)
+        var url = item.link.href;
+        var http = url.replace(/^https?\:\/\//i, "http://");
+        var newUrl = { http : http , https : url }
+
+        var newItem = {"main_image" :{
+                "data": {
+                    "type": "main_image",
+                    "id": item.id,
+                    "url": newUrl
+                }
+            }
+          }
+
+
       } catch (err) {
         console.error('uploadMenuItemImage: error uploading menu item image in ordering system ')
         throw(err)
       }
-      this.body = item
+      this.body = newItem
       return;
     } else {
       console.error('uploadMenuItemImage: updateMenuItem: Menu item does not belong to company')

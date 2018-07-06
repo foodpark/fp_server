@@ -56,6 +56,7 @@ module.exports=function(app) {
 	router.post(apiversion + '/companies/:companyId/categories', requireJWT, storefront.createCategory)
   router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', requireJWT, storefront.createMenuItem)
   router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
+  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
   
   /* for create options without optionCategories ID */ 
   router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems', requireJWT, storefront.createOptionItem)
