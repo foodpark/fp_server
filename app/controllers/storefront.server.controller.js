@@ -458,9 +458,10 @@ exports.listMenuItems=function *(next) {
   debug(data)
   try {
     var results = (yield msc.listMenuItems(this.category))
+    var filteredItems = []
          if (results && results.length > 0){
+
             for (var j=0; j<results.length; j++){
-              
               if(results[j].hasOwnProperty('relationships'))
               {
                 
@@ -493,14 +494,20 @@ exports.listMenuItems=function *(next) {
                 }
                 
               }
+
+              // TODO: remove when moltin filter works
+              if (results[j].category === this.category.id) {
+                filteredItems.push(results[j])
+              }
             }
           }
   } catch (err) {
     console.error('error retrieving menu items from ordering system ')
     throw(err)
   }
-  debug(results)
-  this.body = results
+  // TODO: change this to return result when filter works
+  debug(filteredItems)
+  this.body = filteredItems
   return;
 }
 
