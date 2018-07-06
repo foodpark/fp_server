@@ -465,6 +465,7 @@ exports.listMenuItems=function *(next) {
               // TODO: remove when moltin filter works
               if (results[j].category === this.category.id) {
                 /*------ json mapping start ---- */
+                results[j]['title'] = results[j].name ;
                 if(results[j].hasOwnProperty('relationships'))
                 {
                 
@@ -922,6 +923,7 @@ exports.listMenuItems=function *(next) {
 exports.readMenuItem=function *(next) {
 	
   var menuItemDetail = this.menuItem ;
+  menuItemDetail['title'] = menuItemDetail.name ;
   if(menuItemDetail.hasOwnProperty('relationships'))
   {
     var relationship =  menuItemDetail.relationships
@@ -963,7 +965,7 @@ exports.readMenuItem=function *(next) {
         console.log('length is :',relationship.variations.data.length);
         for(var i=0;i<relationship.variations.data.length;i++)
         {
-          console.log('variation id is ',relationship.variations.data[i].id);
+          //console.log('variation id is ',relationship.variations.data[i].id);
           var variationId = relationship.variations.data[i].id ;
 
           var VariationDetail = yield msc.findoptionCategory(variationId)
@@ -1458,10 +1460,34 @@ exports.createOptionItem=function *(next) {
         this.body = { error: 'Title is required.'}
         return;
       }
-      var description = this.body.description
+
+      var mod_price = this.body.mod_price
+      if (!mod_price) {
+        this.status = 422
+        this.body = { error: 'mod_price is required.'}
+        return;
+      }
+
+
+      var description = this.body.title
       debug('...title '+ title)
       debug('...description '+ description)
+
+      var currency = '';
+      if (this.company.country_id){
+        try{
+          var country = (yield Country.getSingleCountry(this.company.country_id))[0];
+          
+          currency = country.currency;
+        }
+        catch(err){
+          meta.error=err;
+          logger.error('error retrieving country tax band', meta);
+          throw(err);
+        }
+      }
       
+
       if(this.optionCategory)
       var optionCategoryId = this.optionCategory.id
       
@@ -1470,7 +1496,7 @@ exports.createOptionItem=function *(next) {
         debug('...no option category provided. Must be for OptionItems category. Finding...')
         console.log('no optioncategory found')
           debug('...no OptionItems category found. Creating new...')
-          var results = yield msc.createOptionCategory('OptionCategoryVariation')
+          var results = yield msc.createOptionCategory('EXTRA')
           console.log('craete new variation',results)
           var relationship_result = yield msc.createRelationship(this.menuItem.id, results.id)
           console.log('create relationship',relationship_result)
@@ -1479,13 +1505,42 @@ exports.createOptionItem=function *(next) {
       debug('...optionCategoryId '+ optionCategoryId)
       try {
         var results = yield msc.createOptionItem(optionCategoryId, title, description)
-        console.log('option output:',results)
+        console.log('option result ',results)
+        // create price modifer 
+        for(var i=0;i<results.options.length;i++){
+           if(results.options[i].name == title)
+           {
+              var optionId = results.options[i].id ;
+              break;
+           }
+           
+                 
+          }
+
+          
+          var newAmount = parseInt(mod_price*100) ;
+          var data = {
+                          "type": "modifier",
+                          "modifier_type": "price_increment",
+                           "value": [
+                                  {
+                                    "currency": currency,
+                                    "amount": newAmount,
+                                    "includes_tax": false
+                                  }
+                                ]
+                        }
+              console.log('data for mofier',data);
+          var modiferResults = yield msc.createModifer(optionCategoryId,optionId,data)
+   
+           console.log('option modiferResults:',modiferResults)
       } catch (err) {
+        console.log('error is ',err)
         console.error('createOptionItem: Error creating option item ('+ title +', '+ description +')')
         throw(err)
       }
       debug(results)
-      this.body = results
+      this.body = modiferResults
       return;
     } else {
       console.error('createOptionItem: Menu item does not belong to company')
@@ -1867,8 +1922,20 @@ exports.createModifier = function *(next)
       }
       else if(modifier_type === 'price_increment' || modifier_type === 'price_decrement' ) {
          console.log('price type')
-
-        var currency = this.body.currency 
+         var currency = '';
+      if (this.company.country_id){
+        try{
+          var country = (yield Country.getSingleCountry(this.company.country_id))[0];
+          
+          currency = country.currency;
+        }
+        catch(err){
+          meta.error=err;
+          logger.error('error retrieving country tax band', meta);
+          throw(err);
+        }
+      }
+        var currency =  currency
         var mod_price   = this.body.mod_price
 
         if(!mod_price) {
@@ -1876,13 +1943,9 @@ exports.createModifier = function *(next)
             this.body = { error: 'Value for mod_price is required.'}
             return;
           }
-          if(!currency) {
-            this.status = 422
-            this.body = { error: 'Value for currency is required.'}
-            return;
-          }
-          var oldAmount = parseInt(mod_price) ;
-          var newAmount = oldAmount*100 ;
+          
+          
+          var newAmount = parseInt(mod_price*100) ;
           var data = {
                           "type": "modifier",
                           "modifier_type": modifier_type,
@@ -2014,20 +2077,28 @@ exports.updateModifier = function *(next) {
       }
       else if(modifier_type === 'price_increment' || modifier_type === 'price_decrement' ) {
          console.log('price type')
+         var currency = '';
+      if (this.company.country_id){
+        try{
+          var country = (yield Country.getSingleCountry(this.company.country_id))[0];
+          
+          currency = country.currency;
+        }
+        catch(err){
+          meta.error=err;
+          logger.error('error retrieving country tax band', meta);
+          throw(err);
+        }
+      }
+        var currency = currency
+        var mod_price   = this.body.mod_price
 
-        var currency = this.body.currency 
-        var amount   = this.body.amount
-
-        if(!amount) {
+        if(!mod_price) {
             this.status = 422
-            this.body = { error: 'Value for amount is required.'}
+            this.body = { error: 'Value for mod_price is required.'}
             return;
           }
-          if(!currency) {
-            this.status = 422
-            this.body = { error: 'Value for currency is required.'}
-            return;
-          }
+          
 
           var data = {
                           "type": "modifier",
@@ -2035,7 +2106,7 @@ exports.updateModifier = function *(next) {
                            "value": [
                                   {
                                     "currency": currency,
-                                    "amount": parseFloat(amount),
+                                    "amount": parseInt(amount*100),
                                     "includes_tax": false
                                   }
                                 ]
