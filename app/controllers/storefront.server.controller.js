@@ -548,7 +548,7 @@ exports.listMenuItems=function *(next) {
                                         console.log('type ',VariationDetail.options[k].modifiers[m].type)
                                         var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       
                                       
@@ -587,7 +587,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options[k].modifiers.value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       var temModifier = {
                                           id : VariationDetail.options[k].modifiers.id,
@@ -640,7 +640,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options.modifiers[m].value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       var temModifier = {
                                           id : VariationDetail.options.modifiers[m].id,
@@ -678,7 +678,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options.modifiers.value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       var temModifier = {
                                           id : VariationDetail.options.modifiers.id,
@@ -743,7 +743,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       var temModifier = {
                                           id : VariationDetail.options[k].modifiers[m].id,
@@ -780,7 +780,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options[k].modifiers.value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       var temModifier = {
                                           id : VariationDetail.options[k].modifiers.id,
@@ -833,7 +833,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options.modifiers[m].value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
                                       var temModifier = {
                                           id : VariationDetail.options.modifiers[m].id,
@@ -872,7 +872,7 @@ exports.listMenuItems=function *(next) {
                                       {
                                         var price = VariationDetail.options.modifiers.value[0].amount/PRICE_MODIFIER ; 
                                         variations[VariationDetail.id].mod_price  = "+"+price ; 
-                                        variations[VariationDetail.id].difference = "+R$"+price+".00";
+                                        variations[VariationDetail.id].difference = price+".00";
                                       }
 
                                       var temModifier = {
