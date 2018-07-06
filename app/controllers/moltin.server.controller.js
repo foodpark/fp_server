@@ -22,6 +22,8 @@ const OPTION            = '/options';
 const ORDERS            = '/orders';
 var bearerToken='';
 
+const PRICE_MODIFIER = 100;
+
 var refreshBearerToken = function () {
   debug('refreshBearerToken');
   request.post({
@@ -318,7 +320,7 @@ exports.createMenuItem = function(company, title, status, price, category, descr
       description: description,
       price: [
         {
-          amount: price,
+          amount: price * PRICE_MODIFIER,
           currency: currency,
           includes_tax: false
         }
