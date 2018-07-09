@@ -99,6 +99,7 @@ var sendRequest = function *(url, method, data) {
   try {
     var token = yield getBearerToken()
     debug('...token '+ token)
+    console.log('token  ',token)
   } catch (err) {
     console.error(err);
     throw (err);
