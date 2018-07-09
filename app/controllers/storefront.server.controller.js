@@ -1469,8 +1469,11 @@ exports.readOptionItem= function *(next) {
 }
 
 exports.createOptionItem=function *(next) {
+
+   
+
   debug('createOptionItem')
-  
+  debug('... category'+ this.category)
   debug('...menu item '+ this.menuItem)
   debug('...optionCategory '+ this.optionCategory)
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
@@ -1533,10 +1536,32 @@ exports.createOptionItem=function *(next) {
         debug('...no option category provided. Must be for OptionItems category. Finding...')
         console.log('no optioncategory found')
           debug('...no OptionItems category found. Creating new...')
-          var results = yield msc.createOptionCategory('EXTRA')
+          var results = yield msc.createOptionCategory('EXTRAS')
           console.log('craete new variation',results)
-          var relationship_result = yield msc.createRelationship(this.menuItem.id, results.id)
-          console.log('create relationship',relationship_result)
+
+          // automatic mapped with all product into same category
+          var categoryId = this.category.id ;
+
+          var categoryResults = yield msc.listMenuItems(categoryId)
+          var filteredItems = []
+              if (categoryResults && categoryResults.length > 0){
+
+                  for (var j=0; j<categoryResults.length; j++){
+
+                    if (categoryResults[j].category === this.category.id) {
+                      filteredItems.push(categoryResults[j])
+                    }
+                  }
+              }
+
+          for (var i=0;i<filteredItems.length;i++){
+              console.log('count '+i,filteredItems[i].id);
+              var ItemId = filteredItems[i].id ;
+              var relationship_result = yield msc.createRelationship(ItemId, results.id)
+              console.log('create relationship',relationship_result)
+          }
+
+          
           optionCategoryId = results.id
       }
       debug('...optionCategoryId '+ optionCategoryId)

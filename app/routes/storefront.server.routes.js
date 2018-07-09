@@ -59,19 +59,19 @@ module.exports=function(app) {
   router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
   
   /* for create options without optionCategories ID */ 
-  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems', requireJWT, storefront.createOptionItem)
+  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems', requireJWT, storefront.createOptionItem)
   /*======= for create variations ===== */
-  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', requireJWT, storefront.createOptionCategory)
+  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories', requireJWT, storefront.createOptionCategory)
   /* For create options with optionCategories ID */
-  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', requireJWT, storefront.createOptionItem)
+  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', requireJWT, storefront.createOptionItem)
   /*======= route for create modifer ======= */
-  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier', requireJWT, storefront.createModifier)
+  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier', requireJWT, storefront.createModifier)
   
   router.put(apiversion + '/companies/:companyId/categories/:categoryId', requireJWT, storefront.updateCategory);
-  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.updateMenuItem);
-  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
-  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
-  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
+  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId', requireJWT, storefront.updateMenuItem);
+  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
+  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
+  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
   /* for update modifer */
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier/:modifierId', requireJWT, storefront.updateModifier)
 
