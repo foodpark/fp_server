@@ -516,7 +516,7 @@ exports.getFile = function (fileId) {
 
 }
 exports.uploadImage = function *(itemId, path,type) {
-  console.log('type is :::::',type)
+  
   debug('uploadImage')
   try {
     var token = yield getBearerToken()
@@ -543,7 +543,7 @@ exports.uploadImage = function *(itemId, path,type) {
   
 
  debug(imagefile)
- console.log('image file ',imagefile);
+ 
   /*var data = {
     file: path,
     public: true
@@ -555,7 +555,7 @@ exports.uploadImage = function *(itemId, path,type) {
           },
           public: 'true' 
         } ;
-  console.log('data >>>>',data);
+  
 
   
   debug(data)
@@ -572,8 +572,8 @@ exports.uploadImage = function *(itemId, path,type) {
       }
     })
     .then(function (res) {
-      console.log('complete moltin file >>>>>.')
-      console.log('file response is ',res)
+      
+      
       debug('status code '+ res.statusCode)
       debug('sendRequest: parsing...')
       debug(res.body)
@@ -626,7 +626,7 @@ var mainImageUpload = function(token,itemId,imageId) {
 request(options, function (error, response, body) {
   if (error) throw new Error(error);
 
-  console.log(body);
+  
   return body ;
 });
 }
@@ -646,7 +646,7 @@ exports.updateModifer = function(optionCategoryId,optionItemId,modifierId,data) 
    var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA+'/'+modifierId ;
    var Data ={ 
                  "value" : data.value,
-                 "type": "modifier",
+                 "type": data.type,
                  "modifer_type": data.modifer_type,
                  "id" : modifierId
                  

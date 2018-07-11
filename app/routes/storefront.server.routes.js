@@ -35,15 +35,15 @@ module.exports=function(app) {
   router.put(relApiversion + '/food_parks/:foodParkId/drivers/:userId/', requireJWT, foodpark.setAvailable)
 
 
-  router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems)
-	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
+  router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', storefront.listOptionItems)
+	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', storefront.listMenuItems)
 	router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
 	router.get(apiversion + '/companies',requireJWT, storefront.listCompanies)
 
 
-  router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
-  router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId', storefront.readOptionCategory)
+  router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
+  router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', storefront.readOptionCategory)
 	router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId', storefront.readMenuItem)
   router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId', storefront.readMenuItem)
 	router.get(apiversion + '/companies/:companyId/categories/:categoryId', storefront.readCategory)
@@ -56,35 +56,35 @@ module.exports=function(app) {
   router.post(apiversion + '/companies/:companyId/featureddish',  requireJWT, storefront.uploadCompanyFeaturedDish)
 	router.post(apiversion + '/companies/:companyId/categories', requireJWT, storefront.createCategory)
   router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', requireJWT, storefront.createMenuItem)
-  router.post(apiversion + '/companies/:companyId/categories/:categoryIdmenuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
+  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
   router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/images',  requireJWT, storefront.uploadMenuItemImage)
   
-  /* for create options without optionCategories ID */ 
-  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems', requireJWT, storefront.createOptionItem)
+  /* for create options without optionCategoriesID (variation id)  */ 
+  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems', requireJWT, storefront.createOptionItem)
   /*======= for create variations ===== */
-  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories', requireJWT, storefront.createOptionCategory)
-  /* For create options with optionCategories ID */
-  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', requireJWT, storefront.createOptionItem)
+  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', requireJWT, storefront.createOptionCategory)
+  /* For create options with optionCategoriesID (variation id)  */
+  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems', requireJWT, storefront.createOptionItem)
   /*======= route for create modifer ======= */
-  router.post(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier', requireJWT, storefront.createModifier)
+  router.post(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier', requireJWT, storefront.createModifier)
   
   router.put(apiversion + '/companies/:companyId/categories/:categoryId', requireJWT, storefront.updateCategory);
-  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId', requireJWT, storefront.updateMenuItem);
-  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
-  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
-  router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
+  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.updateMenuItem);
+  //router.put(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
+  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.updateOptionCategory);
+  router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT, storefront.updateOptionItem);
   /* for update modifer */
   router.put(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier/:modifierId', requireJWT, storefront.updateModifier)
 
 	router.delete(apiversion + '/companies/:companyId',requireJWT, storefront.deleteCompany);
 	router.delete(apiversion + '/companies/:companyId/categories/:categoryId',requireJWT, storefront.deleteCategory);
   router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId', requireJWT, storefront.deleteMenuItem);
-  router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/images/:imageId', requireJWT, storefront.deleteImage)
+  router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/images/:imageId', requireJWT, storefront.deleteImage)
   //router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optionitems/:optionItemId', requireJWT,  storefront.deleteOptionItem);
-  router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.deleteOptionCategory);
-  router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT,  storefront.deleteOptionItem);
+  router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId', requireJWT,  storefront.deleteOptionCategory);
+  router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', requireJWT,  storefront.deleteOptionItem);
   /* for delete modifer */
-  router.delete(apiversion + '/companies/:companyId/categories/:categoryId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier/:modifierId', requireJWT, storefront.deleteModifier)
+  router.delete(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId/modifier/:modifierId', requireJWT, storefront.deleteModifier)
 
   router.post(relApiversion + '/loyalty/redeem', requireJWT, storefront.redeemLoyalty);
   router.get(relApiversion + '/companies/:companyId/customers/:customerId/loyalty', requireJWT, storefront.getLoyaltyInfo);

@@ -24,6 +24,16 @@ var getErrorMessage = function(err) {
     return message;
 };
 
+var isEmpty = function (myObject) {
+    for(var key in myObject) {
+        if (myObject.hasOwnProperty(key)) {
+            return false;
+        }
+}
+
+    return true;
+}
+
 var sendErrorResponse = function(err, res, status) {
   if (!status) status = 500
   return res.status(status).send({'error': err})
@@ -102,7 +112,7 @@ var uploadCompanyImage=function *(next) {
     debug('..len '+ domainLen);*/
     //var cdnPath = domain.substring(0,domainLen) + suffix;
     var cdnPath = item.link.href ;
-    console.log('cdnpath is >>>>',cdnPath)
+    
     debug('..cdnPath '+ cdnPath);
     return cdnPath;
   } else {
@@ -262,8 +272,9 @@ exports.listCategories=function *(next) {
 
     var filteredCategories = []
     for (let i = 0; i < categories.length; i++) {
+      
       if (categories[i].company === this.company.order_sys_id) {
-        console.log('done');
+        
         categories[i].title = categories[i].name
         filteredCategories.push(categories[i])
       }
@@ -546,6 +557,7 @@ exports.listMenuItems=function *(next) {
                                           
                         if(VariationDetail.hasOwnProperty('options'))
                         {
+                          
                           if(Array.isArray(VariationDetail.options) == true )
                           {
                             for(var k=0;k<VariationDetail.options.length;k++)
@@ -641,10 +653,7 @@ exports.listMenuItems=function *(next) {
                                       
                                   }
                                     
-                                    
-                                    results[j]['is_variation'] = true ;
-                                    optionObject['modifiers'] = modifer
-                                    var newResult = [results[j],optionObject]
+                                   
                               }
 
                             }
@@ -739,17 +748,21 @@ exports.listMenuItems=function *(next) {
                                       
 
                               }
-                              results[j]['is_variation'] = true ;
-                              optionObject['modifiers'] = modifer 
-                              var newResult = [results[j],optionObject]
+                              
                             }
 
 
                           }
                           
-                        }                          
+                        } 
+                        
+                                                
 
                       }
+
+                      
+
+
                   } 
                   else {
 
@@ -853,15 +866,11 @@ exports.listMenuItems=function *(next) {
 
                                   }
                                     
-                                    
-                                    results[j]['is_variation'] = true ;
-                                  
-                                  optionObject['modifiers'] = modifer 
-                                  var newResult = [results[j],optionObject]
                                   
                               }
 
                             }
+                              
                           }
                           else
                           {
@@ -952,26 +961,48 @@ exports.listMenuItems=function *(next) {
                                 
 
                               }
-                              results[j]['is_variation'] = true ;
-                              optionObject['modifiers'] = modifer 
-                              var newResult = [results[j],optionObject]
+                              
                             }
 
 
                           }
                         }
+                        
                   }               
 
+                    if(isEmpty(modifer) == false)
+                      {
+                        results[j]['is_variation'] = true ;
+                         optionObject['modifiers'] = modifer 
+                         var newResult = [results[j],optionObject]
+                      }
+                      else
+                      {
+                        results[j]['is_variation'] = false ;
+                      
+                          var newResult = [results[j]]
 
+                      }
 
                 }
                 else
                 {                
                   results[j]['is_variation'] = false ;
+                  var newResult = [results[j]]
+                }
+                
+                if(newResult[0].hasOwnProperty('meta'))
+                {
+                  if(newResult[0].meta.hasOwnProperty('variations'))
+                  {
+                    newResult[0].relationships['Variations'] = newResult[0].meta.variations
+
+                    delete newResult[0].meta.variations;
+                  }
                 }
 
                 
-                console.log('result ',newResult)
+                
                 filteredItems.push(newResult)
               }
             }
@@ -1029,10 +1060,10 @@ exports.readMenuItem=function *(next) {
       {
         relationship.is_variation = true;
 
-        console.log('length is :',relationship.variations.data.length);
+        
         for(var i=0;i<relationship.variations.data.length;i++)
         {
-          //console.log('variation id is ',relationship.variations.data[i].id);
+          
           var variationId = relationship.variations.data[i].id ;
 
           var VariationDetail = yield msc.findoptionCategory(variationId)
@@ -1042,18 +1073,18 @@ exports.readMenuItem=function *(next) {
             {
                 for(var i=0;i<VariationDetail.options.length;i++)
                 {
-                  // console.log("0")
+                  
                   if(VariationDetail.options[i].hasOwnProperty('modifiers'))
                   {
                     var modifer = { }
-                    // console.log("1");
+                    
                     if(Array.isArray(VariationDetail.options[i].modifiers) == true )
                     {
-                      // console.log("2");
+                      
                       
                       for(var j=0;j<VariationDetail.options[i].modifiers.length;j++)
                       {  
-                          // console.log("reached here");   
+                            
                         var variations = { }  
                         VariationDetail.options[i].modifiers[j].id         = VariationDetail.options[i].modifiers[j].id;
                         VariationDetail.options[i].modifiers[j].order      = "null"
@@ -1071,7 +1102,7 @@ exports.readMenuItem=function *(next) {
                         // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].modifier = VariationDetail.options[i].modifiers[j].id;
 
                         if(menuItemDetail.hasOwnProperty('meta')){
-                          //console.log('meta');
+                          
                           if(menuItemDetail.meta.hasOwnProperty('variations')){
                               menuItemDetail.meta.variations[i].title = menuItemDetail.name;
                               menuItemDetail.meta.variations[i].product = menuItemDetail.id;
@@ -1085,7 +1116,7 @@ exports.readMenuItem=function *(next) {
                               // variations[menuItemDetail.meta.variations[i].id][0].modifier = VariationDetail.options[i].modifiers[j].id;
                           }
                           if(menuItemDetail.meta.hasOwnProperty('timestamps')){
-                              console.log('timestamps');
+                              
                               if(menuItemDetail.meta.timestamps.hasOwnProperty('created_at')){
                                 VariationDetail.options[i].modifiers[j].created_at = menuItemDetail.meta.timestamps.created_at;
                               }
@@ -1121,7 +1152,7 @@ exports.readMenuItem=function *(next) {
                         // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].modifier = VariationDetail.options[i].modifiers[j].id;
 
                         if(menuItemDetail.hasOwnProperty('meta')){
-                          //console.log('meta');
+                          
                           if(menuItemDetail.meta.hasOwnProperty('variations')){
                               menuItemDetail.meta.variations[i].title = menuItemDetail.name;
                               menuItemDetail.meta.variations[i].product = menuItemDetail.id;
@@ -1135,7 +1166,7 @@ exports.readMenuItem=function *(next) {
                               // variations[menuItemDetail.meta.variations[i].id][0].modifier = VariationDetail.options[i].modifiers[j].id;
                           }
                           if(menuItemDetail.meta.hasOwnProperty('timestamps')){
-                              console.log('timestamps');
+                              
                               if(menuItemDetail.meta.timestamps.hasOwnProperty('created_at')){
                                 VariationDetail.options[i].modifiers[j].created_at = menuItemDetail.meta.timestamps.created_at;
                               }
@@ -1161,16 +1192,16 @@ exports.readMenuItem=function *(next) {
                 if(VariationDetail.options.hasOwnProperty('modifiers')){
 
                   var modifer = { }
-                    // console.log("1");
+                    
                     if(Array.isArray(VariationDetail.options.modifiers) == true )
                     {
-                      // console.log("2");
+                      
                       
                       for(var j=0;j<VariationDetail.options.modifiers.length;j++)
                       {  
-                          // console.log("reached here");  
+                           
 
-                          // console.log("reached here");   
+                            
                         var variations = { }  
                         VariationDetail.options.modifiers[j].id         = VariationDetail.options[i].modifiers[j].id;
                         VariationDetail.options.modifiers[j].order      = "null"
@@ -1188,7 +1219,7 @@ exports.readMenuItem=function *(next) {
                         // VariationDetail.options[i].modifiers[j].variations[relationship.variations.data[i].id].modifier = VariationDetail.options[i].modifiers[j].id;
 
                         if(menuItemDetail.hasOwnProperty('meta')){
-                          //console.log('meta');
+                          
                           if(menuItemDetail.meta.hasOwnProperty('variations')){
                               menuItemDetail.meta.variations[i].title = menuItemDetail.name;
                               menuItemDetail.meta.variations[i].product = menuItemDetail.id;
@@ -1202,7 +1233,7 @@ exports.readMenuItem=function *(next) {
                               // variations[menuItemDetail.meta.variations[i].id][0].modifier = VariationDetail.options[i].modifiers[j].id;
                           }
                           if(menuItemDetail.meta.hasOwnProperty('timestamps')){
-                              console.log('timestamps');
+                              
                               if(menuItemDetail.meta.timestamps.hasOwnProperty('created_at')){
                                 VariationDetail.options.modifiers[j].created_at = menuItemDetail.meta.timestamps.created_at;
                               }
@@ -1374,7 +1405,7 @@ exports.uploadMenuItemImage=function *(next) {
   debug(this.body.files)
   debug('..path')
   debug(this.body.files.file.path)
-  console.log('file path is ',this.body.files.file.path);
+  
   debug('..check for files')
   
   
@@ -1399,7 +1430,7 @@ exports.uploadMenuItemImage=function *(next) {
       debug(data)
       try {
         var item = yield msc.uploadImage(this.menuItem.id, this.body.files.file.path,'menu')
-        console.log('item response ',item)
+        
         var url = item.link.href;
         var http = url.replace(/^https?\:\/\//i, "http://");
         var newUrl = { http : http , https : url }
@@ -1514,9 +1545,8 @@ exports.readOptionItem= function *(next) {
 }
 
 exports.createOptionItem=function *(next) {
-
+  
   debug('createOptionItem')
-  debug('... category'+ this.category)
   debug('...menu item '+ this.menuItem)
   debug('...optionCategory '+ this.optionCategory)
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
@@ -1540,7 +1570,7 @@ exports.createOptionItem=function *(next) {
       var title = this.body.title
       if (!title) {
         this.status = 422
-        this.body = { error: 'Title is required.'}
+        this.body = { error: 'title is required.'}
         return;
       }
 
@@ -1565,7 +1595,7 @@ exports.createOptionItem=function *(next) {
         }
         catch(err){
           meta.error=err;
-          logger.error('error retrieving country tax band', meta);
+          logger.error('error retrieving country currency', country);
           throw(err);
         }
       }
@@ -1584,10 +1614,10 @@ exports.createOptionItem=function *(next) {
         
           debug('...no OptionItems category found. Creating new...')
           var results = yield msc.createOptionCategory('EXTRAS')
-          console.log('create new variation',results)
+          
 
           // automatic mapped with all product into same category
-          var categoryId = this.category.id ;
+          var categoryId = this.menuItem.category ; 
 
           var categoryResults = yield msc.listMenuItems(categoryId)
           var filteredItems = []
@@ -1595,18 +1625,18 @@ exports.createOptionItem=function *(next) {
 
                   for (var j=0; j<categoryResults.length; j++){
 
-                    if (categoryResults[j].category === this.category.id) {
+                    if (categoryResults[j].category === this.menuItem.category) { 
                       filteredItems.push(categoryResults[j])
                     }
                   }
               }
 
           for (var i=0;i<filteredItems.length;i++){
-              console.log('count '+i,filteredItems[i].id);
+              
               var ItemId = filteredItems[i].id ;
-              console.log('item id ',ItemId)
+              
               var relationship_result = yield msc.createRelationship(ItemId, results.id)
-              console.log('create relationship',relationship_result)
+              
           }
 
           
@@ -1618,7 +1648,7 @@ exports.createOptionItem=function *(next) {
       debug('...optionCategoryId '+ optionCategoryId)
       try {
         var results = yield msc.createOptionItem(optionCategoryId, title, description)
-        console.log('option result ',results)
+        
         // create price modifer 
         for(var i=0;i<results.options.length;i++){
            if(results.options[i].name == title)
@@ -1638,12 +1668,12 @@ exports.createOptionItem=function *(next) {
                            "value": 
                                 {
                                  "seek": seekVariable,
-                                 "set": seekVariable
+                                 "set": "SKU-"+seekVariable
                                 }
                         }
-              //console.log('data for mofier',data);
+              
           var skuModiferResults = yield msc.createModifer(optionCategoryId,optionId,skuData)
-          console.log('sku modifer ',skuModiferResults)
+          
           // create price modife=ier 
           var newAmount = parseInt(mod_price*100) ;
           var priceData = {
@@ -1657,9 +1687,9 @@ exports.createOptionItem=function *(next) {
                                   }
                                 ]
                         }
-              //console.log('data for mofier',data);
+              
           var modiferResults = yield msc.createModifer(optionCategoryId,optionId,priceData)
-          console.log('price modifier', modiferResults)
+          
    
       } catch (err) {
         console.log('error is ',err)
@@ -1695,6 +1725,7 @@ exports.updateOptionItem=function *(next) {
   debug('...menu item '+ this.menuItem)
   debug('...optionCategory '+ this.optionCategory)
   debug('...option Item '+ this.optionItem)
+
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
     debug('...role authorized')
     var user = this.passport.user
@@ -1713,11 +1744,163 @@ exports.updateOptionItem=function *(next) {
     }
     debug(this.menuItem.company +'=='+ this.company.orderSysId)
     if (this.menuItem.company == this.company.order_sys_id) {
-       var title = this.body.title ;
-       var description = this.body.description ;
+      
+      if(this.body){
+        var title,mod_price,description ;
+        if(this.body.hasOwnProperty('title'))
+         {
+           title = this.body.title
+           description = this.body.title
+         }
+        if(this.body.hasOwnProperty('mod_price'))
+           mod_price = this.body.mod_price
+         
+         if (!title && !mod_price) {
+           this.status = 422
+           this.body = { error: 'Please Provide title or mod_price for update.'}
+           return;
+         }
+
+      }
+      else
+      {
+           this.status = 422
+           this.body = { error: 'Please Provide title or mod_price for update.'}
+           return;
+
+      }
+      
+
+
+
       try {
-        var results = yield msc.updateOptionItem(this.optionCategory.id, this.optionItem.id, title,description)
-      } catch (err) {
+        
+        if(this.optionCategory.hasOwnProperty('options'))
+        {
+           var options = this.optionCategory.options
+           var modifers = [] ;
+           
+            for(var i=0 ; i<options.length ; i++)
+            {
+              if(options[i].id == this.optionItem.id )
+              {
+                
+                modifers = options[i].modifiers
+                
+                break ;
+              }
+
+            }
+            var modPriceId,skuBuilderId ;
+            for(var j= 0 ; j<modifers.length;j++)
+            {
+              if(modifers[j].type == 'sku_builder')
+              {
+                skuBuilderId = modifers[j].id
+              }
+              else if(modifers[j].type == 'price_increment')
+              {
+                modPriceId = modifers[j].id
+              }
+            }
+            
+        }
+        else
+        {
+           this.body = {error: 'Options are not found under the given optioncategory'}
+            return;
+        }
+          if(title != undefined)
+          {
+              var results = yield msc.updateOptionItem(this.optionCategory.id, this.optionItem.id, title,description)
+              var seekVariable = this.optionCategory.name+' '+title ;
+              
+
+              if(skuBuilderId == undefined)  // create new sku builder
+              {
+                var skuData = {
+                          "type": "modifier",
+                          "modifier_type": "sku_builder",
+                           "value": 
+                                {
+                                 "seek": seekVariable,
+                                 "set": "SKU-"+seekVariable
+                                }
+                }
+                var results = yield msc.createModifer(optionCategoryId,optionId,skuData)
+              }
+              else  // update old sku_builder 
+              {
+                var skuData = {
+                                "type": "product-modifier",
+                                "id": skuBuilderId,
+                                "modifier_type": "sku-builder",
+                                "value": {
+                                  "seek": seekVariable,
+                                  "set": "SKU-"+seekVariable,
+                                }
+                              }
+                var results = yield msc.updateModifer(this.optionCategory.id,this.optionItem.id,skuBuilderId,skuData)
+              }
+              
+            }
+            if(mod_price != undefined)
+              {
+                var currency = '';
+                  if (this.company.country_id){
+                    try{
+                      var country = (yield Country.getSingleCountry(this.company.country_id))[0];
+                      
+                      currency = country.currency;
+                    }
+                    catch(err){
+                      meta.error=err;
+                      logger.error('error retrieving country currency', country);
+                      throw(err);
+                    }
+                  }
+                    if(modPriceId == undefined)  // create new price modifer
+                    {
+
+                      var newAmount = parseInt(mod_price*100) ;
+                      var priceData = {
+                              "type": "modifier",
+                              "modifier_type": "price_increment",
+                               "value": [
+                                      {
+                                        "currency": currency,
+                                        "amount": newAmount,
+                                        "includes_tax": false
+                                      }
+                                    ]
+                            }
+                  
+                     var results = yield msc.createModifer(this.optionCategory.id,this.optionItem.id,priceData)
+              
+
+                    }
+                    else  // update price modifer
+                    {
+                             var newAmount = parseInt(mod_price*100) ;
+                             var data = {
+                              "type": "product-modifier",
+                              "modifier_type": "price_increment",
+                               "value": [
+                                      {
+                                        "currency": currency,
+                                        "amount": newAmount,
+                                        "includes_tax": false
+                                      }
+                                    ]
+                            }
+
+                       var results = yield msc.updateModifer(this.optionCategory.id,this.optionItem.id,modPriceId,data)
+
+                    }
+                   
+              }
+          
+        } catch (err) {
         console.error('updateOptionItem: Error updating option item in ordering system ')
         throw(err)
       }
@@ -1822,9 +2005,32 @@ exports.createOptionCategory=function *(func, params, next) {
 
         debug('...calling moltin create option category')
         var results = yield msc.createOptionCategory(title)
-        console.log('result is :',results)
-        var relationship_result = yield msc.createRelationship(this.menuItem.id, results.id)
         
+        //var relationship_result = yield msc.createRelationship(this.menuItem.id, results.id)
+        var categoryId = this.menuItem.category ; 
+
+          var categoryResults = yield msc.listMenuItems(categoryId)
+          var filteredItems = []
+              if (categoryResults && categoryResults.length > 0){
+
+                  for (var j=0; j<categoryResults.length; j++){
+
+                    if (categoryResults[j].category === this.menuItem.category) { 
+                      filteredItems.push(categoryResults[j])
+                    }
+                  }
+              }
+
+          for (var i=0;i<filteredItems.length;i++){
+              
+              var ItemId = filteredItems[i].id ;
+              
+              var relationship_result = yield msc.createRelationship(ItemId, results.id)
+              
+          }
+
+
+
       } catch (err) {
         console.error('createOptionCategory: Error creating '+ title +' option category')
         throw(err)
@@ -1866,7 +2072,7 @@ exports.getoptionCategory = function *(id, next) {
   debug('getoptionCategory')
   debug('id '+ id)
   try {
-    console.log('id is :',id)
+    
     var results = yield msc.findoptionCategory(id)
   } catch (err) {
     console.error('error retrieving option Category from ordering system')
@@ -2016,7 +2222,7 @@ exports.createModifier = function *(next)
         debug('...modifier_type '+ modifier_type)
       if(modifier_type === 'slug_builder' || modifier_type === 'sku_builder')
       {
-         console.log('sku slug type')
+         
           var seek = this.body.seek
           var set  = this.body.set
           
@@ -2048,7 +2254,7 @@ exports.createModifier = function *(next)
           debug('...set'+set)
       }
       else if(modifier_type === 'price_increment' || modifier_type === 'price_decrement' ) {
-         console.log('price type')
+         
          var currency = '';
       if (this.company.country_id){
         try{
@@ -2104,7 +2310,7 @@ exports.createModifier = function *(next)
         
         try {
           var results = yield msc.createModifer(this.optionCategory.id,this.optionItem.id,data)
-          console.log('modifer output:',results)
+          
         } catch (err) {
           console.error('createModifier: Error creating modifier item ('+data+')')
           throw(err)
@@ -2177,7 +2383,7 @@ exports.updateModifier = function *(next) {
         debug('...modifier_type '+ modifier_type)
       if(modifier_type === 'slug_builder' || modifier_type === 'sku_builder')
       {
-         console.log('sku slug type')
+         
           var seek = this.body.seek
           var set  = this.body.set
           
@@ -2203,13 +2409,13 @@ exports.updateModifier = function *(next) {
                           }
                         }
 
-          console.log('data is ',data)
+          
           
           debug('...seek '+ seek)
           debug('...set'+set)
       }
       else if(modifier_type === 'price_increment' || modifier_type === 'price_decrement' ) {
-         console.log('price type')
+         
          var currency = '';
       if (this.company.country_id){
         try{
@@ -2234,7 +2440,7 @@ exports.updateModifier = function *(next) {
           
 
           var data = {
-                          "type": "modifier",
+                          "type": "product-modifier",
                           "modifier_type": modifier_type,
                            "value": [
                                   {
@@ -2258,7 +2464,7 @@ exports.updateModifier = function *(next) {
         
         try {
           var results = yield msc.updateModifer(this.optionCategory.id,this.optionItem.id,this.modifier.id,data)
-          console.log('modifer output:',results)
+          
         } catch (err) {
           console.error('updateModifier: Error updating modifier item ('+data+')')
           throw(err)
@@ -2322,7 +2528,7 @@ exports.deleteModifier = function *(next) {
         
         try {
           var results = yield msc.deleteModifer(this.optionCategory.id,this.optionItem.id,this.modifier.id)
-          console.log('modifer output:',results)
+          
         } catch (err) {
           console.error('DeleteModifier: Error deleting modifier ('+this.modifier.id+')')
           throw(err)
