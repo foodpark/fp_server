@@ -44,66 +44,66 @@ function *simplifyDetails(orderDetail) {
          error: 'Missig order details'});
     return '';
   }
-  var items = orderDetail;
-  debug('array length '+ items.length);
-  logger.info('Processing '+ items.length + ' items in order', {fn: 'simplifyDetails',
-    user_id: this.passport.user.id, role: this.passport.user.role, num_items: items.length});
-  var menuItems = {};
-  for (i = 0; i < items.length; i++ ) {
-    item = items[i];
-    debug('menu item ')
-    debug(item.product.value)
-    debug('quantity ')
-    debug(item.quantity)
-    debug('amount')
-    var itemDetail = {
-      title : item.product.value,
-      quantity : item.quantity
-    }
-    if (item.product.data.modifiers) {
-      debug('modifiers')
-      var modifiers = item.product.data.modifiers
-      itemDetail.options = []
-      itemDetail.selections = {}
-      for (var j in modifiers) {
-        debug(modifiers[j].title)
-        var mod = modifiers[j]
-        debug(mod)
-        if (!mod.type && mod.data.type.value == 'Variant') { // price associated with Variant
-          debug(mod.data.title + ': '+ mod.var_title)
-          itemDetail.selections[mod.data.title] = mod.var_title
-        } else { // option items or single selections
-          var titles = [];
-          if (mod.type.value == 'Variant') {
-            for (var k in mod.variations) {
-              var variation = mod.variations[k]
-              debug('... variant '+ variation.title);
-              debug('...'+ variation.id);
-              titles.push(variation.title);
-            }
-            itemDetail.selections[mod.title]=titles
-          } else if (mod.type.value =='Single') {
-            for (var k in mod.variations) {
-              var variation = mod.variations[k]
-              debug('... option '+ variation.title);
-              debug('... id '+ variation.id);
-              debug('... parent '+ variation.modifier);
-              var options = item.options[variation.modifier];
-              if (options && options[variation.id] ) {
-                debug('... option '+ variation.title +' was selected');
-                titles.push(variation.title);
-              }
-            }
-            itemDetail.options = titles;
-          }
-        }
-      }
-    }
-    debug('... add item detail to list ');
-    debug(itemDetail);
-    menuItems[item.id] = itemDetail;
-    debug(menuItems);
-  }
+var items = orderDetail; 
+debug('array length '+ items.length); 
+logger.info('Processing '+ items.length + ' items in order', {fn: 'simplifyDetails', 
+user_id: this.passport.user.id, role: this.passport.user.role, num_items: items.length}); 
+var menuItems = {}; 
+for (i = 0; i < items.length; i++ ) { 
+item = items[i]; 
+debug('menu item ') 
+debug(item.name) 
+debug('quantity ') 
+debug(item.quantity) 
+debug('amount') 
+var itemDetail = { 
+title : item.name, 
+quantity : item.quantity
+} 
+if (item.data.modifiers) { 
+debug('modifiers') 
+var modifiers = item.data.modifiers
+itemDetail.options = [] 
+itemDetail.selections = {} 
+for (var j in modifiers) { 
+debug(modifiers[j].name) 
+var mod = modifiers[j] 
+debug(mod) 
+if (!mod.type && mod.data.type.name == 'Option') { // price associated with Variant
+debug(mod.data.name + ': '+ mod.var_name) 
+itemDetail.selections[mod.data.name] = mod.var_name
+} else { // option items or single selections
+var titles = []; 
+if (mod.type.name == 'Option') { 
+for (var k in mod.variations) { 
+var variation = mod.variations[k] 
+debug('... variant '+ variation.name); 
+debug('...'+ variation.id); 
+titles.push(variation.name); 
+} 
+itemDetail.selections[mod.name]=titles 
+} else if (mod.type.value == 'Extra') { 
+for (var k in mod.variations) { 
+var variation = mod.variations[k] 
+debug('... option '+ variation.name); 
+debug('... id '+ variation.id); 
+debug('... parent '+ variation.modifier); 
+var options = item.options[variation.modifier]; 
+if (options && options[variation.id] ) { 
+debug('... option '+ variation.name +' was selected'); 
+titles.push(variation.name); 
+} 
+} 
+itemDetail.options = titles; 
+} 
+} 
+} 
+} 
+debug('... add item detail to list '); 
+debug(itemDetail); 
+menuItems[item.product_id] = itemDetail; 
+debug(menuItems); 
+}
   logger.info('Order details simplified', {fn: 'simplifyDetails',
     user_id: this.passport.user.id, role: this.passport.user.role});
   debug(menuItems);
