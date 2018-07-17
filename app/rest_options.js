@@ -35,77 +35,85 @@ const translator = new T();
 const softDeleteTables =  ['companies', 'food_parks', 'territories', 'units', 'users', 'requests'];
 const CENTS_IN_ONE = 100;
 
-function *simplifyDetails(orderDetail) {
-  logger.info('Simplifying order details', {fn: 'simplifyDetails',
-    user_id: this.passport.user.id, role: this.passport.user.role});
+function* simplifyDetails(orderDetail) {
+  logger.info('Simplifying order details', {
+    fn: 'simplifyDetails',
+    user_id: this.passport.user.id, role: this.passport.user.role
+  });
   if (!orderDetail) {
     logger.error('No order details provided',
-        {fn: 'simplifyDetails', user_id: this.passport.user.id, role: this.passport.user.role,
-         error: 'Missig order details'});
+      {
+        fn: 'simplifyDetails', user_id: this.passport.user.id, role: this.passport.user.role,
+        error: 'Missig order details'
+      });
     return '';
   }
-var items = orderDetail; 
-debug('array length '+ items.length); 
-logger.info('Processing '+ items.length + ' items in order', {fn: 'simplifyDetails', 
-user_id: this.passport.user.id, role: this.passport.user.role, num_items: items.length}); 
-var menuItems = {}; 
-for (i = 0; i < items.length; i++ ) { 
-item = items[i]; 
-debug('menu item ') 
-debug(item.name) 
-debug('quantity ') 
-debug(item.quantity) 
-debug('amount') 
-var itemDetail = { 
-title : item.name, 
-quantity : item.quantity
-} 
-if (item.data.modifiers) { 
-debug('modifiers') 
-var modifiers = item.data.modifiers
-itemDetail.options = [] 
-itemDetail.selections = {} 
-for (var j in modifiers) { 
-debug(modifiers[j].name) 
-var mod = modifiers[j] 
-debug(mod) 
-if (!mod.type && mod.data.type.name == 'Option') { // price associated with Variant
-debug(mod.data.name + ': '+ mod.var_name) 
-itemDetail.selections[mod.data.name] = mod.var_name
-} else { // option items or single selections
-var titles = []; 
-if (mod.type.name == 'Option') { 
-for (var k in mod.variations) { 
-var variation = mod.variations[k] 
-debug('... variant '+ variation.name); 
-debug('...'+ variation.id); 
-titles.push(variation.name); 
-} 
-itemDetail.selections[mod.name]=titles 
-} else if (mod.type.value == 'Extra') { 
-for (var k in mod.variations) { 
-var variation = mod.variations[k] 
-debug('... option '+ variation.name); 
-debug('... id '+ variation.id); 
-debug('... parent '+ variation.modifier); 
-var options = item.options[variation.modifier]; 
-if (options && options[variation.id] ) { 
-debug('... option '+ variation.name +' was selected'); 
-titles.push(variation.name); 
-} 
-} 
-itemDetail.options = titles; 
-} 
-} 
-} 
-} 
-debug('... add item detail to list '); 
-debug(itemDetail); 
-menuItems[item.product_id] = itemDetail; 
-debug(menuItems); 
-}
-  logger.info('Order details simplified', {fn: 'simplifyDetails',
-    user_id: this.passport.user.id, role: this.passport.user.role});
+  var items = orderDetail;
+  debug('array length ' + items.length);
+  logger.info('Processing ' + items.length + ' items in order', {
+    fn: 'simplifyDetails',
+    user_id: this.passport.user.id, role: this.passport.user.role, num_items: items.length
+  });
+  var menuItems = {};
+  for (i = 0; i < items.length; i++) {
+    item = items[i];
+    debug('menu item ')
+    debug(item.name)
+    debug('quantity ')
+    debug(item.quantity)
+    debug('amount')
+    var itemDetail = {
+      title: item.name,
+      quantity: item.quantity
+    }
+    if (item.data.order_item) {
+      debug('order_item')
+      var modifiers = item.data.order_item
+      itemDetail.options = []
+      itemDetail.selections = {}
+      for (var j in modifiers) {
+        debug(order_item[j].name)
+        var mod = order_item[j]
+        debug(mod)
+        if (!mod.sku && mod.data.sku == 'Option') { // price associated with Variant
+          debug(mod.data.name + ': ' + mod.var_name)
+          itemDetail.selections[mod.data.name] = mod.var_name
+        } else { // option items or single selections
+          var titles = [];
+          if (mod.sku == 'Option') {
+            for (var k in mod.variations) {
+              var variation = mod.variations[k]
+              debug('... variant ' + variation.name);
+              debug('...' + variation.id);
+              titles.push(variation.name);
+            }
+            itemDetail.selections[mod.name] = titles
+          } else if (mod.sku == 'Extra') {
+            for (var k in mod.variations) {
+              var variation = mod.variations[k]
+              debug('... option ' + variation.name);
+              debug('... id ' + variation.id);
+              debug('... parent ' + variation.modifier);
+              var options = item.options[variation.modifier];
+              if (options && options[variation.id]) {
+                debug('... option ' + variation.name + ' was selected');
+                titles.push(variation.name);
+              }
+            }
+            itemDetail.options = titles;
+          }
+        }
+      }
+    }
+    debug('... add item detail to list ');
+    debug(itemDetail);
+    menuItems[item.product_id] = itemDetail;
+    debug(menuItems);
+  }
+  logger.info('Order details simplified', {
+    fn: 'simplifyDetails',
+    user_id: this.passport.user.id, role: this.passport.user.role
+  });
   debug(menuItems);
   return menuItems;
 }
