@@ -1372,8 +1372,8 @@ exports.deleteMenuItem=function *(next) {
         console.error('error deleting menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
         throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
     }
-    debug(this.menuItem.company.order_sys_id +'=='+ this.company.order_sys_id)
-    if (this.menuItem.company.order_sys_id == this.company.order_sys_id) {
+    debug(this.menuItem.company +'=='+ this.company.order_sys_id)
+    if (this.menuItem.company == this.company.order_sys_id) {
       try {
         var message = yield msc.deleteMenuItem(this.menuItem.id)
       } catch (err) {
@@ -1611,7 +1611,7 @@ exports.createOptionItem=function *(next) {
       // if no optioncategoryId, must find or create the OptionItems category
       if (!optionCategoryId) {
         debug('...no option category provided. Must be for OptionItems category. Finding...')
-        
+         
           debug('...no OptionItems category found. Creating new...')
           var results = yield msc.createOptionCategory('EXTRAS')
           
