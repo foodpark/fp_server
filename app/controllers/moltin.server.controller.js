@@ -317,7 +317,7 @@ exports.createMenuItem = function(company, title, status, price, category, descr
       name: title,
       slug: slug,
       sku: sku,
-      manage_stock: true,
+      manage_stock: false,
       description: description,
       price: [
         {
