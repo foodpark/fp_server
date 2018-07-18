@@ -163,9 +163,10 @@ exports.deleteCompany=function *(next) {
     }
     var results = '';
     try {
-      //results = yield msc.deleteCompany(this.company.order_sys_id)
+      results = yield msc.deleteCompany(this.company.order_sys_id)
       // results = yield msc.softDeleteMoltinCompany(this.company);
       //get and delete
+      /* 
       var categories = yield msc.listCategories(this.company);
       if (categories && categories.length > 0){
         // for (category in categories){
@@ -176,15 +177,16 @@ exports.deleteCompany=function *(next) {
             for (var j=0; j<menuItems.length; j++){
               var menuItem=menuItems[j];
               //delete menuitem 
-              yield msc.updateMenuItem(menuItem.id, {status:"0"});
+              yield msc.deleteMenuItem(menuItem.id);
             } //for menuitems
           } //if menuitems
           //delete category
-          yield msc.updateCategory(category.id, {status:"0"});
+          yield msc.deleteCategory(category.id);
         }//for categories
       } //if categories
       //delete company
-      msc.updateCompany(this.company.id, {status:"0"});
+      msc.deleteCompany(this.company.id);
+      */
     } catch (err) {
       console.error('error deleting company ('+ this.company.id +') in ordering system')
       throw(err)
@@ -200,8 +202,8 @@ exports.deleteCompany=function *(next) {
     debug(results)
 
     this.body = {
-	    "status":true,
-    	"message":"Company removed successfully"
+	    "status":'ok',
+    	"message":"Deleted successfully"
     };
     return;
   } else {

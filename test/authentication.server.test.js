@@ -81,6 +81,7 @@ describe(tests +' POST /auth/register', function() {
       dailySpecialCat = res.body.daily_special_cat_id;
       deliveryChargeCat = res.body.delivery_chg_cat_id;
       deliveryChargeItem = res.body.delivery_chg_item_id;
+      console.log('Default cat: '+ defaultCat);
       done();
     });
   });
@@ -88,12 +89,13 @@ describe(tests +' POST /auth/register', function() {
     chai.request(server)
     .get('/api/v1/mol/companies/' + companyId +'/categories/'+ defaultCat)
     .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal(companyName + ' Menu');
-      done();
+        res.should.have.status(200);
+        console.log(res.body);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.should.have.property('name');
+        res.body.name.should.equal(companyName + ' Menu');
+        done();
     });
   });
   it('should read "Daily Special Category" ', function(done) {
@@ -103,8 +105,8 @@ describe(tests +' POST /auth/register', function() {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Daily Specials');
+      res.body.should.have.property('name');
+      res.body.name.should.equal('Daily Specials');
       done();
     });
   });
@@ -115,8 +117,8 @@ describe(tests +' POST /auth/register', function() {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Delivery Charge Category');
+      res.body.should.have.property('name');
+      res.body.name.should.equal('Delivery Charge Category');
       done();
     });
   });
@@ -127,8 +129,8 @@ describe(tests +' POST /auth/register', function() {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Delivery Charge');
+      res.body.should.have.property('name');
+      res.body.name.should.equal('Delivery Charge');
       done();
     });
   });
@@ -171,11 +173,12 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
     .end(function(err, res) {
         res.should.have.status(200);
         res.should.be.json;
+        console.log(res.body);
         res.body.should.be.a('object');
         res.body.should.have.property('status')
-        res.body.status.should.equal(true)
+        res.body.status.should.equal('ok')
         res.body.should.have.property('message')
-        res.body.message.should.equal('Product removed successfully');
+        res.body.message.should.equal('Deleted successfully');
         done();
         });
     });
@@ -188,9 +191,9 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
       res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('status')
-      res.body.status.should.equal(true)
+      res.body.status.should.equal('ok')
       res.body.should.have.property('message')
-      res.body.message.should.equal('Category removed successfully');
+      res.body.message.should.equal('Deleted successfully');
       done();
     });
   });
@@ -202,14 +205,15 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
+      console.log(res.body);
       res.body.should.have.property('status')
-      res.body.status.should.equal(true)
+      res.body.status.should.equal('ok')
       res.body.should.have.property('message')
-      res.body.message.should.equal('Company removed successfully');
+      res.body.message.should.equal('Deleted successfully');
       done();
     });
   });
-  it('should delete SFEZ user', function(done) {
+  it('should delete user', function(done) {
     chai.request(server)
       .post('/auth/login')
       .send({
