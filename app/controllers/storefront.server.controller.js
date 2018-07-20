@@ -476,7 +476,7 @@ exports.createMenuItem=function *(next) {
                       var relationship_result = yield msc.createRelationship(ItemId, variationId)
                       
                   }
-                
+
               }
               
             }
@@ -1684,6 +1684,19 @@ exports.createOptionItem=function *(next) {
         debug('...no option category provided. Must be for OptionItems category. Finding...')
          
           debug('...no OptionItems category found. Creating new...')
+        if(this.menuItem.relationships.hasOwnProperty('variations'))
+        {
+          console.log('variation h menuitem me')
+           var variationId = this.menuItem.relationships.variations.data[0].id ;
+           var results = yield msc.findoptionCategory(variationId)
+           console.log('results of variation>>>',results)
+
+           optionCategoryId = results.id
+           optionCategoryName = results.name
+        }
+        else
+        {
+          console.log('variation nahi hai')
           var results = yield msc.createOptionCategory('EXTRAS')
           
 
@@ -1713,6 +1726,8 @@ exports.createOptionItem=function *(next) {
           
           optionCategoryId = results.id
           optionCategoryName = results.name
+
+        }
       }
 
       
