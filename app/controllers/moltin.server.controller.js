@@ -3,9 +3,9 @@ var fs = require('fs');
 var sts = require('./security.server.controller');
 var config = require('../../config/config');
 var request = require('requestretry');
+const requestPromise = require('request-promise')
 var logger = require('winston');
 var Country = require('../models/countries.server.model');
-
 
 const DELETE = 'DELETE';
 const GET = 'GET';
@@ -16,11 +16,13 @@ const CATEGORIES        = '/categories';
 const COMPANIES         = '/flows/companies/entries'
 const IMAGES            = '/files';
 const MENU_ITEMS        = '/products';
-const OPTION_CATEGORIES = '/modifiers';
+const OPTION_EXTRA      = '/modifiers'; //OPTION_CATEGORIES
 const OPTION_ITEMS      = '/variations';
+const OPTION            = '/options';
 const ORDERS            = '/orders';
-
 var bearerToken='';
+
+const PRICE_MODIFIER = 100;
 
 var refreshBearerToken = function () {
   debug('refreshBearerToken');
@@ -93,18 +95,29 @@ var getBearerToken = function *(next) {
 
 var sendRequest = function *(url, method, data) {
   debug('sendRequest')
+  debug(data)
   try {
     var token = yield getBearerToken()
     debug('...token '+ token)
+    console.log('token  ',token)
   } catch (err) {
     console.error(err);
     throw (err);
   }
+  var payload = '';
+  
+  if (data) {
+      payload = {
+          data: data
+        }
+   }
+  
+  
   return new Promise(function(resolve, reject) {
     request({
       method: method,
       url: url,
-      json: data,
+      json: payload,
       headers: {
         'Authorization': 'Bearer '+ token
       },
@@ -112,7 +125,9 @@ var sendRequest = function *(url, method, data) {
       retryDelay: 150,  // wait for 150 ms before trying again
     })
     .then( function (res) {
-      debug('status code '+ res.statusCode)
+      var meta = {fn: 'sendRequest', method: method};
+      debug('status code '+ res.statusCode);
+      debug(res.statusMesage);
       debug('sendRequest: parsing...')
       debug(res.body)
       if (res.statusCode == 401 ) { // Unauthorized
@@ -121,19 +136,28 @@ var sendRequest = function *(url, method, data) {
         bearerToken = '';
         reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
-      if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
         debug('..Moltin call successful');
-        var result = res.body.result;
-        if (method == GET) result = JSON.parse(res.body).result;
-        if (method == DELETE) result = JSON.parse(res.body);
-        debug(result);
+        var result = null;
+        if (method == DELETE && res.statusCode == 204) {
+            logger.info('Delete completed', meta)
+            result = {status: 'ok', message: 'Deleted successfully'};
+        } else if (method == GET)
+        {
+          result = res.body ? JSON.parse(res.body).data : null;
+        } else {
+            result = res.body.data;
+            //if (method == GET) result =  JSON.parse(res.body).data;
+        }
+        
+        debug('sendRequest result', result);
         resolve (result)
         return;
       } else { // something went wrong
-        debug('..something went wrong with call to Moltin');
-        var errors = res.body;
-        debug(errors);
-        reject(errors);
+debug('..something went wrong with call to Moltin');
+        var errors = res.body ? res.body : res;
+debug(errors);        
+reject(errors);
       }
     })
     .catch( function (err) {
@@ -147,12 +171,14 @@ var sendRequest = function *(url, method, data) {
 var requestEntities = function *(flow, method, data, id, params) {
   debug('requestEntities')
   debug('... id is '+ id)
+  debug(data)
   var oid = '';
   if (id) oid = '/'+id
   var urlParams = '';
   if (params) urlParams = '?'+params;
   var url = config.moltinStoreUrl + flow + oid + urlParams
   debug('...url : '+ url)
+  
   try {
     var result = yield sendRequest(url, method, data)
   } catch (err) {
@@ -177,6 +203,7 @@ var requestEntities = function *(flow, method, data, id, params) {
 exports.createCompany=function *(sfezCompany) {
   debug('createCompany')
   var data = {
+    'type': 'entry',
     'name': sfezCompany.name,
     'email': sfezCompany.email
   }
@@ -211,30 +238,44 @@ exports.createDefaultCategory=function(moltincompany) {
   debug('slug '+ slug)
   var flow = "/categories"
   var data = {
-    'slug': slug,
-    'status': 1,
-    'title': moltincompany.name + ' Menu',
-    'description': moltincompany.name + ' Menu',
-    'company': moltincompany.id
+    
+   slug: slug,
+      status: 'live',
+      name: moltincompany.name + ' Menu',
+      description: moltincompany.name + ' Menu',
+      company: moltincompany.id,
+    type: 'category'
+
   }
   return requestEntities(flow, POST, data)
 };
 
-exports.createCategory=function (company, catTitle, catParent) {
+exports.createCategory=function *(company, catTitle, catParent) {
   debug('createCategory')
   debug(company)
   var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
   if (!catParent) catParent = company.default_cat;
   var data = {
-    parent: catParent,
-    slug : catSlug,
-    status : 1,
-    title : catTitle,
-    description : catTitle,
-    company : company.order_sys_id
+      parent: catParent,
+      slug : catSlug,
+      status : 'live',
+      name : catTitle,
+      description : catTitle,
+      company : company.order_sys_id,
+      type: 'category'
+
   }
   debug(data)
-  return requestEntities(CATEGORIES, POST, data)
+  var category = yield requestEntities(CATEGORIES, POST, data);
+  try {
+    var relationships = yield requestEntities(`${CATEGORIES}/${category.id}/relationships/parent`, POST, {
+      type: 'category',
+      id: catParent
+    });
+  } catch (error) {
+    console.log('category create relationship error', error)
+  }
+  return category;
 };
 
 exports.findCategory=function (categoryId) {
@@ -257,7 +298,7 @@ exports.deleteCategory=function(categoryId) {
   return requestEntities(CATEGORIES, DELETE, '', categoryId)
 };
 
-exports.createMenuItem=function(company, title, status, price, category, description, taxBand) {
+exports.createMenuItem = function(company, title, status, price, category, description, taxBand, currency) {
   debug('createMenuItem')
   //generate unique sku
   var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
@@ -267,25 +308,39 @@ exports.createMenuItem=function(company, title, status, price, category, descrip
   var stockStatus = 0; // unlimited
   var requiresShipping = 0; // No shipping required
   var catalogOnly = 0; // Not catalog only
-
-  
+ 
   if (!taxBand){
      taxBand=config.defaultTaxBand;
   }
   var data = {
-    sku : sku,
-    slug : slug,
-    status : status,
-    title : title,
-    description : description,
-    price : price,
-    category : category,
-    stock_level : stockLevel,
-    stock_status : stockStatus,
-    requires_shipping : requiresShipping,
-    catalog_only : catalogOnly,
-    tax_band : taxBand,
-    company : company.order_sys_id
+      type: 'product',
+      name: title,
+      slug: slug,
+      sku: sku,
+      manage_stock: false,
+      description: description,
+      price: [
+        {
+          amount: price * PRICE_MODIFIER,
+          currency: currency,
+          includes_tax: false
+        }
+      ],
+      status: 'live',
+      commodity_type: 'physical',
+      meta: {
+        stock: {
+          level: stockLevel
+        }
+      },
+
+      category : category,
+      stock_level : stockLevel,
+      stock_status : stockStatus,
+      requires_shipping : requiresShipping,
+      catalog_only : catalogOnly,
+      tax_band : taxBand,
+      company : company.order_sys_id
   }
   debug(data)
   return requestEntities(MENU_ITEMS, POST, data)
@@ -297,7 +352,7 @@ exports.findMenuItem=function(menuItemId) {
 
 exports.listMenuItems=function(category) {
   debug('listMenuItems')
-  var params = 'category='+ category.id
+  var params = `filter=eq(category,'${category.id}')`
   return requestEntities(MENU_ITEMS, GET, '', '', params)
 };
 
@@ -312,7 +367,7 @@ exports.deleteMenuItem=function(menuItemId) {
 
 var menuOptionFlow = function (menuItemId, optionCategoryId, showOptionItems) {
   debug('menuOptionFlow')
-  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_CATEGORIES
+  var flow = MENU_ITEMS + '/' + menuItemId + OPTION_EXTRA
   if (optionCategoryId) {
     debug('...option category id '+ optionCategoryId)
     flow = flow + '/' + optionCategoryId
@@ -325,15 +380,16 @@ var menuOptionFlow = function (menuItemId, optionCategoryId, showOptionItems) {
   return flow
 }
 
-exports.createOptionItem=function(menuItemId, optionCategoryId, title, modPrice) {
+exports.createOptionItem=function(optionCategoryId, title, description) {
   debug('createOptionItem')
-  if (!modPrice) modPrice = "+0.00"
-  var data = {
-    title : title,
-    mod_price : modPrice
-  }
+  var flow = OPTION_ITEMS+'/'+optionCategoryId +OPTION ;
+   var data ={
+                 name : title,
+                 type  : 'option',
+                 description : description
+          }
   debug(data)
-  return requestEntities(menuOptionFlow(menuItemId, optionCategoryId, true), POST, data)
+  return requestEntities(flow, POST, data)
 };
 
 exports.listOptionItems=function(menuItemId, optionCategoryId) {
@@ -346,46 +402,131 @@ exports.findOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
   return requestEntities(menuOptionFlow(menuItemId, optionCategoryId, true), GET, '', optionItemId)
 };
 
-exports.updateOptionItem=function(menuItemId, optionCategoryId, optionItemId, data) {
+exports.updateOptionItem=function(optionCategoryId, optionItemId, title,description) {
   debug('updateOptionItem')
-  var flow = menuOptionFlow(menuItemId, optionCategoryId, true)
+  
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION ;
+   var data ={ 
+                name : title,
+                 type  : 'option',
+                 description : description,
+                 id : optionItemId,
+                 flow : flow
+                }
   debug('...'+ flow)
   debug('...'+ optionItemId)
-  debug('...'+ data)
+  debug('...'+ data)       
+    
   return requestEntities(flow, PUT, data, optionItemId)
 };
 
-exports.deleteOptionItem=function(menuItemId, optionCategoryId, optionItemId) {
+exports.deleteOptionItem=function(optionCategoryId, optionItemId) {
   debug('deleteOptionItem')
-  var flow = menuOptionFlow(menuItemId, optionCategoryId, true)
+
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION ;
+  
   debug('...'+ flow)
   debug('...'+ optionItemId)
+
   return requestEntities(flow, DELETE, '', optionItemId)
+
+  
 };
 
-exports.createOptionCategory=function(menuItemId, title, type) {
+/* function For Create variation & create Relationship with product */
+exports.createOptionCategory=function(title) {
   debug('createOptionCategory')
   var data = {
-    title : title,
-    type : type
+      name : title,
+      type : 'product-variation'
   }
-  return requestEntities(menuOptionFlow(menuItemId), POST, data)
+  var variation = requestEntities(OPTION_ITEMS, POST, data)
+  
+  return variation
 };
-exports.listOptionCategories=function(menuItemId) {
+
+exports.createRelationship = function *(menuItemId ,variationId) {
+  debug('create Relationship')
+
+
+  var product_rel_url = config.moltinStoreUrl +MENU_ITEMS +'/'+ menuItemId + '/relationships' + OPTION_ITEMS ;
+    var relationData = { data : [{
+                              type: 'product-variation',
+                              id: variationId
+                        }] } ;
+
+  try {
+   var token = yield getBearerToken()
+    debug('...token '+ token)
+    console.log('token createRelationship  ',token)
+  } catch (err) {
+    console.error(err);
+    throw (err);
+  }
+
+
+    return new Promise(function(resolve, reject) {
+    request.post({
+      url: product_rel_url,
+      json: relationData,
+      headers: {
+        'Authorization': 'Bearer '+ token
+      },
+      maxAttempts: 3,
+      retryDelay: 150,  // wait for 150 ms before trying again
+    })
+    .then(function (res) {      
+      
+      debug('status code '+ res.statusCode)
+      debug('sendRequest: parsing...')
+      debug(res.body)
+      console.log('relation>>>>stt>>>',res.statusCode)
+      
+      if (res.statusCode == 401 ) { // Unauthorized
+        debug('...Access token expired')
+        debug('...clear bearer token and throw error')
+        bearerToken = '';
+        reject({'statusCode': 401, 'error': 'Unauthorized'})
+      }
+
+      var result = res.body ;      
+      resolve(result)      
+      return;
+    })
+    .catch( function(err) {
+      console.log('errror',err)
+      console.error("uploadImage: statusCode: " + err.statusCode);
+      console.error("uploadImage: statusText: " + err.statusText);
+      reject (err)
+    })
+  })
+   
+
+
+
+    //return requestEntities(product_rel_url ,POST,relationData)
+}
+exports.listOptionCategories = function(menuItemId) { 
   debug('listOptionCategories')
-  return requestEntities(menuOptionFlow(menuItemId), GET)
+  return requestEntities(OPTION_ITEMS, GET) 
 };
-exports.findOptionCategory=function(menuItemId, optionCategoryId) {
+exports.findoptionCategory = function(optionCategoryId) { 
   debug('findOptionCategory')
-  return requestEntities(menuOptionFlow(menuItemId), GET, '', optionCategoryId)
+  return requestEntities(OPTION_ITEMS, GET, '', optionCategoryId)
+
 };
-exports.updateOptionCategory=function(menuItemId, optionCategoryId, data) {
+exports.updateOptionCategory=function(optionCategoryId, title) { 
   debug('updateOptionCategory')
-  return requestEntities(menuOptionFlow(menuItemId), PUT, data, optionCategoryId)
+  var data = {
+      name : title,
+      type : 'product-variation',
+      id   : optionCategoryId
+  }
+  return requestEntities(OPTION_ITEMS, PUT, data, optionCategoryId)
 };
-exports.deleteOptionCategory=function(menuItemId, optionCategoryId) {
+exports.deleteOptionCategory=function(optionCategoryId) { 
   debug('deleteOptionCategory')
-  return requestEntities(menuOptionFlow(menuItemId), DELETE, '', optionCategoryId)
+  return requestEntities(OPTION_ITEMS, DELETE, '', optionCategoryId)
 };
 
 exports.findOrder=function(orderSysOrderId) {
@@ -420,10 +561,17 @@ exports.deleteImage = function(imageId) {
   return requestEntities(IMAGES, DELETE, '', imageId)
 }
 
-exports.uploadImage = function *(itemId, path) {
+exports.getFile = function (fileId) {
+ 
+ return requestEntities(IMAGES, GET , '',fileId);  
+
+}
+exports.uploadImage = function *(itemId, path,type) {
+  
   debug('uploadImage')
   try {
     var token = yield getBearerToken()
+    console.log('token is',token)
     debug('...token '+ token)
   } catch (err) {
     console.error(err)
@@ -431,51 +579,137 @@ exports.uploadImage = function *(itemId, path) {
   }
 
   var url = config.moltinStoreUrl + IMAGES
+  
   debug('...url : '+ url)
   try {
+    
     var imagefile = fs.createReadStream(path)
+    
   } catch (err) {
+    
     console.error('uploadImage: error')
     console.error(err)
-  }
 
-  debug(imagefile)
-  var data = {
-    file: imagefile,
-    assign_to: itemId
   }
+  
+
+ debug(imagefile)
+ 
+  /*var data = {
+    file: path,
+    public: true
+  }*/
+  var data = { 
+    file: { value: imagefile,
+            options: 
+              { filename: path, contentType: null } 
+          },
+          public: 'true' 
+        } ;
+  
+
+  
   debug(data)
   debug('...uploading')
+    
   return new Promise(function(resolve, reject) {
-    request({
-      method: POST,
+    request.post({
       url: url,
+      json: false,
       formData: data,
       headers: {
-        'Authorization': 'Bearer '+ token
-      },
-      maxAttempts: 3,
-      retryDelay: 150,  // wait for 150 ms before trying again
+        'Authorization': 'Bearer '+ token,
+        'Content-Type': 'multipart/form-data'
+      }
     })
-    .then( function (res) {
+    .then(function (res) {
+      
+      
       debug('status code '+ res.statusCode)
       debug('sendRequest: parsing...')
       debug(res.body)
+      
       if (res.statusCode == 401 ) { // Unauthorized
         debug('...Access token expired')
         debug('...clear bearer token and throw error')
         bearerToken = '';
         reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
-      var result = JSON.parse(res.body).result
-      resolve (result)
-      return;
 
+      var result = res.body ? JSON.parse(res.body).data : null
+      
+      var imageId = result.id ;
+      if(type == 'menu')
+      {
+        var mainImage = mainImageUpload(token,itemId,imageId)
+      }
+        
+      resolve(result)
+      
+      return;
     })
-    .catch( function (err) {
+    .catch( function(err) {
       console.error("uploadImage: statusCode: " + err.statusCode);
       console.error("uploadImage: statusText: " + err.statusText);
       reject (err)
     })
   })
+  
+}
+var mainImageUpload = function(token,itemId,imageId) {
+  
+  var url = config.moltinStoreUrl+MENU_ITEMS + '/' + itemId + '/relationships/main-image' ;
+
+  var options = { method: 'POST',
+  url: url,
+  headers: 
+   { 
+    'Content-Type': 'application/json',
+     Authorization: 'Bearer '+ token },
+  body: 
+   { data: 
+      { type: 'main_image',
+        id: ''+imageId+'' } 
+      },
+      json: true 
+    };
+
+request(options, function (error, response, body) {
+  if (error) throw new Error(error);
+
+  
+  return body ;
+});
+}
+
+/* Functions for modifier */
+
+exports.createModifer = function(optionCategoryId,optionItemId,data) {
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA ;
+   
+  debug(data)
+  
+  return requestEntities(flow, POST, data)
+}
+
+exports.updateModifer = function(optionCategoryId,optionItemId,modifierId,data) {
+   
+   var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA+'/'+modifierId ;
+   var Data ={ 
+                 "value" : data.value,
+                 "type": data.type,
+                 "modifer_type": data.modifer_type,
+                 "id" : modifierId
+                 
+                }
+         
+  debug(data)
+  
+  return requestEntities(flow, PUT, Data)
+
+}
+
+exports.deleteModifer = function(optionCategoryId,optionItemId,modifierId) {
+  var flow = OPTION_ITEMS+'/'+optionCategoryId+OPTION+'/'+optionItemId+OPTION_EXTRA ;
+  return requestEntities(flow, DELETE, '', modifierId)
 }
