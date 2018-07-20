@@ -111,7 +111,7 @@ var sendRequest = function *(url, method, data) {
           data: data
         }
    }
-   
+  
   
   return new Promise(function(resolve, reject) {
     request({
@@ -445,15 +445,66 @@ exports.createOptionCategory=function(title) {
   return variation
 };
 
-exports.createRelationship = function(menuItemId ,variationId) {
+exports.createRelationship = function *(menuItemId ,variationId) {
   debug('create Relationship')
 
-  var product_rel_url = MENU_ITEMS +'/'+ menuItemId + '/relationships' + OPTION_ITEMS ;
-    var relationData = [{
-          type: 'product-variation',
-          id: variationId
-    }]
-    return requestEntities(product_rel_url ,POST,relationData)
+
+  var product_rel_url = config.moltinStoreUrl +MENU_ITEMS +'/'+ menuItemId + '/relationships' + OPTION_ITEMS ;
+    var relationData = { data : [{
+                              type: 'product-variation',
+                              id: variationId
+                        }] } ;
+
+  try {
+   var token = yield getBearerToken()
+    debug('...token '+ token)
+    console.log('token createRelationship  ',token)
+  } catch (err) {
+    console.error(err);
+    throw (err);
+  }
+
+
+    return new Promise(function(resolve, reject) {
+    request.post({
+      url: product_rel_url,
+      json: relationData,
+      headers: {
+        'Authorization': 'Bearer '+ token
+      },
+      maxAttempts: 3,
+      retryDelay: 150,  // wait for 150 ms before trying again
+    })
+    .then(function (res) {      
+      
+      debug('status code '+ res.statusCode)
+      debug('sendRequest: parsing...')
+      debug(res.body)
+      console.log('relation>>>>stt>>>',res.statusCode)
+      
+      if (res.statusCode == 401 ) { // Unauthorized
+        debug('...Access token expired')
+        debug('...clear bearer token and throw error')
+        bearerToken = '';
+        reject({'statusCode': 401, 'error': 'Unauthorized'})
+      }
+
+      var result = res.body ;      
+      resolve(result)      
+      return;
+    })
+    .catch( function(err) {
+      console.log('errror',err)
+      console.error("uploadImage: statusCode: " + err.statusCode);
+      console.error("uploadImage: statusText: " + err.statusText);
+      reject (err)
+    })
+  })
+   
+
+
+
+    //return requestEntities(product_rel_url ,POST,relationData)
 }
 exports.listOptionCategories = function(menuItemId) { 
   debug('listOptionCategories')

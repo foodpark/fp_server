@@ -443,7 +443,76 @@ exports.createMenuItem=function *(next) {
       }
       debug('..creating menu item');
       try {
-        var menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand, currency)
+           
+           // fetch product under category
+           var categoryResults = yield msc.listMenuItems(this.category.id)
+           var filteredItems = []
+              if (categoryResults && categoryResults.length > 0){
+
+                  for (var j=0; j<categoryResults.length; j++){
+
+                    if (categoryResults[j].category === this.category.id) { 
+                      filteredItems.push(categoryResults[j])
+                    }
+                  }
+              }
+
+            if(filteredItems.length > 0)
+            {
+              console.log('product hai ')
+              if(filteredItems[0].relationships.hasOwnProperty('variations'))
+              {
+                 var variationId = filteredItems[0].relationships.variations.data[0].id ;
+              }
+              else
+              {
+                var createVariation = yield msc.createOptionCategory('EXTRAS')
+                var variationId =  createVariation.id ;
+
+                for (var i=0;i<filteredItems.length;i++){
+                      
+                      var ItemId = filteredItems[i].id ;
+                      
+                      var relationship_result = yield msc.createRelationship(ItemId, variationId)
+                      
+                  }
+                
+              }
+              
+            }
+            else
+            {
+              var createVariation = yield msc.createOptionCategory('EXTRAS')
+               var variationId =  createVariation.id ;
+               console.log('nahi hai')
+              
+            }
+
+            var created_menuItem = yield msc.createMenuItem(company, title, status, price, category, description, taxBand, currency)
+              
+            var menuItem = yield msc.createRelationship(created_menuItem.id, variationId)
+
+            if (menuItem.price && Array.isArray(menuItem.price)) {
+                  for (let o = 0; o < menuItem.price.length; o++) {
+                    if (menuItem.price[o].amount) {
+                      menuItem.price[o].amount /= PRICE_MODIFIER
+                    }
+                  }
+                }
+
+                if (menuItem.meta && menuItem.meta.display_price) {
+                  if (menuItem.meta.display_price.with_tax && menuItem.meta.display_price.with_tax.amount) {
+                    menuItem.meta.display_price.with_tax.amount /= PRICE_MODIFIER
+                  }
+
+                  if (menuItem.meta.display_price.without_tax && menuItem.meta.display_price.without_tax.amount) {
+                    menuItem.meta.display_price.without_tax.amount /= PRICE_MODIFIER
+                  }
+                }
+            //var menuItem = filteredItems
+
+
+        
       } catch (err) {
         meta.error=err;
         logger.error('error creating menu item in ordering system ', meta);
@@ -2028,7 +2097,7 @@ exports.createOptionCategory=function *(func, params, next) {
               var ItemId = filteredItems[i].id ;
               
               var relationship_result = yield msc.createRelationship(ItemId, results.id)
-              
+              console.log('relationship result>>>',relationship_result)
           }
 
 
