@@ -1192,13 +1192,17 @@ function *beforeSaveUnit() {
     //get the territory's currency
     var currency='';
     var currencyId='';
+    var currency_symbol='';
     try{
-      var territory = (yield Territories.getSingleTerritory(this.resteasy.object.territory_id))[0];
-      if (territory){
-        var currencyObject=(yield this.resteasy.knex('countries').select('currency','currency_id').where('id',territory.country_id))[0];
+      var company = (yield Company.getSingleCompany(this.resteasy.object.company_id))[0];
+      if (company){
+        var currencyObject=(yield this.resteasy.knex('countries')
+            .select('currency', 'currency_id', 'currency_symbol')
+            .where('id', company.country_id))[0];
         if (currencyObject){
           currency=currencyObject.currency;
           currencyId=currencyObject.currency_id;
+          currency_symbol=currencyObject.currency_symbol;
         }
       }
     } catch (err) {
@@ -1208,11 +1212,15 @@ function *beforeSaveUnit() {
     }
     meta.currency=currency;
     meta.currencyId=currencyId;
+    meta.currency_symbol=currency_symbol;
     if (currency){
       this.resteasy.object.currency=currency;
     }
     if (currencyId){
       this.resteasy.object.currency_id=currencyId;
+    }
+    if (currency_symbol){
+      this.resteasy.object.currency_symbol=currency_symbol;
     }
     debug('..ready to create unit');
     debug(this.resteasy.object);
