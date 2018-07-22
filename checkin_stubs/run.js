@@ -12,7 +12,9 @@ var cron = require('node-cron');
 var getUnitInfo = function(id, callback) {
   knex.select('units.id','units.company_id', 'units.food_park_id',
                 'food_parks.latitude', 'food_parks.longitude',
-                'food_parks.name')
+                'food_parks.name', 'food_parks.city', 'food_parks.state',
+                'food_parks.postal_code', 'food_parks.address',
+                'food_parks.country')
         .from('units')
         .innerJoin('food_parks', 'units.food_park_id', 'food_parks.id')
         .where('units.id', id)
@@ -44,6 +46,19 @@ var getUnits = function(currDayOfWeekOrdinal, callback) {
     .where('stub', true)
     .andWhere('schedule', 'LIKE', '%' + currDayOfWeekOrdinal + '%')
     .then(function(result) {
+      callback(result);
+    });
+}
+
+/*
+ * Updates unit with the current food park address.
+ */
+var updateUnitData = function(unitData, callback) {
+  knex('units').where({id: unitData.id})
+    .update({from_city: unitData.city, from_state: unitData.state,
+              from_zip: unitData.postal_code, from_country: unitData.country,
+              from_street: unitData.address})
+    .then(function(result){
       callback(result);
     });
 }
@@ -128,6 +143,7 @@ var main = function() {
               if (result[0].id) {
                 console.log('Check-in: Unit ' + row.id);
                 doCheckIn(result[0], currentDateTime, function(result) {});
+                updateUnitData(result[0], function(result) {})
               }
             });
 

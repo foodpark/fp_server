@@ -7,13 +7,42 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}\\server.js",
-            "outputCapture": "std",
+            "name": "Launch via NPM",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
+            ],
+            "port": 9229
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Checkin Stubs",
+            "program": "${workspaceFolder}/checkin_stubs/run.js",
             "env": {
-                "NODE_ENV": "test",
-                // "DEBUG": "*"
-                "DEBUG": "auth,rest_options"
+               "NODE_ENV": "development"
+            }
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach by Process ID",
+            "processId": "${command:PickProcess}"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach",
+            "port": 1337
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/server.js",
+            "env": {
+               "NODE_ENV": "development"
             }
         }
     ]
