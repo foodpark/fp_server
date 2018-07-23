@@ -307,12 +307,13 @@ CREATE TABLE countries (
     id integer NOT NULL,
     name text,
     is_enabled boolean DEFAULT false,
-    tax_band text,
     currency_id text DEFAULT '1554615357396746864'::text,
     currency text DEFAULT 'BRL'::text,
     moltin_client_id text,
     moltin_client_secret text,
-    default_payment text
+    default_payment text,
+    currency_symbol text,
+    country_code text
 );
 
 
@@ -458,6 +459,7 @@ CREATE TABLE drivers_foodpark (
     user_id integer,
     available boolean DEFAULT false
 );
+
 
 
 ALTER TABLE drivers_foodpark OWNER TO postgres;
@@ -622,7 +624,8 @@ CREATE TABLE food_parks (
     is_deleted boolean DEFAULT false,
     foodpark_mgr_id integer,
     foodpark_mgr integer,
-    type text
+    type text,
+    address text
 );
 
 
@@ -1503,23 +1506,29 @@ CREATE TABLE categories (
 
 grant all on categories to sfez_rw;
 
-CREATE TABLE requests (    
-    id SERIAL PRIMARY KEY,
-    customer_id integer REFERENCES customers,
+
+CREATE TABLE requests (
+    id integer NOT NULL,
+    customer_id integer,
     request_name text,
     request_photo text,
     category_id integer,
     latitude numeric(8,4),
     longitude numeric(8,4),
-    created_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
-    modified_at timestamp without time zone DEFAULT timezone('UTC'::text, CURRENT_TIMESTAMP),
+    created_at timestamp without time zone DEFAULT timezone('UTC'::text, now()),
+    modified_at timestamp without time zone DEFAULT timezone('UTC'::text, now()),
     is_deleted boolean DEFAULT false,
     request_description text,
     condition character varying(100),
     buy_back_term character varying(225),
     country character varying(100),
     state character varying(100),
-    territory character varying(100)
+    territory character varying(100),
+    category character varying(125),
+    category_photo text,
+    request_photo2 text,
+    request_photo3 text,
+    customer character varying(32)
 );
 
 grant all on requests to sfez_rw;
