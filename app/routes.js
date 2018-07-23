@@ -18,6 +18,7 @@ module.exports = function(app) {
   require('./routes/packages.server.routes')(app);
   require('./routes/prepay.server.routes')(app);
   require('./routes/pawnshop.server.routes')(app);
+  require('./routes/checkin.server.routes')(app);
 
   var apiversion = '/api/'+ config.apiVersion + '/rel';
   app.use(Mount(apiversion,require('./routes/api')));

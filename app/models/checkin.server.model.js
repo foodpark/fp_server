@@ -23,4 +23,8 @@ exports.findByTimeBox = function(lat1, lon1, lat2, lon2, searchtime) {
 exports.findOpenCheckinForUnit = function(id) {
   var now = (new Date()).toISOString();
   return knex('checkins').select('*').where('unit_id',id).andWhere('check_in','<',now).andWhere('check_out','>',now);
-}
+};
+
+exports.createCheckin = function(checkin) {
+  return knex('checkins').insert(checkin).returning('*');
+};
