@@ -20,19 +20,19 @@ describe(tests +' GET /api/v1/mol/companies', function() {
     chai.request(server)
     .get('/api/v1/mol/companies')
     .end(function(err, res) {
-    res.should.have.status(200);
-    res.should.be.json;
-    res.body.should.be.a('array');
-    done();
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        done();
     });
   });
 });
 
 // Test SFEZ Postgres has specfic company
-describe(tests +' GET /api/v1/mol/companies/1008', function() {
-  it('should return company 1008: Grilla Cheez from SFEZ db', function(done) {
+describe(tests +' GET /api/v1/mol/companies/11002', function() {
+  it('should return company 11002: Classy Cuban from SFEZ db', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008')
+    .get('/api/v1/mol/companies/11002')
     .end(function(err, res) {
     res.should.have.status(200);
     res.should.be.json;
@@ -40,11 +40,11 @@ describe(tests +' GET /api/v1/mol/companies/1008', function() {
     res.body.should.have.property('id');
     res.body.id.should.equal(1008);
     res.body.should.have.property('name');
-    res.body.name.should.equal('Grilla Cheez');
+    res.body.name.should.equal('Classy Cuban');
     res.body.should.have.property('order_sys_id');
-    res.body.order_sys_id.should.equal('1441733842225332401');
+    res.body.order_sys_id.should.equal('1555978584605066120');
     res.body.should.have.property('default_cat');
-    res.body.default_cat.should.equal('1441733850261618866');
+    res.body.default_cat.should.equal('1555978591534056329');
     
     defaultCat = res.body.default_cat;
 
@@ -54,16 +54,17 @@ describe(tests +' GET /api/v1/mol/companies/1008', function() {
 });
 
 // Test retrieval of Moltin categories
-describe(tests +' GET /api/v1/mol/companies/1008/categories', function() {
-  it('should return menu categories for 1008: Grilla Cheez from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/11002/categories', function() {
+  it('should return menu categories for 11002: Classy Cuban from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/categories')
+    .get('/api/v1/mol/companies/11002/categories')
     .end(function(err, res) {
-      res.body.should.be.a('array');
-      res.body[0].should.have.property('slug');
-      res.body[0].should.have.property('company');
-      res.body[0].company.value.should.equal('Grilla Cheez');
-      done();
+        console.log(res.body);
+        res.body.should.be.a('array');
+        res.body[0].should.have.property('slug');
+        res.body[0].should.have.property('company');
+        res.body[0].company.value.should.equal('Classy Cuban');
+        done();
     });
   });
 });
@@ -71,10 +72,10 @@ describe(tests +' GET /api/v1/mol/companies/1008/categories', function() {
 
 
 // Test retrieval of one Moltin category
-describe(tests +' GET /api/v1/mol/companies/1008/categories/1441745521759748294', function() {
-  it('should return Dinner category for 1008: Grilla Cheez from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853', function() {
+  it('should return Dinner category for 11002: Classy Cuban from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/categories/1441745521759748294')
+    .get('/api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853')
     .end(function(err, res) {
     res.should.have.status(200);
     res.should.be.json;
@@ -88,36 +89,36 @@ describe(tests +' GET /api/v1/mol/companies/1008/categories/1441745521759748294'
 
 
 // Test retrieval of menu items for Company and Category
-describe(tests +' GET /api/v1/mol/companies/1008/categories/1441745521759748294/menuitems', function() {
-  it('should return menu items for 1008: Grilla Cheez - Dinner category from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853/menuitems', function() {
+  it('should return menu items for 11002: Classy Cuban - Dinner category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/categories/1441745521759748294/menuitems')
+    .get('/api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853/menuitems')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('array');
       res.body[0].should.have.property('slug');
-      res.body[0].slug.should.equal('grilla-cheez-1486088088823-bbq-wings');
+      res.body[0].slug.should.equal('koolaid-1530795364335-taco-salad');
       res.body[0].should.have.property('title');
-      res.body[0].title.should.equal('BBQ Loaf');
+      res.body[0].title.should.equal('Taco Salad');
       done();
     });
   });
 });
 
 // Test retrieval of a specific menu item for Company and Category
-describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337', function() {
-  it('should return BBQ Loaf for 1008: Grilla Cheez - Dinner category from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/11002/menuitems/4c0e2107-d4af-4d44-ba45-c9be478ac346', function() {
+  it('should return Taco Salad for 11002: Classy Cuban - Dinner category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337')
+    .get('/api/v1/mol/companies/11002/menuitems/4c0e2107-d4af-4d44-ba45-c9be478ac346')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('slug');
-      res.body.slug.should.equal('grilla-cheez-1486088088823-bbq-wings');
+      res.body.slug.should.equal('koolaid-1530795364335-taco-salad');
       res.body.should.have.property('title');
-      res.body.title.should.equal('BBQ Loaf');
+      res.body.title.should.equal('Taco Salad');
       done();
     });
   });

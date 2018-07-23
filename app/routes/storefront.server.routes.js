@@ -40,7 +40,7 @@ module.exports=function(app) {
     router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories', storefront.listOptionCategories)
     router.get(apiversion + '/companies/:companyId/categories/:categoryId/menuitems', storefront.listMenuItems)
     router.get(apiversion + '/companies/:companyId/categories', storefront.listCategories)
-    router.get(apiversion + '/companies',requireJWT, storefront.listCompanies)
+    router.get(apiversion + '/companies', storefront.listCompanies)
 
 
     router.get(apiversion + '/companies/:companyId/menuitems/:menuItemId/optioncategories/:optionCategoryId/optionitems/:optionItemId', storefront.readOptionItem)
