@@ -104,3 +104,7 @@ exports.getUnitCoordinates = function(unit_id) {
 exports.getAllCompanyCoordinates = function(company_id) {
   return knex('units').select('food_parks.latitude', 'food_parks.longitude').join('food_parks', 'units.food_park_id', 'food_parks.id').select('food_parks.latitude', 'food_parks.longitude').where('units.company_id', company_id);;
 }
+
+exports.updateUnit = function * (unit_id, params) {
+	return knex('units').where('id', '=', unit_id).update(params);
+}
