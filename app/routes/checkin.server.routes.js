@@ -9,7 +9,7 @@ module.exports = function (app) {
   var router = new Router();
   var apiPath = '/api/'+ config.apiVersion + '/rel/';
 
-  router.post(apiPath + 'checkins', checkin.createCheckin);
+  //router.post(apiPath + 'checkins', checkin.createCheckin);
 
   app.use(router.routes());	
   app.use(router.allowedMethods());
