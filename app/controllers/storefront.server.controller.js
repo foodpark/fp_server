@@ -385,28 +385,7 @@ exports.createMenuItem=function *(next) {
     debug(this.category.company +'=='+ this.company.order_sys_id)
     if (this.category.company == this.company.order_sys_id) {
       debug('..category and company match')
-      /** MOLTIN PRODUCT FIELDS
-      Name	Slug	Field Type	Required?	Unique?	Title Column?
-      *SKU	sku	string	Yes	Yes	No
-      *Product Title	title	string	Yes	No	Yes
-      *Slug	slug	slug	Yes	Yes	No
-      *Price	price	money	Yes	No	No
-      Sale Price	sale_price	decimal	No	No	No
-      *Status	status	choice	Yes	No	No
-      *Category	category	multiple	Yes	No	No
-      *Stock Level	stock_level	integer	Yes	No	No
-      *Stock Status	stock_status	choice	Yes	No	No
-      *Description	description	text	Yes	No	No
-      *Requires Shipping	requires_shipping	choice	Yes	No	No
-      Weight	weight	decimal	No	No	No
-      Height	height	decimal	No	No	No
-      Width	width	decimal	No	No	No
-      Depth	depth	decimal	No	No	No
-      *Catalog Only	catalog_only	choice	Yes	No	No
-      Collection	collection	relationship	No	No	No
-      Brand	brand	relationship	No	No	No
-      *Tax Band	tax_band	tax-band	Yes	No	No
-      *Company	company	relationship	Yes **/
+   
       var company = this.company
       var title = this.body.title;
       var price = this.body.price;
@@ -543,359 +522,255 @@ exports.listMenuItems=function *(next) {
   if (!data)  data = ''
   debug(data)
   try {
-    var results = (yield msc.listMenuItems(this.category))
-    var filteredItems = []
-         if (results && results.length > 0){
-
-            for (var j=0; j<results.length; j++){
-              // TODO: remove when moltin filter works
-              if (results[j].category === this.category.id) {
+    var results = (yield msc.listMenuItems(this.category));
+    debug('Found '+ results.length +' items');
+    return results;
+    var filteredItems = [];
+    if (results && results.length > 0) {
+        for (var j=0; j<results.length; j++) {
+            // TODO: remove when moltin filter works
+            debug('MENU ITEM')
+            debug(results[j]); 
+            if (results[j].category === this.category.id) {
                 /*------ json mapping start ---- */
                 results[j]['title'] = results[j].name ;
                 results[j]['is_variation'] = true ;
-                if(results[j].hasOwnProperty('relationships'))
-                {
-                
-                var relationship =  results[j].relationships
-                if(relationship.hasOwnProperty('main_image'))
-                {
-                  
-                  if(Array.isArray(relationship.main_image.data) == false )
-                  {
-                    var fileId = relationship.main_image.data.id ; 
-                    var FileDetail = yield msc.getFile(fileId) ;
-                    var url = FileDetail.link.href;
-                    var http = url.replace(/^https?\:\/\//i, "http://");
-                    var newUrl = { http : http , https : url }
-                    results[j].relationships.main_image.data.url = newUrl ;
-                  }
-                  else
-                  {
-                    for(var x=0; x<relationship.main_image.data.length;x++)
-                    {
-                      var fileId = relationship.main_image.data.id ; 
-                      var FileDetail = yield msc.getFile(fileId) ;
-                      var url = FileDetail.link.href;
-                      var http = url.replace(/^https?\:\/\//i, "http://");
-                      var newUrl = { http : http , https : url }
-                      results[j].relationships.main_image.data[x].url = newUrl ;
+                if(results[j].hasOwnProperty('relationships')) {
+                    var relationship =  results[j].relationships
+                    if (relationship.hasOwnProperty('main_image')) {
+                        if(Array.isArray(relationship.main_image.data) == false ) {
+                            var fileId = relationship.main_image.data.id ; 
+                            var FileDetail = yield msc.getFile(fileId) ;
+                            var url = FileDetail.link.href;
+                            var http = url.replace(/^https?\:\/\//i, "http://");
+                            var newUrl = { http : http , https : url }
+                            results[j].relationships.main_image.data.url = newUrl ;
+                        } else {
+                            for (var x=0; x<relationship.main_image.data.length;x++) {
+                                var fileId = relationship.main_image.data.id ; 
+                                var FileDetail = yield msc.getFile(fileId) ;
+                                var url = FileDetail.link.href;
+                                var http = url.replace(/^https?\:\/\//i, "http://");
+                                var newUrl = { http : http , https : url }
+                                results[j].relationships.main_image.data[x].url = newUrl ;
+                            }
+                        }
                     }
-                  }
-
                 }
-                
-              }
-
-              /*--- json mapping end ----*/
+                /*--- json mapping end ----*/
 
                 if (results[j].price && Array.isArray(results[j].price)) {
-                  for (let o = 0; o < results[j].price.length; o++) {
-                    if (results[j].price[o].amount) {
-                      results[j].price[o].amount /= PRICE_MODIFIER
+                    for (let o = 0; o < results[j].price.length; o++) {
+                        if (results[j].price[o].amount) {
+                            results[j].price[o].amount /= PRICE_MODIFIER
+                        }
                     }
-                  }
                 }
-
                 if (results[j].meta && results[j].meta.display_price) {
-                  if (results[j].meta.display_price.with_tax && results[j].meta.display_price.with_tax.amount) {
-                    results[j].meta.display_price.with_tax.amount /= PRICE_MODIFIER
-                  }
-
-                  if (results[j].meta.display_price.without_tax && results[j].meta.display_price.without_tax.amount) {
-                    results[j].meta.display_price.without_tax.amount /= PRICE_MODIFIER
-                  }
+                    if (results[j].meta.display_price.with_tax && results[j].meta.display_price.with_tax.amount) {
+                        results[j].meta.display_price.with_tax.amount /= PRICE_MODIFIER
+                    }
+                    if (results[j].meta.display_price.without_tax && results[j].meta.display_price.without_tax.amount) {
+                        results[j].meta.display_price.without_tax.amount /= PRICE_MODIFIER
+                    }
                 }
-
                 // Mapping variation in json
-                if(relationship.hasOwnProperty('variations'))
-                {
-                  
-                  
-                  var optionObject = {
-                                title        : results[j].name, 
-                                instructions : " " , 
-                                product      : results[j].id ,
-                                variations : { }
-                               }
-                  var modifer = {}
-                  if(Array.isArray(relationship.variations.data) == true ) {
-                      for(var i=0;i<relationship.variations.data.length;i++)
-                      {
-                        
-                        var variationId =  relationship.variations.data[i].id 
-                        var VariationDetail = yield msc.findoptionCategory(variationId) 
+                if (relationship.hasOwnProperty('variations')) {
+                    var optionObject = {
+                            title        : results[j].name, 
+                            instructions : " " , 
+                            product      : results[j].id ,
+                            variations : { }
+                        }
+                    var modifer = {}
+                    if (Array.isArray(relationship.variations.data) == true ) {
+                        for (var i=0;i<relationship.variations.data.length;i++) {
+                            var variationId =  relationship.variations.data[i].id 
+                            var VariationDetail = yield msc.findoptionCategory(variationId) 
+                            if (VariationDetail.hasOwnProperty('options')) {
+                                if (Array.isArray(VariationDetail.options) == true ) {
+                                    for(var k=0;k<VariationDetail.options.length;k++) {
+                                        if(VariationDetail.options[k].hasOwnProperty('modifiers')) {
+                                            if(Array.isArray(VariationDetail.options[k].modifiers) == true ) {
+                                                for(var m=0;m<VariationDetail.options[k].modifiers.length;m++) {
+                                                    if(VariationDetail.options[k].modifiers[m].type === "price_increment") {
+                                                        var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                                        optionObject.variations[VariationDetail.options[k].id] = {
+                                                            title      : VariationDetail.options[k].name ,
+                                                            product    : results[j].id,
+                                                            modifer    : VariationDetail.options[k].modifiers[m].id,
+                                                            mod_price  : "+"+price ,
+                                                            id         : VariationDetail.options[k].id,
+                                                            difference : price
+                                                        }
 
-                                          
-                        if(VariationDetail.hasOwnProperty('options'))
-                        {
-                          
-                          if(Array.isArray(VariationDetail.options) == true )
-                          {
-                            for(var k=0;k<VariationDetail.options.length;k++)
-                            {
-                              if(VariationDetail.options[k].hasOwnProperty('modifiers'))
-                              {
-                                
-                                  
-                                  if(Array.isArray(VariationDetail.options[k].modifiers) == true )
-                                  {
-                                    
-                                    for(var m=0;m<VariationDetail.options[k].modifiers.length;m++)
-                                    {
-                                      
-                                      if(VariationDetail.options[k].modifiers[m].type === "price_increment")
-                                      {
-                                        var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
-                                        optionObject.variations[VariationDetail.options[k].id] = {
-                                          title      : VariationDetail.options[k].name ,
-                                          product    : results[j].id,
-                                          modifer    : VariationDetail.options[k].modifiers[m].id,
-                                          mod_price  : "+"+price ,
-                                          id         : VariationDetail.options[k].id,
-                                          difference : price
-                                        }
-
-                                        modifer[VariationDetail.options[k].modifiers[m].id] = {
-                                          id : VariationDetail.options[k].modifiers[m].id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options[k].modifiers[m].type,
-                                          data  : VariationDetail.options[k].modifiers[m].value[0]
-                                          }
-                                        }
+                                                        modifer[VariationDetail.options[k].modifiers[m].id] = {
+                                                            id : VariationDetail.options[k].modifiers[m].id,
+                                                            order : null,
+                                                            type : {
+                                                                value : VariationDetail.options[k].modifiers[m].type,
+                                                                data  : VariationDetail.options[k].modifiers[m].value[0]
+                                                            }
+                                                        }
 
 
-                                      }
-                                      else
-                                      {
-                                        modifer[VariationDetail.options[k].modifiers[m].id] = {
-                                          id : VariationDetail.options[k].modifiers[m].id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options[k].modifiers[m].type,
-                                          data  : VariationDetail.options[k].modifiers[m].value
-                                          }
-                                        }
-
-                                      }
-                                      
-                                      
-                                    
-
-                                    }
-                                  }
-                                  else
-                                  {
-                                    
-                                     if(VariationDetail.options[k].modifiers.type === "price_increment")
-                                      {
-                                        var price = VariationDetail.options[k].modifiers.value[0].amount/PRICE_MODIFIER ; 
-                                        optionObject.variations[VariationDetail.options[k].id] = {
-                                          title      : VariationDetail.options[k].name ,
-                                          product    : results[j].id,
-                                          modifer    : VariationDetail.options[k].modifiers.id,
-                                          mod_price  : "+"+price ,
-                                          id         : VariationDetail.options[k].id,
-                                          difference : price
-                                        }
-
-                                        modifer[VariationDetail.options[k].modifiers.id] = {
-                                          id : VariationDetail.options[k].modifiers.id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options[k].modifiers.type,
-                                          data  : VariationDetail.options[k].modifiers.value[0]
-                                          }
-                                        }
-
-
-                                      }
-                                      else
-                                      {
-                                        modifer[VariationDetail.options[k].modifiers.id] = {
-                                          id : VariationDetail.options[k].modifiers.id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options[k].modifiers.type,
-                                          data  : VariationDetail.options[k].modifiers.value
-                                          }
-                                        }
-                                      }
-                                      
-                                  }
-                                    
-                                   
-                              }
-
-                            }
-                          }
-                          else
-                          {
-                            if(VariationDetail.options.hasOwnProperty('modifiers'))
-                            {
-                              
-                              if(Array.isArray(VariationDetail.options.modifiers) == true )
-                              {
-                                for(var m=0;m<VariationDetail.options.modifiers.length;m++)
-                                    {
-                                      
-
-                                      if(VariationDetail.options.modifiers[m].type === 'price_increment')
-                                      {
-                                        var price = VariationDetail.options.modifiers[m].value[0].amount/PRICE_MODIFIER ; 
-                                        
-                                        optionObject.variations[VariationDetail.options.id] = {
-                                          title      : VariationDetail.options.name ,
-                                          product    : results[j].id,
-                                          modifer    : VariationDetail.options.modifiers[m].id,
-                                          mod_price  : "+"+price ,
-                                          id         : VariationDetail.options.id,
-                                          difference : price
-                                        }
-
-                                        modifer[VariationDetail.options.modifiers[m].id] = {
-                                          id : VariationDetail.options.modifiers[m].id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options.modifiers[m].type,
-                                          data  : VariationDetail.options.modifiers[m].value[0]
-                                          }
-                                        }
-
-
-                                      }
-                                      else
-                                      {
-                                        modifer[VariationDetail.options.modifiers[m].id] = {
-                                          id : VariationDetail.options.modifiers[m].id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options.modifiers[m].type,
-                                          data  : VariationDetail.options.modifiers[m].value
-                                          }
-                                        }
-                                      }
-                                      
-
-                                    }
-
-                              }
-                              else
-                              {
-                                if(VariationDetail.options.modifiers.type === 'price_increment')
-                                {
-                                  var price = VariationDetail.options.modifiers.value[0].amount/PRICE_MODIFIER ; 
-                                  
-                                   optionObject.variations[VariationDetail.options.id] = {
-                                    title      : VariationDetail.options.name ,
-                                    product    : results[j].id,
-                                    modifer    : VariationDetail.options.modifiers.id,
-                                    mod_price  : "+"+price ,
-                                    id         : VariationDetail.options.id,
-                                    difference : price
-                                  }
-
-                                  modifer[VariationDetail.options.modifiers.id] = {
-                                          id : VariationDetail.options.modifiers.id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options.modifiers.type,
-                                          data  : VariationDetail.options.modifiers.value[0]
-                                          }
-                                        }
-
-                                }
-                                else
-                                {
-                                  modifer[VariationDetail.options.modifiers.id] = {
-                                          id : VariationDetail.options.modifiers.id,
-                                          order : null,
-                                          type : {
-                                          value : VariationDetail.options.modifiers.type,
-                                          data  : VariationDetail.options.modifiers.value
-                                          }
-                                        }
-                                }
-                                      
-
-                              }
-                              
-                            }
-
-
-                          }
-                          
-                        } 
-                        
-                                                
-
-                      }
-
-                      
-
-
-                  } 
-                  else {
-
-                      var variationId =  relationship.variations.data.id 
-                      var VariationDetail = yield msc.findoptionCategory(variationId)
-                      
-                        if(VariationDetail.hasOwnProperty('options'))
-                        {
-                          if(Array.isArray(VariationDetail.options) == true )
-                          {
-                            for(var k=0;k<VariationDetail.options.length;k++)
-                            {
-                              if(VariationDetail.options[k].hasOwnProperty('modifiers'))
-                              {
-                                
-                                  
-                                  if(Array.isArray(VariationDetail.options[k].modifiers) == true )
-                                  {
-                                    
-                                    for(var m=0;m<VariationDetail.options[k].modifiers.length;m++)
-                                    {
-                                      
-                                      if(VariationDetail.options[k].modifiers[m].type === 'price_increment')
-                                      {
-                                        var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
-                                        
-                                         optionObject.variations[VariationDetail.options[k].id] = {
-                                          title      : VariationDetail.options[k].name ,
-                                          product    : results[j].id,
-                                          modifer    : VariationDetail.options[k].modifiers[m].id,
-                                          mod_price  : "+"+price ,
-                                          id         : VariationDetail.options[k].id,
-                                          difference : price
-                                        }
-
-                                        modifer[VariationDetail.options[k].modifiers[m].id] = {
-                                                id : VariationDetail.options[k].modifiers[m].id,
-                                                order : null,
-                                                type : {
-                                                value : VariationDetail.options[k].modifiers[m].type,
-                                                data  : VariationDetail.options[k].modifiers[m].value[0]
+                                                    } else {
+                                                        modifer[VariationDetail.options[k].modifiers[m].id] = {
+                                                            id : VariationDetail.options[k].modifiers[m].id,
+                                                            order : null,
+                                                            type : {
+                                                                value : VariationDetail.options[k].modifiers[m].type,
+                                                                data  : VariationDetail.options[k].modifiers[m].value
+                                                            }
+                                                        }
+                                                    }
                                                 }
-                                              }
+                                            } else {
+                                                if(VariationDetail.options[k].modifiers.type === "price_increment") {
+                                                    var price = VariationDetail.options[k].modifiers.value[0].amount/PRICE_MODIFIER ; 
+                                                    optionObject.variations[VariationDetail.options[k].id] = {
+                                                        title      : VariationDetail.options[k].name ,
+                                                        product    : results[j].id,
+                                                        modifer    : VariationDetail.options[k].modifiers.id,
+                                                        mod_price  : "+"+price ,
+                                                        id         : VariationDetail.options[k].id,
+                                                        difference : price
+                                                    }
 
-                                      }
-                                      else
-                                      {
-                                        modifer[VariationDetail.options[k].modifiers[m].id] = {
-                                                id : VariationDetail.options[k].modifiers[m].id,
-                                                order : null,
-                                                type : {
-                                                value : VariationDetail.options[k].modifiers[m].type,
-                                                data  : VariationDetail.options[k].modifiers[m].value
+                                                    modifer[VariationDetail.options[k].modifiers.id] = {
+                                                        id : VariationDetail.options[k].modifiers.id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options[k].modifiers.type,
+                                                            data  : VariationDetail.options[k].modifiers.value[0]
+                                                        }
+                                                    }
+                                                } else {
+                                                    modifer[VariationDetail.options[k].modifiers.id] = {
+                                                        id : VariationDetail.options[k].modifiers.id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options[k].modifiers.type,
+                                                            data  : VariationDetail.options[k].modifiers.value
+                                                        }
+                                                    }
                                                 }
+                                            }
                                         }
-
-                                      }
-
                                     }
-                                  }
-                                  else
-                                  {
+                                } else {
+                                    if(VariationDetail.options.hasOwnProperty('modifiers')) {
+                                        if(Array.isArray(VariationDetail.options.modifiers) == true ) {
+                                            for (var m=0;m<VariationDetail.options.modifiers.length;m++) {
+                                                if(VariationDetail.options.modifiers[m].type === 'price_increment') {
+                                                    var price = VariationDetail.options.modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                            
+                                                    optionObject.variations[VariationDetail.options.id] = {
+                                                        title      : VariationDetail.options.name ,
+                                                        product    : results[j].id,
+                                                        modifer    : VariationDetail.options.modifiers[m].id,
+                                                        mod_price  : "+"+price ,
+                                                        id         : VariationDetail.options.id,
+                                                        difference : price
+                                                    }
+
+                                                    modifer[VariationDetail.options.modifiers[m].id] = {
+                                                        id : VariationDetail.options.modifiers[m].id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options.modifiers[m].type,
+                                                            data  : VariationDetail.options.modifiers[m].value[0]
+                                                        }
+                                                    }
+                                                } else {
+                                                    modifer[VariationDetail.options.modifiers[m].id] = {
+                                                        id : VariationDetail.options.modifiers[m].id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options.modifiers[m].type,
+                                                            data  : VariationDetail.options.modifiers[m].value
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            if  (VariationDetail.options.modifiers.type === 'price_increment') {
+                                                var price = VariationDetail.options.modifiers.value[0].amount/PRICE_MODIFIER ; 
+                                  
+                                                optionObject.variations[VariationDetail.options.id] = {
+                                                    title      : VariationDetail.options.name ,
+                                                    product    : results[j].id,
+                                                    modifer    : VariationDetail.options.modifiers.id,
+                                                    mod_price  : "+"+price ,
+                                                    id         : VariationDetail.options.id,
+                                                    difference : price
+                                                }
+
+                                                modifer[VariationDetail.options.modifiers.id] = {
+                                                    id : VariationDetail.options.modifiers.id,
+                                                    order : null,
+                                                    type : {
+                                                        value : VariationDetail.options.modifiers.type,
+                                                        data  : VariationDetail.options.modifiers.value[0]
+                                                    }
+                                                }
+
+                                            } else {
+                                                modifer[VariationDetail.options.modifiers.id] = {
+                                                        id : VariationDetail.options.modifiers.id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options.modifiers.type,
+                                                            data  : VariationDetail.options.modifiers.value
+                                                        }
+                                                    }
+                                            }
+                                        }
+                                    }
+                                }
+                            } 
+                        }
+                    } else {
+                        var variationId =  relationship.variations.data.id 
+                        var VariationDetail = yield msc.findoptionCategory(variationId)
+                        if(VariationDetail.hasOwnProperty('options')) {
+                            if(Array.isArray(VariationDetail.options) == true ) {
+                                for(var k=0;k<VariationDetail.options.length;k++) {
+                                    if(VariationDetail.options[k].hasOwnProperty('modifiers')) {
+                                        if(Array.isArray(VariationDetail.options[k].modifiers) == true ) {
+                                            for(var m=0;m<VariationDetail.options[k].modifiers.length;m++) {
+                                                if(VariationDetail.options[k].modifiers[m].type === 'price_increment') {
+                                                    var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
+                                        
+                                                    optionObject.variations[VariationDetail.options[k].id] = {
+                                                        title      : VariationDetail.options[k].name ,
+                                                        product    : results[j].id,
+                                                        modifer    : VariationDetail.options[k].modifiers[m].id,
+                                                        mod_price  : "+"+price ,
+                                                        id         : VariationDetail.options[k].id,
+                                                        difference : price
+                                                    }
+
+                                                    modifer[VariationDetail.options[k].modifiers[m].id] = {
+                                                        id : VariationDetail.options[k].modifiers[m].id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options[k].modifiers[m].type,
+                                                            data  : VariationDetail.options[k].modifiers[m].value[0]
+                                                        }
+                                                    }
+                                                } else {
+                                                    modifer[VariationDetail.options[k].modifiers[m].id] = {
+                                                        id : VariationDetail.options[k].modifiers[m].id,
+                                                        order : null,
+                                                        type : {
+                                                            value : VariationDetail.options[k].modifiers[m].type,
+                                                            data  : VariationDetail.options[k].modifiers[m].value
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
 
                                     if(VariationDetail.options[k].modifiers.type === 'price_increment')
                                       {
@@ -919,29 +794,21 @@ exports.listMenuItems=function *(next) {
                                                 }
                                               }
 
-                                      }
-                                      else
-                                      {
-                                        modifer[VariationDetail.options[k].modifiers.id] = {
-                                                id : VariationDetail.options[k].modifiers.id,
-                                                order : null,
-                                                type : {
+                                    }
+                                      else {
+                                          modifer[VariationDetail.options[k].modifiers.id] = {
+                                            id : VariationDetail.options[k].modifiers.id,
+                                            order : null,
+                                            type : {
                                                 value : VariationDetail.options[k].modifiers.type,
                                                 data  : VariationDetail.options[k].modifiers.value
-                                                }
+                                            }
                                         }
 
                                       }
-                                    
-
-
                                   }
-                                    
-                                  
-                              }
-
-                            }
-                              
+                                }
+                            } 
                           }
                           else
                           {
@@ -1077,7 +944,7 @@ exports.listMenuItems=function *(next) {
                 filteredItems.push(newResult)
               }
             }
-          }
+        }
   } catch (err) {
     console.error('error retrieving menu items from ordering system ')
     throw(err)

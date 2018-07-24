@@ -11,42 +11,81 @@ chai.use(chaiHttp);
 // TEST MOLTIN INTEGRATIONS
 
 var tests = "- Storefront Tests - ";
-var defaultCat = '';
 
 // UNAUTHENTICATED ROUTES
-// Test SFEZ Postgres has Moltin-mapped companies
-describe(tests +' GET /api/v1/mol/companies', function() {
-  it('should return all companies in SFEZ db', function(done) {
+
+// Create company
+var ts = Date.now();
+var userId = '123';
+var companyId = '';
+var ecommercId = '';
+var defaultCat = ''; 
+var dailySpecialCat = '';
+var deliveryChargeCat = '';
+var deliveryChargeItem = '';
+var authName = 'auth.test'+ ts;
+var companyName = 'Auth Test Co '+ ts;
+var countryId = 1;
+
+describe(tests +' POST /auth/register', function() {
+  it('should register company and return JWT token', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies')
-    .end(function(err, res) {
-        res.should.have.status(200);
+    .post('/auth/register')
+    .send( {
+        "first_name": "Arthur",
+        "last_name": "Test",
+        "company_name": companyName,
+        "email": authName+"@gmail.com",
+        "password": authName,
+        "role": "OWNER",
+        "country_id" : countryId
+    })
+    .end(function (err, res) {
+        console.log(err);
+        res.should.have.status(201);
         res.should.be.json;
-        res.body.should.be.a('array');
+        res.body.should.be.a('object')
+        res.body.should.have.property('token');
+        res.body.should.have.property('user');
+        res.body.user.should.have.property('id');
+
+        userId = res.body.user.id;
+
+        res.body.user.should.have.property('username');
+        res.body.user.username.should.equal(authName+'@gmail.com');
+        res.body.user.should.have.property('role');
+        res.body.user.role.should.equal('OWNER');
+        res.body.user.should.have.property('company_id');
+
+        companyId = res.body.user.company_id;
+
         done();
     });
   });
 });
 
+
 // Test SFEZ Postgres has specfic company
-describe(tests +' GET /api/v1/mol/companies/11002', function() {
-  it('should return company 11002: Classy Cuban from SFEZ db', function(done) {
+describe(tests +' GET /api/v1/mol/companies/{companyId}', function() {
+  it('should return test company '+ companyId +' from SFEZ db', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/11002')
+    .get('/api/v1/mol/companies/'+ companyId)
     .end(function(err, res) {
     res.should.have.status(200);
     res.should.be.json;
     res.body.should.be.a('object');
     res.body.should.have.property('id');
-    res.body.id.should.equal(1008);
+    res.body.id.should.equal(companyId);
     res.body.should.have.property('name');
-    res.body.name.should.equal('Classy Cuban');
+    res.body.name.should.equal(companyName);
     res.body.should.have.property('order_sys_id');
-    res.body.order_sys_id.should.equal('1555978584605066120');
     res.body.should.have.property('default_cat');
-    res.body.default_cat.should.equal('1555978591534056329');
-    
+
+    ecommercId = res.body.order_sys_id;
     defaultCat = res.body.default_cat;
+    dailySpecialCat = res.body.daily_special_cat_id;
+    deliveryChargeCat = res.body.delivery_chg_cat_id;
+    deliveryChargeItem = res.body.delivery_chg_cat_item_id;
 
     done();
     });
@@ -54,16 +93,16 @@ describe(tests +' GET /api/v1/mol/companies/11002', function() {
 });
 
 // Test retrieval of Moltin categories
-describe(tests +' GET /api/v1/mol/companies/11002/categories', function() {
-  it('should return menu categories for 11002: Classy Cuban from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/{companyId}/categories', function() {
+  it('should return menu categories from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/11002/categories')
+    .get('/api/v1/mol/companies/'+ companyId +'/categories')
     .end(function(err, res) {
-        console.log(res.body);
         res.body.should.be.a('array');
-        res.body[0].should.have.property('slug');
-        res.body[0].should.have.property('company');
-        res.body[0].company.value.should.equal('Classy Cuban');
+        for (var i = 0; i < res.body.length; i++) {
+            res.body[i].should.have.property('company');
+            res.body[i].company.should.equal(ecommercId);
+        }
         done();
     });
   });
@@ -72,16 +111,16 @@ describe(tests +' GET /api/v1/mol/companies/11002/categories', function() {
 
 
 // Test retrieval of one Moltin category
-describe(tests +' GET /api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853', function() {
-  it('should return Dinner category for 11002: Classy Cuban from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/{companyId}/categories/{deliveryChargeCat}', function() {
+  it('should return Delivery Charge category for '+ companyId +' from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853')
+    .get('/api/v1/mol/companies/'+ companyId + '/categories/'+ deliveryChargeCat)
     .end(function(err, res) {
     res.should.have.status(200);
     res.should.be.json;
     res.body.should.be.a('object');
-    res.body.should.have.property('title');
-    res.body.title.should.equal('Dinner');
+    res.body.should.have.property('name');
+    res.body.name.should.equal('Delivery Charge Category');
     done();
     });
   });
@@ -89,41 +128,41 @@ describe(tests +' GET /api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-
 
 
 // Test retrieval of menu items for Company and Category
-describe(tests +' GET /api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853/menuitems', function() {
-  it('should return menu items for 11002: Classy Cuban - Dinner category from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/{companyId}/categories/{deliveryChargeCat}/menuitems', function() {
+  it('should return menu items for Delivery Charge category from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/11002/categories/532ce69b-a18e-41b0-be73-b298fd034853/menuitems')
+    .get('/api/v1/mol/companies/'+ companyId + '/categories/'+ deliveryChargeCat +'/menuitems')
     .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('array');
-      res.body[0].should.have.property('slug');
-      res.body[0].slug.should.equal('koolaid-1530795364335-taco-salad');
-      res.body[0].should.have.property('title');
-      res.body[0].title.should.equal('Taco Salad');
-      done();
+        console.log(res.body);
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body[0].should.have.property('slug');
+        res.body[0].should.have.property('name');
+        res.body[0].name.should.equal('Delivery Charge');
+        done();
     });
   });
 });
 
 // Test retrieval of a specific menu item for Company and Category
-describe(tests +' GET /api/v1/mol/companies/11002/menuitems/4c0e2107-d4af-4d44-ba45-c9be478ac346', function() {
-  it('should return Taco Salad for 11002: Classy Cuban - Dinner category from Moltin', function(done) {
+describe(tests +' GET /api/v1/mol/companies/{companyId}/menuitems/{deliveryChargeItem}', function() {
+  it('should return Delivery Charge menu item from Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/11002/menuitems/4c0e2107-d4af-4d44-ba45-c9be478ac346')
+    .get('/api/v1/mol/companies/'+ companyId + '/menuitems/'+ deliveryChargeItem)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('slug');
-      res.body.slug.should.equal('koolaid-1530795364335-taco-salad');
       res.body.should.have.property('title');
-      res.body.title.should.equal('Taco Salad');
+      res.body.title.should.equal('Delivery Charge');
       done();
     });
   });
 });
 
+/*
 // Test retrieval of option categories for specific menu item for Company and Category
 describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories', function() {
   it('should return option categories for BBQ Loaf for Grilla Cheez - Dinner category from Moltin', function(done) {
@@ -179,6 +218,7 @@ describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
     });
   });
 });
+*/
 
 // AUTHENTICATED ROUTES
 
@@ -649,3 +689,103 @@ describe(tests +' Delete /api/v1/mol/companies/1008/menuitems/<menutItemId>/opti
     });
   });
 });
+
+// Clean up
+describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and product for delivery charge', function() {
+    it('should login and retrieve JWT token', function(done) {
+      chai.request(server)
+      .post('/auth/login')
+      .send({
+          "username": authName+"@gmail.com",
+          "password": authName
+      })
+      .end(function (err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object')
+        // Save the JWT token
+        res.body.should.have.property('token');
+        token = res.body.token;
+  
+        res.body.should.have.property('user');
+        res.body.user.should.have.property('id');
+        res.body.user.should.have.property('username');
+        res.body.user.username.should.equal(authName+'@gmail.com');
+        res.body.user.should.have.property('role');
+        res.body.user.role.should.equal('OWNER');
+        done();
+      });
+    });
+    it('should delete "Delivery Charge" item from company', function(done) {
+      chai.request(server)
+      .delete('/api/v1/mol/companies/' + companyId +'/menuitems/'+ deliveryChargeItem)
+      .set('Authorization', token)
+      .end(function(err, res) {
+          res.should.have.status(200);
+          res.should.be.json;
+          console.log(res.body);
+          res.body.should.be.a('object');
+          res.body.should.have.property('status')
+          res.body.status.should.equal('ok')
+          res.body.should.have.property('message')
+          res.body.message.should.equal('Deleted successfully');
+          done();
+          });
+      });
+    it('should delete "Delivery Charge Category" category from company', function(done) {
+      chai.request(server)
+      .delete('/api/v1/mol/companies/' + companyId +'/categories/'+ deliveryChargeCat)
+      .set('Authorization', token)
+      .end(function(err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.should.have.property('status')
+        res.body.status.should.equal('ok')
+        res.body.should.have.property('message')
+        res.body.message.should.equal('Deleted successfully');
+        done();
+      });
+    });
+    it('should delete Auth Testing company', function(done) {
+      chai.request(server)
+      .delete('/api/v1/mol/companies/' + companyId)
+      .set('Authorization', token)
+      .end(function(err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        console.log(res.body);
+        res.body.should.have.property('status')
+        res.body.status.should.equal('ok')
+        res.body.should.have.property('message')
+        res.body.message.should.equal('Deleted successfully');
+        done();
+      });
+    });
+    it('should delete user', function(done) {
+      chai.request(server)
+        .post('/auth/login')
+        .send({
+            'username' : utils.adminCredentials.username,
+            'password' : utils.adminCredentials.password
+        })
+        .end(function (err, res) {
+            token = res.body.token;
+            console.log(token);
+  
+            chai.request(server)
+            .delete('/api/v1/rel/users/' + userId)
+            .set('Authorization', token)
+            .end(function(err, res) {
+              res.should.have.status(200);
+              res.should.be.json;
+              res.body.should.be.a('object');
+              res.body.is_deleted.should.equal(true);
+              done();
+            });
+        });
+  
+  
+    });
+  });
