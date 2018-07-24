@@ -46,68 +46,61 @@ function *simplifyDetails(orderDetail) {
     debug('Order Detail:');
     debug(orderDetail);
     var items = orderDetail; 
-    debug('Number of items in order: '+ items.result.length);
-    meta.num_items = items.result.length;
-    logger.info('Processing '+ items.length + ' items in order', meta); 
-    var menuItems = {}; 
-    for (i = 0; i < items.result.length; i++ ) {
-        item = items.result[i]; // get an order item for processing
-        debug('menu item ') 
-        debug(item.name) 
-        debug('quantity ') 
-        debug(item.quantity) 
-        debug('amount') 
-        var itemDetail = {
-            title : item.name,
-            quantity : item.quantity
-        } 
-        if (item.data.modifiers) { 
-            debug('modifiers') 
-            var modifiers = item.data.modifiers
-            itemDetail.options = [];
-            itemDetail.selections = {};
-            for (var j in modifiers) { 
-                debug(modifiers[j].name) 
-                var mod = modifiers[j] 
-                debug(mod) 
-                if (!mod.type && mod.data.type.name == 'Option') { // price associated with Variant
-                    debug(mod.data.name + ': '+ mod.var_name) 
-                    itemDetail.selections[mod.data.name] = mod.var_name
-                } else { // option items or single selections
-                    var titles = []; 
-                    if (mod.type.name == 'Option') {
-                        for (var k in mod.variations) { 
-                            var variation = mod.variations[k] 
-                            debug('... variant '+ variation.name); 
-                            debug('...'+ variation.id); 
-                            titles.push(variation.name); 
-                        } 
-                        itemDetail.selections[mod.name]=titles
-                    } else if (mod.type.value == 'Extra') { 
-                        for (var k in mod.variations) { 
-                            var variation = mod.variations[k] 
-                            debug('... option '+ variation.name); 
-                            debug('... id '+ variation.id); 
-                            debug('... parent '+ variation.modifier); 
-                            var options = item.options[variation.modifier]; 
-                            if (options && options[variation.id] ) { 
-                                debug('... option '+ variation.name +' was selected'); 
-                                titles.push(variation.name); 
-                            } 
-                        } 
-                        itemDetail.options = titles; 
-                    } 
-                } 
-            } 
-        } 
-        debug('... add item detail to list '); 
-        debug(itemDetail); 
-        menuItems[item.product_id] = itemDetail; 
-        debug(menuItems); 
+    var itemsData = items[0].data;
+    debug('Number of items in order: '+ itemsData.length);
+    meta.num_items = itemsData.length;
+    logger.info('Processing '+ itemsData.length + ' items in order', meta);
+
+    var menuItems = getSkuFromOrderDetail(itemsData);
+    for (var key in menuItems) {
+      menuItems[key].options = getExtraSkuFromOrderDetail(itemsData, menuItems[key].sku);
+      delete menuItems[key].sku;
     }
+
     logger.info('Order details simplified', meta);
     debug(menuItems);
     return menuItems;
+}
+
+function getSkuFromOrderDetail(orderDetailItems) {
+  var menuItems = {};
+  for (i = 0; i < orderDetailItems.length; i++ ) {
+    item = orderDetailItems[i];
+    if (!item.sku.startsWith("Extra")) {
+      var itemDetail = {
+          title: item.name,
+          sku: item.sku,
+          quantity: item.quantity,
+          options: [],
+          selections: {}
+      }
+      menuItems[item.product_id] = itemDetail;
+    }
+  }
+
+  return menuItems;
+}
+
+function getExtraSkuFromOrderDetail(orderDetailItems, productSku){
+  extraOptionItems = []
+  for (i = 0; i < orderDetailItems.length; i++ ) {
+    item = orderDetailItems[i];
+    /*
+     * Considering the productSku:
+     *  koolaid-1530795364335-burrito
+     *
+     * This filter will return one extra sku like the following:
+     *  Extra-Chips-and-Salsa-koolaid-1530795364335-burrito
+     *
+     * But not:
+     *  Extra-Chips-and-Salsa-koolaid-1530795364335-burrito2
+     */
+    if (item.sku.startsWith("Extra") && item.sku.endsWith(productSku)) {
+      extraOptionItems.push(item.name);
+    }
+  }
+
+  return extraOptionItems;
 }
 
 function * calculateDeliveryPickup(unitId, deliveryTime) {
@@ -340,27 +333,6 @@ function * beforeSaveOrderHistory() {
     }
 
     if (eCommerce) {
-      //Determine whether it is Square or Moltin API
-      var squareInfo = yield Square.getUnitSquareInfo(unitId);
-
-      if (squareInfo && squareInfo.location_id) {
-        logger.info('Square order');
-        var square_order_id = osoId;
-
-        var orderDetails = yield Square.getOrder(squareInfo.location_id, square_order_id);
-        var parsedOrderDetails = Square.simplifySquareOrderDetails(orderDetails);
-
-        if (Object.keys(parsedOrderDetails).length === 0) {
-          logger.error('Invalid square order id');
-          throw new Error('Invalid square order id', 422);
-        }
-
-        this.resteasy.object.amount = Format.formatPrice(orderDetails.total_money.currency, getSquareMoneyValue(orderDetails.total_money.amount));
-        this.resteasy.object.order_detail = parsedOrderDetails;
-        delete this.resteasy.object.files;
-      }
-
-      else {
         // get order details and streamline for display
         var moltin_order_id = osoId;
         var order_details = {};
@@ -403,9 +375,6 @@ function * beforeSaveOrderHistory() {
           }
         }
 
-
-
-
         if (this.passport.user.role !== 'CUSTOMER')
           this.resteasy.object.status.created_by = this.passport.user.id;
 
@@ -419,7 +388,6 @@ function * beforeSaveOrderHistory() {
         }
 
         debug(this.resteasy.object);
-        // }
 
         // Handle delivery details
         if (this.resteasy.object.for_delivery) {
@@ -478,7 +446,6 @@ function * beforeSaveOrderHistory() {
             this.resteasy.object.desired_pickup_time = pickup;
           }
         }
-      }
 
       // Ready to save
       debug(this.resteasy.object);
