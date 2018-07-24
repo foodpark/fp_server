@@ -28,8 +28,8 @@ exports.findByCheckinTimebox = function(latitude, longitude, distance, searchtim
     var maxlon = lon1;
   }
   return knex('checkins').select(['units.id as id','units.name','companies.name as company_name','units.number','units.customer_order_window','units.territory_id','units.type','units.description','units.qr_code','units.unit_order_sys_id','units.delivery', 'units.prepay', 'checkins.latitude','checkins.longitude','checkins.company_id','checkins.check_in','checkins.check_out','checkins.food_park_name','checkins.food_park_id','checkins.display_address','companies.tags','companies.calculated_rating as rating','companies.photo'])
-  .whereRaw('(latitude >= ? and latitude <= ?) and (longitude >= ? and longitude <= ?) and check_in < ? and check_out IS NULL',
-  [minlat, maxlat, minlon, maxlon, searchtime]).andWhere('units.is_deleted',false).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');
+  .whereRaw('(latitude >= ? and latitude <= ?) and (longitude >= ? and longitude <= ?) and check_in < ? and check_out > ?',
+  [minlat, maxlat, minlon, maxlon, searchtime, searchtime]).andWhere('units.is_deleted',false).innerJoin('units','units.id','checkins.unit_id').innerJoin('companies','companies.id','checkins.company_id');
 };
 
 exports.getCompanyUnit = function (unitId) {
