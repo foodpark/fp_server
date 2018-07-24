@@ -23,18 +23,18 @@ var getUnitInfo = function(id, callback) {
     });
 }
 
-var doCheckIn = function(unitData, currentDateTime, callback) {
+var doCheckIn = function(unitData, currentDateTime, expectedCloseHour, callback) {
   knex('checkins').insert({company_id: unitData.company_id, unit_id: unitData.id,
-                            check_in: currentDateTime, latitude: unitData.latitude,
-                            longitude: unitData.longitude, food_park_id: unitData.food_park_id,
-                            food_park_name: unitData.name})
+                            check_in: currentDateTime, check_out: expectedCloseHour,
+                            latitude: unitData.latitude, longitude: unitData.longitude,
+                            food_park_id: unitData.food_park_id, food_park_name: unitData.name})
     .then(function(result) {
       callback(result);
     });
 }
 
 var doCheckOut = function(unitData, currentDateTime, callback) {
-  knex('checkins').where({company_id: unitData.company_id, unit_id: unitData.id}).andWhere('check_out', null)
+  knex('checkins').where({company_id: unitData.company_id, unit_id: unitData.id}).andWhere('check_out', '>=', currentDateTime)
     .update({check_out: currentDateTime})
     .then(function(result){
       callback(result);
@@ -112,6 +112,20 @@ var parseHour = function(hourRaw) {
   return hourData;
 }
 
+var getExpectedCloseHour = function(openCloseHour) {
+  var closeHour = new Date();
+
+  if (openCloseHour.close.hour - openCloseHour.open.hour < 0) {
+    closeHour.setDate(closeHour.getDate() + 1);
+  }
+  closeHour.setHours(openCloseHour.close.hour);
+  closeHour.setMinutes(openCloseHour.close.minutes);
+  closeHour.setSeconds(59);
+  closeHour.setMilliseconds(999);
+
+  return closeHour;
+}
+
 // Main logic
 cron.schedule('0,59 * * * *', function() {
   main();
@@ -142,7 +156,8 @@ var main = function() {
             getUnitInfo(row.id, function(result){
               if (result[0].id) {
                 console.log('Check-in: Unit ' + row.id);
-                doCheckIn(result[0], currentDateTime, function(result) {});
+                expectedCloseHour = getExpectedCloseHour(openCloseHour);
+                doCheckIn(result[0], currentDateTime, expectedCloseHour, function(result) {});
                 updateUnitData(result[0], function(result) {})
               }
             });
