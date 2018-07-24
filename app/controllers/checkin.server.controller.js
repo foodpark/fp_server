@@ -24,7 +24,7 @@ exports.createCheckin = function * (next) {
         var unitResponse = yield Unit.updateUnit(checkin.unit_id, unitData[0]);
 
         this.status = 201;
-        this.body = {message : 'Request created.', data : response};
+        this.body = response[0];
     } catch (err) {
         logger.error('Error saving request.');
         this.status = 500; // Internal Server Error - Operation Failed
