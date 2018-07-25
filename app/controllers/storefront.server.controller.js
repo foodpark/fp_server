@@ -434,8 +434,8 @@ exports.createMenuItem=function *(next) {
            
            // fetch product under category
            var categoryResults = yield msc.listMenuItems(this.category.id)
-           var filteredItems = []
-              if (categoryResults && categoryResults.length > 0){
+           var filteredItems = categoryResults
+              /*if (categoryResults && categoryResults.length > 0){
 
                   for (var j=0; j<categoryResults.length; j++){
 
@@ -443,7 +443,7 @@ exports.createMenuItem=function *(next) {
                       filteredItems.push(categoryResults[j])
                     }
                   }
-              }
+              }*/
 
             if(filteredItems.length > 0)
             {
@@ -532,7 +532,7 @@ exports.listMenuItems=function *(next) {
   debug(data)
   try {
     var results = (yield msc.listMenuItems(this.category));
-    console.log('>>>>>')
+    
     debug('Found '+ results.length +' items');
     //return results;
     var filteredItems = [];
@@ -542,7 +542,7 @@ exports.listMenuItems=function *(next) {
             // TODO: remove when moltin filter works
             debug('MENU ITEM')
             debug(results[j]); 
-            if (results[j].category === this.category.id) {
+            //if (results[j].category === this.category.id) {
               console.log('3')
                 /*------ json mapping start ---- */
                 results[j]['title'] = results[j].name ;
@@ -778,7 +778,7 @@ exports.listMenuItems=function *(next) {
                 
                 
                 filteredItems.push(newResult)
-              }
+              //}
             }
         }
   } catch (err) {
