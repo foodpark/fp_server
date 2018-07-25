@@ -380,7 +380,7 @@ exports.findMenuItem=function(menuItemId) {
 exports.listMenuItems=function(category) {
   debug('listMenuItems')
   debug(category);
-  var params = `filter=eq(category.id,${category.id})`
+  var params = `filter=eq(category.id,'${category.id}')`
   debug('Filtering by : '+ params);
   return requestEntities(MENU_ITEMS, GET, '', '', params)
 };
