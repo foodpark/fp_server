@@ -433,7 +433,8 @@ exports.createMenuItem=function *(next) {
       try {
            
            // fetch product under category
-           var categoryResults = yield msc.listMenuItems(this.category.id)
+           var category_id  = {id : this.category.id }
+           var categoryResults = yield msc.listMenuItems(category_id)
            var filteredItems = categoryResults
               /*if (categoryResults && categoryResults.length > 0){
 
@@ -450,10 +451,12 @@ exports.createMenuItem=function *(next) {
               console.log('product hai ')
               if(filteredItems[0].relationships.hasOwnProperty('variations'))
               {
+                 console.log('>>> variation haiiiii')
                  var variationId = filteredItems[0].relationships.variations.data[0].id ;
               }
               else
               {
+                console.log('variation nahi hai ')
                 var createVariation = yield msc.createOptionCategory('EXTRAS')
                 var variationId =  createVariation.id ;
 
@@ -472,7 +475,7 @@ exports.createMenuItem=function *(next) {
             {
               var createVariation = yield msc.createOptionCategory('EXTRAS')
                var variationId =  createVariation.id ;
-               console.log('nahi hai')
+               console.log('product nahi hai')
               
             }
 
@@ -748,6 +751,7 @@ exports.listMenuItems=function *(next) {
                       {
                         results[j]['is_variation'] = true ;
                          optionObject['modifiers'] = modifer 
+
                          var newResult = [results[j],optionObject]
                       }
                       else
@@ -864,6 +868,7 @@ if (Array.isArray(relationship.variations.data) == true ) {
                 for(var k=0;k<VariationDetail.options.length;k++) {
                     if(VariationDetail.options[k].hasOwnProperty('modifiers')) {
                         if(Array.isArray(VariationDetail.options[k].modifiers) == true ) {
+
                             for(var m=0;m<VariationDetail.options[k].modifiers.length;m++) {
                                 if(VariationDetail.options[k].modifiers[m].type === "price_increment") {
                                     var price = VariationDetail.options[k].modifiers[m].value[0].amount/PRICE_MODIFIER ; 
@@ -1004,7 +1009,6 @@ if (Array.isArray(relationship.variations.data) == true ) {
     }
 }
 
- 
 if(isEmpty(modifer) == false)
 {
     menuItemDetail['is_variation'] = true ;
@@ -1019,6 +1023,7 @@ else
 
 }
 
+
 }
 else
 {                
@@ -1026,7 +1031,7 @@ else
   var newResult = [menuItemDetail]
 }
 
-var newResult = [menuItemDetail]
+
 if(newResult[0].hasOwnProperty('meta'))
 {
   if(newResult[0].meta.hasOwnProperty('variations'))
@@ -1036,10 +1041,9 @@ if(newResult[0].hasOwnProperty('meta'))
     delete newResult[0].meta.variations;
   }
 }
-
+console.log('final >>',newResult)
 filteredItems.push(newResult)
   this.body = filteredItems
-  
   
   return ;
 }
@@ -1634,11 +1638,11 @@ exports.createOptionItem=function *(next) {
           
 
           // automatic mapped with all product into same category
-          var categoryId = this.menuItem.category ; 
+          var categoryId = {id : this.menuItem.relationships.categories.data[0].id }; 
 
           var categoryResults = yield msc.listMenuItems(categoryId)
-          var filteredItems = []
-              if (categoryResults && categoryResults.length > 0){
+          var filteredItems = categoryResults
+          /* if (categoryResults && categoryResults.length > 0){
 
                   for (var j=0; j<categoryResults.length; j++){
 
@@ -1646,7 +1650,7 @@ exports.createOptionItem=function *(next) {
                       filteredItems.push(categoryResults[j])
                     }
                   }
-              }
+              }*/
 
           for (var i=0;i<filteredItems.length;i++){
               
@@ -2026,11 +2030,10 @@ exports.createOptionCategory=function *(func, params, next) {
         var results = yield msc.createOptionCategory(title)
         
         //var relationship_result = yield msc.createRelationship(this.menuItem.id, results.id)
-        var categoryId = this.menuItem.category ; 
-
+         var categoryId = {id : this.menuItem.relationships.categories.data[0].id };
           var categoryResults = yield msc.listMenuItems(categoryId)
-          var filteredItems = []
-              if (categoryResults && categoryResults.length > 0){
+          var filteredItems = categoryResults
+             /* if (categoryResults && categoryResults.length > 0){
 
                   for (var j=0; j<categoryResults.length; j++){
 
@@ -2038,7 +2041,7 @@ exports.createOptionCategory=function *(func, params, next) {
                       filteredItems.push(categoryResults[j])
                     }
                   }
-              }
+              }*/
 
           for (var i=0;i<filteredItems.length;i++){
               
