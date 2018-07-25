@@ -251,31 +251,33 @@ exports.createDefaultCategory=function(moltincompany) {
 };
 
 exports.createCategory=function *(company, catTitle, catParent) {
-  debug('createCategory')
-  debug(company)
-  var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
-  if (!catParent) catParent = company.default_cat;
-  var data = {
-      parent: catParent,
-      slug : catSlug,
-      status : 'live',
-      name : catTitle,
-      description : catTitle,
-      company : company.order_sys_id,
-      type: 'category'
-
-  }
-  debug(data)
-  var category = yield requestEntities(CATEGORIES, POST, data);
-  try {
-    var relationships = yield requestEntities(`${CATEGORIES}/${category.id}/relationships/parent`, POST, {
-      type: 'category',
-      id: catParent
-    });
-  } catch (error) {
-    console.log('category create relationship error', error)
-  }
-  return category;
+    debug('createCategory')
+    debug(company)
+    var meta = {fn: 'createCategory', company_id: company.id, cat_name: catTitle, cat_parent: catParent};
+    logger.info('Creating category for company', meta);
+    var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
+    if (!catParent) catParent = company.default_cat;
+    var data = {
+        slug : catSlug,
+        status : 'live',
+        name : catTitle,
+        description : catTitle,
+        company : company.order_sys_id,
+        type: 'category'
+    }
+    debug(data)
+    var category = yield requestEntities(CATEGORIES, POST, data);
+    try {
+        var relationships = yield requestEntities(`${CATEGORIES}/${category.id}/relationships/parent`, POST, {
+            type: 'category',
+            id: catParent
+        });
+    } catch (error) {
+        console.log('category create relationship error', error)
+    }
+    debug('relationships')
+    debug(relationships)
+    return relationships;
 };
 
 exports.findCategory=function (categoryId) {
@@ -284,11 +286,34 @@ exports.findCategory=function (categoryId) {
   return requestEntities(CATEGORIES, GET, '', categoryId)
 };
 
-exports.listCategories=function(company) {
-  debug('listCategories')
-  debug(company.order_sys_id)
-  return requestEntities(CATEGORIES, GET, '', '', 'company='+company.order_sys_id)
+exports.listCategories=function *(company) {
+    debug('listCategories')
+    var meta = {fn: 'listCategories', company_id: company.id, default_cat: company.default_cat};
+    logger.info('List categories for company', meta);
+    var defcat = yield requestEntities(CATEGORIES, GET, '', company.default_cat);
+    var cats = [];
+    if (defcat.relationships && defcat.relationships.children) { 
+        var children = defcat.relationships.children.data;
+        var child = '';
+        var aCat = '';
+        meta.num_relationships = children.length;
+        logger.info('Got category relationships', meta);
+        for (var i = 0; i < children.length; i++) {
+            child = children[i];
+            debug(child);
+            if ('category' == child.type) {
+                aCat = yield requestEntities(CATEGORIES, GET, '', child.id);
+                debug(aCat);
+                cats.push(aCat);
+            }
+        }
+    }
+    debug(cats);
+    meta.num_categories = cats.length;
+    logger.info('Returning categories for company', meta);
+    return cats;
 };
+
 exports.updateCategory=function(categoryId, data) {
   debug('updateCategory')
   return requestEntities(CATEGORIES, PUT, data, categoryId)
@@ -298,53 +323,55 @@ exports.deleteCategory=function(categoryId) {
   return requestEntities(CATEGORIES, DELETE, '', categoryId)
 };
 
-exports.createMenuItem = function(company, title, status, price, category, description, taxBand, currency) {
-  debug('createMenuItem')
-  //generate unique sku
-  var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
-  var slug = sku;
-  var status = (status?status:1) ; // is live
-  var stockLevel = 10000000;
-  var stockStatus = 0; // unlimited
-  var requiresShipping = 0; // No shipping required
-  var catalogOnly = 0; // Not catalog only
- 
-  if (!taxBand){
-     taxBand=config.defaultTaxBand;
-  }
-  var data = {
-      type: 'product',
-      name: title,
-      slug: slug,
-      sku: sku,
-      manage_stock: false,
-      description: description,
-      price: [
-        {
-          amount: price * PRICE_MODIFIER,
-          currency: currency,
-          includes_tax: false
-        }
-      ],
-      status: 'live',
-      commodity_type: 'physical',
-      meta: {
-        stock: {
-          level: stockLevel
-        }
-      },
+exports.createMenuItem = function *(company, title, status, price, category, description, taxBand, currency) {
+    debug('createMenuItem')
+    debug(company)
+    var meta = {fn: 'createMenuItem', company_name: company.name, title: title, category: category};
+    logger.info('Creating menu item', meta);
+    //generate unique sku
+    var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
+    var slug = sku;
+    var status = (status?status:1) ; // is live
+    meta.sku = sku
+   
+    var data = {
+        type: 'product',
+        name: title,
+        slug: slug,
+        sku: sku,
+        manage_stock: false,
+        description: description,
+        price: [
+            {
+            amount: price * PRICE_MODIFIER,
+            currency: currency,
+            includes_tax: false
+            }
+        ],
+        status: 'live',
+        commodity_type: 'physical',
+        company : company.order_sys_id
+    }
+    debug(data)
+    logger.info('Creating menu item', meta);
+    var menuitem = yield requestEntities(MENU_ITEMS, POST, data);
+    meta.menu_item_id = menuitem.id;
+    logger.info('Menu item created', meta);
 
-      category : category,
-      stock_level : stockLevel,
-      stock_status : stockStatus,
-      requires_shipping : requiresShipping,
-      catalog_only : catalogOnly,
-      tax_band : taxBand,
-      company : company.order_sys_id
-  }
-  debug(data)
-  return requestEntities(MENU_ITEMS, POST, data)
+    logger.info('Creating menu item-category relationship', meta);
+    try {
+        var relationship = yield requestEntities(`${MENU_ITEMS}/${menuitem.id}/relationships/categories`, POST, 
+        [{
+            type: 'category',
+            id: category
+        }]);
+    } catch (error) {
+        meta.error = error;
+        logger.error('Menuitem - category relationship creation error', meta);
+    }
+    return menuitem;
 };
+
 exports.findMenuItem=function(menuItemId) {
   debug('findMenuItem')
   return requestEntities(MENU_ITEMS, GET, '', menuItemId)
@@ -352,7 +379,9 @@ exports.findMenuItem=function(menuItemId) {
 
 exports.listMenuItems=function(category) {
   debug('listMenuItems')
-  var params = `filter=eq(category,'${category.id}')`
+  debug(category);
+  var params = `filter=eq(category.id,${category.id})`
+  debug('Filtering by : '+ params);
   return requestEntities(MENU_ITEMS, GET, '', '', params)
 };
 
@@ -500,9 +529,6 @@ exports.createRelationship = function *(menuItemId ,variationId) {
       reject (err)
     })
   })
-   
-
-
 
     //return requestEntities(product_rel_url ,POST,relationData)
 }
