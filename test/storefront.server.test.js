@@ -18,7 +18,7 @@ var tests = "- Storefront Tests - ";
 var ts = Date.now();
 var userId = '123';
 var companyId = '';
-var ecommercId = '';
+var ecommerceId = '';
 var defaultCat = ''; 
 var dailySpecialCat = '';
 var deliveryChargeCat = '';
@@ -81,7 +81,7 @@ describe(tests +' GET /api/v1/mol/companies/{companyId}', function() {
     res.body.should.have.property('order_sys_id');
     res.body.should.have.property('default_cat');
 
-    ecommercId = res.body.order_sys_id;
+    ecommerceId = res.body.order_sys_id;
     defaultCat = res.body.default_cat;
     dailySpecialCat = res.body.daily_special_cat_id;
     deliveryChargeCat = res.body.delivery_chg_cat_id;
@@ -101,7 +101,7 @@ describe(tests +' GET /api/v1/mol/companies/{companyId}/categories', function() 
         res.body.should.be.a('array');
         for (var i = 0; i < res.body.length; i++) {
             res.body[i].should.have.property('company');
-            res.body[i].company.should.equal(ecommercId);
+            res.body[i].company.should.equal(ecommerceId);
         }
         done();
     });
@@ -126,7 +126,7 @@ describe(tests +' GET /api/v1/mol/companies/{companyId}/categories/{deliveryChar
   });
 });
 
-
+/*
 // Test retrieval of menu items for Company and Category
 describe(tests +' GET /api/v1/mol/companies/{companyId}/categories/{deliveryChargeCat}/menuitems', function() {
   it('should return menu items for Delivery Charge category from Moltin', function(done) {
@@ -161,7 +161,7 @@ describe(tests +' GET /api/v1/mol/companies/{companyId}/menuitems/{deliveryCharg
     });
   });
 });
-
+*/
 /*
 // Test retrieval of option categories for specific menu item for Company and Category
 describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories', function() {
@@ -225,12 +225,12 @@ describe(tests +' GET /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
 var token  = ''
 var mochaId = ''
 // Test CRUD of a Category for a specific Company
-describe(tests +' CRUD /api/v1/mol/companies/1008/categories', function() {
+describe(tests +' CRUD /api/v1/mol/companies/{companyId}/categories', function() {
   it('should login and retrieve JWT token', function(done) {
     chai.request(server)
     .post('/auth/login')
-    .field("username", "grilla@grillacheez.com")
-    .field("password", "grilla")
+    .field("username", authName+ "@gmail.com")
+    .field("password", authName)
     .end(function (err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -240,71 +240,102 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/categories', function() {
 
       res.body.should.have.property('user');
       res.body.user.should.have.property('id');
-      res.body.user.id.should.equal(11025);
+      res.body.user.id.should.equal(userId);
       res.body.user.should.have.property('username');
-      res.body.user.username.should.equal('Grilla@grillacheez.com');
+      res.body.user.username.should.equal(authName+'@gmail.com');
       res.body.user.should.have.property('role');
       res.body.user.role.should.equal('OWNER');
       res.body.should.have.property('token');
       done();
     });
   });
-  it('should create category "Mocha" for 1008: Grilla Cheez in Moltin', function(done) {
+  it('should create category "Mocha" in Moltin', function(done) {
     chai.request(server)
-    .post('/api/v1/mol/companies/1008/categories')
+    .post('/api/v1/mol/companies/'+ companyId +'/categories')
     .set('Authorization', token)
     .field('title','Mocha')
     .field('parent', defaultCat)
     .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object');
-      // Save the newly created category id
-      mochaId = res.body.id
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        // Save the newly created category id
+        mochaId = res.body.id
 
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha');
-      done();
+        res.body.should.have.property('name');
+        res.body.name.should.equal('Mocha');
+        res.body.should.have.property('relationships');
+        res.body.relationships.should.have.property('parent');
+        res.body.relationships.parent.should.have.property('data');
+        res.body.relationships.parent.data.should.be.a('array');
+        res.body.relationships.parent.data[0].should.have.property('type');
+        res.body.relationships.parent.data[0].type.should.equal('category');
+        res.body.relationships.parent.data[0].should.have.property('id');
+        res.body.relationships.parent.data[0].id.should.equal(defaultCat);
+        done();
     });
   });
   it('should read "Mocha" category in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/categories/'+ mochaId)
+    .get('/api/v1/mol/companies/'+ companyId +'/categories/'+ mochaId)
     .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha');
-      done();
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        res.body.should.have.property('name');
+        res.body.name.should.equal('Mocha');
+        res.body.should.have.property('company');
+        res.body.company.should.equal(ecommerceId);
+        res.body.should.have.property('relationships');
+        res.body.relationships.should.have.property('parent');
+        res.body.relationships.parent.should.have.property('data');
+        res.body.relationships.parent.data.should.be.a('array');
+        res.body.relationships.parent.data[0].should.have.property('type');
+        res.body.relationships.parent.data[0].type.should.equal('category');
+        res.body.relationships.parent.data[0].should.have.property('id');
+        res.body.relationships.parent.data[0].id.should.equal(defaultCat);
+        done();
     });
   });
   it('should update "Mocha" to "Mocha-Mocha" category in Moltin', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/categories/'+ mochaId)
+    .put('/api/v1/mol/companies/'+ companyId +'/categories/'+ mochaId)
     .set('Authorization', token)
     .field('title','Mocha-Mocha')
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha-Mocha');
+      console.log(1)
+      res.body.should.have.property('name');
+      res.body.name.should.equal('Mocha-Mocha');
+      console.log(1)
+      res.body.should.have.property('company');
+      res.body.company.should.equal(ecommerceId);
+      console.log(1)
+      res.body.should.have.property('relationships');
+      res.body.relationships.should.have.property('parent');
+      res.body.relationships.parent.should.have.property('data');
+      res.body.relationships.parent.data.should.be.a('array');
+      res.body.relationships.parent.data[0].should.have.property('type');
+      res.body.relationships.parent.data[0].type.should.equal('category');
+      res.body.relationships.parent.data[0].should.have.property('id');
+      res.body.relationships.parent.data[0].id.should.equal(defaultCat);
       done();
     });
   });
   it('should delete "Mocha-Mocha" category in Moltin', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/categories/'+ mochaId)
+    .delete('/api/v1/mol/companies/'+ companyId +'/categories/'+ mochaId)
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
       res.body.should.have.property('status')
-      res.body.status.should.equal(true)
+      res.body.status.should.equal('ok')
       res.body.should.have.property('message')
-      res.body.message.should.equal('Category removed successfully');
+      res.body.message.should.equal('Deleted successfully');
       done();
     });
   });

@@ -253,6 +253,8 @@ exports.createDefaultCategory=function(moltincompany) {
 exports.createCategory=function *(company, catTitle, catParent) {
     debug('createCategory')
     debug(company)
+    var meta = {fn: 'createCategory', company_id: company.id, cat_name: catTitle, cat_parent: catParent};
+    logger.info('Creating category for company', meta);
     var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
     if (!catParent) catParent = company.default_cat;
     var data = {
@@ -262,7 +264,6 @@ exports.createCategory=function *(company, catTitle, catParent) {
         description : catTitle,
         company : company.order_sys_id,
         type: 'category'
-
     }
     debug(data)
     var category = yield requestEntities(CATEGORIES, POST, data);
@@ -274,7 +275,9 @@ exports.createCategory=function *(company, catTitle, catParent) {
     } catch (error) {
         console.log('category create relationship error', error)
     }
-    return category;
+    debug('relationships')
+    debug(relationships)
+    return relationships;
 };
 
 exports.findCategory=function (categoryId) {

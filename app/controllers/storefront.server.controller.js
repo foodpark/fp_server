@@ -291,45 +291,45 @@ exports.listCategories=function *(next) {
 }
 
 exports.updateCategory=function *(next) {
-  debug('updateCategory')
-  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
-    var user = this.passport.user
-    if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('error updating category: Owner '+ user.id + 'not associated with '+ this.company.name)
-        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
-    }
-    debug(this.category.company +'=='+ this.company.order_sys_id)
-    if (this.category.company == this.company.order_sys_id) {
-      this.body.id = this.category.id
-      this.body.type = 'category'
-      this.body.name = this.body.title ? this.body.title : undefined
+    debug('updateCategory')
+    if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+        var user = this.passport.user
+        if (user.role == auth.OWNER && user.id != this.company.user_id) {
+            console.error('error updating category: Owner '+ user.id + 'not associated with '+ this.company.name)
+            throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+        }
+        debug(this.category.company +'=='+ this.company.order_sys_id)
+        if (this.category.company == this.company.order_sys_id) {
 
-      var data = {
-        data: this.body
-      }
+            var data = {
+                type: 'category',
+                id : this.category.id,
+                name: this.body.title,
+                company: this.company.order_sys_id
+            }
 
-      debug('data '+ data.toString())
-      try {
-        var results = yield msc.updateCategory(this.category.id, data)
-      } catch (err) {
-        console.error('error updating category ('+ id +')')
-        throw(err)
-      }
-      debug(results)
-      this.body = results
-      return;
+            debug('data '+ data.toString())
+            try {
+                var results = yield msc.updateCategory(this.category.id, data)
+            } catch (err) {
+                console.error('error updating category ('+ id +')')
+                throw(err)
+            }
+            debug(results)
+            this.body = results
+            return;
+            } else {
+            console.error('updateCategory: Category does not belong to company')
+            this.status=422
+            this.body = {error: 'Category does not belong to company'}
+            return;
+            }
     } else {
-      console.error('updateCategory: Category does not belong to company')
-      this.status=422
-      this.body = {error: 'Category does not belong to company'}
-      return;
+        console.error('updateCategory: User not authorized')
+        this.status=401
+        this.body = {error: 'User not authorized'}
+        return;
     }
-  } else {
-    console.error('updateCategory: User not authorized')
-    this.status=401
-    this.body = {error: 'User not authorized'}
-    return;
-  }
 }
 
 exports.deleteCategory=function *(next) {
@@ -385,7 +385,7 @@ exports.createMenuItem=function *(next) {
     debug(this.category.company +'=='+ this.company.order_sys_id)
     if (this.category.company == this.company.order_sys_id) {
       debug('..category and company match')
-   
+
       var company = this.company
       var title = this.body.title;
       var price = this.body.price;
