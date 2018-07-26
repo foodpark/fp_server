@@ -1042,8 +1042,8 @@ if(newResult[0].hasOwnProperty('meta'))
   }
 }
 console.log('final >>',newResult)
-filteredItems.push(newResult)
-  this.body = filteredItems
+//filteredItems.push(newResult)
+  this.body = newResult
   
   return ;
 }
