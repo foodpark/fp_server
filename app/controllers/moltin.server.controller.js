@@ -251,8 +251,6 @@ exports.createDefaultCategory=function(moltincompany) {
 };
 
 exports.createCategory=function *(company, catTitle, catParent) {
-    debug('createCategory')
-    debug(company)
     var meta = {fn: 'createCategory', company_id: company.id, cat_name: catTitle, cat_parent: catParent};
     logger.info('Creating category for company', meta);
     var catSlug = company.base_slug + '-' + catTitle.replace(/\W+/g, '-').toLowerCase();
@@ -267,15 +265,19 @@ exports.createCategory=function *(company, catTitle, catParent) {
     }
     debug(data)
     var category = yield requestEntities(CATEGORIES, POST, data);
+    meta.category_id = category.id;
+    logger.info('Category created', meta);
     try {
         var relationships = yield requestEntities(`${CATEGORIES}/${category.id}/relationships/parent`, POST, {
             type: 'category',
             id: catParent
         });
     } catch (error) {
-        console.log('category create relationship error', error)
+        meta.error = error;
+        logger.error('Error creating category relationship to parent default category', meta);
+        throw(error);
     }
-    debug('relationships')
+    logger.info('Created catgory-default category relationship', meta)
     debug(relationships)
     return relationships;
 };
@@ -314,13 +316,26 @@ exports.listCategories=function *(company) {
     return cats;
 };
 
-exports.updateCategory=function(categoryId, data) {
+exports.updateCategory=function (categoryId, data) {
   debug('updateCategory')
   return requestEntities(CATEGORIES, PUT, data, categoryId)
 };
-exports.deleteCategory=function(categoryId) {
-  debug('deleteCategory')
-  return requestEntities(CATEGORIES, DELETE, '', categoryId)
+exports.deleteCategory=function *(catParent, categoryId) {
+    var meta = {fn: 'deleteCategory', category_parent: catParent, delete_category_id: categoryId}; 
+    logger.info('Removing category-parent relationship', meta);
+    try {
+        var relationships = yield requestEntities(`${CATEGORIES}/${categoryId}/relationships/parent`, DELETE, {
+            type: 'category',
+            id: catParent
+        });
+    } catch (error) {
+        meta.error = error;
+        logger.error('Error deleting category-parent relationship', meta)
+    }
+    logger.info('Deleting category', meta);
+    var results = yield requestEntities(CATEGORIES, DELETE, '', categoryId);
+    console.log(results);
+    return results;
 };
 
 exports.createMenuItem = function *(company, title, status, price, category, description, taxBand, currency) {

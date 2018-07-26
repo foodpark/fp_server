@@ -41,7 +41,6 @@ describe(tests +' POST /auth/register', function() {
         "country_id" : countryId
     })
     .end(function (err, res) {
-        console.log(err);
         res.should.have.status(201);
         res.should.be.json;
         res.body.should.be.a('object')
@@ -99,7 +98,10 @@ describe(tests +' GET /api/v1/mol/companies/{companyId}/categories', function() 
     .get('/api/v1/mol/companies/'+ companyId +'/categories')
     .end(function(err, res) {
         res.body.should.be.a('array');
+        res.body.length.should.equal(2);
         for (var i = 0; i < res.body.length; i++) {
+            res.body[i].should.have.property('type');
+            res.body[i].type.should.equal('category');
             res.body[i].should.have.property('company');
             res.body[i].company.should.equal(ecommerceId);
         }
@@ -133,7 +135,6 @@ describe(tests +' GET /api/v1/mol/companies/{companyId}/categories/{deliveryChar
     chai.request(server)
     .get('/api/v1/mol/companies/'+ companyId + '/categories/'+ deliveryChargeCat +'/menuitems')
     .end(function(err, res) {
-        console.log(res.body);
         res.should.have.status(200);
         res.should.be.json;
         res.body.should.be.a('array');
@@ -306,13 +307,10 @@ describe(tests +' CRUD /api/v1/mol/companies/{companyId}/categories', function()
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      console.log(1)
       res.body.should.have.property('name');
       res.body.name.should.equal('Mocha-Mocha');
-      console.log(1)
       res.body.should.have.property('company');
       res.body.company.should.equal(ecommerceId);
-      console.log(1)
       res.body.should.have.property('relationships');
       res.body.relationships.should.have.property('parent');
       res.body.relationships.parent.should.have.property('data');
@@ -324,6 +322,23 @@ describe(tests +' CRUD /api/v1/mol/companies/{companyId}/categories', function()
       done();
     });
   });
+  it('should read all categories in Moltin', function(done) {
+  chai.request(server)
+  .get('/api/v1/mol/companies/'+ companyId +'/categories')
+  .end(function(err, res) {
+      res.should.have.status(200);
+      res.should.be.json;
+      res.body.should.be.a('array');
+      res.body.length.should.equal(3);
+      for (var i = 0; i < res.body.length; i++) {
+          res.body[i].should.have.property('type');
+          res.body[i].type.should.equal('category');
+          res.body[i].should.have.property('company');
+          res.body[i].company.should.equal(ecommerceId);
+      }
+      done();
+  });
+});
   it('should delete "Mocha-Mocha" category in Moltin', function(done) {
     chai.request(server)
     .delete('/api/v1/mol/companies/'+ companyId +'/categories/'+ mochaId)
@@ -337,6 +352,23 @@ describe(tests +' CRUD /api/v1/mol/companies/{companyId}/categories', function()
       res.body.should.have.property('message')
       res.body.message.should.equal('Deleted successfully');
       done();
+    });
+  });
+    it('should read remaining categories in Moltin', function(done) {
+    chai.request(server)
+    .get('/api/v1/mol/companies/'+ companyId +'/categories')
+    .end(function(err, res) {
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('array');
+        res.body.length.should.equal(2);
+        for (var i = 0; i < res.body.length; i++) {
+            res.body[i].should.have.property('type');
+            res.body[i].type.should.equal('category');
+            res.body[i].should.have.property('company');
+            res.body[i].company.should.equal(ecommerceId);
+        }
+        done();
     });
   });
 });
@@ -754,7 +786,6 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
       .end(function(err, res) {
           res.should.have.status(200);
           res.should.be.json;
-          console.log(res.body);
           res.body.should.be.a('object');
           res.body.should.have.property('status')
           res.body.status.should.equal('ok')
@@ -786,7 +817,6 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
         res.should.have.status(200);
         res.should.be.json;
         res.body.should.be.a('object');
-        console.log(res.body);
         res.body.should.have.property('status')
         res.body.status.should.equal('ok')
         res.body.should.have.property('message')

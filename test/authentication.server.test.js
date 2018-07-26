@@ -90,7 +90,6 @@ describe(tests +' POST /auth/register', function() {
     .get('/api/v1/mol/companies/' + companyId +'/categories/'+ defaultCat)
     .end(function(err, res) {
         res.should.have.status(200);
-        console.log(res.body);
         res.should.be.json;
         res.body.should.be.a('object');
         res.body.should.have.property('name');
@@ -173,7 +172,6 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
     .end(function(err, res) {
         res.should.have.status(200);
         res.should.be.json;
-        console.log(res.body);
         res.body.should.be.a('object');
         res.body.should.have.property('status')
         res.body.status.should.equal('ok')
@@ -205,7 +203,6 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
       res.should.have.status(200);
       res.should.be.json;
       res.body.should.be.a('object');
-      console.log(res.body);
       res.body.should.have.property('status')
       res.body.status.should.equal('ok')
       res.body.should.have.property('message')
@@ -222,7 +219,6 @@ describe(tests +' Clean up SFEZ/Moltin company, SFEZ user, Moltin category and p
       })
       .end(function (err, res) {
           token = res.body.token;
-          console.log(token);
 
           chai.request(server)
           .delete('/api/v1/rel/users/' + userId)
