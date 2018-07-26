@@ -276,7 +276,6 @@ var createMoltinDeliveryChargeItem = function* (company, deliveryCat) {
   } catch (err) {
     meta.error = err;
     logger.error('Error creating delivery charge item', meta);
-    console.error(err);
     throw (err)
   }
   meta.delivery_chg_item_id = chargeItem.id;
@@ -465,12 +464,13 @@ function* removeUserOnFailure(userId) {
 
 exports.register = function* (next, mapping) {
   debug("register")
+  var meta = { fn: 'register'}
+  logger.info('Registering', meta)
   if (!this.isAuthenticated()) {
     if (mapping) {
       this.body = mapping;
     }
 
-    console.log(this.body);
     var first_name = this.body.first_name;
     var last_name = this.body.last_name;
     var company_name = this.body.company_name;
@@ -481,89 +481,84 @@ exports.register = function* (next, mapping) {
     var territory_id = this.body.territory_id;
     var phone = this.body.phone;
 
+    meta.company_name = company_name;
+
     const sentRole = this.body.role; //this is the value sent by the call; 
     //it will be stored in another const as upper case after it is confirmed to have a value
     //otherwise we get errors trying to assign to a const
 
+    meta.role = sentRole;
+    logger.info('Registration data snapshot', meta);
+
+    var missingDataMsg = '';
+
     if (!email) {
-      this.throw(422, 'Please enter an email address.');
-      //this.status = 422
-      //this.body = {error: 'Please enter an email address.'}
-      //return;
+        missingDataMsg += 'email address, ';
     }
     if (!first_name) {
-      this.status = 422
-      this.body = { error: 'Please enter your first name.' }
-      return;
+      missingDataMsg += comma + 'first name, ';
     }
     if (!last_name) {
-      this.status = 422
-      this.body = { error: 'Please enter your last name.' }
-      return;
+      missingDataMsg += 'last name, ';
     }
+
     if (!password) {
-      this.status = 422
-      this.body = { error: 'Please enter a password.' }
-      return;
+      missingDataMsg += 'password, ';
     }
     if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR'].indexOf(sentRole.toUpperCase()) < 0) {
-      this.status = 422
-      this.body = { error: 'Missing role: CUSTOMER / OWNER / ADMIN / FOODPARKMGR' };
-      return;
+      missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR], ';
     }
     const role = sentRole.toUpperCase();
     if (role == 'OWNER') {
       if (!company_name) {
-        this.status = 422
-        this.body = { error: 'Please enter a company name.' }
-        return;
+        missingDataMsg += 'company name, ';
       }
       if (!country_id) {
-        this.status = 422
-        this.body = { error: 'Please enter a country.' }
-        return;
+        missingDataMsg += 'country, ';
       }
-      debug('register: checking for duplicate company name');
+
+      if (missingDataMsg) {
+          mdm = missingDataMsg.substring(0, missingDataMsg.length-2);
+          this.throw(422, 'Please provide value(s) for: '+ mdm);
+      }
+
+      logger.info('Checking for duplicate company name', meta);
       try {
         existingCompany = (yield Company.companyForCompanyName(company_name))[0];
       } catch (err) {
-        console.error('register: error during registration');
-        console.error(err)
-        throw err;
+          meta.error = err;
+          logger.error('Error during registration', meta);
+          throw err;
       }
       if (existingCompany) {
-        this.status = 422;
-        this.body = { error: 'That company name is already in use.' };
-        return;
+        logger.error('Company name is already in use', meta);
+        this.throw(422, 'That company name is already in use.' );
       }
     }
 
-    debug('register: checking for duplicate user name/email');
+    logger.info('Checking for duplicate user name/email', meta);
     try {
       existingUser = (yield User.userForUsername(email))[0];
     } catch (err) {
-      console.error('register: error during registration');
-      console.error(err)
-      throw err;
+        meta.error = err;
+        logger.error('Error during duplicate user name search', meta);
+        throw err;
     }
     if (existingUser) {
-      this.status = 422;
-      this.body = { error: 'That email is already in use.' };
-      return;
+        logger.error('User name is already in use', meta);
+        this.throw(422, 'That email is already in use.');
     }
 
     if (role == 'DRIVER') {
 
       if (!territory_id) {
-        this.status = 422;
-        this.body = { error: 'Please enter a territory.' }
-        return;
+        logger.error('Please enter a territory', meta);
+        this.throw(422, 'Please enter a territory.');
       }
 
       if (!phone) {
-        this.status = 422;
-        this.body = { error: 'Please enter your phone number.' }
-        return;
+        logger.error('Please enter a phone number', meta);
+        this.throw(422, 'Please enter your phone number.');
       }
 
     }
@@ -590,6 +585,7 @@ exports.register = function* (next, mapping) {
       provider_data: '{}'
     };
 
+    console.log(1)
     debug('register: creating user');
     try {
       var userObject = (yield User.createUser(user))[0];

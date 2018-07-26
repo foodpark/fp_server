@@ -342,38 +342,38 @@ exports.updateCategory=function *(next) {
 }
 
 exports.deleteCategory=function *(next) {
-  debug('deleteCategory')
-  debug('id '+ this.category)
-  if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
-    var user = this.passport.user
-    if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('error deleting category: Owner '+ user.id + 'not associated with '+ this.company.name)
-        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
-    }
-    debug(this.category.company +'=='+ this.company.order_sys_id)
-    if (this.category.company == this.company.order_sys_id) {
-        var result = '';      
-  try {
-            results = yield msc.deleteCategory(this.category.id)
-        } catch (err) {
-            console.error('error deleting category ('+ this.category.id +')')
-            throw(err)
+    var meta = { fn: 'deleteCategory', company_id: this.company.id, default_cat: this.company.default_cat, 
+        category_id: this.category.id};
+    logger.info('Deleting category', meta);
+    if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
+        var user = this.passport.user
+        if (user.role == auth.OWNER && user.id != this.company.user_id) {
+            console.error('error deleting category: Owner '+ user.id + 'not associated with '+ this.company.name)
+            throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
         }
-        debug(results);
-        this.body = results
-        return;
+        debug(this.category.company +'=='+ this.company.order_sys_id)
+        if (this.category.company == this.company.order_sys_id) {
+            var result = '';      
+            try {
+                results = yield msc.deleteCategory(this.company.default_cat, this.category.id);
+            } catch (err) {
+                meta.error = err;
+                logger.error('Error deleting category', meta);
+                throw(err)
+            }
+            debug(results);
+            this.body = results
+            return;
+        } else {
+            meta.order_sys_id = this.company.order_sys_id;
+            meta.category_company_id = this.category.company;
+            logger.error('Cannot delete: Category does not belong to company', meta)
+            this.throw(422,  'Category does not belong to company');
+        }
     } else {
-      console.error('deleteCategory: Category does not belong to company')
-      this.status=422
-      this.body = {error: 'Category does not belong to company'}
-      return;
+        console.error('deleteCategory: User not authorized')
+        this.throw(401, 'User not authorized');
     }
-  } else {
-    console.error('deleteCategory: User not authorized')
-    this.status=401
-    this.body = {error: 'User not authorized'}
-    return;
-  }
 }
 
 exports.createMenuItem=function *(next) {
