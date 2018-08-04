@@ -26,6 +26,13 @@ exports.updateOrderHistory = function * (next) {
         status_list = yield orderhistory.getStatus(this.params.order_history_id);
         status_list[0].status[request.status] = new Date();
 
+        // order_accepted and order_paid must be included at the same time everytime.
+        if (request.status == 'order_accepted') {
+          status_list[0].status['order_paid'] = new Date();
+        } else if (request.status == 'order_paid') {
+          status_list[0].status['order_accepted'] = new Date();
+        }
+
         request.status = status_list[0].status;
       }
     }
