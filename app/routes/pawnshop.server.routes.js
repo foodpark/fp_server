@@ -4,6 +4,7 @@
 var pawnshop = require('../controllers/pawnshop.server.controller');
 var request = require('../controllers/request.server.controller');
 var offer = require('../controllers/offer.server.controller');
+var orderhistory = require('../controllers/orderhistory.server.controller')
 var passport = require('koa-passport');
 var Router = require('koa-router');
 var config = require('../../config/config');
@@ -30,6 +31,8 @@ module.exports = function (app) {
   router.put(apiPath + 'companies/:company_id/units/:unit_id/offers/:offer_id', requireJWT, offer.updateOffer);
   router.delete(apiPath + 'companies/:company_id/units/:unit_id/offers/:offer_id', offer.deleteOffer);
   router.get(apiPath + 'companies/:company_id/units/:unit_id/offers', offer.getOffersByUnit);
+
+  router.put(apiPath + 'companies/:company_id/units/:unit_id/order_history/:order_history_id', requireJWT, orderhistory.updateOrderHistory);
 
   // Pawn Shop and Customer Contracts
   router.get(apiPath + 'companies/:company_id/contracts', request.getRequestsContractApprovedByCompany);
