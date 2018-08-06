@@ -93,7 +93,7 @@ var getBearerToken = function *(next) {
   return bearerToken
 };
 
-var sendRequest = function *(url, method, data) {
+var sendRequest = function *(url, method, data, currency) {
   debug('sendRequest')
   debug(data)
   try {
@@ -119,7 +119,8 @@ var sendRequest = function *(url, method, data) {
       url: url,
       json: payload,
       headers: {
-        'Authorization': 'Bearer '+ token
+        'Authorization': 'Bearer '+ token,
+        'X-MOLTIN-CURRENCY' : currency
       },
       maxAttempts: 3,
       retryDelay: 150,  // wait for 150 ms before trying again
@@ -168,7 +169,7 @@ reject(errors);
   })
 }
 
-var requestEntities = function *(flow, method, data, id, params) {
+var requestEntities = function *(flow, method, data, id, params, currency) {
   debug('requestEntities')
   debug('... id is '+ id)
   debug(data)
@@ -180,13 +181,13 @@ var requestEntities = function *(flow, method, data, id, params) {
   debug('...url : '+ url)
   
   try {
-    var result = yield sendRequest(url, method, data)
+    var result = yield sendRequest(url, method, data, currency)
   } catch (err) {
     console.error(err)
     if (err.statusCode == 401) {
       // try again with fresh bearerToken
       try {
-        result = yield sendRequest(url, method, data)
+        result = yield sendRequest(url, method, data, currency)
       } catch (err) {
         console.error(err)
         throw(err)
@@ -347,7 +348,18 @@ exports.createMenuItem = function *(company, title, status, price, category, des
     var sku = company.base_slug + '-'+ title.replace(/\W+/g, '-').toLowerCase();
     var slug = sku;
     var status = (status?status:1) ; // is live
-    meta.sku = sku
+    meta.sku = sku;
+
+    var parray = price;
+    if (!Array.isArray(price)) {
+        parray = [
+            {
+            amount: price * PRICE_MODIFIER,
+            currency: currency,
+            includes_tax: false
+            }
+        ]
+    }
    
     var data = {
         type: 'product',
@@ -356,13 +368,7 @@ exports.createMenuItem = function *(company, title, status, price, category, des
         sku: sku,
         manage_stock: false,
         description: description,
-        price: [
-            {
-            amount: price * PRICE_MODIFIER,
-            currency: currency,
-            includes_tax: false
-            }
-        ],
+        price: parray,
         status: 'live',
         commodity_type: 'physical',
         company : company.order_sys_id
@@ -387,17 +393,17 @@ exports.createMenuItem = function *(company, title, status, price, category, des
     return menuitem;
 };
 
-exports.findMenuItem=function(menuItemId) {
+exports.findMenuItem=function(menuItemId, currency) {
   debug('findMenuItem')
-  return requestEntities(MENU_ITEMS, GET, '', menuItemId)
+  return requestEntities(MENU_ITEMS, GET, '', menuItemId, '', currency)
 };
 
-exports.listMenuItems=function(category) {
+exports.listMenuItems=function(category, currency) {
   debug('listMenuItems')
   debug(category);
   var params = `filter=eq(category.id,${category.id})`
   debug('Filtering by : '+ params);
-  return requestEntities(MENU_ITEMS, GET, '', '', params)
+  return requestEntities(MENU_ITEMS, GET, '', '', params, currency)
 };
 
 exports.updateMenuItem=function(menuItemId, data) {

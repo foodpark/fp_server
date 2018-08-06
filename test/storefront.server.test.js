@@ -377,12 +377,12 @@ token = ''
 mochaId = ''
 
 // Test CRUD of a Daily Special Menu Item for a specific Company
-describe(tests +' CRUD /api/v1/mol/companies/1008/categories/1463313172281688785/menuitems', function() {
+describe(tests +' CRUD /api/v1/mol/companies/{companyid}/categories/{categoryid}/menuitems', function() {
   it('should login and retrieve JWT token', function(done) {
     chai.request(server)
     .post('/auth/login')
-    .field("username", "grilla@grillacheez.com")
-    .field("password", "grilla")
+    .field("username", authName+ "@gmail.com")
+    .field("password", authName)
     .end(function (err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -392,9 +392,9 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/categories/1463313172281688785
 
       res.body.should.have.property('user');
       res.body.user.should.have.property('id');
-      res.body.user.id.should.equal(11025);
+      res.body.user.id.should.equal(userId);
       res.body.user.should.have.property('username');
-      res.body.user.username.should.equal('Grilla@grillacheez.com');
+      res.body.user.username.should.equal(authName+ '@gmail.com');
       res.body.user.should.have.property('role');
       res.body.user.role.should.equal('OWNER');
       res.body.should.have.property('token');
@@ -402,101 +402,120 @@ describe(tests +' CRUD /api/v1/mol/companies/1008/categories/1463313172281688785
     });
   });
   it('should create menu item "Mocha Sandwich" for the Daily Specials category in Moltin', function(done) {
+      var prices = [ 
+          { "amount": 525, "currency": "USD", "includes_tax": true},
+          { "amount": 495, "currency": "BRL", "includes_tax": true} 
+        ];
     chai.request(server)
-    .post('/api/v1/mol/companies/1008/categories/1463313172281688785/menuitems')
+    .post('/api/v1/mol/companies/'+ companyId +'/categories/'+ dailySpecialCat +'/menuitems')
     .set('Authorization', token)
-    .field('title','Mocha Sandwich')
-    .field('price','4.95')
-    .field('status','1')
-    .field('category','1463313172281688785')
-    .field('description','Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla')
+    .send({
+        'title' : 'Mocha Sandwich',
+        'price': prices,
+        'description': 'Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla'
+    })
     .end(function(err, res) {
-      res.should.have.status(200);
-      res.should.be.json;
-      res.body.should.be.a('object');
-      // Save the newly created id
-      mochaId = res.body.id
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha Sandwich');
+        res.should.have.status(200);
+        res.should.be.json;
+        res.body.should.be.a('object');
+        // Save the newly created id
+        mochaId = res.body.id
+        res.body.should.have.property('name');
+        res.body.name.should.equal('Mocha Sandwich');
+        res.body.should.have.property('status');
+        res.body.status.should.equal('live');
+        res.body.should.have.property('manage_stock');
+        res.body.manage_stock.should.equal(false);
+        res.body.should.have.property('description');
+        res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+        res.body.should.have.property('relationships');
+        res.body.relationships.should.have.property('categories');
+        res.body.relationships.categories.data[0].should.have.property('type');
+        res.body.relationships.categories.data[0].type.should.equal('category');
+        res.body.relationships.categories.data[0].should.have.property('id');
+        res.body.relationships.categories.data[0].id.should.equal(dailySpecialCat);
 
-      res.body.should.have.property('price');
-      res.body.price.value.should.equal('R$4.95');
-
-      res.body.should.have.property('status');
-      res.body.status.value.should.equal('Live');
-
-      res.body.should.have.property('category');
-      res.body.category.value.should.equal('Daily Specials');
-
-      res.body.should.have.property('description');
-      res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
-      done();
+        res.body.should.have.property('price');
+        res.body.price[0].amount.should.equal(5.25);
+        res.body.price[0].currency.should.equal('USD');
+        res.body.price[0].includes_tax.should.equal(true);
+        done();
     });
   });
   it('should read "Mocha Sandwich" menu item in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/'+ mochaId)
+    .get('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha Sandwich');
+      res.body.should.be.a('array');
 
-      res.body.should.have.property('price');
-      res.body.price.value.should.equal('R$4.95');
+      res.body[0].should.have.property('name');
+      res.body[0].name.should.equal('Mocha Sandwich');
+      res.body[0].should.have.property('status');
+      res.body[0].status.should.equal('live');
+      res.body[0].should.have.property('manage_stock');
+      res.body[0].manage_stock.should.equal(false);
+      res.body[0].should.have.property('description');
+      res.body[0].description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+      res.body[0].should.have.property('relationships');
+      res.body[0].relationships.should.have.property('categories');
+      res.body[0].relationships.categories.data[0].should.have.property('type');
+      res.body[0].relationships.categories.data[0].type.should.equal('category');
+      res.body[0].relationships.categories.data[0].should.have.property('id');
+      res.body[0].relationships.categories.data[0].id.should.equal(dailySpecialCat);
 
-      res.body.should.have.property('status');
-      res.body.status.value.should.equal('Live');
-
-      res.body.should.have.property('category');
-      res.body.category.value.should.equal('Daily Specials');
-
-      res.body.should.have.property('description');
-      res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+      res.body[0].should.have.property('price');
+      res.body[0].price[0].amount.should.equal(5.25);
+      res.body[0].price[0].currency.should.equal('USD');
+      res.body[0].price[0].includes_tax.should.equal(true);
       done();
     });
   });
   it('should update "Mocha Sandwich" to "Mocha Avalanche Sandwich" item title & price in Moltin', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/'+ mochaId)
+    .put('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId)
     .set('Authorization', token)
-    .field('title','Mocha Avalanche Sandwich')
-    .field('price','6.95')
+    .send ( {
+        'title': 'Mocha Avalanche Sandwich',
+        'price': 695
+    })
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
-      res.body.should.be.a('object');
-      res.body.should.have.property('title');
-      res.body.title.should.equal('Mocha Avalanche Sandwich');
-
-      res.body.should.have.property('price');
-      res.body.price.value.should.equal('R$6.95');
-
-      res.body.should.have.property('status');
-      res.body.status.value.should.equal('Live');
-
-      res.body.should.have.property('category');
-      res.body.category.value.should.equal('Daily Specials');
-
-      res.body.should.have.property('description');
-      res.body.description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
-
+      console.log(res.body)
+      res.body.should.be.a('array');
+      console.log(res.body[0][0]);
+      res.body[0][0].should.have.property('name');
+      res.body[0][0].name.should.equal('Mocha Avalanche Sandwich');
+      res.body[0][0].should.have.property('description');
+      res.body[0][0].description.should.equal('Spicy chocolate mousse and bitter chocolate shavings fill a flash-fried tortilla');
+      res.body[0][0].should.have.property('price');
+      console.log(res.body[0][0].price);
+      res.body[0][0].price[0].amount.should.equal(695);
+      res.body[0][0].should.have.property('status');
+      res.body[0][0].status.should.equal('live');
+      res.body[0][0].relationships.should.have.property('categories');
+      res.body[0][0].relationships.categories.data[0].should.have.property('type');
+      res.body[0][0].relationships.categories.data[0].type.should.equal('category');
+      res.body[0][0].relationships.categories.data[0].should.have.property('id');
+      res.body[0][0].relationships.categories.data[0].id.should.equal(dailySpecialCat);
       done();
     });
   });
   it('should delete '+mochaId+': "Mocha Avalanche Sandwich" menu item in Moltin', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/'+ mochaId)
+    .delete('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId)
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
+      console.log(res.body)
       res.body.should.be.a('object');
       res.body.should.have.property('status')
-      res.body.status.should.equal(true)
+      res.body.status.should.equal('ok')
       res.body.should.have.property('message')
-      res.body.message.should.equal('Product removed successfully');
+      res.body.message.should.equal('Deleted successfully');
       done();
     });
   });
@@ -506,7 +525,7 @@ token = ''
 var ocId = ''
 
 // Test CRU of an Option Category for a specific Company/Menu Item
-describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories', function() {
+describe(tests +' CRU /api/v1/mol/companies/{companyid}/menuitems/{menuitemid}/optioncategories', function() {
   it('should login and retrieve JWT token', function(done) {
     chai.request(server)
     .post('/auth/login')
@@ -532,7 +551,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
   });
   it('should create option category "Pickles" in Moltin', function(done) {
     chai.request(server)
-    .post('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories')
+    .post('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories')
     .set('Authorization', token)
     .field('title','Pickles')
     .end(function(err, res) {
@@ -551,7 +570,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
   });
   it('should read "Pickles" option category in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId)
+    .get('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -566,7 +585,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
   });
   it('should update "Pickles" option category to "PicklePickle" title in Moltin', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId)
+    .put('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId)
     .set('Authorization', token)
     .field('title','PicklePickle')
     .end(function(err, res) {
@@ -587,10 +606,10 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
 var oiId = '';
 
 // Test CRU of an Option Item for an Option Category for a specific Company/Menu Item
-describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/<optcatId>/optionitems', function() {
+describe(tests +' CRU /api/v1/mol/companies/{companyid}/menuitems/{menuitemid}/optioncategories/{optcatId}/optionitems', function() {
   it('should create option item "Spelt" for option category '+ ocId +' of the BBQ Loaf for Grilla Cheez in Moltin', function(done) {
     chai.request(server)
-    .post('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems')
+    .post('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems')
     .set('Authorization', token)
     .field('title','Spelt')
     .field('mod_price','+0.00')
@@ -610,7 +629,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
   });
   it('should read "Spelt" option item for the '+ ocId +' option category of the  BBQ Loaf for Grilla Cheez in Moltin', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ oiId)
+    .get('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems/'+ oiId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -625,7 +644,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
   });
   it('should update "Spelt" option item title to "Amaranth" ', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ oiId)
+    .put('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems/'+ oiId)
     .set('Authorization', token)
     .field('title','Amaranth')
     .end(function(err, res) {
@@ -646,10 +665,10 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/1441751723700912337/o
 var multiOiId = '';
 
 // Test CRU of multi-select Option Items for a specific Company/Menu Item
-describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/<optCatId>/optionitems', function() {
+describe(tests +' CRU /api/v1/mol/companies/{companyid}/menuitems/{optCatId}/optionitems', function() {
   it('should create option item "Iced" for the BBQ Loaf menu item in the Dinner category in Moltin', function(done) {
     chai.request(server)
-    .post('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optionitems')
+    .post('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optionitems')
     .set('Authorization', token)
     .field('title','Iced')
     .field('mod_price','+0.00')
@@ -669,7 +688,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/<optCatId>/optionitem
   });
   it('should read "Iced" option item for the BBQ Loaf menu item', function(done) {
     chai.request(server)
-    .get('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515/optionitems/'+ multOiId)
+    .get('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems/'+ multOiId)
     .end(function(err, res) {
       res.should.have.status(200);
       res.should.be.json;
@@ -684,7 +703,7 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/<optCatId>/optionitem
   });
   it('should update "Iced" option item title to "Blended" ', function(done) {
     chai.request(server)
-    .put('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/1506186173423288515/optionitems/'+ multOiId)
+    .put('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems/'+ multOiId)
     .set('Authorization', token)
     .field('title','Blended')
     .end(function(err, res) {
@@ -705,10 +724,10 @@ describe(tests +' CRU /api/v1/mol/companies/1008/menuitems/<optCatId>/optionitem
 
 
 // Test Delete of option category, option item, and multi-select Option Items for a specific Company/Menu Item
-describe(tests +' Delete /api/v1/mol/companies/1008/menuitems/<menutItemId>/optioncategories/<optCatId>/optionitems', function() {
+describe(tests +' Delete /api/v1/mol/companies/{companyid}/menuitems/{menutItemId}/optioncategories/{optCatId}/optionitems', function() {
   it('should delete '+oiId+': "Amaranth" option item ', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ oiId)
+    .delete('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems/'+ oiId)
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);
@@ -723,7 +742,7 @@ describe(tests +' Delete /api/v1/mol/companies/1008/menuitems/<menutItemId>/opti
   });
   it('should delete the "Blended" option item ', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId +'/optionitems/'+ multOiId)
+    .delete('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId +'/optionitems/'+ multOiId)
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);
@@ -738,7 +757,7 @@ describe(tests +' Delete /api/v1/mol/companies/1008/menuitems/<menutItemId>/opti
   });
   it('should delete  the '+ ocId +' option category ', function(done) {
     chai.request(server)
-    .delete('/api/v1/mol/companies/1008/menuitems/1441751723700912337/optioncategories/'+ ocId )
+    .delete('/api/v1/mol/companies/'+ companyId +'/menuitems/'+ mochaId +'/optioncategories/'+ ocId )
     .set('Authorization', token)
     .end(function(err, res) {
       res.should.have.status(200);

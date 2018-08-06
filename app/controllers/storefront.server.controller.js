@@ -531,10 +531,14 @@ exports.createMenuItem=function *(next) {
 exports.listMenuItems=function *(next) {
   var data = this.body;
   debug(this.category)
+  console.log(this.params);
+  console.log(this.company);
   if (!data)  data = ''
   debug(data)
   try {
-    var results = (yield msc.listMenuItems(this.category));
+    var country = yield Country.getSingleCountry(this.company.country_id);
+    debug(country);
+    var results = (yield msc.listMenuItems(this.category, country.currency));
     
     debug('Found '+ results.length +' items');
     //return results;
@@ -1049,14 +1053,18 @@ console.log('final >>',newResult)
 }
 
 exports.getMenuItem=function *(id, next) {
-  debug('getMenuItem')
-  debug('id '+ id)
-  
+    var meta = { fn: 'getMenuItem', menu_item_id: id, company_id: this.params.companyId}
   try {
-    var results = yield msc.findMenuItem(id)
+    var company = (yield Company.getSingleCompany(this.params.companyId))[0];
+    debug(company);
+    debug(company.country_id)
+    var country = (yield Country.getSingleCountry(company.country_id))[0];
+    debug(country)
+    var results = yield msc.findMenuItem(id, country.currency)
   } catch (err) {
-    console.error('error retrieving menu item from ordering system')
-    throw(err)
+      meta.error = err;
+      logger.error('Error retrieving menu item', meta)
+      throw(err)
   }
   debug(results)
   
@@ -1077,17 +1085,18 @@ var internalGetMenuItem = function *(id) {
 }
 
 exports.updateMenuItem=function *(next) {
-  debug('updateMenuItem')
-  debug('id '+ this.menuItem.id)
+    var meta = { fn: 'updateMenuItem', menu_item_id: this.menuItem.id};
+    logger.info('Update menu item', meta);
   if (auth.isAuthorized(auth.OWNER, auth.ADMIN)) {
-    debug('updateMenuItem: Role authorized')
+    logger.info('Role authorized', meta);
     var user = this.passport.user
     if (user.role == auth.OWNER && user.id != this.company.user_id) {
-        console.error('error updating menu item: Owner '+ user.id + 'not associated with '+ this.company.name)
-        throw('Owner '+ this.user.id + ' not associated with '+ this.company.name)
+        var authErr = 'Owner '+ user.id +' not associate with company '+ this.company.name;
+        meta.error = authErr;
+        logger.error('Error updating menu item: '+ authErr, meta);
+        throw(authErr);
     }
-    debug(this.menuItem.company +'=='+ this.company.orderSysId)
-    debug('menuitem', this.menuItem)
+    console.info(this.menuItem.company +'=='+ this.company.orderSysId, meta);
     if (this.menuItem.company == this.company.order_sys_id) {
       this.body.type = 'product'
       this.body.id = this.menuItem.id
