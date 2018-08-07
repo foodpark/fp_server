@@ -529,28 +529,29 @@ exports.createMenuItem=function *(next) {
 }
 
 exports.listMenuItems=function *(next) {
-  var data = this.body;
-  debug(this.category)
-  console.log(this.params);
-  console.log(this.company);
+    var meta = { fn: 'listMenuItems', company_id: this.company.id, category_id: this.category.id};
+    logger.info('List menu items', meta);
+    var data = this.body;
+    console.log(this.params);
   if (!data)  data = ''
   debug(data)
   try {
-    var country = yield Country.getSingleCountry(this.company.country_id);
-    debug(country);
+    meta.country_id = this.company.country_id;
+    logger.info('Getting country', meta);
+    var country = (yield Country.getSingleCountry(this.company.country_id))[0];
+    meta.currency = country.currency;
+    logger.info('And got currency', meta);
     var results = (yield msc.listMenuItems(this.category, country.currency));
     
     debug('Found '+ results.length +' items');
     //return results;
     var filteredItems = [];
     if (results && results.length > 0) {
-       console.log('2')
         for (var j=0; j<results.length; j++) {
             // TODO: remove when moltin filter works
             debug('MENU ITEM')
             debug(results[j]); 
             //if (results[j].category === this.category.id) {
-              console.log('3')
                 /*------ json mapping start ---- */
                 results[j]['title'] = results[j].name ;
                 results[j]['is_variation'] = true ;
@@ -1060,7 +1061,7 @@ exports.getMenuItem=function *(id, next) {
     debug(company.country_id)
     var country = (yield Country.getSingleCountry(company.country_id))[0];
     debug(country)
-    var results = yield msc.findMenuItem(id, country.currency)
+    var results = yield msc.findMenuItem(id, country.currency);
   } catch (err) {
       meta.error = err;
       logger.error('Error retrieving menu item', meta)
