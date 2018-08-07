@@ -463,7 +463,6 @@ function* removeUserOnFailure(userId) {
 }
 
 exports.register = function* (next, mapping) {
-  debug("register")
   var meta = { fn: 'register'}
   logger.info('Registering', meta)
   if (!this.isAuthenticated()) {
@@ -496,7 +495,7 @@ exports.register = function* (next, mapping) {
         missingDataMsg += 'email address, ';
     }
     if (!first_name) {
-      missingDataMsg += comma + 'first name, ';
+      missingDataMsg += 'first name, ';
     }
     if (!last_name) {
       missingDataMsg += 'last name, ';
@@ -505,10 +504,17 @@ exports.register = function* (next, mapping) {
     if (!password) {
       missingDataMsg += 'password, ';
     }
+
+    var role = ''; 
     if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR'].indexOf(sentRole.toUpperCase()) < 0) {
-      missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR], ';
+        missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR], ';
+
+        mdm = missingDataMsg.substring(0, missingDataMsg.length-2);
+        this.throw(422, 'Please provide value(s) for: '+ mdm);
+        
+    } else {
+        role = sentRole.toUpperCase();
     }
-    const role = sentRole.toUpperCase();
     if (role == 'OWNER') {
       if (!company_name) {
         missingDataMsg += 'company name, ';

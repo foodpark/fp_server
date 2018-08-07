@@ -94,8 +94,8 @@ var getBearerToken = function *(next) {
 };
 
 var sendRequest = function *(url, method, data, currency) {
-  debug('sendRequest')
-  debug(data)
+    var meta = {fn: 'sendRequest', url: url, method: method, data: data, currency: currency}
+    logger.info('Sending request', meta);
   try {
     var token = yield getBearerToken()
     debug('...token '+ token)
@@ -111,6 +111,8 @@ var sendRequest = function *(url, method, data, currency) {
           data: data
         }
    }
+
+
   
   
   return new Promise(function(resolve, reject) {
@@ -126,8 +128,8 @@ var sendRequest = function *(url, method, data, currency) {
       retryDelay: 150,  // wait for 150 ms before trying again
     })
     .then( function (res) {
-      var meta = {fn: 'sendRequest', method: method};
-      debug('status code '+ res.statusCode);
+        meta.status = res.statusCode;
+        logger.info('Request completed', meta);
       debug(res.statusMesage);
       debug('sendRequest: parsing...')
       debug(res.body)
@@ -138,7 +140,7 @@ var sendRequest = function *(url, method, data, currency) {
         reject({'statusCode': 401, 'error': 'Unauthorized'})
       }
       if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
-        debug('..Moltin call successful');
+        logger.info('..Moltin call successful', meta);
         var result = null;
         if (method == DELETE && res.statusCode == 204) {
             logger.info('Delete completed', meta)
@@ -155,16 +157,16 @@ var sendRequest = function *(url, method, data, currency) {
         resolve (result)
         return;
       } else { // something went wrong
-debug('..something went wrong with call to Moltin');
         var errors = res.body ? res.body : res;
-debug(errors);        
-reject(errors);
+        meta.errors = errors;
+        logger.error('Something went wrong with call to Moltin', meta);
+        reject(errors);
       }
     })
     .catch( function (err) {
-      console.error("...statusCode: " + err.statusCode);
-      console.error("...statusText: " + err.statusText);
-      reject (err)
+        meta.error = err;
+        logger.error("Error encountered", meta);
+        reject (err)
     })
   })
 }
@@ -375,7 +377,7 @@ exports.createMenuItem = function *(company, title, status, price, category, des
     }
     debug(data)
     logger.info('Creating menu item', meta);
-    var menuitem = yield requestEntities(MENU_ITEMS, POST, data);
+    var menuitem = yield requestEntities(MENU_ITEMS, POST, data, '', '', currency);
     meta.menu_item_id = menuitem.id;
     logger.info('Menu item created', meta);
 
