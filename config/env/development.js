@@ -5,8 +5,8 @@ var properties = {
     pg_connection_string: process.env.DATABASE_URL || "postgres://sfez_rw:sfez@localhost:5432/sfezdb",
     secret: "CorrectHorseBatteryStaple",
     apiVersion: "v1",
-    moltinAuthUrl: "https://api.molt.in/oauth/access_token",
-    moltinStoreUrl: "https://api.molt.in/v1",
+    moltinAuthUrl: "https://api.moltin.com/oauth/access_token",
+    moltinStoreUrl: "https://api.moltin.com/v2",
     clientId: "eDlPjoMabiu84tszlmr9gcpgm1YJXOJoSZxCBooYuW",      // Brazil Store
     client_secret: "hqvxfSwzIz9RP3nTLP3SbDZUUDDpfMteRJtfm3rOv3", // Brazil Store
     grant_type: "client_credentials",

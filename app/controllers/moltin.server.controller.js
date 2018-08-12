@@ -397,7 +397,7 @@ exports.createMenuItem = function *(company, title, status, price, category, des
 
 exports.findMenuItem=function(menuItemId, currency) {
   debug('findMenuItem')
-  return requestEntities(MENU_ITEMS, GET, '', menuItemId, '', currency)
+  return requestEntities(MENU_ITEMS, GET, '', menuItemId, 'include=main_image', currency)
 };
 
 exports.listMenuItems=function(category, currency) {
