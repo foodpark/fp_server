@@ -62,7 +62,8 @@ exports.simplifySpecial = function * (special) {
         id : special.id,
         title : special.title,
         description : special.description,
-        price : special.price.value
+        price : special.price.value,
+        data: special
     }
     if (special.images && special.images[0]) detail.image = special.images[0].url.http;
     debug(detail);
