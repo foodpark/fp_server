@@ -16,7 +16,7 @@ exports.updateOrderHistory = function * (next) {
   var user = this.passport.user;
   var orders = {};
   
-  if (user.role == 'OWNER' || user.role == 'UNITMGR' || user.role == 'ADMIN' || user.role == 'CUSTOMER') {
+  if (user.role == 'OWNER' || user.role == 'UNITMGR' || user.role == 'ADMIN' || user.role == 'CUSTOMER' || user.role == 'FOODPARKMGR') {
     debug('..authorized');
 
     var request = this.body;
