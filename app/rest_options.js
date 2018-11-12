@@ -1071,7 +1071,7 @@ function *beforeSaveCustomer(){
 }
 
 function * beforeSaveFoodpark() {
-  logger.info('Starting update of existing Foodpark', meta);
+  //logger.info('Starting update of existing Foodpark', meta);
   debug('..starting update of existing Foodpark');
 
   if (this.resteasy.object.apns_id) {
@@ -1081,15 +1081,15 @@ function * beforeSaveFoodpark() {
       gcmId = yield push.importAPNS.call(this,this.resteasy.object.apns_id);
     } catch (err) {
       meta.error = err;
-      logger.error('Error sending APNS token to GCM', meta);
+      //logger.error('Error sending APNS token to GCM', meta);
       throw err;
     }
     this.resteasy.object.gcm_id = gcmId;
     meta.gcm_id = gcmId;
-    logger.info('Foodpark\'s GCM mapped', meta);
+    //logger.info('Foodpark\'s GCM mapped', meta);
   }
 
-  logger.info('Ready to update Foodpark', meta);
+  //logger.info('Ready to update Foodpark', meta);
 }
 
 function *beforeSaveUnit() {
