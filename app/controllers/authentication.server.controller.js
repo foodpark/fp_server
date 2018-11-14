@@ -652,7 +652,7 @@ exports.register = function* (next, mapping) {
       }
       debug('...admin created with id ' + admin.id)
       userObject.admin_id = admin.id
-    } else if (role === 'FOODPARKMGR') {
+    } else if (role === 'FOODPARKMGR' || role ==='HUBMGR') {
       try {
         yield FoodPark.setManager(this.body.food_park_id, userObject.id);
       } catch (err) {
