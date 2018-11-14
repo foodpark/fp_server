@@ -506,8 +506,8 @@ exports.register = function* (next, mapping) {
     }
 
     var role = ''; 
-    if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR'].indexOf(sentRole.toUpperCase()) < 0) {
-        missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR], ';
+    if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR', 'HUBMGR'].indexOf(sentRole.toUpperCase()) < 0) {
+        missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR|HUBMGR], ';
 
         mdm = missingDataMsg.substring(0, missingDataMsg.length-2);
         this.throw(422, 'Please provide value(s) for: '+ mdm);
