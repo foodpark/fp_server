@@ -546,13 +546,17 @@ exports.register = function* (next, mapping) {
       logger.info('Checking if MainHub is created or not', meta);
       try {
         existingFoodPark = (yield FoodPark.getMainHub(this.body.food_park_id))[0];
+        if (existingFoodPark === undefined) {
+          logger.error('Error during registration: MainHub ID is not proper');
+          this.throw(422, 'Improper Main Hub selected');
+        }
       } catch  (err) {
         meta.error = err;
         logger.error('Error during registration', meta);
         throw err;
       }
       
-      if (existingFoodPark && existingFoodPark.foodpark_manager !== null) {
+      if (existingFoodPark && existingFoodPark.foodpark_mgr !== null) {
         logger.error('Manager already available for the food park you selected')
         this.throw(422, 'Manager already available for the food park you selected');
       }
