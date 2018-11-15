@@ -542,6 +542,23 @@ exports.register = function* (next, mapping) {
       }
     }
 
+    if (role === 'HUBMGR') {
+      logger.info('Checking if MainHub is created or not', meta);
+      try {
+        existingFoodPark = (yield FoodPark.getMainHub(this.body.food_park_id))[0];
+      } catch  (err) {
+        meta.error = err;
+        logger.error('Error during registration', meta);
+        throw err;
+      }
+      
+      if (existingFoodPark && existingFoodPark.foodpark_manager !== null) {
+        logger.error('Manager already available for the food park you selected')
+        this.throw(422, 'Manager already available for the food park you selected');
+      }
+    }
+
+
     logger.info('Checking for duplicate user name/email', meta);
     try {
       existingUser = (yield User.userForUsername(email))[0];

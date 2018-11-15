@@ -1,6 +1,10 @@
 var knex = require('../../config/knex');
 var debug = require('debug')('food_parks.model');
 
+exports.getMainHub = function(id) {
+  return knex('food_parks').select().where('type', 'MAIN').where('id', id);
+}
+
 exports.getAllFoodParks = function() {
   return knex('food_parks').select();
 };
