@@ -2001,7 +2001,7 @@ module.exports = {
           }
         }
          else if (this.params.table == 'companies' || this.params.table == 'units' || this.params.table == 'loyalty_rewards') {
-          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'FOODPARKMGR')) {
+          if(!this.isAuthenticated() || !this.passport.user || (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'FOODPARKMGR' && this.passport.user.role != 'HUBMGR')) {
             this.throw('Update/Delete Unauthorized - Owners/Admin only',401);
           } else {
             if (this.passport.user.role == 'FOODPARKMGR') {
