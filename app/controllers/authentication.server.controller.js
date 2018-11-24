@@ -54,6 +54,7 @@ var setUserInfo = function (user) {
   else if (user.customer_id) info.customer_id = user.customer_id;
   else if (user.admin_id) info.admin_id = user.admin_id;
   else if (user.unit_id) info.unit_id = user.unit_id;
+  else if (user.church_id) info.church_id = user.church_id;
   debug(info)
   return info
 };
@@ -481,7 +482,7 @@ exports.register = function* (next, mapping) {
     var territory_id = this.body.territory_id;
     var phone = this.body.phone;
 
-    meta.company_name = company_name;
+    meta.church_name = church_name;
 
     const sentRole = this.body.role; //this is the value sent by the call; 
     //it will be stored in another const as upper case after it is confirmed to have a value
@@ -626,10 +627,10 @@ exports.register = function* (next, mapping) {
     debug('...user created with id ' + userObject.id)
 
     if (role == 'OWNER') {
-      debug('register: creating company');
+      debug('register: creating church');
 
       try {
-        var church = yield Church.createChurch(church_name);
+        var church = (yield Church.createChurch(church_name))[0];
       } catch (err) {
         console.error('register: error creating church');
         console.error(err);
@@ -638,9 +639,10 @@ exports.register = function* (next, mapping) {
         throw err;
       }
 
-      debug(church)
-      debug('...church created with id ' + church.id)
-      debug(userObject)
+      logger.info(church)
+      logger.info('...church created with id ' + church.id)
+      userObject.church_id = church.id
+      logger.info(userObject)
       // try {
       //   var company = yield createCompany(company_name, email, country_id, userObject.id);
       // } catch (err) {
