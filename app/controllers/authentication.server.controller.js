@@ -12,6 +12,7 @@ var FoodPark = require('../models/foodpark.server.model');
 var debug = require('debug')('auth');
 var _ = require('lodash');
 var logger = require('winston');
+var  Church = require('../models/churches.server.model');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var passport = require('passport');
 
@@ -476,7 +477,7 @@ exports.register = function* (next, mapping) {
     var email = this.body.email;
     var password = this.body.password;
     var country_id = this.body.country_id;
-
+    var church_name = this.body.church_name;
     var territory_id = this.body.territory_id;
     var phone = this.body.phone;
 
@@ -516,8 +517,9 @@ exports.register = function* (next, mapping) {
         role = sentRole.toUpperCase();
     }
     if (role == 'OWNER') {
-      if (!company_name) {
-        missingDataMsg += 'company name, ';
+
+      if (!church_name) {
+        missingDataMsg += 'church name, ';
       }
       if (!country_id) {
         missingDataMsg += 'country, ';
@@ -528,17 +530,17 @@ exports.register = function* (next, mapping) {
           this.throw(422, 'Please provide value(s) for: '+ mdm);
       }
 
-      logger.info('Checking for duplicate company name', meta);
+      logger.info('Checking for duplicate church name', meta);
       try {
-        existingCompany = (yield Company.companyForCompanyName(company_name))[0];
+        existingChurch = (yield Church.churchForChurchName(church_name))[0];
       } catch (err) {
           meta.error = err;
           logger.error('Error during registration', meta);
           throw err;
       }
-      if (existingCompany) {
-        logger.error('Company name is already in use', meta);
-        this.throw(422, 'That company name is already in use.' );
+      if (existingChurch) {
+        logger.error('Church name is already in use', meta);
+        this.throw(422, 'That Church name is already in use.' );
       }
     }
 
@@ -627,19 +629,32 @@ exports.register = function* (next, mapping) {
       debug('register: creating company');
 
       try {
-        var company = yield createCompany(company_name, email, country_id, userObject.id);
+        var church = yield Church.createChurch(church_name);
       } catch (err) {
-        console.error('register: error creating company');
-        console.error(err)
-        // clean up user
+        console.error('register: error creating church');
+        console.error(err);
         debug('deleting user ' + userObject.id);
         yield removeUserOnFailure(userObject.id);
         throw err;
       }
-      debug(company)
-      debug('...company created with id ' + company.id)
-      userObject.company_id = company.id
+
+      debug(church)
+      debug('...church created with id ' + church.id)
       debug(userObject)
+      // try {
+      //   var company = yield createCompany(company_name, email, country_id, userObject.id);
+      // } catch (err) {
+      //   console.error('register: error creating company');
+      //   console.error(err)
+      //   // clean up user
+      //   debug('deleting user ' + userObject.id);
+      //   yield removeUserOnFailure(userObject.id);
+      //   throw err;
+      // }
+      // debug(company)
+      // debug('...company created with id ' + company.id)
+      // userObject.company_id = company.id
+      // debug(userObject)
 
     } else if (role == 'CUSTOMER') {
       debug('register: creating customer with user id ' + userObject.id);
