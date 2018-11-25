@@ -1,6 +1,6 @@
 var Churches = require('../models/churches.server.model');
 
-function *updateChurch() {
+exports.updateChurch = function * () {
   try {
     const body = this.body;
     const church_id = this.params.churchId;

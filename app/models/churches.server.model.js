@@ -1,4 +1,8 @@
+
+var knex  = require('../../config/knex');
+var debug = require('debug')('church.model');
 const multer = require("multer");
+
 const MIME_TYPE_MAP = {
   'application/msword': 'doc',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx'
@@ -19,10 +23,6 @@ const storege = multer.diskStorage({
     cb(null, name + '-' + Date.now() + ".", ext);
   }
 });
-
-var knex  = require('../../config/knex');
-var debug = require('debug')('church.model');
-
 
 exports.createChurch = function(name) {
   return knex('churches').insert(
