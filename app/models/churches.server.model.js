@@ -1,11 +1,13 @@
 var knex  = require('../../config/knex');
 var debug = require('debug')('church.model');
 
-
-exports.createChurch = function(name) {
+exports.createChurch = function(name, email, country_id, userId) {
   return knex('churches').insert(
     {
-      name: name
+      name: name,
+      email: email,
+      country_id: country_id,
+      user_id: parseInt(userId),
     }).returning('*');
 };
 
