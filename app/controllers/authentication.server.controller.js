@@ -630,7 +630,7 @@ exports.register = function* (next, mapping) {
       debug('register: creating church');
 
       try {
-        var church = (yield Church.createChurch(church_name))[0];
+        var church = (yield Church.createChurch(church_name, email, country_id, userObject.id))[0];
       } catch (err) {
         console.error('register: error creating church');
         console.error(err);

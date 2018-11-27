@@ -1,33 +1,14 @@
 
 var knex  = require('../../config/knex');
 var debug = require('debug')('church.model');
-const multer = require("multer");
 
-const MIME_TYPE_MAP = {
-  'application/msword': 'doc',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx'
-};
-
-const storege = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const isValid = MIME_TYPE_MAP[file.mimetype];
-    let error = new Error("Invalid mime type");
-    if (isValid) {
-      error = null;
-    }
-    cb(error, "app/wordfiles")
-  },
-  filename: (req, file, cb) => {
-    const name = file.originalname.toLocaleLowerCase().split(' ').join('-');
-    const ext = MIME_TYPE_MAP[file.mimetype];
-    cb(null, name + '-' + Date.now() + ".", ext);
-  }
-});
-
-exports.createChurch = function(name) {
+exports.createChurch = function(name, email, country_id, userId) {
   return knex('churches').insert(
     {
-      name: name
+      name: name,
+      email: email,
+      country_id: country_id,
+      user_id: parseInt(userId),
     }).returning('*');
 };
 
