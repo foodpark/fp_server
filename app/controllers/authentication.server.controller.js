@@ -508,8 +508,8 @@ exports.register = function* (next, mapping) {
     }
 
     var role = ''; 
-    if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR', 'HUBMGR'].indexOf(sentRole.toUpperCase()) < 0) {
-        missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR|HUBMGR], ';
+    if (!sentRole || ['OWNER', 'CUSTOMER', 'ADMIN', 'DRIVER', 'FOODPARKMGR', 'HUBMGR', 'PODMGR'].indexOf(sentRole.toUpperCase()) < 0) {
+        missingDataMsg += 'role [CUSTOMER|OWNER|ADMIN|FOODPARKMGR|HUBMGR|PODMGR], ';
 
         mdm = missingDataMsg.substring(0, missingDataMsg.length-2);
         this.throw(422, 'Please provide value(s) for: '+ mdm);
@@ -517,7 +517,7 @@ exports.register = function* (next, mapping) {
     } else {
         role = sentRole.toUpperCase();
     }
-    if (role == 'OWNER') {
+    if (role === 'PODMGR' || role === 'OWNER') {
 
       if (!church_name) {
         missingDataMsg += 'church name, ';
@@ -615,10 +615,17 @@ exports.register = function* (next, mapping) {
       provider_data: '{}'
     };
 
-    console.log(1)
     debug('register: creating user');
     try {
       var userObject = (yield User.createUser(user))[0];
+
+      if (role === 'PODMGR' ) {
+        emailComponents = email.split('@');
+        const eml = emailComponents[0] + '-church@' + emailComponents[1];
+        user.username = eml;
+        user.role = 'OWNER';  
+        var tempObject = (yield User.createUser(user))[0];
+      }
     } catch (err) {
       console.error('register: error creating user');
       console.error(err)
@@ -626,7 +633,7 @@ exports.register = function* (next, mapping) {
     }
     debug('...user created with id ' + userObject.id)
 
-    if (role == 'OWNER') {
+    if (role == 'OWNER' || role == 'PODMGR') {
       debug('register: creating church');
 
       try {

@@ -20,7 +20,7 @@ exports.updateChurch = function(church_id, body) {
   return knex('churches').update({
     sponsor: body.sponsor,
     title: body.title,
-    type: body.church_type,
+    type: body.type,
     connected_with: body.connected_with,
     addendum_file: body.attachment,
     latitude: body.latitude,
