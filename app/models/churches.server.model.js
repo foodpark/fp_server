@@ -18,6 +18,7 @@ exports.churchForChurchName = function(churchName) {
 
 exports.updateChurch = function(church_id, body) {
   return knex('churches').update({
+    name: body.name,
     sponsor: body.sponsor,
     title: body.title,
     type: body.type,
