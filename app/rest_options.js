@@ -2030,7 +2030,7 @@ module.exports = {
           }
         }  else if (this.params.table == 'drivers') {
           if(!this.isAuthenticated() || !this.passport.user ||
-             (this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'UNITMGR')) {
+             (this.passport.user.role != 'HUBMGR' && this.passport.user.role != 'OWNER' && this.passport.user.role != 'ADMIN' && this.passport.user.role != 'UNITMGR')) {
             this.throw('Update/Delete Unauthorized - Unit Managers/Owners/Admin only',401);
           } else {
             var valid = false;
