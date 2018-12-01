@@ -290,7 +290,7 @@ exports.getDrivers = function * (next) {
     var foodParkId = this.params.foodParkId;
     var user = this.passport.user;
 
-    if (!user || user.role !== 'FOODPARKMGR' && user.role !== 'ADMIN') {
+    if (!user || user.role !== 'FOODPARKMGR' && user.role !== 'ADMIN' && user.role != 'HUBMGR') {
         this.status = 401;
         return;
     }
