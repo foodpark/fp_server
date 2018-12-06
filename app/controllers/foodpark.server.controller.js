@@ -22,15 +22,6 @@ exports.getFoodParkCheckins = function * (next) {
   var user = this.passport.user
   var id = this.foodpark.id
 
-  if (!user || !user.role == 'FOODPARKMGR') {
-    this.status = 401
-    return
-  }
-
-  debug('authorized...')
-  debug('getFoodParkCheckins')
-  debug('id ' + id)
-
   if (!id || isNaN(id)) {
     this.status = 400;
     return
@@ -51,15 +42,6 @@ exports.getFoodParkCheckins = function * (next) {
 exports.getFoodParkUnits = function * (id, next) {
   var user = this.passport.user
   var id = this.foodpark.id
-
-  if (!user || !user.role == 'FOODPARKMGR') {
-    this.status = 401
-    return
-  }
-
-  debug('authorized...')
-  debug('getFoodParkCheckins')
-  debug('id ' + id)
 
   if (!id || isNaN(id)) {
     this.status = 400;
@@ -82,11 +64,6 @@ exports.getFoodParkCompanies = function * (next) {
   var user = this.passport.user
   var foodParkId = this.params.foodParkId;
 
-  if (!user || !user.role === 'FOODPARKMGR') {
-    this.status = 401;
-    return
-  }
-
   if (!foodParkId || isNaN(foodParkId)) {
     this.status = 400;
     return
@@ -106,12 +83,6 @@ exports.getFoodParkCompanies = function * (next) {
 exports.addFoodParkUnits = function * (id, next) {
   var user = this.passport.user
 
-
-  if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
-    this.status = 401
-    return
-  }
-
   if (!this.body) {
     this.status = 400;
     return
@@ -129,10 +100,6 @@ exports.addFoodParkUnits = function * (id, next) {
     this.status = 400;
     return
   }
-
-  debug('authorized...')
-  debug('addFoodParkUnits')
-  debug('id ' + id)
 
   var b = {
     unit_id: unit_id,
@@ -154,11 +121,6 @@ exports.removeFoodParkUnits = function * (id, next) {
   var user = this.passport.user
   var foodParkId = this.params.foodParkId;
   var unit_id = this.params.fpUnitId;
-
-  if (!user || !user.role == 'FOODPARKMGR' || !user.role == 'UNITMGR') {
-    this.status = 401
-    return
-  }
 
   debug('authorized...')
   debug('addFoodParkUnits')
@@ -192,11 +154,6 @@ exports.removeFoodParkUnits = function * (id, next) {
 exports.getUnitsActiveOrders = function * (next) {
   var user = this.passport.user;
   var food_park_id = this.params.foodParkId;
-
-  if (!user || !user.role == 'FOODPARKMGR') {
-    this.status = 401
-    return
-  }
 
   debug('authorized...');
   debug('getUnitsActiveOrders');
@@ -236,11 +193,6 @@ exports.setDriverToOrder = function *(next) {
   var order_id = this.params.orderId;
   var driver_id = this.body.driver_id;
 
-  if (!user || !user.role == 'FOODPARKMGR') {
-    this.status = 401
-    return
-  }
-
   if (driver_id === undefined || driver_id === null || isNaN(driver_id)) {
     this.status = 400;
     return;
@@ -265,12 +217,7 @@ exports.setAvailable = function * (next) {
 
     var available = this.body.available;
 
-    if (!user || !user.role === 'FOODPARKMGR') {
-      this.status = 401;
-      return;
-    }
-
-    if (!driver || driver[0].role !== 'DRIVER') {
+    if (!driver) {
       this.status = 400;
       this.body = {message : 'invalid driver'};
       return;
@@ -290,11 +237,6 @@ exports.getDrivers = function * (next) {
     var foodParkId = this.params.foodParkId;
     var user = this.passport.user;
 
-    if (!user || user.role !== 'FOODPARKMGR' && user.role !== 'ADMIN' && user.role != 'HUBMGR') {
-        this.status = 401;
-        return;
-    }
-
     try {
       var drivers = yield FoodPark.getAllDrivers(foodParkId);
       this.body = drivers.rows;
@@ -313,12 +255,7 @@ exports.addDriver = function * (next) {
 
     var driver = yield User.getSingleUser(driverId);
 
-    if (!user || user.role !== 'FOODPARKMGR' && user.role !== 'ADMIN') {
-        this.status = 401;
-        return;
-    }
-
-    if (!driver || driver[0].role !== 'DRIVER') {
+    if (!driver) {
         this.status = 400;
         this.body = {message : 'invalid driver'};
         return;
@@ -354,12 +291,7 @@ exports.deleteDriver = function * (next, req) {
     var driverId = this.params.userId;
     var driver = yield User.getSingleUser(driverId);
 
-    if (!user || user.role !== 'FOODPARKMGR') {
-        this.status = 401;
-        return;
-    }
-
-    if (!driverId || driver[0].role !== 'DRIVER') {
+    if (!driverId) {
         this.status = 400;
         this.body = {message : 'invalid driver'};
         return;
@@ -382,11 +314,6 @@ exports.getDriverByOrder = function *(next) {
   var food_park_id = this.params.foodparkId;
   var order_id = this.params.orderId;
   var driver_id = this.params.driverId;
-
-  if (!user || !user.role == 'FOODPARKMGR') {
-    this.status = 401;
-    return
-  }
 
   if (!food_park_id || isNaN(food_park_id)) {
     this.status = 400;

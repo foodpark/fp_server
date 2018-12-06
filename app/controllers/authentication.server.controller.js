@@ -76,81 +76,81 @@ exports.login = function* (next) {
   }
   yield (User.updateUser(meta.user_id, { default_language: lang }));
   userInfo = setUserInfo(this.passport.user)
-  if (this.passport.user.role == 'OWNER') {
-    var company = '';
-    try {
-      company = (yield Company.companyForUser(this.passport.user.id))[0];
-    } catch (err) {
-      logger.error('Error retrieving company for owner',
-        { fn: 'login', user_id: this.passport.user.id, error: err });
-      throw err;
-    }
-    userInfo.company_id = company.id;
-    userInfo.default_unit_id = company.default_unit;
-    meta.company_id = company.id;
-    meta.default_unit_id = company.default_unit;
-  } else if (this.passport.user.role == 'CUSTOMER') {
-    var customer = '';
-    try {
-      customer = (yield Customer.getForUser(this.passport.user.id))[0];
-    } catch (err) {
-      logger.error('Error retrieving customer role for user',
-        { fn: 'login', user_id: this.passport.user.id, error: err });
-      throw err;
-    }
-    userInfo.customer_id = customer.id
-    meta.customer_id = customer.id;
-  } else if (this.passport.user.role === 'FOODPARKMGR') {
-    var foodPark = {};
-    try {
-      foodPark = (yield FoodPark.getManagedFoodPark(this.passport.user.id))[0];
-      console.log(foodPark);
-    } catch (err) {
-      logger.error('Error retrieving customer role for user',
-        { fn: 'login', user_id: this.passport.user.id, error: err });
-      throw err;
-    }
-    userInfo.food_park_id = foodPark.id;
-    userInfo.country_id = this.passport.user.country_id;
-    meta.customer_id = foodPark.id;
-  } else if (this.passport.user.role == 'ADMIN') {
-    var admin = '';
-    try {
-      admin = (yield Admin.getForUser(this.passport.user.id))[0];
-    } catch (err) {
-      logger.error('Error retrieving admin role for user',
-        { fn: 'login', user_id: this.passport.user.id, error: err });
-      throw err;
-    }
-    userInfo.admin_id = admin.id
-    meta.admin_id = admin.id;
-  } else if (this.passport.user.role == 'UNITMGR') {
-    var unit = '';
-    try {
-      unit = (yield Unit.getForUser(this.passport.user.id))[0];
-      company = (yield Company.getSingleCompany(unit.company_id))[0]
-    } catch (err) {
-      logger.error('Error retrieving unit for unit manager',
-        { fn: 'login', user_id: this.passport.user.id, error: err });
-      throw err;
-    }
-    userInfo.unit_id = unit.id;
-    userInfo.company_id = company.id;
-    userInfo.owner_id = company.user_id;
-    userInfo.country_id = this.passport.user.country_id;
-    meta.unit_id = unit.id;
-  } else if (this.passport.user.role == 'DRIVER') {
-    var drivers = '';
-    try {
-      drivers = (yield Driver.getDriversByUser(this.passport.user.id))[0];
-    } catch (err) {
-      logger.error('Error retrieving drives for driver user',
-        { fn: 'login', user_id: this.passport.user.id, error: err });
-      throw err;
-    }
-    userInfo.drivers = drivers;
-    meta.drivers = drivers;
-  }
+  // if (this.passport.user.role == 'OWNER') {
+  //   var company = '';
+  //   try {
+  //     company = (yield Company.companyForUser(this.passport.user.id))[0];
+  //   } catch (err) {
+  //     logger.error('Error retrieving company for owner',
+  //       { fn: 'login', user_id: this.passport.user.id, error: err });
+  //     throw err;
+  //   }
+  //   userInfo.company_id = company.id;
+  //   userInfo.default_unit_id = company.default_unit;
+  //   meta.company_id = company.id;
+  //   meta.default_unit_id = company.default_unit;
+  // } else if (this.passport.user.role == 'CUSTOMER') {
+  //   var customer = '';
+  //   try {
+  //     customer = (yield Customer.getForUser(this.passport.user.id))[0];
+  //   } catch (err) {
+  //     logger.error('Error retrieving customer role for user',
+  //       { fn: 'login', user_id: this.passport.user.id, error: err });
+  //     throw err;
+  //   }
+  //   userInfo.customer_id = customer.id
+  //   meta.customer_id = customer.id;
+  // } else if (this.passport.user.role === 'FOODPARKMGR') {
+  //   var foodPark = {};
+  //   try {
+  //     foodPark = (yield FoodPark.getManagedFoodPark(this.passport.user.id))[0];
+  //     console.log(foodPark);
+  //   } catch (err) {
+  //     logger.error('Error retrieving customer role for user',
+  //       { fn: 'login', user_id: this.passport.user.id, error: err });
+  //     throw err;
+  //   }
+  //   userInfo.food_park_id = foodPark.id;
+  //   userInfo.country_id = this.passport.user.country_id;
+  //   meta.customer_id = foodPark.id;
+  // } else if (this.passport.user.role == 'ADMIN') {
+  //   var admin = '';
+  //   try {
+  //     admin = (yield Admin.getForUser(this.passport.user.id))[0];
+  //   } catch (err) {
+  //     logger.error('Error retrieving admin role for user',
+  //       { fn: 'login', user_id: this.passport.user.id, error: err });
+  //     throw err;
+  //   }
+  //   userInfo.admin_id = admin.id
+  //   meta.admin_id = admin.id;
+  // } else if (this.passport.user.role == 'UNITMGR') {
+  //   var unit = '';
+  //   try {
+  //     unit = (yield Unit.getForUser(this.passport.user.id))[0];
+  //     company = (yield Company.getSingleCompany(unit.company_id))[0]
+  //   } catch (err) {
+  //     logger.error('Error retrieving unit for unit manager',
+  //       { fn: 'login', user_id: this.passport.user.id, error: err });
+  //     throw err;
+  //   }
+  //   userInfo.unit_id = unit.id;
+  //   userInfo.company_id = company.id;
+  //   userInfo.owner_id = company.user_id;
+  //   userInfo.country_id = this.passport.user.country_id;
+  //   meta.unit_id = unit.id;
+  // } else if (this.passport.user.role == 'DRIVER') {
+  //   var drivers = '';
+  //   try {
+  //     drivers = (yield Driver.getDriversByUser(this.passport.user.id))[0];
+  //   } catch (err) {
+  //     logger.error('Error retrieving drives for driver user',
+  //       { fn: 'login', user_id: this.passport.user.id, error: err });
+  //     throw err;
+  //   }
+  //   userInfo.drivers = drivers;
+  //   meta.drivers = drivers;
+  // }
   debug('done')
   debug('userInfo: ' + userInfo)
   this.status = 200;

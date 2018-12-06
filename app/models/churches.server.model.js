@@ -16,16 +16,16 @@ exports.churchForChurchName = function(churchName) {
   return knex('churches').select('*').where('name', 'ILIKE', churchName)
 };
 
-exports.updateChurch = function(church_id, body) {
-  return knex('churches').update({
-    name: body.name,
-    sponsor: body.sponsor,
-    title: body.title,
-    type: body.type,
-    connected_with: body.connected_with,
-    addendum_file: body.attachment,
-    latitude: body.latitude,
-    longitude: body.longitude,
-    approved: body.approved
-  }).where('id', church_id).returning('*');
-}
+// exports.updateChurch = function(church_id, body) {
+//   return knex('churches').update({
+//     name: body.name,
+//     sponsor: body.sponsor,
+//     title: body.title,
+//     type: body.type,
+//     connected_with: body.connected_with,
+//     addendum_file: body.attachment,
+//     latitude: body.latitude,
+//     longitude: body.longitude,
+//     approved: body.approved
+//   }).where('id', church_id).returning('*');
+// }
