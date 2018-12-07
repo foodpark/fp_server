@@ -4,8 +4,6 @@ var Loads = require('../models/loads.server.model');
 exports.fetchLoads = function* () {
   
   try {
-    var loads = yield Loads.getAllLoads();
-    
     var retLoads = [];
     var loads = yield Loads.getAllLoads();
     for (let index = 0; index < loads.length; index++) {
