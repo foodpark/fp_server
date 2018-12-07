@@ -19,7 +19,7 @@ exports.fetchLoads = function* () {
         created_at: element['created_at'],
         updated_at: element['updated_at'],
         main_hub_id: element['main_hub_id'],
-        donataions: donations
+        pod_loads: donations
       }
 
       retMasterLoads.push(tempMasterLoad);
