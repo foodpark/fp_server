@@ -4,19 +4,23 @@ var Loads = require('../models/loads.server.model');
 exports.fetchLoads = function* () {
   
   try {
-    //var loads = yield Loads.getAllLoads();
+    var loads = yield Loads.getAllLoads();
     
     var retLoads = [];
     var loads = yield Loads.getAllLoads();
     for (let index = 0; index < loads.length; index++) {
       var element = loads[index];
-      var loadItems = yield Loads.getAllLoadItems(element.id);
+      var pallets = yield Loads.getPallets(element.id);
+      var boxes = yield Loads.getBoxes(element.id);
+      var items = yield Loads.getItems(element.id);
       let tempLoad = {
         id: element['id'],
         name: element['name'],
         created_at: element['created_at'],
         updated_at: element['updated_at'],
-        load_items: loadItems
+        pallets: pallets,
+        boxes: boxes,
+        items: items
       }
       retLoads.push(tempLoad);
     }
