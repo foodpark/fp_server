@@ -1,8 +1,33 @@
+var MasterLoads = require("../models/masterload.server.model");
 
-var MasterLoads = require('../models/masterload.server.model');
+exports.createMasterLoad = function*(next) {
+  var load = this.body;
 
-exports.fetchLoads = function* () {
-  
+  var masterload = yield MasterLoads.getMasterLoad(load.name, load.main_hub_id);
+  if (masterload.length != 0) {
+    this.status = 422;
+    this.body = {
+      error: "Master load name already exists, please provide different name"
+    };
+    return;
+  }
+
+  try {
+    var response = yield MasterLoads.createMasterLoad(this.body);
+    this.status = 201;
+    this.body = { message: "Masterload created" };
+  } catch (err) {
+    logger.error("Error crerating master load");
+    debug("Error creating master load");
+    this.status = 500;
+    this.body = { error: "Error in  creating  mater load" };
+    throw err;
+  }
+
+  return;
+};
+
+exports.fetchLoads = function*() {
   try {
     var retMasterLoads = [];
 
@@ -13,23 +38,23 @@ exports.fetchLoads = function* () {
       let donations = yield MasterLoads.getDonations(element.id);
 
       let tempMasterLoad = {
-        id: element['id'],
-        name: element['name'],
-        excelfile: element['excelfile'],
-        created_at: element['created_at'],
-        updated_at: element['updated_at'],
-        main_hub_id: element['main_hub_id'],
+        id: element["id"],
+        name: element["name"],
+        excelfile: element["excelfile"],
+        created_at: element["created_at"],
+        updated_at: element["updated_at"],
+        main_hub_id: element["main_hub_id"],
         pod_loads: donations
-      }
+      };
 
       retMasterLoads.push(tempMasterLoad);
-    };
+    }
 
     this.body = retMasterLoads;
   } catch (err) {
-    console.error('error getting loads')
-    throw(err)
+    console.error("error getting loads");
+    throw err;
   }
 
-  return;  
-}
+  return;
+};

@@ -8,7 +8,10 @@ var requireJWT = passport.authenticate('jwt', { session: false });
 module.exports = function (app) {
   var router = new Router();
   var apiPath = '/api/' + config.apiVersion + '/rel/master_loads/';
+
+  router.post(apiPath, masterload.createMasterLoad);
   router.get(apiPath, requireJWT, masterload.fetchLoads);
+  
 
   app.use(router.routes());
   app.use(router.allowedMethods());
