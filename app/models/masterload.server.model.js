@@ -14,6 +14,9 @@ exports.createMasterLoad = function (load) {
   return knex('master_loads').insert(load).returning('*');
 };
 
+exports.deleteMasterLoad = function(masterLoadID) {
+  return knex('master_loads').where('id', masterLoadID).del();
+}
 
 exports.getDonations = function(masterLoadId) {
   return  knex('donation_orders').where('master_load_id', masterLoadId);

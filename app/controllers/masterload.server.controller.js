@@ -23,8 +23,17 @@ exports.createMasterLoad = function*(next) {
     this.body = { error: "Error in  creating  mater load" };
     throw err;
   }
+};
 
-  return;
+exports.deleteMasterLoad = function*() {
+  var masterLoadId = this.params.master_load_id;
+
+  yield MasterLoads.deleteMasterLoad(masterLoadId);
+
+  this.status = 202;
+  this.body = {
+    success: "Deleted masterload " + masterLoadId
+  };
 };
 
 exports.fetchLoads = function*() {

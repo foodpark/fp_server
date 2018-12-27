@@ -11,7 +11,7 @@ module.exports = function (app) {
 
   router.post(apiPath, masterload.createMasterLoad);
   router.get(apiPath, requireJWT, masterload.fetchLoads);
-  
+  router.delete(apiPath + ':master_load_id', requireJWT, masterload.deleteMasterLoad);
 
   app.use(router.routes());
   app.use(router.allowedMethods());
