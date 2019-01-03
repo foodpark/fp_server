@@ -27,6 +27,4 @@ exports.fetchLoads = function* () {
     console.error('error getting loads')
     throw(err)
   }
-
-  return;  
 }

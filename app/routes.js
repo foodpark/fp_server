@@ -22,6 +22,7 @@ module.exports = function(app) {
   // require('./routes/churches.server.routes')(app);
   require('./routes/loads.server.routes')(app);
   require('./routes/masterload.server.routes')(app);
+  require('./routes/reporting.server.routese')(app);
 
   var apiversion = '/api/'+ config.apiVersion + '/rel';
   app.use(Mount(apiversion,require('./routes/api')));
