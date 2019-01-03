@@ -19,7 +19,7 @@ exports.getFoodParkReport = function* () {
     
     var masterLoadCount = (yield reportModel.getMasterLoadsCountForMainHub(foodParkId, start, end)).rows[0]
     console.log(masterLoadCount);
-    report['master_loads'] = masterLoadCount;
+    report['master_loads'] = masterLoadCount['count'];
 
     var regionalHubs = yield reportModel.getRegionalHubsForFoodPark(foodParkId, start, end);
     report['regionalhubs'] = regionalHubs;
