@@ -28,7 +28,7 @@ exports.getPodsForRegionalHub = function(regionalHubId, start, end) {
   }
 
   let customQuery = `id=${regionalHubId} and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
-  return  knex('regionalhubs').select('*').whereRaw(customQuery);
+  return  knex('churches').select('*').whereRaw(customQuery);
 }
 
 exports.getMasterLoadsCountForMainHub = function(mainHubId, start, end) {
