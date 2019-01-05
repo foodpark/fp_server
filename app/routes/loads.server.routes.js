@@ -7,9 +7,10 @@ var requireJWT = passport.authenticate('jwt', { session: false });
 
 module.exports = function (app) {
   var router = new Router();
-  var apiPath = '/api/' + config.apiVersion + '/rel/loads/';
-  // router.put(apiPath + ':churchId', requireJWT, churches.updateChurch);
-  router.get(apiPath, requireJWT, loads.fetchLoads);
+  var apiPath = '/api/' + config.apiVersion + '/rel';
+  
+  router.get(apiPath + '/loads/', requireJWT, loads.fetchLoads);
+  router.get(apiPath + '/churches/:churchId/loads', requireJWT, loads.fetchPodLoads);
 
   app.use(router.routes());
   app.use(router.allowedMethods());
