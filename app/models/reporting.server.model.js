@@ -43,3 +43,16 @@ exports.getMasterLoadsCountForMainHub = function(mainHubId, start, end) {
   let customQuery = `select count(*) from master_loads where main_hub_id=${mainHubId} and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
   return knex.raw(customQuery);
 }
+
+exports.getMasterLoadsCountForPod = function(podId, start, end) {
+  if (!start) {
+    start = 0;
+  }
+
+  if (!end) {
+    end = (new Date()).getTime()/1000;
+  }
+
+  let customQuery = `select count(*) from loads where church_id=${podId}  and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
+  return knex.raw(customQuery);
+}

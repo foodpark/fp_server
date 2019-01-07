@@ -17,13 +17,22 @@ exports.getFoodParkReport = function* () {
     var foodPark = yield reportModel.getMainHub(foodParkId)
     report['mainhub'] = foodPark;
     
-    var masterLoadCount = (yield reportModel.getMasterLoadsCountForMainHub(foodParkId, start, end)).rows[0]
+    var masterLoadCount = (yield reportModel.getMasterLoadsCountForMainHub(foodParkId, start, end)).rows[0];
     report['master_loads'] = masterLoadCount['count'];
 
     var regionalHubs = yield reportModel.getRegionalHubsForFoodPark(foodParkId, start, end);
     for (item in regionalHubs) {
       var regionalhub = regionalHubs[item];
       var pods = yield reportModel.getPodsForRegionalHub(regionalhub['id'], start, end);
+
+      var regionalHubCount = 0;
+      for (podItem in pods) {
+        var pod = pods[podItem];
+        var podLoadCount = (yield reportModel.getMasterLoadsCountForPod(pod['id'], start, end)).rows[0];
+        pod['load_count'] = podLoadCount['count'];
+        regionalHubCount += podLoadCount['count'];
+      }
+      regionalhub['load_count'] = regionalHubCount;
       regionalhub['pods'] = pods;
       regionalhub['pods_count'] = pods.length;
     }
