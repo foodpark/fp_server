@@ -30,7 +30,7 @@ exports.getFoodParkReport = function* () {
         var pod = pods[podItem];
         var podLoadCount = (yield reportModel.getMasterLoadsCountForPod(pod['id'], start, end)).rows[0];
         pod['load_count'] = podLoadCount['count'];
-        regionalHubCount += podLoadCount['count'];
+        regionalHubCount += parseInt(podLoadCount['count'], 10);
       }
       regionalhub['load_count'] = regionalHubCount;
       regionalhub['pods'] = pods;
