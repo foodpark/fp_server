@@ -24,6 +24,7 @@ module.exports = function(app) {
   require('./routes/masterload.server.routes')(app);
   require('./routes/reporting.server.routes')(app);
   require('./routes/ordermanagement.server.routes')(app);
+  require('./routes/podmanager.server.routes')(app);
 
   var apiversion = '/api/'+ config.apiVersion + '/rel';
   app.use(Mount(apiversion,require('./routes/api')));
