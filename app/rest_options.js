@@ -1895,18 +1895,18 @@ function* beforeSaveUser() {
     throw new Error("No user id provided", 422);
   }
   debug("beforeSaveUser");
-  if (
-    this.passport.user.role != "ADMIN" &&
-    this.passport.user.id != this.params.id
-  ) {
-    logger.error("Logged-in user id does not match param user id", {
-      fn: "beforeSaveUser",
-      loggedIn_user_id: this.passport.user.id,
-      param_user_id: this.params.id,
-      error: "Param id does not match logged-in user credentials"
-    });
-    throw new Error("Param id does not match logged-in user credentials", 422);
-  }
+  // if (
+  //   this.passport.user.role != "ADMIN" &&
+  //   this.passport.user.id != this.params.id
+  // ) {
+  //   logger.error("Logged-in user id does not match param user id", {
+  //     fn: "beforeSaveUser",
+  //     loggedIn_user_id: this.passport.user.id,
+  //     param_user_id: this.params.id,
+  //     error: "Param id does not match logged-in user credentials"
+  //   });
+  //   throw new Error("Param id does not match logged-in user credentials", 422);
+  // }
   var password = this.resteasy.object.password;
   debug(password);
   if (password) {
