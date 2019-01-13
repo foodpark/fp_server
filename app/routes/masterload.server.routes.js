@@ -10,7 +10,7 @@ module.exports = function (app) {
   var apiPath = '/api/' + config.apiVersion + '/rel/master_loads/';
 
   router.post(apiPath, requireJWT, masterload.createMasterLoad);
-  router.get(apiPath + ':mainHubId', requireJWT, masterload.fetchLoads);
+  router.get(apiPath, requireJWT, masterload.fetchLoads);
   router.delete(apiPath + ':master_load_id', requireJWT, masterload.deleteMasterLoad);
 
   app.use(router.routes());

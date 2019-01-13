@@ -44,7 +44,7 @@ exports.deleteMasterLoad = function*() {
 exports.fetchLoads = function*() {
   try {
     var retMasterLoads = [];
-    var mainHubId = this.params.main_hub_id;
+    var mainHubId = this.query.main_hub_id;
 
     if (!mainHubId || isNaN(mainHubId)) {
       this.status = 400;
