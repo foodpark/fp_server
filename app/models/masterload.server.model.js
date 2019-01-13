@@ -6,6 +6,10 @@ exports.getAllMasterLoads = function() {
   return knex('master_loads');
 }
 
+exports.getMasterLoadsInMainHub = function(mainHubId) {
+  return knex('master_loads').where('main_hub_id', mainHubId);
+}
+
 exports.getMasterLoad = function(load_name, main_hub_id) {
   return knex('master_loads').where('name', load_name).andWhere('main_hub_id', main_hub_id);
 }

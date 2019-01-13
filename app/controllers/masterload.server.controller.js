@@ -28,6 +28,11 @@ exports.createMasterLoad = function*(next) {
 exports.deleteMasterLoad = function*() {
   var masterLoadId = this.params.master_load_id;
 
+  if (!masterLoadId || isNaN(masterLoadId)) {
+    this.status = 400;
+    return;
+  }
+
   yield MasterLoads.deleteMasterLoad(masterLoadId);
 
   this.status = 202;
@@ -39,8 +44,14 @@ exports.deleteMasterLoad = function*() {
 exports.fetchLoads = function*() {
   try {
     var retMasterLoads = [];
+    var mainHubId = this.params.main_hub_id;
 
-    var masterloads = yield MasterLoads.getAllMasterLoads();
+    if (!mainHubId || isNaN(mainHubId)) {
+      this.status = 400;
+      return;
+    }
+
+    var masterloads = yield MasterLoads.getMasterLoadsInMainHub(mainHubId);
 
     for (let index = 0; index < masterloads.length; index++) {
       var element = masterloads[index];
