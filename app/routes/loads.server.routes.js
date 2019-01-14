@@ -11,7 +11,7 @@ module.exports = function (app) {
   
   router.get(apiPath + '/loads/', requireJWT, loads.fetchLoads);
   router.get(apiPath + '/churches/:churchId/loads', requireJWT, loads.fetchPodLoads);
-  router.get(apiPath + 'foodparks/:mainHubId/loads', requireJWT, loads.fetchFoodParkLoads);
+  router.get(apiPath + '/foodparks/:mainHubId/loads', requireJWT, loads.fetchFoodParkLoads);
 
   app.use(router.routes());
   app.use(router.allowedMethods());
