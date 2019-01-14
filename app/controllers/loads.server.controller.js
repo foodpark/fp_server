@@ -28,6 +28,35 @@ exports.fetchLoads = function* () {
   }
 }
 
+exports.fetchFoodParkLoads = function*() {
+  var mainHubId = this.params.mainHubId;
+  try {
+    var retLoads = [];
+    var loads = yield Loads.getAllLoadsForMainHub(mainHubId);
+
+    for (let index = 0; index < loads.length; index++) {
+      var element = loads[index];
+      var pallets = yield Loads.getPallets(element.id);
+      var boxes = yield Loads.getBoxes(element.id);
+      var items = yield Loads.getItems(element.id);
+      let tempLoad = {
+        id: element['id'],
+        name: element['name'],
+        created_at: element['created_at'],
+        updated_at: element['updated_at'],
+        pallets: pallets,
+        boxes: boxes,
+        items: items
+      }
+      retLoads.push(tempLoad);
+    }
+    this.body = retLoads;
+  } catch (err) {
+    console.error('error getting loads')
+    throw(err)
+  }
+}
+
 exports.fetchPodLoads = function* () {
   var churchId = this.params.churchId;
 
