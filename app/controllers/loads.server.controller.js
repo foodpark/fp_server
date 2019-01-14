@@ -32,7 +32,8 @@ exports.fetchFoodParkLoads = function*() {
   var mainHubId = this.params.mainHubId;
   try {
     var retLoads = [];
-    var loads = yield Loads.getAllLoadsForMainHub(mainHubId);
+    const loadsQuerey = yield Loads.getAllLoadsForMainHub(mainHubId);
+    var loads = loadsQuerey['rows'];
 
     for (let index = 0; index < loads.length; index++) {
       var element = loads[index];
