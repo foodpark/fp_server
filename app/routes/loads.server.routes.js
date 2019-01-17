@@ -12,6 +12,7 @@ module.exports = function (app) {
   router.get(apiPath + '/loads/', requireJWT, loads.fetchLoads);
   router.get(apiPath + '/churches/:churchId/loads', requireJWT, loads.fetchPodLoads);
   router.get(apiPath + '/foodparks/:mainHubId/loads', requireJWT, loads.fetchFoodParkLoads);
+  router.get(apiPath + '/regionalhubs/:regionalHubId/loads', requireJWT, loads.fetchRegionalHubLoads);
 
   app.use(router.routes());
   app.use(router.allowedMethods());

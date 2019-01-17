@@ -6,6 +6,11 @@ exports.getAllLoads = function(id) {
   return knex('loads');
 }
 
+exports.getAllLoadsForRegionalHub = function(regionalHubId) {
+  let customQuery = `select loads.* from loads inner join churches on churches.id = loads.church_id and churches.regional_hub_id = ${regionalHubId}`;
+  return knex.raw(customQuery);
+}
+
 exports.getAllLoadsForMainHub = function(mainHubId) {
   let customQuery = `select loads.* from loads inner join churches on churches.id = loads.church_id and churches.main_hub_id = ${mainHubId}`;
   return knex.raw(customQuery);
