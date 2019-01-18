@@ -7,7 +7,8 @@ exports.getAllLoads = function(id) {
 }
 
 exports.getAllLoadsForRegionalHub = function(regionalHubId) {
-  let customQuery = `select loads.* from loads inner join churches on churches.id = loads.church_id and churches.regional_hub_id = ${regionalHubId}`;
+  let customQuery = `select distinct(loads.id), loads.name, loads.created_at, loads.updated_at, loads.church_id, loads.status, loads.driver_id, loads.driver_name from loads inner join churches on churches.id = loads.church_id and churches.regional_hub_id = ${regionalHubId} WHERE NOT EXISTS (select load_id as id from donation_orders where loads.id = donation_orders.load_id)`;
+
   return knex.raw(customQuery);
 }
 
