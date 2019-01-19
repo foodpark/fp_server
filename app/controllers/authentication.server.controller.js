@@ -20,6 +20,7 @@ exports.CUSTOMER = 'CUSTOMER';
 exports.OWNER = 'OWNER';
 exports.UNIT_MGR = 'UNITMGR';
 exports.ADMIN = 'ADMIN';
+exports.PODMGR = 'PODMGR';
 
 var getErrorMessage = function (err) {
   var message = '';
@@ -76,6 +77,21 @@ exports.login = function* (next) {
   }
   yield (User.updateUser(meta.user_id, { default_language: lang }));
   userInfo = setUserInfo(this.passport.user)
+
+  if (this.passport.user.role == 'PODMGR') {
+    try {
+      (yield Church.churchForChurchName(church_name))[0];
+      let podCount = (yield Church.churchForUserId(this.passport.user.id));
+      let count = podCount.rows.count;
+      if (count == 0) {
+        this.status = 401;
+        this.body = 'Unauthorized';
+        return;
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
   // if (this.passport.user.role == 'OWNER') {
   //   var company = '';
   //   try {
