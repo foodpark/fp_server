@@ -85,7 +85,7 @@ exports.login = function* (next) {
       let count = row['count'];
       if (count == 0) {
         this.status = 401;
-        this.body = 'Unauthorized';
+        this.body = 'You are not associated with any pod. Please contact your Main Hub Manager';
         return;
       }
     } catch (err) {
