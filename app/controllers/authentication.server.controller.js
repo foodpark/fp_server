@@ -80,9 +80,9 @@ exports.login = function* (next) {
 
   if (this.passport.user.role == 'PODMGR') {
     try {
-      (yield Church.churchForChurchName(church_name))[0];
       let podCount = (yield Church.churchForUserId(this.passport.user.id));
-      let count = podCount.rows.count;
+      let row = podCount.rows[0];
+      let count = row['count'];
       if (count == 0) {
         this.status = 401;
         this.body = 'Unauthorized';
