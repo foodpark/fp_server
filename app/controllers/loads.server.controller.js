@@ -28,11 +28,11 @@ exports.fetchLoads = function* () {
   }
 }
 
-exports.fetchFilteredPodLoads = function*() {
+exports.fetchAvailablePodLoads = function*() {
   var churchId = this.params.churchId;
   try {
     var retLoads = [];
-    const loads = yield Churches.getLoadsForChurch(churchId);
+    const loadsQuerey = yield Loads.getAvailableLoadsForPod(churchId);
     var loads = loadsQuerey['rows'];
 
     for (let index = 0; index < loads.length; index++) {
