@@ -20,7 +20,8 @@ exports.getMainHubOrderManagementDetails = function*() {
       var podObjects = [];
       for (poditem in pods) {
         var pod = pods[poditem];
-        var orders = yield loadsModel.getLoadsFromDonationOrderForPod(pod['id']);
+        var ordersQuery = yield loadsModel.getLoadsFromDonationOrderForPod(pod['id']);
+        var orders = ordersQuery['rows'];
 
         var retLoads = [];
         for (orderitem in orders) {
