@@ -21,6 +21,11 @@ exports.getAllLoadsForMainHub = function(mainHubId) {
   return knex.raw(customQuery);
 }
 
+exports.getLoadsFromDonationOrderForPod = function(churchId) {
+  let customQuery = `select distinct(loads.id), loads.name, loads.created_at, loads.updated_at, loads.church_id, loads.status, loads.driver_id, loads.driver_name from loads inner join donation_orders on donation_orders.load_id = loads.id and loads.church_id = ${churchId}`;
+  return knex.raw(customQuery);
+}
+
 exports.getAllLoadsForPod = function(churchId) {
   return knex('loads').select().where('church_id', churchId);
 }
