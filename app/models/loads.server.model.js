@@ -21,7 +21,7 @@ exports.getAllLoadsForMainHub = function(mainHubId) {
   return knex.raw(customQuery);
 }
 
-exports.getLoadsForPod = function(churchId) {
+exports.getAllLoadsForPod = function(churchId) {
   return knex('loads').select().where('church_id', churchId);
 }
 
