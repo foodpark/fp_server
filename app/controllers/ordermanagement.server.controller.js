@@ -69,7 +69,7 @@ exports.getPodOrderManagementDetails = function*() {
   }
 
   try {
-    var orders = yield loadsModel.getAllLoadsForPod(churchId);
+    var orders = yield loadsModel.getLoadsFromDonationOrderForPod(churchId);
 
     var retLoads = [];
     for (orderitem in orders) {
