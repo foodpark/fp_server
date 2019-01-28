@@ -3,7 +3,7 @@ var debug = require('debug')('reporting.model');
 
 exports.getMainHub = function(id) {
   // return knex('food_parks').select().where('type', 'MAIN').andWhere('id', id);
-  return knex('food_parks').select('id', 'name').where('type', 'MAIN').andWhere('id', id);
+  return knex('food_parks').select('id', 'name', 'latitude', 'longitude').where('type', 'MAIN').andWhere('id', id);
 }
 
 exports.getRegionalHubsForFoodPark = function(foodparkId, start, end) {
@@ -29,7 +29,7 @@ exports.getPodsForRegionalHub = function(regionalHubId, start, end) {
   }
 
   let customQuery = `regional_hub_id=${regionalHubId} and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
-  return  knex('churches').select('id', 'name').whereRaw(customQuery);
+  return  knex('churches').select('id', 'name', 'latitude', 'longitude').whereRaw(customQuery);
 }
 
 exports.getMasterLoadsCountForMainHub = function(mainHubId, start, end) {
