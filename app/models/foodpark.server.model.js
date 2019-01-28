@@ -1,6 +1,10 @@
 var knex = require('../../config/knex');
 var debug = require('debug')('food_parks.model');
 
+exports.getMainHubsInTerritory = function(territoryId) {
+  return  knex('food_parks').where('type', 'MAIN').andWhere('territory_id', territoryId);
+}
+
 exports.getMainHub = function(id) {
   return knex('food_parks').select().where('type', 'MAIN').where('id', id);
 }

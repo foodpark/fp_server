@@ -1,4 +1,31 @@
 var reportModel = require('../models/reporting.server.model');
+var foodparkModel = require('../models/foodpark.server.model');
+
+exports.getTerritoryReport = function* () {
+  var report = new Array();
+  var territoryId = this.params.territoryId;
+  var start = this.query.start;
+  var end = this.query.end;
+  
+  if (!territoryId || isNaN(territoryId)) {
+    this.status = 400;
+    return;
+  }
+
+  try {
+    var mainHubs = yield foodparkModel.getMainHubsInTerritory(territoryId);
+    for (item in  mainHubs) {
+      var mainHub = mainHubs[item];
+      let mainHubReporting  = getFoodParkReport(mainHub['id']);
+      report.push(mainHubReporting);
+    }
+    this.body = report;
+  } catch (err) {
+    console.error('error getting admin graphs reporting')
+    throw(err)
+  }
+
+}
 
 exports.getFoodParkReport = function* () {
   
@@ -41,7 +68,7 @@ exports.getFoodParkReport = function* () {
       
     this.body = report;
   } catch (err) {
-    console.error('error getting foodpark checkins')
+    console.error('error getting foodpark report')
     throw(err)
   }
 }
