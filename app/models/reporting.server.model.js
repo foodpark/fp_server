@@ -2,7 +2,8 @@ var knex = require('../../config/knex');
 var debug = require('debug')('reporting.model');
 
 exports.getMainHub = function(id) {
-  return knex('food_parks').select().where('type', 'MAIN').andWhere('id', id);
+  // return knex('food_parks').select().where('type', 'MAIN').andWhere('id', id);
+  return knex('food_parks').select('id', 'name').where('type', 'MAIN').andWhere('id', id);
 }
 
 exports.getRegionalHubsForFoodPark = function(foodparkId, start, end) {
