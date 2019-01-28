@@ -16,7 +16,7 @@ exports.getRegionalHubsForFoodPark = function(foodparkId, start, end) {
   }
 
   let customQuery = `food_park_id=${foodparkId} and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
-  return  knex('regionalhubs').select('*').whereRaw(customQuery);
+  return  knex('regionalhubs').select('id', 'name').whereRaw(customQuery);
 }
 
 exports.getPodsForRegionalHub = function(regionalHubId, start, end) {
@@ -29,7 +29,7 @@ exports.getPodsForRegionalHub = function(regionalHubId, start, end) {
   }
 
   let customQuery = `regional_hub_id=${regionalHubId} and created_at between to_timestamp(${start}) and to_timestamp(${end})`;
-  return  knex('churches').select('*').whereRaw(customQuery);
+  return  knex('churches').select('id', 'name').whereRaw(customQuery);
 }
 
 exports.getMasterLoadsCountForMainHub = function(mainHubId, start, end) {
