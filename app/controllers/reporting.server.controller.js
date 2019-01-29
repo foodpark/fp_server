@@ -28,7 +28,7 @@ exports.getTerritoryReport = function*() {
         start,
         end
       )).rows[0];
-      report["master_loads"] = masterLoadCount["count"];
+      report["master_loads"] = parseInt(masterLoadCount["count"]);
   
       var regionalHubs = yield reportModel.getRegionalHubsForFoodPark(
         foodParkId,
@@ -91,7 +91,7 @@ exports.getFoodParkReport = function*() {
       start,
       end
     )).rows[0];
-    report["master_loads"] = masterLoadCount["count"];
+    report["master_loads"] = parseInt(masterLoadCount["count"]);
 
     var regionalHubs = yield reportModel.getRegionalHubsForFoodPark(
       foodParkId,
