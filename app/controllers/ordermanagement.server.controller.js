@@ -69,7 +69,8 @@ exports.getPodOrderManagementDetails = function*() {
   }
 
   try {
-    var orders = yield loadsModel.getLoadsFromDonationOrderForPod(churchId);
+    var ordersQuery = yield loadsModel.getLoadsFromDonationOrderForPod(churchId);
+    var orders = ordersQuery['rows'];
 
     var retLoads = [];
     for (orderitem in orders) {
@@ -95,7 +96,7 @@ exports.getPodOrderManagementDetails = function*() {
 
     this.body = ordermanagement;
   } catch (err) {
-    console.error('error getting foodpark checkins');
+    console.error('error getting pod order management');
     throw err;
   }
 };

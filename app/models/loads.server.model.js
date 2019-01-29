@@ -35,13 +35,13 @@ exports.getAllLoadItems = function(loadId) {
 }
 
 exports.getPallets = function(loadId) {
-  return knex('load_items').select().where('load_id', loadId).andWhere('load_type', "PALLET");
+  return knex('load_items').where('load_id', loadId).andWhere('load_type', "PALLET");
 }
 
 exports.getBoxes = function(loadId) {
-  return knex('load_items').select().where('load_id', loadId).andWhere('load_type', "BOX");
+  return knex('load_items').where('load_id', loadId).andWhere('load_type', "BOX");
 }
 
 exports.getItems = function(loadId) {
-  return knex('load_items').select().where('load_id', loadId).andWhere('load_type', "ITEM");
+  return knex('load_items').where('load_id', loadId).andWhere('load_type', "ITEM");
 }
